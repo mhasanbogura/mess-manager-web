@@ -786,16 +786,17 @@ select.input-sm { cursor: pointer; }
 }
 .meal-month-bar strong { color: #F44336; font-size: 14px; }
 
-.meal-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-sm); }
-.meal-grid { border-collapse: separate; border-spacing: 0; width: max-content; }
-.meal-grid thead tr { height: 40px; }
-.meal-grid tbody tr { height: 36px; }
-
-.mg-sticky-corner {
+.mg-grid-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-sm); }
+.mg-grid {
+    display: grid;
+    grid-template-columns: 110px 110px repeat(var(--mg-days, 30), 50px);
+    width: max-content;
+}
+.mg-g-corner {
     position: sticky; left: 0; z-index: 3; background: var(--bg);
-    width: 220px; min-width: 220px; max-width: 220px; padding: 0;
+    grid-column: 1 / 3; height: 40px;
+    display: flex; align-items: center; justify-content: center;
     border: 1px solid var(--card-border);
-    vertical-align: middle;
 }
 .mg-view-btn {
     display: flex; align-items: center; justify-content: center;
@@ -804,47 +805,38 @@ select.input-sm { cursor: pointer; }
     font-family: inherit; padding: 0;
 }
 .mg-view-btn .material-icons-round { font-size: 18px; }
-.mg-day {
-    min-width: 50px; max-width: 50px; padding: 0; background: #FFC107; color: #1a1a1a;
+.mg-g-day {
+    height: 40px; background: #FFC107; color: #1a1a1a;
     font-size: 13px; font-weight: 700; text-align: center;
     border: 1px solid #e0a800; white-space: nowrap;
-    vertical-align: middle;
+    display: flex; align-items: center; justify-content: center;
 }
-.mg-name {
+.mg-g-name {
     position: sticky; left: 0; z-index: 2;
-    min-width: 110px; max-width: 110px; padding: 0; color: white; font-size: 13px;
-    border: none; text-align: center;
-    vertical-align: middle;
-    box-shadow: inset 0 1px 0 rgba(0,0,0,0.05), inset 0 -1px 0 rgba(0,0,0,0.05), 1px 0 0 var(--card-border);
+    background: #388e3c; color: white; font-size: 13px;
+    text-align: center; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    border-right: 1px solid var(--card-border);
 }
-.mg-name-first { border-radius: 8px 0 0 0; }
-.mg-name-mid { border-radius: 0; }
-.mg-name-last { border-radius: 0 0 0 8px; }
-.mg-name-single { border-radius: 8px 0 0 8px; }
-.mg-name-inner {
-    position: absolute; top: 0; left: 0; right: 0; height: 144px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    pointer-events: none;
-}
-.mg-member-sep { box-shadow: inset 0 -3px 0 0 rgba(255,255,255,0.25); }
-.mg-name strong { font-size: 13px; display: block; }
-.mg-name small { font-size: 11px; opacity: 0.8; }
-.mg-type {
+.mg-g-name strong { font-size: 13px; }
+.mg-g-name small { font-size: 11px; opacity: 0.8; }
+.mg-g-member-sep { box-shadow: inset 0 -3px 0 0 rgba(255,255,255,0.3); }
+.mg-g-type {
     position: sticky; left: 110px; z-index: 2;
-    min-width: 110px; max-width: 110px; padding: 0 6px; white-space: nowrap;
-    border: 1px solid var(--card-border); display: flex; align-items: center; gap: 4px;
-    vertical-align: middle;
+    height: 36px; padding: 0 6px; white-space: nowrap;
+    border: 1px solid var(--card-border);
+    display: flex; align-items: center; gap: 4px;
 }
-.mg-row-sep { border-top: 3px solid rgba(255,255,255,0.15) !important; }
-.mg-type-icon { font-size: 16px; flex-shrink: 0; }
-.mg-type-label { font-size: 12px; color: #aaa; margin-left: auto; }
-.mg-type strong { font-size: 13px; color: white; min-width: 20px; }
-.mg-cell {
-    min-width: 50px; max-width: 50px; padding: 0 4px; text-align: center; font-size: 12px;
+.mg-g-row-sep { border-top: 3px solid rgba(255,255,255,0.15) !important; }
+.mg-g-type-icon { font-size: 16px; flex-shrink: 0; }
+.mg-g-type-label { font-size: 12px; color: #aaa; margin-left: auto; }
+.mg-g-type strong { font-size: 13px; color: white; min-width: 20px; }
+.mg-g-cell {
+    height: 36px; padding: 0 4px; text-align: center; font-size: 12px;
     color: #555; background: #1a1a2e; border: 1px solid var(--card-border);
-    vertical-align: middle;
+    display: flex; align-items: center; justify-content: center;
 }
-.mg-cell.filled { color: white; font-weight: 600; }
+.mg-g-cell.filled { color: white; font-weight: 600; }
 
 .gv-title { font-size: 18px; font-weight: 700; color: white; margin-bottom: 4px; }
 .gv-subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
