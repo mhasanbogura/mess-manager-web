@@ -170,11 +170,14 @@ const App = {
         try {
             const code = this.genCode(6);
             const ref = db.ref('messes').push();
-            await ref.set({
+            const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Connection timeout. Check your internet and Firebase database rules.')), 15000));
+            const write = ref.set({
                 settings: { messName: name, messCode: code, owner: this.currentUser.uid, createdAt: Date.now() },
                 members: { [this.currentUser.uid]: { name: this.currentUser.displayName || 'Admin', email: this.currentUser.email, role: 'admin', joinedAt: Date.now() } }
             });
-            await db.ref(`users/${this.currentUser.uid}/messes/${ref.key}`).set({ role: 'admin', joinedAt: Date.now() });
+            await Promise.race([write, timeout]);
+            const userWrite = db.ref(`users/${this.currentUser.uid}/messes/${ref.key}`).set({ role: 'admin', joinedAt: Date.now() });
+            await Promise.race([userWrite, timeout]);
             this.toast('Mess created!', 'success');
             document.getElementById('create-mess-name').value = '';
             this.enterMess(ref.key);

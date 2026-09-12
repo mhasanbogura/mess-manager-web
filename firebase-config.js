@@ -1,7 +1,7 @@
-// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyAGSes0nNoGWzgweoYrta99oRU_fKxkZCc",
     authDomain: "mess-manager-a91c8.firebaseapp.com",
+    databaseURL: "https://mess-manager-a91c8-default-rtdb.firebaseio.com",
     projectId: "mess-manager-a91c8",
     storageBucket: "mess-manager-a91c8.firebasestorage.app",
     messagingSenderId: "714155755588",
