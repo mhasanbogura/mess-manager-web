@@ -329,10 +329,30 @@ const App = {
     renderMembers(members) {
         const div = document.getElementById('members-list');
         const ids = Object.keys(members);
-        if (!ids.length) { div.innerHTML = '<p class="empty-state">No members</p>'; return; }
+        if (!ids.length) { div.innerHTML = '<p class="empty-state" style="color:#888">No members</p>'; return; }
+        const colors = ['#1976d2','#388e3c','#f57c00','#c62828','#7b1fa2','#00838f','#4e342e','#37474f'];
         let html = '';
-        ids.forEach(id => { const m = members[id]; const init = (m.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-            html += `<div class="member-item"><div class="member-avatar">${init}</div><div class="member-info"><h4>${this.esc(m.name)}</h4><p>${this.esc(m.email || '')} | ${m.role || 'member'}</p></div><div class="member-actions"><button class="icon-btn" onclick="App.editMember('${id}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteMember('${id}')"><span class="material-icons-round">delete</span></button></div></div>`;
+        ids.forEach((id, i) => {
+            const m = members[id];
+            const init = (m.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            const bg = colors[i % colors.length];
+            const isManager = m.role === 'admin';
+            const roleBadge = isManager ? '<span class="member-role-badge manager">Manager</span>' : '<span class="member-role-badge member">Member</span>';
+            const isYou = id === this.currentUser?.uid;
+            const youLabel = isYou ? ', You' : '';
+            html += `<div class="dash-member-card">
+                <div class="dash-member-left">
+                    <div class="dash-member-avatar" style="background:${bg}">${init}</div>
+                    <div class="dash-member-info">
+                        <h4>${this.esc(m.name)} ${roleBadge}${isYou ? '<span style="color:#4CAF50;font-size:12px">' + youLabel + '</span>' : ''}</h4>
+                        <p class="dash-member-email">${this.esc(m.email || '')}</p>
+                    </div>
+                </div>
+                <div class="dash-member-actions">
+                    ${!isManager ? `<button class="btn-promote" onclick="App.promoteMember('${id}')"><span class="material-icons-round">workspace_premium</span> Promote</button>` : ''}
+                    <button class="btn-remove" onclick="App.deleteMember('${id}')"><span class="material-icons-round">delete</span> Remove</button>
+                </div>
+            </div>`;
         });
         div.innerHTML = html;
     },
@@ -354,7 +374,8 @@ const App = {
     },
 
     async editMember(id) { this.showMemberModal(id, this.allMembers[id]); },
-    async deleteMember(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/members/${id}`).remove(); this.loadMembers(); },
+    async promoteMember(id) { if (!confirm('Promote to manager?')) return; await db.ref(`messes/${this.messId}/members/${id}/role`).set('admin'); this.loadMembers(); this.toast('Promoted!', 'success'); },
+    async deleteMember(id) { if (!confirm('Remove member?')) return; await db.ref(`messes/${this.messId}/members/${id}`).remove(); this.loadMembers(); },
 
     async loadMeals() {
         const key = this.dk(this.mealDate); document.getElementById('meal-date-label').textContent = this.fmtDate(this.mealDate);

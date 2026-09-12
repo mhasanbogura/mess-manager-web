@@ -230,13 +230,15 @@
             <!-- MEMBERS -->
             <div class="page" id="page-members">
                 <div class="page-header">
-                    <h3>Members <span id="member-count" style="font-size:13px;color:var(--text-secondary)">(0/30)</span></h3>
+                    <h3>Flat Members <span id="member-count" style="font-size:13px;color:#888">(0/30)</span></h3>
                     <button class="btn-primary btn-sm" id="add-member-btn"><span class="material-icons-round">person_add</span> Add</button>
                 </div>
-                <div class="card" style="margin-bottom:12px"><div class="card-body" style="padding:8px 16px">
-                    <div class="input-group" style="margin:0"><span class="material-icons-round">search</span><input type="text" id="member-search" placeholder="Search members..." oninput="App.filterMembers()"></div>
-                </div></div>
-                <div class="card"><div class="card-body" id="members-list"><p class="empty-state">No members yet</p></div></div>
+                <div class="dash-today-card" style="margin-bottom:12px">
+                    <div class="input-group" style="margin:0;border-color:#3a3a50;background:#2a2a3e"><span class="material-icons-round" style="color:#888">search</span><input type="text" id="member-search" placeholder="Search members..." oninput="App.filterMembers()" style="color:white"></div>
+                </div>
+                <div id="members-list">
+                    <p class="empty-state" style="color:#888">No members yet</p>
+                </div>
             </div>
 
             <!-- MEALS -->

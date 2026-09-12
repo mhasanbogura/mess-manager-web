@@ -973,7 +973,102 @@ select.input-sm { cursor: pointer; }
     .dash-mess-info-row { grid-template-columns: 1fr; }
 }
 
-/* END DASHBOARD */
+/* DASHBOARD MEMBER CARD (used in members page too) */
+.dash-member-card {
+    background: #1e1e30;
+    border: 1px solid #2a2a40;
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dash-member-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+}
+
+.dash-member-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.dash-member-info h4 { font-size: 14px; font-weight: 600; color: white; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.dash-member-email { font-size: 12px; color: #888; margin-top: 2px; }
+
+.member-role-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.member-role-badge.manager { background: rgba(255,193,7,0.15); color: #FFC107; }
+.member-role-badge.member { background: rgba(76,175,80,0.15); color: #4CAF50; }
+
+.dash-member-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.btn-promote {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: #FFC107;
+    color: #1a1a1a;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.btn-promote:hover { background: #FFD54F; }
+.btn-promote .material-icons-round { font-size: 14px; }
+
+.btn-remove {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: #3a3a50;
+    color: #ccc;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.btn-remove:hover { background: #4a4a60; }
+.btn-remove .material-icons-round { font-size: 14px; }
+
+@media (max-width: 480px) {
+    .dash-member-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .dash-member-actions { width: 100%; }
+    .btn-promote, .btn-remove { flex: 1; justify-content: center; }
+}
+
+/* END DASHBOARD MEMBER CARD */
 .mess-item {
     display: flex;
     align-items: center;
