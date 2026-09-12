@@ -789,9 +789,7 @@ select.input-sm { cursor: pointer; }
 .mg-grid-wrap { overflow: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-sm); }
 .mg-grid {
     display: grid;
-    grid-template-columns: 110px 110px repeat(var(--mg-days, 30), 50px);
     width: max-content;
-    position: relative;
 }
 .mg-g-corner {
     position: sticky; left: 0; top: 0; z-index: 3; background: var(--bg);
