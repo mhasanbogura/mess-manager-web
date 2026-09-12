@@ -793,7 +793,7 @@ select.input-sm { cursor: pointer; }
 
 .mg-sticky-corner {
     position: sticky; left: 0; z-index: 3; background: var(--bg);
-    width: 110px; min-width: 110px; max-width: 110px; padding: 0;
+    width: 220px; min-width: 220px; max-width: 220px; padding: 0;
     border: 1px solid var(--card-border);
     vertical-align: middle;
 }
