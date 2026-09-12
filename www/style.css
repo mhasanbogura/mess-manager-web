@@ -807,6 +807,21 @@ select.input-sm { cursor: pointer; }
 }
 .meal-summary-bar strong { color: white; }
 
+/* MODAL BUTTONS */
+.btn-modal-add {
+    flex: 1; padding: 12px 20px; background: #FFC107; color: #1a1a1a;
+    border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700;
+    cursor: pointer; font-family: inherit; min-height: 44px;
+}
+.btn-modal-add:hover { background: #FFD54F; }
+
+.btn-modal-cancel {
+    flex: 1; padding: 12px 20px; background: #3a3a50; color: #ccc;
+    border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: inherit; min-height: 44px;
+}
+.btn-modal-cancel:hover { background: #4a4a60; }
+
 /* FAB BUTTON */
 .btn-fab {
     position: fixed; bottom: 80px; right: 16px;

@@ -109,7 +109,7 @@
                 <a href="#" class="nav-item active" data-page="dashboard"><span class="material-icons-round">dashboard</span> Dashboard</a>
                 <a href="#" class="nav-item" data-page="members"><span class="material-icons-round">group</span> Flat</a>
                 <a href="#" class="nav-item" data-page="meals"><span class="material-icons-round">restaurant_menu</span> Meals</a>
-                <a href="#" class="nav-item" data-page="bazaar"><span class="material-icons-round">shopping_cart</span> Bazaar</a>
+                <a href="#" class="nav-item" data-page="bazaar"><span class="material-icons-round">shopping_cart</span> Shopping</a>
                 <a href="#" class="nav-item" data-page="balance"><span class="material-icons-round">account_balance_wallet</span> Balance</a>
                 <a href="#" class="nav-item" data-page="notices"><span class="material-icons-round">campaign</span> Notices</a>
                 <a href="#" class="nav-item" data-page="monthly"><span class="material-icons-round">insights</span> Analysis</a>
@@ -176,11 +176,11 @@
                     <div class="dash-action-row">
                         <div class="dash-bazar-duty">
                             <span class="material-icons-round">assignment</span>
-                            <div><strong>Bazar Duty</strong><p id="dash-bazar-duty">Not assigned</p></div>
+                            <div><strong>Shopping Duty</strong><p id="dash-bazar-duty">Not assigned</p></div>
                         </div>
                         <div class="dash-live-bazar" onclick="App.navigate('bazaar')">
                             <span class="dot-red"></span>
-                            <div><strong>LIVE Bazar</strong><p id="dash-live-count">0 items</p></div>
+                            <div><strong>LIVE Shopping</strong><p id="dash-live-count">0 items</p></div>
                         </div>
                     </div>
                 </div>
@@ -256,7 +256,7 @@
                     <button class="flat-tab" data-tab="permissions" onclick="App.switchFlatTab('permissions')">Permissions</button>
                 </div>
                 <div class="flat-tab-content" id="flat-tab-members">
-                    <div class="flat-info-box"><span class="material-icons-round">restaurant</span><p>Members are the names your meals, bazar and balances are counted against. Add everyone who eats in this flat &mdash; they do not need the app.</p></div>
+                    <div class="flat-info-box"><span class="material-icons-round">restaurant</span><p>Members are the names your meals, shopping and balances are counted against. Add everyone who eats in this flat &mdash; they do not need the app.</p></div>
                     <div class="flat-add-row">
                         <input type="text" id="flat-add-member-name" placeholder="Add Member" maxlength="20">
                         <button class="btn-flat-add" onclick="App.quickAddMember()">ADD</button>
@@ -271,7 +271,7 @@
                     <div id="peoples-list"></div>
                 </div>
                 <div class="flat-tab-content" id="flat-tab-permissions" style="display:none">
-                    <div class="flat-info-box" style="border-color:#5a3d20;background:#2a1e10"><span class="material-icons-round" style="color:#FFC107">lock</span><p style="color:#ccc">What each People is allowed to do &mdash; add meals, add bazar, manage the lists. Only Peoples appear here.</p></div>
+                    <div class="flat-info-box" style="border-color:#5a3d20;background:#2a1e10"><span class="material-icons-round" style="color:#FFC107">lock</span><p style="color:#ccc">What each People is allowed to do &mdash; add meals, add shopping, manage the lists. Only Peoples appear here.</p></div>
                     <div id="permissions-list"></div>
                     <p class="flat-hint" style="margin-top:10px"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">info</span> The manager always has every permission.</p>
                 </div>
@@ -303,7 +303,7 @@
             <!-- BAZAAR -->
             <div class="page" id="page-bazaar">
                 <div class="page-header">
-                    <h3>Bazar List</h3>
+                    <h3>Shopping List</h3>
                     <div style="display:flex;gap:6px">
                         <button class="btn-icon-top" onclick="App.navigate('expenses')"><span class="material-icons-round">receipt_long</span><small>Utility</small></button>
                     </div>
@@ -353,7 +353,7 @@
                 <div id="analysis-collection" class="analysis-card"></div>
                 <div id="analysis-paidin" class="analysis-card"></div>
                 <div class="analysis-card"><h4>Cost per meal trend</h4><p id="analysis-trend-label" class="analysis-sub"></p><div class="chart-wrap"><canvas id="chart-trend"></canvas></div></div>
-                <div class="analysis-card"><h4>Bazar by day</h4><p id="analysis-bazar-day-total" class="analysis-sub"></p><div class="chart-wrap"><canvas id="chart-bazar-day"></canvas></div></div>
+                <div class="analysis-card"><h4>Shopping by day</h4><p id="analysis-bazar-day-total" class="analysis-sub"></p><div class="chart-wrap"><canvas id="chart-bazar-day"></canvas></div></div>
                 <div class="analysis-card"><h4>Meals by day</h4><p id="analysis-meals-day-total" class="analysis-sub"></p><div class="chart-wrap"><canvas id="chart-meals-day"></canvas></div></div>
                 <div id="analysis-top-items" class="analysis-card"></div>
                 <div id="analysis-member-balances" class="analysis-card"></div>
@@ -376,7 +376,7 @@
         <div class="bottom-nav-items">
             <button class="bottom-nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')"><span class="material-icons-round">dashboard</span>Home</button>
             <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">group</span>Flat</button>
-            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Bazar</button>
+            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Shopping</button>
             <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant_menu</span>Meal</button>
             <button class="bottom-nav-item" data-page="monthly" onclick="App.navigate('monthly')"><span class="material-icons-round">insights</span>Analyse</button>
         </div>

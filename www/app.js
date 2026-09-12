@@ -248,7 +248,7 @@ const App = {
         const ni = document.querySelector(`.nav-item[data-page="${page}"]`); if (ni) ni.classList.add('active');
         document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
         const bni = document.querySelector(`.bottom-nav-item[data-page="${page}"]`); if (bni) bni.classList.add('active');
-        const titles = { dashboard: this.messName || 'My Mess', members: 'Flat', meals: 'Meals', bazaar: 'Bazar', balance: 'Balance', notices: 'Notices', monthly: 'Analysis' };
+        const titles = { dashboard: this.messName || 'My Mess', members: 'Flat', meals: 'Meals', bazaar: 'Shopping', balance: 'Balance', notices: 'Notices', monthly: 'Analysis' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         this.closeSidebar();
         const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), monthly: () => this.loadMonthlyOverview() };
@@ -425,8 +425,8 @@ const App = {
         const div = document.getElementById('permissions-list');
         const mids = Object.keys(members);
         if (!mids.length) { div.innerHTML = '<p class="empty-state" style="color:#666">No peoples</p>'; return; }
-        const permKeys = ['manage_members', 'meal_entry', 'meal_edit', 'bazar_entry', 'special_meal', 'manage_permissions'];
-        const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Bazar Entry', 'Special Meal Management', 'Turn on/off Permissions'];
+        const permKeys = ['manage_members', 'meal_entry', 'meal_edit', 'shopping_entry', 'special_meal', 'manage_permissions'];
+        const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Shopping Entry', 'Special Meal Management', 'Turn on/off Permissions'];
         let html = '';
         mids.forEach(id => {
             const m = members[id];
@@ -620,12 +620,12 @@ const App = {
             const dayTotal = items.reduce((s, b) => s + (b.amount || 0), 0);
             const d = new Date(dk + 'T00:00:00');
             const dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
-            const catBazar = items.filter(b => (b.category || 'Bazar') === 'Bazar').reduce((s, b) => s + (b.amount || 0), 0);
+            const catShopping = items.filter(b => (b.category || 'Shopping') === 'Shopping').reduce((s, b) => s + (b.amount || 0), 0);
             const catUtility = items.filter(b => b.category === 'Utility').reduce((s, b) => s + (b.amount || 0), 0);
 
             html += `<div class="collapse-card" id="bazar-${dk}">
                 <div class="collapse-header" onclick="App.toggleCollapse('bazar-${dk}')">
-                    <div><strong>${dateStr}</strong><p class="collapse-sub">Bazar ৳${catBazar} · ${items.length} item${items.length > 1 ? 's' : ''}${catUtility > 0 ? ' · <span style="color:#FFC107">Utility ৳' + catUtility + '</span>' : ''}</p></div>
+                    <div><strong>${dateStr}</strong><p class="collapse-sub">Shopping \u09F3${catShopping} \u00B7 ${items.length} item${items.length > 1 ? 's' : ''}${catUtility > 0 ? ' \u00B7 <span style="color:#FFC107">Utility \u09F3' + catUtility + '</span>' : ''}</p></div>
                     <div class="collapse-right"><span style="color:#F44336;font-weight:700">৳${dayTotal}</span><span class="material-icons-round collapse-arrow">expand_less</span></div>
                 </div>
                 <div class="collapse-body">
@@ -643,13 +643,18 @@ const App = {
     },
 
     showBazarModal(id = null, data = null) {
-        document.getElementById('modal-title').textContent = id ? 'Edit Item' : 'Add Bazaar';
-        document.getElementById('modal-title').innerHTML += '<div class="bazar-cat-tabs" id="bazar-cat-tabs"><button class="bazar-tab active" data-cat="Bazar" onclick="App.setBazarCat(\'Bazar\')"><span class="material-icons-round">shopping_cart</span> Bazar</button><button class="bazar-tab" data-cat="Utility" onclick="App.setBazarCat(\'Utility\')"><span class="material-icons-round">lightbulb</span> Utility</button><button class="bazar-tab" data-cat="Special" onclick="App.setBazarCat(\'Special\')"><span class="material-icons-round">star</span> Special</button></div>';
+        document.getElementById('modal-title').innerHTML = (id ? 'Edit Item' : 'Add Shopping') + '<div class="bazar-cat-tabs" id="bazar-cat-tabs"><button class="bazar-tab active" data-cat="Shopping" onclick="App.setBazarCat(\'Shopping\')"><span class="material-icons-round">shopping_cart</span> Shopping</button><button class="bazar-tab" data-cat="Utility" onclick="App.setBazarCat(\'Utility\')"><span class="material-icons-round">lightbulb</span> Utility</button><button class="bazar-tab" data-cat="Special" onclick="App.setBazarCat(\'Special\')"><span class="material-icons-round">star</span> Special</button></div>';
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
-            const m = snap.val() || {}; let chips = '';
-            Object.entries(m).forEach(([mid, v]) => { chips += `<button class="member-chip" data-mid="${mid}" onclick="App.selectBazarMember(this)">${this.esc(v.name)}</button>`; });
+            const m = snap.val() || {}; let payChips = '', doneChips = '';
+            Object.entries(m).forEach(([mid, v]) => {
+                payChips += `<button class="member-chip" data-mid="${mid}" onclick="App.selectBazarMember(this)">${this.esc(v.name)}</button>`;
+                doneChips += `<button class="member-chip" data-mid="${mid}" onclick="App.selectBazarDoneBy(this)">${this.esc(v.name)}</button>`;
+            });
+            const today = data?.dateKey || this.dk(new Date());
             document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label style="color:#888">Money paid by</label><div class="bazar-member-chips" id="bazar-member-chips">${chips}</div></div>
+                <div class="form-group"><label style="color:#888">Date</label><input type="date" id="bazar-date" value="${today}" style="width:100%;padding:10px 14px;border:1px solid #3a3a50;border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;background:#2a2a3e;color:white;min-height:44px"></div>
+                <div class="form-group"><label style="color:#888">Money paid by</label><div class="bazar-member-chips" id="bazar-member-chips">${payChips}</div></div>
+                <div class="form-group"><label style="color:#888">Shopping done by</label><div class="bazar-member-chips" id="bazar-doneby-chips">${doneChips}</div></div>
                 <div id="bazar-items-list">
                     <div class="bazar-item-row">
                         <div class="form-group" style="flex:2"><label style="color:#888">Item name</label><input class="bazar-item-name" placeholder="e.g. Rice"></div>
@@ -659,15 +664,17 @@ const App = {
                 <button class="btn-add-item" onclick="App.addBazarItemRow()"><span class="material-icons-round">add</span> Add another item</button>
                 <p style="font-size:12px;color:#888;margin-top:8px">Add each item on its own line for better analysis.</p>
             `;
-            document.getElementById('modal-footer').innerHTML = `<div class="bazar-footer-bar"><div class="bazar-footer-info"><strong id="bazar-item-count">0 items</strong><span style="color:#888">Pick whose money it is</span></div><strong id="bazar-total-input" style="color:#4CAF50;font-size:18px">\u09F30</strong></div><div style="display:flex;gap:10px;margin-top:12px"><button class="btn-primary" style="background:#FFC107;color:#1a1a1a;flex:1" onclick="App.saveBazarMulti('${id || ''}')">${id ? 'Update' : 'Add'}</button><button class="btn-danger" style="flex:1" onclick="App.closeModal()">Cancel</button></div>`;
-            this.bazarCat = 'Bazar';
+            document.getElementById('modal-footer').innerHTML = `<div class="bazar-footer-bar"><div class="bazar-footer-info"><strong id="bazar-item-count">0 items</strong><span style="color:#888">Pick whose money it is</span></div><strong id="bazar-total-input" style="color:#4CAF50;font-size:18px">\u09F30</strong></div><div style="display:flex;gap:10px;margin-top:12px"><button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button><button class="btn-modal-add" onclick="App.saveBazarMulti('${id || ''}')">${id ? 'Update' : 'Add'}</button></div>`;
+            this.bazarCat = 'Shopping';
             this.bazarSelectedMember = null;
+            this.bazarDoneBy = null;
             this.openModal();
         });
     },
 
-    bazarCat: 'Bazar',
+    bazarCat: 'Shopping',
     bazarSelectedMember: null,
+    bazarDoneBy: null,
 
     setBazarCat(cat) {
         this.bazarCat = cat;
@@ -675,9 +682,15 @@ const App = {
     },
 
     selectBazarMember(btn) {
-        document.querySelectorAll('.member-chip').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('#bazar-member-chips .member-chip').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
         this.bazarSelectedMember = btn.dataset.mid;
+    },
+
+    selectBazarDoneBy(btn) {
+        document.querySelectorAll('#bazar-doneby-chips .member-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        this.bazarDoneBy = btn.dataset.mid;
     },
 
     addBazarItemRow() {
@@ -700,13 +713,16 @@ const App = {
         const names = document.querySelectorAll('.bazar-item-name');
         const costs = document.querySelectorAll('.bazar-item-cost');
         const buyer = (await db.ref(`messes/${this.messId}/members/${this.bazarSelectedMember}/name`).once('value')).val() || '';
-        const dk = this.dk(this.bazarDate);
+        const doneById = this.bazarDoneBy;
+        const doneByName = doneById ? (await db.ref(`messes/${this.messId}/members/${doneById}/name`).once('value')).val() || '' : '';
+        const dateVal = document.getElementById('bazar-date').value;
+        const dk = dateVal || this.dk(new Date());
         let saved = 0;
         for (let i = 0; i < names.length; i++) {
             const item = names[i].value.trim();
             const amount = parseFloat(costs[i].value) || 0;
             if (!item || amount <= 0) continue;
-            const data = { item, amount, buyer, category: this.bazarCat, dateKey: dk, updatedAt: Date.now() };
+            const data = { item, amount, buyer, doneBy: doneByName, category: this.bazarCat, dateKey: dk, updatedAt: Date.now() };
             if (editId) await db.ref(`messes/${this.messId}/bazaar/${editId}`).update(data);
             else { data.createdAt = Date.now(); await db.ref(`messes/${this.messId}/bazaar`).push(data); }
             saved++;
@@ -867,7 +883,7 @@ const App = {
         Object.entries(members).forEach(([id, m]) => { const ml = meals[id] || {}; const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); totalMeals += t; rows += `<div class="report-row"><span>${m.name}</span><span>${t} (B:${ml.breakfast || 0} L:${ml.lunch || 0} D:${ml.dinner || 0})</span></div>`; });
         let totalBazar = 0; const bs = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
         bs.forEach(s => { totalBazar += s.val().amount || 0; });
-        document.getElementById('daily-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows || '<p>No data</p>'}</div><div class="report-section"><h5>Bazaar: \u09F3${totalBazar}</h5></div>${totalMeals > 0 ? `<div class="report-section"><h5>Rate: \u09F3${(totalBazar / totalMeals).toFixed(2)}/meal</h5></div>` : ''}`;
+        document.getElementById('daily-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows || '<p>No data</p>'}</div><div class="report-section"><h5>Shopping: \u09F3${totalBazar}</h5></div>${totalMeals > 0 ? `<div class="report-section"><h5>Rate: \u09F3${(totalBazar / totalMeals).toFixed(2)}/meal</h5></div>` : ''}`;
     },
 
     async loadMonthlyReport() {
@@ -881,7 +897,7 @@ const App = {
         const bs = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value'); bs.forEach(s => { totalBazar += s.val().amount || 0; });
         const es = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value'); es.forEach(s => { totalExp += s.val().amount || 0; });
         const tc = totalBazar + totalExp, rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
-        document.getElementById('monthly-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows}</div><div class="report-section"><h5>Finance</h5><div class="report-row"><span>Bazaar</span><span>\u09F3${totalBazar}</span></div><div class="report-row"><span>Expenses</span><span>\u09F3${totalExp}</span></div><div class="report-row report-total"><span>Total</span><span>\u09F3${tc}</span></div></div><div class="report-section"><h5>Rate: \u09F3${rate}/meal</h5></div>`;
+        document.getElementById('monthly-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows}</div><div class="report-section"><h5>Finance</h5><div class="report-row"><span>Shopping</span><span>\u09F3${totalBazar}</span></div><div class="report-row"><span>Expenses</span><span>\u09F3${totalExp}</span></div><div class="report-row report-total"><span>Total</span><span>\u09F3${tc}</span></div></div><div class="report-section"><h5>Rate: \u09F3${rate}/meal</h5></div>`;
     },
 
     async loadMonthlyOverview() {
@@ -943,8 +959,8 @@ const App = {
 
         document.getElementById('analysis-summary').innerHTML = `
             <div class="analysis-stat-card"><p>Total meals</p><strong>${totalMeals}</strong><span>Normal ${normalMeals}</span><span>Special ${specialMeals}</span></div>
-            <div class="analysis-stat-card"><p>Total bazar</p><strong>\u09F3${totalBazar}</strong><span>Members \u09F3${totalBazar}</span><span>Manager \u09F30</span></div>
-            <div class="analysis-stat-card"><p>Cost per meal</p><strong>\u09F3${rate}</strong><span>Bazar \u09F3${totalBazar}</span><span>\u00F7 Meals ${totalMeals}</span></div>`;
+            <div class="analysis-stat-card"><p>Total shopping</p><strong>\u09F3${totalBazar}</strong><span>Members \u09F3${totalBazar}</span><span>Manager \u09F30</span></div>
+            <div class="analysis-stat-card"><p>Cost per meal</p><strong>\u09F3${rate}</strong><span>Shopping \u09F3${totalBazar}</span><span>\u00F7 Meals ${totalMeals}</span></div>`;
 
         const spendBreakdown = Object.entries(expenseBreakdown).map(([k, v]) => `${k}: \u09F3${v}`).join('  ');
         document.getElementById('analysis-collection').innerHTML = `
@@ -957,7 +973,7 @@ const App = {
                 <div><strong class="${(totalDep - tc) >= 0 ? 'positive' : 'negative'}">\u09F3${(totalDep - tc).toFixed(1)}</strong><small>Balance</small></div>
             </div>
             <p class="analysis-sub" style="margin-top:10px">Spending breakdown</p>
-            <p class="analysis-sub">\u09F3${totalBazar} bazar${spendBreakdown ? ' + ' + spendBreakdown : ''}</p>`;
+            <p class="analysis-sub">\u09F3${totalBazar} shopping${spendBreakdown ? ' + ' + spendBreakdown : ''}</p>`;
 
         let paidIn = 0;
         Object.values(deposits).forEach(d => { paidIn += d.amount || 0; });
