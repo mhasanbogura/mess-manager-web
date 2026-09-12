@@ -792,19 +792,19 @@ select.input-sm { cursor: pointer; }
 .meal-grid tbody tr { height: 32px; }
 
 .mg-sticky-corner {
-    position: sticky; left: 0; z-index: 3; background: var(--bg);
+    position: sticky; left: 0; z-index: 3; background: #FFC107;
     width: 90px; min-width: 90px; max-width: 90px; padding: 0;
-    border: 1px solid var(--card-border); border-right: 1px solid var(--card-border);
+    border: 1px solid #e0a800; border-right: 1px solid #e0a800;
     vertical-align: middle;
 }
 .mg-view-btn {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 2px; width: 100%; height: 100%; background: none; border: none;
-    color: #888; font-size: 11px; font-weight: 600; cursor: pointer;
+    display: flex; flex-direction: row; align-items: center; justify-content: center;
+    gap: 4px; width: 100%; height: 100%; background: none; border: none;
+    color: #1a1a1a; font-size: 13px; font-weight: 600; cursor: pointer;
     font-family: inherit; padding: 4px 0;
 }
-.mg-view-btn .material-icons-round { font-size: 16px; }
-.mg-view-btn.collapsed { color: #FFC107; }
+.mg-view-btn .material-icons-round { font-size: 18px; }
+.mg-view-btn.collapsed { color: #1a1a1a; }
 .mg-day {
     min-width: 44px; max-width: 44px; padding: 0; background: #FFC107; color: #1a1a1a;
     font-size: 12px; font-weight: 700; text-align: center;
@@ -813,7 +813,7 @@ select.input-sm { cursor: pointer; }
 }
 .mg-name {
     position: sticky; left: 0; z-index: 2;
-    min-width: 90px; max-width: 90px; padding: 4px; color: white; font-size: 12px;
+    min-width: 90px; max-width: 90px; padding: 4px; color: white; font-size: 14px;
     border: none; text-align: center;
     vertical-align: middle;
 }
@@ -822,8 +822,8 @@ select.input-sm { cursor: pointer; }
 .mg-name-last { border-radius: 0 0 0 8px; border-top: none; }
 .mg-name-single { border-radius: 8px 0 0 8px; }
 .mg-member-sep { box-shadow: inset 0 -3px 0 0 rgba(255,255,255,0.25); }
-.mg-name strong { font-size: 12px; display: block; }
-.mg-name small { font-size: 10px; opacity: 0.8; }
+.mg-name strong { font-size: 14px; display: block; }
+.mg-name small { font-size: 11px; opacity: 0.8; }
 .mg-type {
     position: sticky; left: 90px; z-index: 2;
     min-width: 100px; max-width: 100px; padding: 0 6px; white-space: nowrap;
