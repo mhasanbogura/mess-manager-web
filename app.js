@@ -214,7 +214,8 @@ const App = {
         document.getElementById('sidebar-name').textContent = this.currentUser.displayName || 'User';
         document.getElementById('sidebar-email').textContent = this.currentUser.email || '';
         document.getElementById('sidebar-mess-code').textContent = this.messCode || '------';
-        document.getElementById('topbar-mess-label').textContent = this.messName || 'Switch mess';
+        document.getElementById('page-title').textContent = this.messName || 'My Mess';
+        document.getElementById('topbar-mess-label').textContent = this.messCode || '';
         this.loadDashboard();
     },
 
@@ -236,18 +237,80 @@ const App = {
     async loadDashboard() {
         if (!this.messId) return;
         const today = this.dk(new Date()), month = this.mk(new Date());
+        const now = new Date();
+        const hour = now.getHours();
+        const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+        const userName = this.currentUser.displayName || 'User';
+        document.getElementById('dash-greeting').textContent = `${greeting}, ${userName}`;
+        document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
+        document.getElementById('dash-manager').textContent = userName;
+        document.getElementById('dash-month').textContent = this.fmtMonth(now);
+        document.getElementById('dash-date').textContent = 'Today is ' + now.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' });
+
         const ms = await db.ref(`messes/${this.messId}/members`).once('value');
-        document.getElementById('stat-members').textContent = ms.numChildren();
+        const members = ms.val() || {};
+        const memberCount = Object.keys(members).length;
+        document.getElementById('dash-online-count').textContent = memberCount;
+
         const ml = await db.ref(`messes/${this.messId}/meals/${today}`).once('value');
-        let tm = 0; ml.forEach(s => { const v = s.val(); tm += (v.breakfast || 0) + (v.lunch || 0) + (v.dinner || 0); });
-        document.getElementById('stat-today-meals').textContent = tm;
-        const bz = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let mb = 0; bz.forEach(s => { mb += s.val().amount || 0; }); document.getElementById('stat-month-bazar').textContent = '\u09F3' + mb;
-        const ex = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let me = 0; ex.forEach(s => { me += s.val().amount || 0; }); document.getElementById('stat-month-expense').textContent = '\u09F3' + me;
-        const ac = await db.ref(`messes/${this.messId}/activity`).orderByChild('ts').limitToLast(10).once('value');
-        const ad = document.getElementById('recent-activity');
-        if (ac.exists()) { let h = ''; ac.forEach(s => { const a = s.val(); h += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(a.text || '')}</h4></div><div class="item-card-details"><span>${this.timeAgo(a.ts)}</span></div></div>`; }); ad.innerHTML = h; } else ad.innerHTML = '<p class="empty-state">No recent activity</p>';
+        const todayMeals = ml.val() || {};
+        let breakfast = 0, lunch = 0, dinner = 0;
+        Object.values(todayMeals).forEach(m => { breakfast += m.breakfast || 0; lunch += m.lunch || 0; dinner += m.dinner || 0; });
+        document.getElementById('dash-breakfast').textContent = breakfast;
+        document.getElementById('dash-lunch').textContent = lunch;
+        document.getElementById('dash-dinner').textContent = dinner;
+
+        const bzSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(today).once('value');
+        const bazarCount = bzSnap.numChildren();
+        document.getElementById('dash-live-count').textContent = bazarCount + ' items';
+
+        const noticeSnap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(1).once('value');
+        if (noticeSnap.exists()) { const n = noticeSnap.val(); const k = Object.keys(n)[0]; document.getElementById('dash-notice-preview').textContent = n[k].title || 'Pin a notice for the whole house'; }
+
+        let totalDep = 0;
+        const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
+        depSnap.forEach(s => { totalDep += (s.val().amount || 0); });
+
+        let totalExp = 0, totalBazar = 0;
+        const expSnap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
+        expSnap.forEach(s => { totalExp += s.val().amount || 0; });
+        const bzMonth = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
+        bzMonth.forEach(s => { totalBazar += s.val().amount || 0; });
+        const totalCost = totalExp + totalBazar;
+
+        let totalMeals = 0;
+        const mlS = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
+        const memberMeals = {};
+        mlS.forEach(d => { Object.entries(d.val() || {}).forEach(([mid, m]) => { const t = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0); totalMeals += t; if (!memberMeals[mid]) memberMeals[mid] = 0; memberMeals[mid] += t; }); });
+        const rate = totalMeals > 0 ? (totalCost / totalMeals) : 0;
+        const balance = totalDep - totalCost;
+
+        document.getElementById('dash-deposit').textContent = '\u09F3' + totalDep;
+        const balEl = document.getElementById('dash-balance');
+        balEl.textContent = '\u09F3' + balance;
+        balEl.className = balance >= 0 ? 'balance-green' : 'balance-red';
+        document.getElementById('dash-rate').textContent = '\u09F3' + rate.toFixed(2);
+
+        const mids = Object.keys(members);
+        let rows = '';
+        mids.forEach(mid => {
+            const m = members[mid];
+            const mm = memberMeals[mid] || 0;
+            const cost = (mm * rate).toFixed(0);
+            const dep = (depSnap.child(mid).val() || {}).amount || 0;
+            const due = (dep - parseFloat(cost)).toFixed(0);
+            const dueClass = parseFloat(due) >= 0 ? 'cell-positive' : 'cell-negative';
+            rows += `<tr><td>${this.esc(m.name)}</td><td>${mm}</td><td>\u09F3${cost}</td><td>\u09F3${dep}</td><td class="${dueClass}">\u09F3${due}</td></tr>`;
+        });
+        document.getElementById('dash-member-rows').innerHTML = rows || '<tr><td colspan="5" class="empty-state">No data</td></tr>';
+    },
+
+    shareMessCode() {
+        if (this.messCode) {
+            const text = `Join my mess in Mess Manager!\nCode: ${this.messCode}\nOpen: ${window.location.href}`;
+            if (navigator.share) navigator.share({ title: 'Mess Manager', text });
+            else navigator.clipboard.writeText(text).then(() => this.toast('Copied!', 'info'));
+        }
     },
 
     async loadMembers() {

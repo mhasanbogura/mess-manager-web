@@ -125,19 +125,106 @@
         <main class="main-content">
             <!-- DASHBOARD -->
             <div class="page active" id="page-dashboard">
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-icon" style="background:#e3f2fd;color:#1976d2"><span class="material-icons-round">group</span></div><div class="stat-info"><h3 id="stat-members">0</h3><p>Members</p></div></div>
-                    <div class="stat-card"><div class="stat-icon" style="background:#e8f5e9;color:#388e3c"><span class="material-icons-round">restaurant_menu</span></div><div class="stat-info"><h3 id="stat-today-meals">0</h3><p>Today Meals</p></div></div>
-                    <div class="stat-card"><div class="stat-icon" style="background:#fff3e0;color:#f57c00"><span class="material-icons-round">shopping_cart</span></div><div class="stat-info"><h3 id="stat-month-bazar">৳0</h3><p>Month Bazaar</p></div></div>
-                    <div class="stat-card"><div class="stat-icon" style="background:#fce4ec;color:#c62828"><span class="material-icons-round">receipt_long</span></div><div class="stat-info"><h3 id="stat-month-expense">৳0</h3><p>Month Expense</p></div></div>
+                <div class="dash-greeting" id="dash-greeting">Good day</div>
+
+                <div class="dash-mess-card">
+                    <div class="dash-mess-top">
+                        <div>
+                            <h2 id="dash-mess-name">Mess Name</h2>
+                            <p class="dash-mess-sub">Calculated meal rate</p>
+                        </div>
+                        <button class="btn-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Code</button>
+                    </div>
+                    <div class="dash-mess-info-row">
+                        <div class="dash-info-box">
+                            <span class="material-icons-round">person</span>
+                            <div><small>Manager</small><strong id="dash-manager">-</strong></div>
+                        </div>
+                        <div class="dash-info-box">
+                            <span class="material-icons-round">calendar_month</span>
+                            <div><small>Current month</small><strong id="dash-month">-</strong></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card"><div class="card-header"><h3>Recent Activity</h3></div><div class="card-body" id="recent-activity"><p class="empty-state">No recent activity</p></div></div>
-                <div class="card"><div class="card-header"><h3>Quick Actions</h3></div><div class="card-body quick-actions">
-                    <button class="quick-btn" onclick="App.navigate('meals')"><span class="material-icons-round">add_circle</span> Add Meal</button>
-                    <button class="quick-btn" onclick="App.navigate('bazaar')"><span class="material-icons-round">add_shopping_cart</span> Add Bazaar</button>
-                    <button class="quick-btn" onclick="App.navigate('expenses')"><span class="material-icons-round">add_card</span> Add Expense</button>
-                    <button class="quick-btn" onclick="App.navigate('notices')"><span class="material-icons-round">post_add</span> Post Notice</button>
-                </div></div>
+
+                <div class="dash-notice-bar" onclick="App.navigate('notices')">
+                    <span class="material-icons-round">campaign</span>
+                    <div><strong>Notice Board</strong><p id="dash-notice-preview">Pin a notice for the whole house</p></div>
+                    <span class="material-icons-round">chevron_right</span>
+                </div>
+
+                <div class="dash-today-card">
+                    <div class="dash-today-header">
+                        <strong id="dash-date">Today</strong>
+                        <span class="dash-online"><span class="dot-green"></span> <span id="dash-online-count">0</span> online</span>
+                    </div>
+                    <div class="dash-meal-grid">
+                        <div class="dash-meal-box breakfast">
+                            <span class="dash-meal-icon">&#9749;</span>
+                            <small>Breakfast</small>
+                            <strong id="dash-breakfast">0</strong>
+                        </div>
+                        <div class="dash-meal-box lunch">
+                            <span class="dash-meal-icon">&#127858;</span>
+                            <small>Lunch</small>
+                            <strong id="dash-lunch">0</strong>
+                        </div>
+                        <div class="dash-meal-box dinner">
+                            <span class="dash-meal-icon">&#127860;</span>
+                            <small>Dinner</small>
+                            <strong id="dash-dinner">0</strong>
+                        </div>
+                    </div>
+                    <div class="dash-action-row">
+                        <div class="dash-bazar-duty">
+                            <span class="material-icons-round">assignment</span>
+                            <div><strong>Bazar Duty</strong><p id="dash-bazar-duty">Not assigned</p></div>
+                        </div>
+                        <div class="dash-live-bazar" onclick="App.navigate('bazaar')">
+                            <span class="dot-red"></span>
+                            <div><strong>LIVE Bazar</strong><p id="dash-live-count">0 items</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-finance-row">
+                    <div class="dash-finance-box">
+                        <small>Deposit</small>
+                        <strong id="dash-deposit">৳0</strong>
+                    </div>
+                    <div class="dash-finance-box">
+                        <small>Balance</small>
+                        <strong id="dash-balance" class="balance-green">৳0</strong>
+                    </div>
+                    <div class="dash-finance-box">
+                        <small>Cost/meal</small>
+                        <strong id="dash-rate">৳0</strong>
+                    </div>
+                    <button class="btn-analyse" onclick="App.navigate('monthly')"><span class="material-icons-round">insights</span> Analyse</button>
+                </div>
+
+                <div class="dash-member-stats">
+                    <div class="dash-stats-header">
+                        <span class="material-icons-round">group</span>
+                        <strong>Member Stats</strong>
+                    </div>
+                    <div class="dash-table-wrap">
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Meals</th>
+                                    <th>Cost(৳)</th>
+                                    <th>Deposit(৳)</th>
+                                    <th>Balance(৳)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-member-rows">
+                                <tr><td colspan="5" class="empty-state">No data</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <!-- MEMBERS -->
