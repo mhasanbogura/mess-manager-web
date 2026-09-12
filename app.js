@@ -49,7 +49,7 @@ const App = {
         $('menu-toggle').addEventListener('click', () => this.toggleSidebar());
         $('sidebar-overlay').addEventListener('click', () => this.closeSidebar());
         document.querySelectorAll('.nav-item[data-page]').forEach(i => i.addEventListener('click', e => { e.preventDefault(); this.navigate(i.dataset.page); }));
-        $('switch-mess-btn').addEventListener('click', e => { e.preventDefault(); this.showScreen('mess-select-screen'); this.loadMyMesses(); this.closeSidebar(); });
+        $('leave-mess-btn').addEventListener('click', e => { e.preventDefault(); this.leaveMess(); });
         $('logout-btn').addEventListener('click', e => { e.preventDefault(); auth.signOut(); });
         $('user-avatar').addEventListener('click', () => this.navigate('dashboard'));
         $('copy-mess-code').addEventListener('click', () => { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); });
@@ -127,27 +127,36 @@ const App = {
 
     async loadMyMesses() {
         if (!this.currentUser) return;
-        this.showScreen('mess-select-screen');
         try {
             const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
             const data = snap.val() || {};
             const ids = Object.keys(data);
-            const div = document.getElementById('my-messes-list');
-            if (!ids.length) { div.innerHTML = '<div class="card-body"><p class="empty-state">No messes yet. Create or join one below.</p></div>'; return; }
-            let html = '<div class="card-body">';
-            for (const mid of ids) {
-                const ms = await db.ref(`messes/${mid}/settings`).once('value');
-                const s = ms.val() || {};
-                html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
-                    <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
-                    <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
-                    <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
-                </div>`;
+            if (ids.length === 1) {
+                this.enterMess(ids[0]);
+                return;
             }
-            div.innerHTML = html + '</div>';
+            if (ids.length > 1) {
+                this.showScreen('mess-select-screen');
+                const div = document.getElementById('my-messes-list');
+                let html = '<div class="card-body">';
+                for (const mid of ids) {
+                    const ms = await db.ref(`messes/${mid}/settings`).once('value');
+                    const s = ms.val() || {};
+                    html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
+                        <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
+                        <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
+                        <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
+                    </div>`;
+                }
+                div.innerHTML = html + '</div>';
+                return;
+            }
+            this.showScreen('mess-select-screen');
+            document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">No mess yet. Create or join one below.</p></div>';
         } catch (e) {
             console.error('loadMyMesses error:', e);
-            document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">Error loading messes. Check connection.</p></div>';
+            this.showScreen('mess-select-screen');
+            document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">Error loading mess. Check connection.</p></div>';
         }
     },
 
@@ -160,6 +169,24 @@ const App = {
             this.messName = v.messName;
             this.showApp();
         }).catch(e => { console.error('enterMess error:', e); this.toast('Error loading mess', 'error'); });
+    },
+
+    async leaveMess() {
+        if (!confirm('Are you sure you want to leave this mess? You will lose access to all data.')) return;
+        if (!this.messId || !this.currentUser) return;
+        try {
+            await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).remove();
+            await db.ref(`users/${this.currentUser.uid}/messes/${this.messId}`).remove();
+            this.toast('Left mess', 'success');
+            this.messId = null;
+            this.messCode = null;
+            this.messName = null;
+            this.closeSidebar();
+            this.loadMyMesses();
+        } catch (e) {
+            console.error('leaveMess error:', e);
+            this.toast('Error leaving mess', 'error');
+        }
     },
 
     async createMess() {
@@ -216,7 +243,8 @@ const App = {
         document.getElementById('sidebar-mess-code').textContent = this.messCode || '------';
         document.getElementById('page-title').textContent = this.messName || 'My Mess';
         document.getElementById('topbar-mess-label').textContent = this.messCode || '';
-        this.loadDashboard();
+        document.querySelector('.nav-item[data-page="dashboard"]').classList.add('active');
+        this.navigate('dashboard');
     },
 
     toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('active'); },
@@ -228,7 +256,8 @@ const App = {
         document.getElementById('page-' + page).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         const ni = document.querySelector(`.nav-item[data-page="${page}"]`); if (ni) ni.classList.add('active');
-        document.getElementById('page-title').textContent = page.charAt(0).toUpperCase() + page.slice(1);
+        const titles = { dashboard: this.messName || 'My Mess', members: 'Members', meals: 'Meals', bazaar: 'Bazaar', expenses: 'Expenses', balance: 'Balance', notices: 'Notices', reports: 'Reports', monthly: 'Monthly' };
+        document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         this.closeSidebar();
         const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), expenses: () => this.loadExpenses(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), reports: () => { this.loadDailyReport(); this.loadMonthlyReport(); }, monthly: () => this.loadMonthlyOverview() };
         if (loaders[page]) loaders[page]();
