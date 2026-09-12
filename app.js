@@ -496,17 +496,21 @@ const App = {
 
         const colors = ['#388e3c','#1976d2','#f57c00','#c62828','#7b1fa2','#00838f','#4e342e','#37474f'];
         const viewDays = daysInMonth;
-        const collapsed = this.mealCollapsed || false;
+        const vis = this.mealVisibility || { breakfast: true, lunch: true, dinner: true, special: true };
+        const mealKeys = ['breakfast', 'lunch', 'dinner', 'special'];
         const mealLabels = ['Morning', 'Noon', 'Night', 'Special'];
         const mealIcons = ['coffee', 'lunch_dining', 'dinner_dining', 'star'];
         const mealColors = ['#FFC107', '#4CAF50', '#42a5f5', '#26a69a'];
+        const mealBgs = ['#3d2b1a', '#1a2e1a', '#1a1e3a', '#1a2a2a'];
+        const visibleMeals = mealKeys.filter(k => vis[k]);
+        const headerRows = Math.max(visibleMeals.length, 1);
 
         let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead>';
-        for (let r = 0; r < 4; r++) {
+        for (let r = 0; r < headerRows; r++) {
             html += '<tr>';
-            if (r === 0) html += `<th class="mg-sticky-corner" rowspan="4"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></th>`;
+            if (r === 0) html += `<th class="mg-sticky-corner" rowspan="${headerRows}"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></th>`;
             for (let d = 1; d <= viewDays; d++) {
-                if (r === 0) html += `<th class="mg-day" rowspan="4">${d}</th>`;
+                if (r === 0) html += `<th class="mg-day" rowspan="${headerRows}">${d}</th>`;
             }
             html += '</tr>';
         }
@@ -517,19 +521,11 @@ const App = {
             const mData = allMeals[mid] || {};
             let mTotal = 0;
             Object.values(mData).forEach(ml => { mTotal += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); });
-            const meals = ['breakfast', 'lunch', 'dinner', 'special'];
-            const bgs = ['#3d2b1a', '#1a2e1a', '#1a1e3a', '#1a2a2a'];
             const memberColor = colors[idx % colors.length];
             const memberSep = idx > 0 ? ' mg-member-sep' : '';
 
-            if (collapsed) {
-                let rowTotal = 0;
-                for (let d = 1; d <= viewDays; d++) {
-                    const dk = `${month}-${String(d).padStart(2, '0')}`;
-                    const ml = mData[dk];
-                    if (ml) rowTotal += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0);
-                }
-                html += `<tr class="mg-collapsed-row${memberSep ? ' mg-row-sep' : ''}">`;
+            if (visibleMeals.length === 0) {
+                html += `<tr${memberSep ? ' class="mg-row-sep"' : ''}>`;
                 html += `<td class="mg-name mg-name-single" style="background:${memberColor}"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></td>`;
                 html += `<td class="mg-type" style="background:#333"><span class="material-icons-round mg-type-icon" style="color:#aaa">restaurant</span><strong>${mTotal}</strong><span class="mg-type-label">Total</span></td>`;
                 for (let d = 1; d <= viewDays; d++) {
@@ -540,17 +536,20 @@ const App = {
                 }
                 html += '</tr>';
             } else {
-                meals.forEach((meal, mi) => {
+                visibleMeals.forEach((meal, vi) => {
+                    const mi = mealKeys.indexOf(meal);
                     let rowTotal = 0;
                     for (let d = 1; d <= viewDays; d++) {
                         const dk = `${month}-${String(d).padStart(2, '0')}`;
                         rowTotal += (mData[dk] && mData[dk][meal]) || 0;
                     }
-                    const namePos = mi === 0 ? ' mg-name-first' : mi === 3 ? ' mg-name-last' : ' mg-name-mid';
-                    const rowSep = (mi === 0 && idx > 0) ? ' mg-row-sep' : '';
+                    const isFirst = vi === 0;
+                    const isLast = vi === visibleMeals.length - 1;
+                    const namePos = isFirst ? ' mg-name-first' : isLast ? ' mg-name-last' : ' mg-name-mid';
+                    const rowSep = (isFirst && idx > 0) ? ' mg-row-sep' : '';
                     html += '<tr>';
-                    html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor}">${mi === 0 ? `<strong>${this.esc(m.name)}</strong><small>(${mTotal})</small>` : '&nbsp;'}</td>`;
-                    html += `<td class="mg-type${rowSep}" style="background:${bgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mealColors[mi]}">${mealIcons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${mealLabels[mi]}</span></td>`;
+                    html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor};${!isFirst ? 'border-top:none;' : ''}${!isLast ? 'border-bottom:none;' : ''}">${isFirst ? `<strong>${this.esc(m.name)}</strong><small>(${mTotal})</small>` : '&nbsp;'}</td>`;
+                    html += `<td class="mg-type${rowSep}" style="background:${mealBgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mealColors[mi]}">${mealIcons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${mealLabels[mi]}</span></td>`;
                     for (let d = 1; d <= viewDays; d++) {
                         const dk = `${month}-${String(d).padStart(2, '0')}`;
                         const val = (mData[dk] && mData[dk][meal]) || 0;
@@ -565,7 +564,36 @@ const App = {
     },
 
     toggleMealView() {
-        this.mealCollapsed = !this.mealCollapsed;
+        if (!this.mealVisibility) this.mealVisibility = { breakfast: true, lunch: true, dinner: true, special: true };
+        const meals = ['breakfast', 'lunch', 'dinner', 'special'];
+        const labels = ['Morning', 'Noon', 'Night', 'Special'];
+        const icons = ['coffee', 'lunch_dining', 'dinner_dining', 'star'];
+        const colors = ['#FFC107', '#4CAF50', '#42a5f5', '#26a69a'];
+        let html = '<div class="gv-title">Grid view</div><div class="gv-subtitle">Show meals</div>';
+        meals.forEach((meal, i) => {
+            const checked = this.mealVisibility[meal];
+            const c = colors[i];
+            html += `<label class="gv-row" onclick="App.toggleMealVis('${meal}')"><span class="material-icons-round" style="color:${c};font-size:28px">${icons[i]}</span><span class="gv-label">${labels[i]}</span><span class="gv-check${checked ? ' active' : ''}" id="gv-check-${meal}" style="border-color:${c};${checked ? `background:${c}` : ''}"><span class="material-icons-round" style="font-size:18px;color:${checked?'#1a1a1a':'transparent'}">check</span></span></label>`;
+        });
+        document.getElementById('modal-title').textContent = '';
+        document.getElementById('modal-header').style.display = 'none';
+        document.getElementById('modal-body').innerHTML = html;
+        document.getElementById('modal-body').style.padding = '20px 16px';
+        document.getElementById('modal-footer').innerHTML = '';
+        document.getElementById('modal-footer').style.display = 'none';
+        document.querySelector('.modal-overlay').classList.add('sheet');
+        this.openModal();
+    },
+
+    toggleMealVis(meal) {
+        if (!this.mealVisibility) this.mealVisibility = { breakfast: true, lunch: true, dinner: true, special: true };
+        this.mealVisibility[meal] = !this.mealVisibility[meal];
+        const el = document.getElementById(`gv-check-${meal}`);
+        if (el) {
+            el.classList.toggle('active');
+            const icon = el.querySelector('.material-icons-round');
+            if (icon) icon.style.color = this.mealVisibility[meal] ? '#1a1a1a' : 'transparent';
+        }
         this.renderMeals();
     },
 
@@ -1403,7 +1431,13 @@ const App = {
         return entries;
     },
     openModal() { document.getElementById('modal-overlay').classList.add('active'); },
-    closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
+    closeModal() {
+        document.getElementById('modal-overlay').classList.remove('active');
+        document.getElementById('modal-overlay').classList.remove('sheet');
+        document.getElementById('modal-header').style.display = '';
+        document.getElementById('modal-footer').style.display = '';
+        document.getElementById('modal-body').style.padding = '';
+    },
 
     toggleCollapse(id) {
         const card = document.getElementById(id);
