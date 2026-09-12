@@ -496,9 +496,21 @@ const App = {
 
         const colors = ['#388e3c','#1976d2','#f57c00','#c62828','#7b1fa2','#00838f','#4e342e','#37474f'];
         const viewDays = daysInMonth;
-        let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead><tr><th class="mg-sticky-corner"></th><th class="mg-sticky-label"><span class="material-icons-round" style="font-size:16px">tune</span> View</th>';
-        for (let d = 1; d <= viewDays; d++) html += `<th class="mg-day">${d}</th>`;
-        html += '</tr></thead><tbody>';
+        const collapsed = this.mealCollapsed || false;
+        const mealLabels = ['Morning', 'Noon', 'Night', 'Special'];
+        const mealIcons = ['coffee', 'lunch_dining', 'dinner_dining', 'star'];
+        const mealColors = ['#FFC107', '#4CAF50', '#42a5f5', '#26a69a'];
+
+        let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead>';
+        for (let r = 0; r < 4; r++) {
+            html += '<tr>';
+            if (r === 0) html += `<th class="mg-sticky-corner" rowspan="4"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></th>`;
+            for (let d = 1; d <= viewDays; d++) {
+                if (r === 0) html += `<th class="mg-day" rowspan="4">${d}</th>`;
+            }
+            html += '</tr>';
+        }
+        html += '</thead><tbody>';
 
         mids.forEach((mid, idx) => {
             const m = members[mid];
@@ -506,33 +518,55 @@ const App = {
             let mTotal = 0;
             Object.values(mData).forEach(ml => { mTotal += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); });
             const meals = ['breakfast', 'lunch', 'dinner', 'special'];
-            const labels = ['Morning', 'Noon', 'Night', 'Special'];
-            const icons = ['coffee', 'lunch_dining', 'dinner_dining', 'star'];
             const bgs = ['#3d2b1a', '#1a2e1a', '#1a1e3a', '#1a2a2a'];
             const memberColor = colors[idx % colors.length];
+            const memberSep = idx > 0 ? ' mg-member-sep' : '';
 
-            meals.forEach((meal, mi) => {
+            if (collapsed) {
                 let rowTotal = 0;
-                for (let d = 1; d <= daysInMonth; d++) {
-                    const dk = `${month}-${String(d).padStart(2, '0')}`;
-                    rowTotal += (mData[dk] && mData[dk][meal]) || 0;
-                }
-                const namePos = mi === 0 ? ' mg-name-first' : mi === 3 ? ' mg-name-last' : ' mg-name-mid';
-                const memberSep = (mi === 0 && idx > 0) ? ' mg-member-sep' : '';
-                const rowSep = (mi === 0 && idx > 0) ? ' mg-row-sep' : '';
-                html += '<tr>';
-                html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor}">${mi === 0 ? `<strong>${this.esc(m.name)}</strong><small>(${mTotal})</small>` : '&nbsp;'}</td>`;
-                html += `<td class="mg-type${rowSep}" style="background:${bgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mi===0?'#FFC107':mi===1?'#4CAF50':mi===2?'#42a5f5':'#26a69a'}">${icons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${labels[mi]}</span></td>`;
                 for (let d = 1; d <= viewDays; d++) {
                     const dk = `${month}-${String(d).padStart(2, '0')}`;
-                    const val = (mData[dk] && mData[dk][meal]) || 0;
-                    html += `<td class="mg-cell${val ? ' filled' : ''}${rowSep}">${val || ''}</td>`;
+                    const ml = mData[dk];
+                    if (ml) rowTotal += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0);
+                }
+                html += `<tr class="mg-collapsed-row${memberSep ? ' mg-row-sep' : ''}">`;
+                html += `<td class="mg-name mg-name-single" style="background:${memberColor}"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></td>`;
+                html += `<td class="mg-type" style="background:#333"><span class="material-icons-round mg-type-icon" style="color:#aaa">restaurant</span><strong>${mTotal}</strong><span class="mg-type-label">Total</span></td>`;
+                for (let d = 1; d <= viewDays; d++) {
+                    const dk = `${month}-${String(d).padStart(2, '0')}`;
+                    const ml = mData[dk];
+                    const val = ml ? (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0) : 0;
+                    html += `<td class="mg-cell${val ? ' filled' : ''}">${val || ''}</td>`;
                 }
                 html += '</tr>';
-            });
+            } else {
+                meals.forEach((meal, mi) => {
+                    let rowTotal = 0;
+                    for (let d = 1; d <= viewDays; d++) {
+                        const dk = `${month}-${String(d).padStart(2, '0')}`;
+                        rowTotal += (mData[dk] && mData[dk][meal]) || 0;
+                    }
+                    const namePos = mi === 0 ? ' mg-name-first' : mi === 3 ? ' mg-name-last' : ' mg-name-mid';
+                    const rowSep = (mi === 0 && idx > 0) ? ' mg-row-sep' : '';
+                    html += '<tr>';
+                    html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor}">${mi === 0 ? `<strong>${this.esc(m.name)}</strong><small>(${mTotal})</small>` : '&nbsp;'}</td>`;
+                    html += `<td class="mg-type${rowSep}" style="background:${bgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mealColors[mi]}">${mealIcons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${mealLabels[mi]}</span></td>`;
+                    for (let d = 1; d <= viewDays; d++) {
+                        const dk = `${month}-${String(d).padStart(2, '0')}`;
+                        const val = (mData[dk] && mData[dk][meal]) || 0;
+                        html += `<td class="mg-cell${val ? ' filled' : ''}${rowSep}">${val || ''}</td>`;
+                    }
+                    html += '</tr>';
+                });
+            }
         });
         html += '</tbody></table></div>';
         document.getElementById('meal-grid-wrap').innerHTML = html;
+    },
+
+    toggleMealView() {
+        this.mealCollapsed = !this.mealCollapsed;
+        this.renderMeals();
     },
 
     showMealModal(mid = null, dk = null, data = null) {
