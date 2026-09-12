@@ -788,6 +788,39 @@ select.input-sm { cursor: pointer; }
 
 .form-group textarea { resize: vertical; min-height: 80px; }
 
+/* MESS ITEM (selector) */
+.mess-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mess-item:hover { border-color: var(--primary); background: var(--primary-light); }
+
+.mess-item-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--primary-light); display: flex; align-items: center; justify-content: center;
+}
+
+.mess-item-icon .material-icons-round { color: var(--primary-dark); font-size: 22px; }
+.mess-item-info { flex: 1; }
+.mess-item-info h4 { font-size: 14px; font-weight: 600; }
+.mess-item-info p { font-size: 12px; color: var(--text-secondary); }
+
+/* BULK MEAL ROW */
+.bulk-row {
+    display: flex; align-items: center; gap: 8px; padding: 8px 0;
+    border-bottom: 1px solid var(--border); font-size: 13px;
+}
+
+.bulk-row input { padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; text-align: center; width: 50px; }
+
 /* TOAST */
 #toast-container {
     position: fixed;

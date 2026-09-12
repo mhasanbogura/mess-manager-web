@@ -1,91 +1,60 @@
 const App = {
-    currentUser: null,
-    currentPage: 'dashboard',
-    messId: null,
-    messCode: null,
-    userRole: null,
-    mealDate: new Date(),
-    bazarDate: new Date(),
-    expenseMonth: new Date(),
-    reportDate: new Date(),
-    reportMonth: new Date(),
+    currentUser: null, messId: null, messCode: null, messName: null,
+    currentPage: 'dashboard', allMembers: {},
+    mealDate: new Date(), bazarDate: new Date(), expenseMonth: new Date(),
+    reportDate: new Date(), reportMonth: new Date(), monthlyDate: new Date(),
 
     init() {
         if (firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
-            document.getElementById('auth-screen').classList.add('active');
-            document.querySelector('.auth-container').innerHTML = `
-                <div class="auth-header">
-                    <div class="auth-logo"><span class="material-icons-round">warning</span></div>
-                    <h1>Firebase Setup Required</h1>
-                    <p style="margin-top:12px;line-height:1.6">Open <code>firebase-config.js</code> and add your Firebase config.</p>
-                </div>`;
+            this.showScreen('auth-screen');
+            document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
             return;
         }
-
         this.bindEvents();
+        this.populateYearSelects();
         auth.onAuthStateChanged(user => {
-            if (user) {
-                this.currentUser = user;
-                this.checkMessMembership();
-            } else {
-                this.showScreen('auth-screen');
-            }
+            if (user) { this.currentUser = user; this.loadMyMesses(); }
+            else { this.showScreen('auth-screen'); }
+        });
+    },
+
+    populateYearSelects() {
+        const now = new Date();
+        let opts = '';
+        for (let y = now.getFullYear(); y >= now.getFullYear() - 5; y--) opts += `<option value="${y}">${y}</option>`;
+        ['report-year-select', 'monthly-year-select'].forEach(id => {
+            const el = document.getElementById(id); if (el) el.innerHTML = opts;
         });
     },
 
     bindEvents() {
-        // Auth
         document.getElementById('login-btn').addEventListener('click', () => this.emailLogin());
         document.getElementById('google-login').addEventListener('click', () => this.googleLogin());
-        document.getElementById('show-register').addEventListener('click', () => {
-            document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'none';
-            document.getElementById('register-card').style.display = 'block';
-        });
-        document.getElementById('back-to-login').addEventListener('click', () => {
-            document.getElementById('register-card').style.display = 'none';
-            document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'block';
-        });
+        document.getElementById('show-register').addEventListener('click', () => { document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'none'; document.getElementById('register-card').style.display = 'block'; });
+        document.getElementById('back-to-login').addEventListener('click', () => { document.getElementById('register-card').style.display = 'none'; document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'block'; });
         document.getElementById('register-btn').addEventListener('click', () => this.emailRegister());
         document.getElementById('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
+        document.getElementById('forgot-back-login').addEventListener('click', () => this.showScreen('auth-screen'));
         document.getElementById('send-reset-btn').addEventListener('click', () => this.sendResetEmail());
-        document.getElementById('logout-from-setup').addEventListener('click', () => auth.signOut());
-
-        // Setup tabs
-        document.querySelectorAll('.setup-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.setup-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                document.getElementById('create-mess-card').style.display = tab.dataset.tab === 'create' ? 'block' : 'none';
-                document.getElementById('join-mess-card').style.display = tab.dataset.tab === 'join' ? 'block' : 'none';
-            });
-        });
         document.getElementById('create-mess-btn').addEventListener('click', () => this.createMess());
         document.getElementById('join-mess-btn').addEventListener('click', () => this.joinMess());
-
-        // Sidebar
+        document.getElementById('logout-from-setup').addEventListener('click', () => auth.signOut());
         document.getElementById('menu-toggle').addEventListener('click', () => this.toggleSidebar());
         document.getElementById('sidebar-overlay').addEventListener('click', () => this.closeSidebar());
-        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-            item.addEventListener('click', e => { e.preventDefault(); this.navigate(item.dataset.page); });
-        });
-        document.getElementById('user-avatar').addEventListener('click', () => this.navigate('dashboard'));
-        document.getElementById('copy-mess-code').addEventListener('click', () => this.copyMessCode());
-        document.getElementById('leave-mess-btn').addEventListener('click', e => { e.preventDefault(); this.leaveMess(); });
+        document.querySelectorAll('.nav-item[data-page]').forEach(i => i.addEventListener('click', e => { e.preventDefault(); this.navigate(i.dataset.page); }));
+        document.getElementById('switch-mess-btn').addEventListener('click', e => { e.preventDefault(); this.showScreen('mess-select-screen'); this.loadMyMesses(); this.closeSidebar(); });
         document.getElementById('logout-btn').addEventListener('click', e => { e.preventDefault(); auth.signOut(); });
-
-        // Page buttons
+        document.getElementById('user-avatar').addEventListener('click', () => this.navigate('dashboard'));
+        document.getElementById('copy-mess-code').addEventListener('click', () => { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); });
         document.getElementById('add-member-btn').addEventListener('click', () => this.showMemberModal());
         document.getElementById('add-meal-btn').addEventListener('click', () => this.showMealModal());
+        document.getElementById('bulk-meal-btn').addEventListener('click', () => this.showBulkMealModal());
         document.getElementById('add-bazar-btn').addEventListener('click', () => this.showBazarModal());
         document.getElementById('add-expense-btn').addEventListener('click', () => this.showExpenseModal());
         document.getElementById('add-deposit-btn').addEventListener('click', () => this.showDepositModal());
         document.getElementById('add-notice-btn').addEventListener('click', () => this.showNoticeModal());
-
-        // Modal
         document.getElementById('modal-close').addEventListener('click', () => this.closeModal());
         document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
-
-        // Date navs
         document.getElementById('meal-prev-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() - 1); this.loadMeals(); });
         document.getElementById('meal-next-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() + 1); this.loadMeals(); });
         document.getElementById('bazar-prev-day').addEventListener('click', () => { this.bazarDate.setDate(this.bazarDate.getDate() - 1); this.loadBazaar(); });
@@ -94,482 +63,325 @@ const App = {
         document.getElementById('expense-next-month').addEventListener('click', () => { this.expenseMonth.setMonth(this.expenseMonth.getMonth() + 1); this.loadExpenses(); });
         document.getElementById('report-prev-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() - 1); this.loadDailyReport(); });
         document.getElementById('report-next-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() + 1); this.loadDailyReport(); });
-        document.getElementById('report-prev-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() - 1); this.loadMonthlyReport(); });
-        document.getElementById('report-next-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() + 1); this.loadMonthlyReport(); });
-        document.getElementById('export-daily-pdf').addEventListener('click', () => this.exportDailyPDF());
-        document.getElementById('export-monthly-pdf').addEventListener('click', () => this.exportMonthlyPDF());
+        document.getElementById('report-prev-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() - 1); document.getElementById('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
+        document.getElementById('report-next-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() + 1); document.getElementById('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
+        document.getElementById('report-year-select').addEventListener('change', e => { this.reportMonth.setFullYear(+e.target.value); this.loadMonthlyReport(); });
+        document.getElementById('monthly-prev').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() - 1); document.getElementById('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
+        document.getElementById('monthly-next').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() + 1); document.getElementById('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
+        document.getElementById('monthly-year-select').addEventListener('change', e => { this.monthlyDate.setFullYear(+e.target.value); this.loadMonthlyOverview(); });
+        document.getElementById('export-daily-pdf').addEventListener('click', () => this.exportPDF('daily'));
+        document.getElementById('export-monthly-pdf').addEventListener('click', () => this.exportPDF('monthly'));
     },
 
-    showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    },
+    showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
 
     // AUTH
     async emailLogin() {
-        const email = document.getElementById('login-email').value.trim();
-        const pass = document.getElementById('login-password').value;
-        if (!email || !pass) { this.toast('Please fill in all fields', 'error'); return; }
-        const btn = document.getElementById('login-btn');
-        btn.textContent = 'Logging in...'; btn.disabled = true;
-        try {
-            await auth.signInWithEmailAndPassword(email, pass);
-            this.toast('Login successful!', 'success');
-        } catch (e) {
-            let msg = e.message;
-            if (e.code === 'auth/user-not-found') msg = 'No account found with this email';
-            else if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Invalid email or password';
-            else if (e.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later';
-            this.toast(msg, 'error');
-        } finally { btn.textContent = 'Login'; btn.disabled = false; }
+        const email = document.getElementById('login-email').value.trim(), pass = document.getElementById('login-password').value;
+        if (!email || !pass) { this.toast('Fill all fields', 'error'); return; }
+        const btn = document.getElementById('login-btn'); btn.textContent = 'Logging in...'; btn.disabled = true;
+        try { await auth.signInWithEmailAndPassword(email, pass); }
+        catch (e) { let m = e.message; if (e.code === 'auth/invalid-credential') m = 'Invalid email or password'; this.toast(m, 'error'); }
+        finally { btn.textContent = 'Login'; btn.disabled = false; }
     },
 
     async emailRegister() {
-        const name = document.getElementById('reg-name').value.trim();
-        const email = document.getElementById('reg-email').value.trim();
-        const phone = document.getElementById('reg-phone').value.trim();
-        const pass = document.getElementById('reg-password').value;
-        if (!name || !email || !pass) { this.toast('Please fill in name, email and password', 'error'); return; }
-        if (pass.length < 6) { this.toast('Password must be at least 6 characters', 'error'); return; }
-        const btn = document.getElementById('register-btn');
-        btn.textContent = 'Creating...'; btn.disabled = true;
-        try {
-            const cred = await auth.createUserWithEmailAndPassword(email, pass);
-            await cred.user.updateProfile({ displayName: name });
-            await db.ref(`users/${cred.user.uid}`).set({ name, email, phone, role: 'admin', createdAt: Date.now() });
-            this.toast('Account created!', 'success');
-        } catch (e) {
-            let msg = e.message;
-            if (e.code === 'auth/email-already-in-use') msg = 'Email already registered. Try logging in.';
-            else if (e.code === 'auth/weak-password') msg = 'Password is too weak';
-            this.toast(msg, 'error');
-        } finally { btn.textContent = 'Create Account'; btn.disabled = false; }
+        const name = document.getElementById('reg-name').value.trim(), email = document.getElementById('reg-email').value.trim(), phone = document.getElementById('reg-phone').value.trim(), pass = document.getElementById('reg-password').value;
+        if (!name || !email || !pass) { this.toast('Fill name, email, password', 'error'); return; }
+        if (pass.length < 6) { this.toast('Password min 6 chars', 'error'); return; }
+        const btn = document.getElementById('register-btn'); btn.textContent = 'Creating...'; btn.disabled = true;
+        try { const c = await auth.createUserWithEmailAndPassword(email, pass); await c.user.updateProfile({ displayName: name }); await db.ref(`users/${c.user.uid}`).set({ name, email, phone, createdAt: Date.now() }); }
+        catch (e) { let m = e.message; if (e.code === 'auth/email-already-in-use') m = 'Already registered'; this.toast(m, 'error'); }
+        finally { btn.textContent = 'Create Account'; btn.disabled = false; }
     },
 
     async googleLogin() {
-        const btn = document.getElementById('google-login');
-        const origHTML = btn.innerHTML;
-        btn.innerHTML = '<span class="material-icons-round" style="animation:spin 1s linear infinite">refresh</span> Connecting...';
-        btn.disabled = true;
-        try {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            const cred = await auth.signInWithPopup(provider);
-            // Save user profile (non-blocking — don't wait)
-            db.ref(`users/${cred.user.uid}`).once('value').then(snap => {
-                if (!snap.exists()) {
-                    db.ref(`users/${cred.user.uid}`).set({
-                        name: cred.user.displayName, email: cred.user.email,
-                        role: 'admin', createdAt: Date.now()
-                    });
-                }
-            }).catch(e => console.warn('DB write skipped:', e));
-        } catch (e) {
-            let msg = e.message;
-            if (e.code === 'auth/popup-closed-by-user') msg = 'Login cancelled';
-            else if (e.code === 'auth/popup-blocked') msg = 'Popup blocked. Allow popups for this site.';
-            else if (e.code === 'auth/cancelled-popup-request') msg = 'Login cancelled';
-            console.error('Google login error:', e);
-            this.toast(msg, 'error');
-        } finally {
-            btn.innerHTML = origHTML;
-            btn.disabled = false;
-        }
+        const btn = document.getElementById('google-login'); const orig = btn.innerHTML;
+        btn.innerHTML = '<span class="material-icons-round" style="animation:spin 1s linear infinite">refresh</span> Connecting...'; btn.disabled = true;
+        try { const p = new firebase.auth.GoogleAuthProvider(); const c = await auth.signInWithPopup(p); const s = await db.ref(`users/${c.user.uid}`).once('value'); if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() }); }
+        catch (e) { let m = e.message; if (e.code === 'auth/popup-closed-by-user') m = 'Cancelled'; this.toast(m, 'error'); }
+        finally { btn.innerHTML = orig; btn.disabled = false; }
     },
 
     async sendResetEmail() {
         const email = document.getElementById('reset-email').value.trim();
-        if (!email) { this.toast('Enter your email', 'error'); return; }
-        try {
-            await auth.sendPasswordResetEmail(email);
-            this.toast('Reset link sent! Check your email.', 'success');
-            setTimeout(() => this.showScreen('auth-screen'), 2000);
-        } catch (e) {
-            this.toast(e.message, 'error');
-        }
+        if (!email) { this.toast('Enter email', 'error'); return; }
+        try { await auth.sendPasswordResetEmail(email); this.toast('Reset link sent!', 'success'); setTimeout(() => this.showScreen('auth-screen'), 2000); }
+        catch (e) { this.toast(e.message, 'error'); }
     },
 
-    // MESS MEMBERSHIP CHECK
-    async checkMessMembership() {
-        try {
-            const snap = await db.ref(`users/${this.currentUser.uid}/messId`).once('value');
-            if (snap.exists()) {
-                this.messId = snap.val();
-                const messSnap = await db.ref(`messes/${this.messId}/settings`).once('value');
-                const settings = messSnap.val() || {};
-                this.messCode = settings.messCode || null;
-                this.userRole = settings.owner === this.currentUser.uid ? 'admin' : 'member';
-                this.showApp();
-            } else {
-                this.showScreen('mess-setup-screen');
-            }
-        } catch (e) {
-            console.error('checkMessMembership error:', e);
-            this.showScreen('mess-setup-screen');
+    // MULTI-MESS
+    async loadMyMesses() {
+        const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
+        const data = snap.val() || {};
+        const ids = Object.keys(data);
+        const div = document.getElementById('my-messes-list');
+        if (!ids.length) { div.innerHTML = '<div class="card-body"><p class="empty-state">No messes yet. Create or join one below.</p></div>'; return; }
+        let html = '<div class="card-body">';
+        for (const mid of ids) {
+            const ms = await db.ref(`messes/${mid}/settings`).once('value');
+            const s = ms.val() || {};
+            html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
+                <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
+                <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
+                <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
+            </div>`;
         }
+        div.innerHTML = html + '</div>';
+    },
+
+    enterMess(mid) {
+        this.messId = mid;
+        this.messCode = null;
+        const ref = db.ref(`messes/${mid}/settings`);
+        ref.once('value').then(s => { const v = s.val() || {}; this.messCode = v.messCode; this.messName = v.messName; this.showApp(); });
     },
 
     async createMess() {
         const name = document.getElementById('create-mess-name').value.trim();
-        const address = document.getElementById('create-mess-address').value.trim();
-        if (!name) { this.toast('Enter a mess name', 'error'); return; }
-
-        const btn = document.getElementById('create-mess-btn');
-        btn.textContent = 'Creating...';
-        btn.disabled = true;
-
+        if (!name) { this.toast('Enter name', 'error'); return; }
+        const btn = document.getElementById('create-mess-btn'); btn.textContent = 'Creating...'; btn.disabled = true;
         try {
-            const code = this.generateCode(6);
-            const messRef = db.ref('messes').push();
-            this.messId = messRef.key;
-            this.messCode = code;
-
-            await messRef.set({
-                settings: {
-                    messName: name,
-                    address: address,
-                    messCode: code,
-                    owner: this.currentUser.uid,
-                    createdAt: Date.now()
-                },
-                members: {
-                    [this.currentUser.uid]: {
-                        name: this.currentUser.displayName || 'Admin',
-                        email: this.currentUser.email,
-                        role: 'admin',
-                        joinedAt: Date.now()
-                    }
-                }
-            });
-
-            await db.ref(`users/${this.currentUser.uid}/messId`).set(this.messId);
+            const code = this.genCode(6);
+            const ref = db.ref('messes').push();
+            await ref.set({ settings: { messName: name, messCode: code, owner: this.currentUser.uid, createdAt: Date.now() }, members: { [this.currentUser.uid]: { name: this.currentUser.displayName || 'Admin', email: this.currentUser.email, role: 'admin', joinedAt: Date.now() } } });
+            await db.ref(`users/${this.currentUser.uid}/messes/${ref.key}`).set({ role: 'admin', joinedAt: Date.now() });
             this.toast('Mess created!', 'success');
-            this.showApp();
-        } catch (e) {
-            this.toast(e.message, 'error');
-        } finally {
-            btn.textContent = 'Create Mess';
-            btn.disabled = false;
-        }
+            this.enterMess(ref.key);
+        } catch (e) { this.toast(e.message, 'error'); }
+        finally { btn.textContent = 'Create Mess'; btn.disabled = false; }
     },
 
     async joinMess() {
         const code = document.getElementById('join-mess-code').value.trim().toUpperCase();
-        if (!code || code.length !== 6) { this.toast('Enter a valid 6-digit code', 'error'); return; }
-
-        const btn = document.getElementById('join-mess-btn');
-        btn.textContent = 'Joining...';
-        btn.disabled = true;
-
+        if (!code || code.length !== 6) { this.toast('Enter 6-digit code', 'error'); return; }
+        const btn = document.getElementById('join-mess-btn'); btn.textContent = 'Joining...'; btn.disabled = true;
         try {
-            // Find mess by code
             const snap = await db.ref('messes').orderByChild('settings/messCode').equalTo(code).once('value');
-            if (!snap.exists()) { this.toast('Mess not found. Check the code.', 'error'); return; }
-
-            let foundMessId = null;
-            snap.forEach(s => { foundMessId = s.key; });
-            this.messId = foundMessId;
-            this.messCode = code;
-
-            // Add user to mess members
-            await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).set({
-                name: this.currentUser.displayName || 'Member',
-                email: this.currentUser.email,
-                role: 'member',
-                joinedAt: Date.now()
-            });
-
-            await db.ref(`users/${this.currentUser.uid}/messId`).set(this.messId);
-            this.toast('Joined mess successfully!', 'success');
-            this.showApp();
-        } catch (e) {
-            this.toast(e.message, 'error');
-        } finally {
-            btn.textContent = 'Join Mess';
-            btn.disabled = false;
-        }
+            if (!snap.exists()) { this.toast('Mess not found', 'error'); return; }
+            let mid = null; snap.forEach(s => { mid = s.key; });
+            await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).set({ name: this.currentUser.displayName || 'Member', email: this.currentUser.email, role: 'member', joinedAt: Date.now() });
+            await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).set({ role: 'member', joinedAt: Date.now() });
+            this.toast('Joined!', 'success');
+            this.enterMess(mid);
+        } catch (e) { this.toast(e.message, 'error'); }
+        finally { btn.textContent = 'Join Mess'; btn.disabled = false; }
     },
 
-    generateCode(len) {
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        let code = '';
-        for (let i = 0; i < len; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-        return code;
-    },
+    genCode(n) { const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r = ''; for (let i = 0; i < n; i++) r += c[Math.floor(Math.random() * c.length)]; return r; },
 
-    copyMessCode() {
-        if (!this.messCode) return;
-        navigator.clipboard.writeText(this.messCode).then(() => this.toast('Code copied!', 'info'));
-    },
-
-    async leaveMess() {
-        if (!confirm('Leave this mess? You will need a code to rejoin.')) return;
-        await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).remove();
-        await db.ref(`users/${this.currentUser.uid}/messId`).remove();
-        this.messId = null;
-        this.messCode = null;
-        this.showScreen('mess-setup-screen');
-    },
-
-    // APP
     showApp() {
         this.showScreen('app-screen');
         document.getElementById('sidebar-name').textContent = this.currentUser.displayName || 'User';
         document.getElementById('sidebar-email').textContent = this.currentUser.email || '';
         document.getElementById('sidebar-mess-code').textContent = this.messCode || '------';
+        document.getElementById('topbar-mess-label').textContent = this.messName || 'Switch mess';
         this.loadDashboard();
     },
 
-    toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('open');
-        document.getElementById('sidebar-overlay').classList.toggle('active');
-    },
-
-    closeSidebar() {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebar-overlay').classList.remove('active');
-    },
+    toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('active'); },
+    closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); },
 
     navigate(page) {
         this.currentPage = page;
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('page-' + page).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        const navItem = document.querySelector(`.nav-item[data-page="${page}"]`);
-        if (navItem) navItem.classList.add('active');
+        const ni = document.querySelector(`.nav-item[data-page="${page}"]`); if (ni) ni.classList.add('active');
         document.getElementById('page-title').textContent = page.charAt(0).toUpperCase() + page.slice(1);
         this.closeSidebar();
-        this.loadPageData(page);
-    },
-
-    loadPageData(page) {
-        const loaders = {
-            dashboard: () => this.loadDashboard(),
-            members: () => this.loadMembers(),
-            meals: () => this.loadMeals(),
-            bazaar: () => this.loadBazaar(),
-            expenses: () => this.loadExpenses(),
-            balance: () => this.loadBalance(),
-            notices: () => this.loadNotices(),
-            reports: () => { this.loadDailyReport(); this.loadMonthlyReport(); }
-        };
+        const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), expenses: () => this.loadExpenses(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), reports: () => { this.loadDailyReport(); this.loadMonthlyReport(); }, monthly: () => this.loadMonthlyOverview() };
         if (loaders[page]) loaders[page]();
     },
 
     // DASHBOARD
     async loadDashboard() {
-        if (!this.currentUser || !this.messId) return;
-        const today = this.dateKey(new Date());
-        const month = this.monthKey(new Date());
-
-        const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-        document.getElementById('stat-members').textContent = membersSnap.numChildren();
-
-        const mealsSnap = await db.ref(`messes/${this.messId}/meals/${today}`).once('value');
-        let todayMeals = 0;
-        mealsSnap.forEach(s => { const m = s.val(); todayMeals += (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0); });
-        document.getElementById('stat-today-meals').textContent = todayMeals;
-
-        const bazarSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let monthBazar = 0; bazarSnap.forEach(s => { monthBazar += s.val().amount || 0; });
-        document.getElementById('stat-month-bazar').textContent = '৳' + monthBazar;
-
-        const expSnap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let monthExp = 0; expSnap.forEach(s => { monthExp += s.val().amount || 0; });
-        document.getElementById('stat-month-expense').textContent = '৳' + monthExp;
-
-        const actSnap = await db.ref(`messes/${this.messId}/activity`).orderByChild('ts').limitToLast(10).once('value');
-        const actDiv = document.getElementById('recent-activity');
-        if (actSnap.exists()) {
-            let html = '';
-            actSnap.forEach(s => { const a = s.val(); html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(a.text || '')}</h4></div><div class="item-card-details"><span>${this.timeAgo(a.ts)}</span></div></div>`; });
-            actDiv.innerHTML = html;
-        } else {
-            actDiv.innerHTML = '<p class="empty-state">No recent activity</p>';
-        }
+        if (!this.messId) return;
+        const today = this.dk(new Date()), month = this.mk(new Date());
+        const ms = await db.ref(`messes/${this.messId}/members`).once('value');
+        document.getElementById('stat-members').textContent = ms.numChildren();
+        const ml = await db.ref(`messes/${this.messId}/meals/${today}`).once('value');
+        let tm = 0; ml.forEach(s => { const v = s.val(); tm += (v.breakfast || 0) + (v.lunch || 0) + (v.dinner || 0); });
+        document.getElementById('stat-today-meals').textContent = tm;
+        const bz = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
+        let mb = 0; bz.forEach(s => { mb += s.val().amount || 0; }); document.getElementById('stat-month-bazar').textContent = '৳' + mb;
+        const ex = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
+        let me = 0; ex.forEach(s => { me += s.val().amount || 0; }); document.getElementById('stat-month-expense').textContent = '৳' + me;
+        const ac = await db.ref(`messes/${this.messId}/activity`).orderByChild('ts').limitToLast(10).once('value');
+        const ad = document.getElementById('recent-activity');
+        if (ac.exists()) { let h = ''; ac.forEach(s => { const a = s.val(); h += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(a.text || '')}</h4></div><div class="item-card-details"><span>${this.timeAgo(a.ts)}</span></div></div>`; }); ad.innerHTML = h; } else ad.innerHTML = '<p class="empty-state">No recent activity</p>';
     },
 
     // MEMBERS
     async loadMembers() {
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        this.allMembers = snap.val() || {};
+        document.getElementById('member-count').textContent = `(${Object.keys(this.allMembers).length}/30)`;
+        this.renderMembers(this.allMembers);
+    },
+
+    filterMembers() {
+        const q = document.getElementById('member-search').value.toLowerCase();
+        const filtered = Object.fromEntries(Object.entries(this.allMembers).filter(([, m]) => (m.name || '').toLowerCase().includes(q) || (m.email || '').toLowerCase().includes(q)));
+        this.renderMembers(filtered);
+    },
+
+    renderMembers(members) {
         const div = document.getElementById('members-list');
-        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No members yet</p>'; return; }
+        const ids = Object.keys(members);
+        if (!ids.length) { div.innerHTML = '<p class="empty-state">No members</p>'; return; }
         let html = '';
-        snap.forEach(s => {
-            const m = s.val();
-            const init = (m.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-            html += `<div class="member-item">
-                <div class="member-avatar">${init}</div>
-                <div class="member-info"><h4>${this.esc(m.name || '')}</h4><p>${this.esc(m.email || '')}</p></div>
-                <div class="member-actions">
-                    <button class="icon-btn" onclick="App.editMember('${s.key}')"><span class="material-icons-round">edit</span></button>
-                    <button class="icon-btn" onclick="App.deleteMember('${s.key}')"><span class="material-icons-round">delete</span></button>
-                </div>
-            </div>`;
+        ids.forEach(id => { const m = members[id]; const init = (m.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            html += `<div class="member-item"><div class="member-avatar">${init}</div><div class="member-info"><h4>${this.esc(m.name)}</h4><p>${this.esc(m.email || '')} | ${m.role || 'member'}</p></div><div class="member-actions"><button class="icon-btn" onclick="App.editMember('${id}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteMember('${id}')"><span class="material-icons-round">delete</span></button></div></div>`;
         });
         div.innerHTML = html;
     },
 
     showMemberModal(id = null, data = null) {
+        if (!id && Object.keys(this.allMembers).length >= 30) { this.toast('Max 30 members per mess', 'error'); return; }
         document.getElementById('modal-title').textContent = id ? 'Edit Member' : 'Add Member';
-        document.getElementById('modal-body').innerHTML = `
-            <div class="form-group"><label>Name</label><input id="m-name" value="${data?.name || ''}"></div>
-            <div class="form-group"><label>Email</label><input id="m-email" value="${data?.email || ''}"></div>
-            <div class="form-group"><label>Role</label><select id="m-role">
-                <option value="member" ${data?.role !== 'admin' ? 'selected' : ''}>Member</option>
-                <option value="admin" ${data?.role === 'admin' ? 'selected' : ''}>Admin</option>
-            </select></div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Name</label><input id="m-name" value="${data?.name || ''}"></div><div class="form-group"><label>Email</label><input id="m-email" value="${data?.email || ''}"></div><div class="form-group"><label>Phone</label><input id="m-phone" value="${data?.phone || ''}"></div><div class="form-group"><label>Role</label><select id="m-role"><option value="member" ${data?.role !== 'admin' ? 'selected' : ''}>Member</option><option value="admin" ${data?.role === 'admin' ? 'selected' : ''}>Admin</option><option value="cook" ${data?.role === 'cook' ? 'selected' : ''}>Cook</option></select></div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveMember('${id || ''}')">${id ? 'Update' : 'Add'}</button>`;
         this.openModal();
     },
 
     async saveMember(id) {
-        const data = { name: document.getElementById('m-name').value.trim(), email: document.getElementById('m-email').value.trim(), role: document.getElementById('m-role').value, updatedAt: Date.now() };
+        const data = { name: document.getElementById('m-name').value.trim(), email: document.getElementById('m-email').value.trim(), phone: document.getElementById('m-phone').value.trim(), role: document.getElementById('m-role').value, updatedAt: Date.now() };
         if (!data.name) { this.toast('Name required', 'error'); return; }
         if (id) await db.ref(`messes/${this.messId}/members/${id}`).update(data);
         else { data.createdAt = Date.now(); await db.ref(`messes/${this.messId}/members`).push(data); }
         this.closeModal(); this.loadMembers(); this.toast('Saved', 'success');
     },
 
-    async editMember(id) { const s = await db.ref(`messes/${this.messId}/members/${id}`).once('value'); this.showMemberModal(id, s.val()); },
-    async deleteMember(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/members/${id}`).remove(); this.loadMembers(); this.toast('Deleted', 'success'); },
+    async editMember(id) { this.showMemberModal(id, this.allMembers[id]); },
+    async deleteMember(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/members/${id}`).remove(); this.loadMembers(); },
 
     // MEALS
     async loadMeals() {
-        const key = this.dateKey(this.mealDate);
-        document.getElementById('meal-date-label').textContent = this.formatDate(this.mealDate);
-        const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-        const members = membersSnap.val() || {};
-        const mealsSnap = await db.ref(`messes/${this.messId}/meals/${key}`).once('value');
-        const meals = mealsSnap.val() || {};
-        const div = document.getElementById('meals-list');
-        const mids = Object.keys(members);
+        const key = this.dk(this.mealDate); document.getElementById('meal-date-label').textContent = this.fmtDate(this.mealDate);
+        const mbrs = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = mbrs.val() || {};
+        const mlSnap = await db.ref(`messes/${this.messId}/meals/${key}`).once('value');
+        const meals = mlSnap.val() || {};
+        const div = document.getElementById('meals-list'); const mids = Object.keys(members);
         if (!mids.length) { div.innerHTML = '<p class="empty-state">Add members first</p>'; return; }
         let html = '', totalToday = 0;
-        mids.forEach(mid => {
-            const m = members[mid], ml = meals[mid] || {};
-            const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0);
-            totalToday += t;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(m.name)}</h4><span class="amount">${t} meals</span></div>
-                <div class="item-card-details"><span>B: ${ml.breakfast || 0}</span><span>L: ${ml.lunch || 0}</span><span>D: ${ml.dinner || 0}</span></div>
-                <div class="item-card-actions"><button class="icon-btn" onclick="App.editMeal('${mid}','${key}')"><span class="material-icons-round">edit</span></button></div></div>`;
+        mids.forEach(mid => { const m = members[mid], ml = meals[mid] || {}; const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); totalToday += t;
+            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(m.name)}</h4><span class="amount">${t}</span></div><div class="item-card-details"><span>B:${ml.breakfast || 0} L:${ml.lunch || 0} D:${ml.dinner || 0}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editMeal('${mid}','${key}')"><span class="material-icons-round">edit</span></button></div></div>`;
         });
-        div.innerHTML = html;
-        document.getElementById('meal-total-today').textContent = totalToday;
-        const month = this.monthKey(this.mealDate);
-        let totalMonth = 0;
+        div.innerHTML = html; document.getElementById('meal-total-today').textContent = totalToday;
+        const month = this.mk(this.mealDate); let totalMonth = 0;
         const ms = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
         ms.forEach(d => { Object.values(d.val() || {}).forEach(ml => { totalMonth += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); }); });
         document.getElementById('meal-total-month').textContent = totalMonth;
     },
 
-    showMealModal(memberId = null, dateKey = null, data = null) {
+    showMealModal(mid = null, dk = null, data = null) {
         document.getElementById('modal-title').textContent = data ? 'Edit Meal' : 'Add Meal';
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
-            const members = snap.val() || {};
-            let opts = '<option value="">Select Member</option>';
-            Object.entries(members).forEach(([id, m]) => { opts += `<option value="${id}" ${id === memberId ? 'selected' : ''}>${m.name}</option>`; });
-            document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label>Member</label><select id="ml-member">${opts}</select></div>
-                <div class="form-group"><label>Breakfast</label><input type="number" id="ml-b" min="0" value="${data?.breakfast || 0}"></div>
-                <div class="form-group"><label>Lunch</label><input type="number" id="ml-l" min="0" value="${data?.lunch || 0}"></div>
-                <div class="form-group"><label>Dinner</label><input type="number" id="ml-d" min="0" value="${data?.dinner || 0}"></div>`;
-            document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveMeal('${dateKey || this.dateKey(this.mealDate)}')">Save</button>`;
+            const m = snap.val() || {}; let opts = '<option value="">Select</option>';
+            Object.entries(m).forEach(([id, v]) => { opts += `<option value="${id}" ${id === mid ? 'selected' : ''}>${v.name}</option>`; });
+            document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Member</label><select id="ml-member">${opts}</select></div><div class="form-group"><label>Breakfast</label><input type="number" id="ml-b" min="0" value="${data?.breakfast || 0}"></div><div class="form-group"><label>Lunch</label><input type="number" id="ml-l" min="0" value="${data?.lunch || 0}"></div><div class="form-group"><label>Dinner</label><input type="number" id="ml-d" min="0" value="${data?.dinner || 0}"></div>`;
+            document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveMeal('${dk || this.dk(this.mealDate)}')">Save</button>`;
             this.openModal();
         });
     },
 
-    async saveMeal(dateKey) {
-        const mid = document.getElementById('ml-member').value;
-        if (!mid) { this.toast('Select member', 'error'); return; }
-        const data = { breakfast: +document.getElementById('ml-b').value || 0, lunch: +document.getElementById('ml-l').value || 0, dinner: +document.getElementById('ml-d').value || 0, updatedAt: Date.now() };
-        await db.ref(`messes/${this.messId}/meals/${dateKey}/${mid}`).update(data);
-        this.closeModal(); this.loadMeals(); this.toast('Saved', 'success');
+    showBulkMealModal() {
+        document.getElementById('modal-title').textContent = 'Bulk Meal Entry';
+        db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
+            const m = snap.val() || {}; const mids = Object.keys(m);
+            if (!mids.length) { this.toast('No members', 'error'); return; }
+            let rows = '';
+            mids.forEach(id => { const v = m[id]; rows += `<div class="bulk-row" data-mid="${id}"><span style="min-width:100px;font-size:13px">${this.esc(v.name)}</span><input type="number" min="0" value="0" class="bulk-b" style="width:50px" placeholder="B"><input type="number" min="0" value="0" class="bulk-l" style="width:50px" placeholder="L"><input type="number" min="0" value="0" class="bulk-d" style="width:50px" placeholder="D"></div>`; });
+            document.getElementById('modal-body').innerHTML = `<p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">B=Breakfast, L=Lunch, D=Dinner</p><div style="max-height:400px;overflow-y:auto">${rows}</div>`;
+            document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveBulkMeals()">Save All</button>`;
+            this.openModal();
+        });
+    },
+
+    async saveBulkMeals() {
+        const dk = this.dk(this.mealDate);
+        const rows = document.querySelectorAll('.bulk-row');
+        const updates = {};
+        rows.forEach(row => {
+            const mid = row.dataset.mid;
+            updates[`messes/${this.messId}/meals/${dk}/${mid}`] = {
+                breakfast: +row.querySelector('.bulk-b').value || 0,
+                lunch: +row.querySelector('.bulk-l').value || 0,
+                dinner: +row.querySelector('.bulk-d').value || 0,
+                updatedAt: Date.now()
+            };
+        });
+        await db.ref().update(updates);
+        this.closeModal(); this.loadMeals(); this.toast('Bulk meals saved!', 'success');
     },
 
     async editMeal(mid, dk) { const s = await db.ref(`messes/${this.messId}/meals/${dk}/${mid}`).once('value'); this.showMealModal(mid, dk, s.val()); },
 
+    async saveMeal(dk) {
+        const mid = document.getElementById('ml-member').value;
+        if (!mid) { this.toast('Select member', 'error'); return; }
+        await db.ref(`messes/${this.messId}/meals/${dk}/${mid}`).update({ breakfast: +document.getElementById('ml-b').value || 0, lunch: +document.getElementById('ml-l').value || 0, dinner: +document.getElementById('ml-d').value || 0, updatedAt: Date.now() });
+        this.closeModal(); this.loadMeals(); this.toast('Saved', 'success');
+    },
+
     // BAZAAR
     async loadBazaar() {
-        const key = this.dateKey(this.bazarDate);
-        document.getElementById('bazar-date-label').textContent = this.formatDate(this.bazarDate);
+        const key = this.dk(this.bazarDate); document.getElementById('bazar-date-label').textContent = this.fmtDate(this.bazarDate);
         const snap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
         const div = document.getElementById('bazar-list');
-        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No bazaar items</p>'; document.getElementById('bazar-total-today').textContent = '৳0'; return; }
+        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No items</p>'; document.getElementById('bazar-total-today').textContent = '৳0'; return; }
         let total = 0, html = '';
         snap.forEach(s => { const b = s.val(); total += b.amount || 0;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(b.item || '')}</h4><span class="amount">৳${b.amount || 0}</span></div>
-                <div class="item-card-details"><span>Qty: ${b.quantity || '-'}</span><span>Buyer: ${this.esc(b.buyer || '')}</span></div>
-                <div class="item-card-actions"><button class="icon-btn" onclick="App.editBazar('${s.key}')"><span class="material-icons-round">edit</span></button>
-                <button class="icon-btn" onclick="App.deleteBazar('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
+            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(b.item || '')}</h4><span class="amount">৳${b.amount || 0}</span></div><div class="item-card-details"><span>Qty: ${b.quantity || '-'}</span><span>Buyer: ${this.esc(b.buyer || '')}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editBazar('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteBazar('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
         });
-        div.innerHTML = html;
-        document.getElementById('bazar-total-today').textContent = '৳' + total;
-        const month = this.monthKey(this.bazarDate);
+        div.innerHTML = html; document.getElementById('bazar-total-today').textContent = '৳' + total;
+        const month = this.mk(this.bazarDate); let mt = 0;
         const ms = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let mt = 0; ms.forEach(s => { mt += s.val().amount || 0; });
-        document.getElementById('bazar-total-month').textContent = '৳' + mt;
+        ms.forEach(s => { mt += s.val().amount || 0; }); document.getElementById('bazar-total-month').textContent = '৳' + mt;
     },
 
     showBazarModal(id = null, data = null) {
         document.getElementById('modal-title').textContent = id ? 'Edit Bazaar' : 'Add Bazaar';
-        document.getElementById('modal-body').innerHTML = `
-            <div class="form-group"><label>Item</label><input id="bz-item" value="${data?.item || ''}" placeholder="e.g. Rice, Oil"></div>
-            <div class="form-group"><label>Amount (৳)</label><input type="number" id="bz-amount" min="0" value="${data?.amount || ''}"></div>
-            <div class="form-group"><label>Quantity</label><input id="bz-qty" value="${data?.quantity || ''}" placeholder="e.g. 5 kg"></div>
-            <div class="form-group"><label>Buyer</label><input id="bz-buyer" value="${data?.buyer || ''}"></div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Item</label><input id="bz-item" value="${data?.item || ''}"></div><div class="form-group"><label>Amount (৳)</label><input type="number" id="bz-amount" min="0" value="${data?.amount || ''}"></div><div class="form-group"><label>Quantity</label><input id="bz-qty" value="${data?.quantity || ''}"></div><div class="form-group"><label>Buyer</label><input id="bz-buyer" value="${data?.buyer || ''}"></div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveBazar('${id || ''}')">${id ? 'Update' : 'Add'}</button>`;
         this.openModal();
     },
 
     async saveBazar(id) {
-        const data = { item: document.getElementById('bz-item').value.trim(), amount: parseFloat(document.getElementById('bz-amount').value) || 0, quantity: document.getElementById('bz-qty').value.trim(), buyer: document.getElementById('bz-buyer').value.trim(), dateKey: this.dateKey(this.bazarDate), updatedAt: Date.now() };
-        if (!data.item) { this.toast('Item name required', 'error'); return; }
+        const data = { item: document.getElementById('bz-item').value.trim(), amount: parseFloat(document.getElementById('bz-amount').value) || 0, quantity: document.getElementById('bz-qty').value.trim(), buyer: document.getElementById('bz-buyer').value.trim(), dateKey: this.dk(this.bazarDate), updatedAt: Date.now() };
+        if (!data.item) { this.toast('Item required', 'error'); return; }
         if (id) await db.ref(`messes/${this.messId}/bazaar/${id}`).update(data);
         else { data.createdAt = Date.now(); await db.ref(`messes/${this.messId}/bazaar`).push(data); }
         this.closeModal(); this.loadBazaar(); this.toast('Saved', 'success');
     },
 
     async editBazar(id) { const s = await db.ref(`messes/${this.messId}/bazaar/${id}`).once('value'); this.showBazarModal(id, s.val()); },
-    async deleteBazar(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/bazaar/${id}`).remove(); this.loadBazaar(); this.toast('Deleted', 'success'); },
+    async deleteBazar(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/bazaar/${id}`).remove(); this.loadBazaar(); },
 
     // EXPENSES
     async loadExpenses() {
-        const month = this.monthKey(this.expenseMonth);
-        document.getElementById('expense-month-label').textContent = this.formatMonth(this.expenseMonth);
+        const month = this.mk(this.expenseMonth); document.getElementById('expense-month-label').textContent = this.fmtMonth(this.expenseMonth);
         const snap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
         const div = document.getElementById('expenses-list');
         if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No expenses</p>'; document.getElementById('expense-total-month').textContent = '৳0'; return; }
         let total = 0, html = '';
         snap.forEach(s => { const e = s.val(); total += e.amount || 0;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(e.category || '')} - ${this.esc(e.description || '')}</h4><span class="amount">৳${e.amount || 0}</span></div>
-                <div class="item-card-details"><span>${this.formatDate(new Date(e.date))}</span><span>By: ${this.esc(e.paidBy || '')}</span></div>
-                <div class="item-card-actions"><button class="icon-btn" onclick="App.editExpense('${s.key}')"><span class="material-icons-round">edit</span></button>
-                <button class="icon-btn" onclick="App.deleteExpense('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
+            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(e.category || '')} - ${this.esc(e.description || '')}</h4><span class="amount">৳${e.amount || 0}</span></div><div class="item-card-details"><span>${e.paidBy || ''}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editExpense('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteExpense('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
         });
-        div.innerHTML = html;
-        document.getElementById('expense-total-month').textContent = '৳' + total;
+        div.innerHTML = html; document.getElementById('expense-total-month').textContent = '৳' + total;
     },
 
     showExpenseModal(id = null, data = null) {
         document.getElementById('modal-title').textContent = id ? 'Edit Expense' : 'Add Expense';
-        document.getElementById('modal-body').innerHTML = `
-            <div class="form-group"><label>Category</label><select id="ex-cat">
-                <option ${data?.category === 'Food' ? 'selected' : ''}>Food</option>
-                <option ${data?.category === 'Utility' ? 'selected' : ''}>Utility</option>
-                <option ${data?.category === 'Rent' ? 'selected' : ''}>Rent</option>
-                <option ${data?.category === 'Salary' ? 'selected' : ''}>Salary</option>
-                <option ${data?.category === 'Maintenance' ? 'selected' : ''}>Maintenance</option>
-                <option ${data?.category === 'Other' ? 'selected' : ''}>Other</option>
-            </select></div>
-            <div class="form-group"><label>Description</label><input id="ex-desc" value="${data?.description || ''}"></div>
-            <div class="form-group"><label>Amount (৳)</label><input type="number" id="ex-amount" min="0" value="${data?.amount || ''}"></div>
-            <div class="form-group"><label>Paid By</label><input id="ex-paidby" value="${data?.paidBy || ''}"></div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Category</label><select id="ex-cat"><option ${data?.category === 'Food' ? 'selected' : ''}>Food</option><option ${data?.category === 'Utility' ? 'selected' : ''}>Utility</option><option ${data?.category === 'Rent' ? 'selected' : ''}>Rent</option><option ${data?.category === 'Salary' ? 'selected' : ''}>Salary</option><option ${data?.category === 'Maintenance' ? 'selected' : ''}>Maintenance</option><option ${data?.category === 'Other' ? 'selected' : ''}>Other</option></select></div><div class="form-group"><label>Description</label><input id="ex-desc" value="${data?.description || ''}"></div><div class="form-group"><label>Amount (৳)</label><input type="number" id="ex-amount" min="0" value="${data?.amount || ''}"></div><div class="form-group"><label>Paid By</label><input id="ex-paidby" value="${data?.paidBy || ''}"></div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveExpense('${id || ''}')">${id ? 'Update' : 'Add'}</button>`;
         this.openModal();
     },
 
     async saveExpense(id) {
-        const data = { category: document.getElementById('ex-cat').value, description: document.getElementById('ex-desc').value.trim(), amount: parseFloat(document.getElementById('ex-amount').value) || 0, paidBy: document.getElementById('ex-paidby').value.trim(), dateKey: this.dateKey(new Date()), date: new Date().toISOString(), updatedAt: Date.now() };
+        const data = { category: document.getElementById('ex-cat').value, description: document.getElementById('ex-desc').value.trim(), amount: parseFloat(document.getElementById('ex-amount').value) || 0, paidBy: document.getElementById('ex-paidby').value.trim(), dateKey: this.dk(new Date()), date: new Date().toISOString(), updatedAt: Date.now() };
         if (!data.amount) { this.toast('Amount required', 'error'); return; }
         if (id) await db.ref(`messes/${this.messId}/expenses/${id}`).update(data);
         else { data.createdAt = Date.now(); await db.ref(`messes/${this.messId}/expenses`).push(data); }
@@ -577,45 +389,35 @@ const App = {
     },
 
     async editExpense(id) { const s = await db.ref(`messes/${this.messId}/expenses/${id}`).once('value'); this.showExpenseModal(id, s.val()); },
-    async deleteExpense(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/expenses/${id}`).remove(); this.loadExpenses(); this.toast('Deleted', 'success'); },
+    async deleteExpense(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/expenses/${id}`).remove(); this.loadExpenses(); },
 
     // BALANCE
     async loadBalance() {
-        const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-        const members = membersSnap.val() || {};
-        const depositsSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
-        const deposits = depositsSnap.val() || {};
-        const month = this.monthKey(new Date());
-
-        const expSnap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let totalExp = 0; expSnap.forEach(s => { totalExp += s.val().amount || 0; });
-        const bazarSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let totalBazar = 0; bazarSnap.forEach(s => { totalBazar += s.val().amount || 0; });
-        let totalDep = 0; Object.values(deposits).forEach(d => { totalDep += d.amount || 0; });
-        const totalCost = totalExp + totalBazar;
-        const remaining = totalDep - totalCost;
-
+        const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
+        const deposits = (await db.ref(`messes/${this.messId}/deposits`).once('value')).val() || {};
+        const month = this.mk(new Date());
+        let totalExp = 0, totalBazar = 0, totalDep = 0;
+        const expS = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
+        expS.forEach(s => { totalExp += s.val().amount || 0; });
+        const bzS = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
+        bzS.forEach(s => { totalBazar += s.val().amount || 0; });
+        Object.values(deposits).forEach(d => { totalDep += d.amount || 0; });
+        const tc = totalExp + totalBazar;
         document.getElementById('balance-income').textContent = '৳' + totalDep;
-        document.getElementById('balance-expense').textContent = '৳' + totalCost;
-        document.getElementById('balance-remaining').textContent = '৳' + remaining;
-
+        document.getElementById('balance-expense').textContent = '৳' + tc;
+        document.getElementById('balance-remaining').textContent = '৳' + (totalDep - tc);
         let totalMeals = 0;
-        const mealsSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
-        mealsSnap.forEach(d => { Object.values(d.val() || {}).forEach(ml => { totalMeals += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); }); });
-        const rate = totalMeals > 0 ? (totalCost / totalMeals).toFixed(2) : 0;
+        const mlS = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
+        mlS.forEach(d => { Object.values(d.val() || {}).forEach(ml => { totalMeals += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); }); });
+        const rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
         document.getElementById('balance-rate').textContent = '৳' + rate;
-
-        const div = document.getElementById('member-dues-list');
-        const mids = Object.keys(members);
+        const div = document.getElementById('member-dues-list'); const mids = Object.keys(members);
         if (!mids.length) { div.innerHTML = '<p class="empty-state">No members</p>'; return; }
         let html = '';
-        mids.forEach(mid => {
-            const m = members[mid], dep = deposits[mid]?.amount || 0;
-            let mm = 0;
-            mealsSnap.forEach(d => { const ml = (d.val() || {})[mid] || {}; mm += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); });
-            const cost = (mm * parseFloat(rate)).toFixed(2);
-            const due = (dep - parseFloat(cost)).toFixed(2);
-            html += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals | Deposit: ৳${dep}</p></div><div class="due-amount ${parseFloat(due) >= 0 ? 'positive' : 'negative'}">৳${due}</div></div>`;
+        mids.forEach(mid => { const m = members[mid], dep = deposits[mid]?.amount || 0;
+            let mm = 0; mlS.forEach(d => { const ml = (d.val() || {})[mid] || {}; mm += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); });
+            const cost = (mm * parseFloat(rate)).toFixed(2); const due = (dep - parseFloat(cost)).toFixed(2);
+            html += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals | Dep: ৳${dep}</p></div><div class="due-amount ${parseFloat(due) >= 0 ? 'positive' : 'negative'}">৳${due}</div></div>`;
         });
         div.innerHTML = html;
     },
@@ -623,26 +425,20 @@ const App = {
     showDepositModal() {
         document.getElementById('modal-title').textContent = 'Record Deposit';
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
-            const members = snap.val() || {};
-            let opts = '<option value="">Select Member</option>';
-            Object.entries(members).forEach(([id, m]) => { opts += `<option value="${id}">${m.name}</option>`; });
-            document.getElementById('modal-body').innerHTML = `
-                <div class="form-group"><label>Member</label><select id="dp-member">${opts}</select></div>
-                <div class="form-group"><label>Amount (৳)</label><input type="number" id="dp-amount" min="0"></div>
-                <div class="form-group"><label>Note</label><input id="dp-note" placeholder="Optional"></div>`;
+            const m = snap.val() || {}; let opts = '<option value="">Select</option>';
+            Object.entries(m).forEach(([id, v]) => { opts += `<option value="${id}">${v.name}</option>`; });
+            document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Member</label><select id="dp-member">${opts}</select></div><div class="form-group"><label>Amount (৳)</label><input type="number" id="dp-amount" min="0"></div><div class="form-group"><label>Note</label><input id="dp-note" placeholder="Optional"></div>`;
             document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveDeposit()">Save</button>`;
             this.openModal();
         });
     },
 
     async saveDeposit() {
-        const mid = document.getElementById('dp-member').value;
-        const amount = parseFloat(document.getElementById('dp-amount').value) || 0;
-        const note = document.getElementById('dp-note').value.trim();
+        const mid = document.getElementById('dp-member').value, amount = parseFloat(document.getElementById('dp-amount').value) || 0, note = document.getElementById('dp-note').value.trim();
         if (!mid || !amount) { this.toast('Select member and amount', 'error'); return; }
         const existing = (await db.ref(`messes/${this.messId}/deposits/${mid}/amount`).once('value')).val() || 0;
         await db.ref(`messes/${this.messId}/deposits/${mid}`).set({ amount: existing + amount, note, updatedAt: Date.now() });
-        this.closeModal(); this.loadBalance(); this.toast('Deposit recorded', 'success');
+        this.closeModal(); this.loadBalance(); this.toast('Recorded', 'success');
     },
 
     // NOTICES
@@ -650,108 +446,127 @@ const App = {
         const snap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(50).once('value');
         const div = document.getElementById('notices-list');
         if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No notices</p>'; return; }
-        let html = ''; const arr = [];
-        snap.forEach(s => { arr.unshift({ key: s.key, ...s.val() }); });
-        arr.forEach(n => {
-            html += `<div class="notice-item"><h4>${this.esc(n.title || '')}</h4><p>${this.esc(n.body || '')}</p>
-                <div class="notice-meta"><span>By: ${this.esc(n.author || '')}</span><span>${this.timeAgo(n.createdAt)}</span></div>
-                <div class="item-card-actions"><button class="icon-btn" onclick="App.deleteNotice('${n.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
-        });
+        let html = ''; const arr = []; snap.forEach(s => { arr.unshift({ key: s.key, ...s.val() }); });
+        arr.forEach(n => { html += `<div class="notice-item"><h4>${this.esc(n.title || '')}</h4><p>${this.esc(n.body || '')}</p><div class="notice-meta"><span>${this.esc(n.author || '')}</span><span>${this.timeAgo(n.createdAt)}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.deleteNotice('${n.key}')"><span class="material-icons-round">delete</span></button></div></div>`; });
         div.innerHTML = html;
     },
 
     showNoticeModal() {
         document.getElementById('modal-title').textContent = 'Post Notice';
-        document.getElementById('modal-body').innerHTML = `
-            <div class="form-group"><label>Title</label><input id="nt-title"></div>
-            <div class="form-group"><label>Message</label><textarea id="nt-body"></textarea></div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Title</label><input id="nt-title"></div><div class="form-group"><label>Message</label><textarea id="nt-body"></textarea></div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveNotice()">Post</button>`;
         this.openModal();
     },
 
     async saveNotice() {
-        const title = document.getElementById('nt-title').value.trim();
-        const body = document.getElementById('nt-body').value.trim();
+        const title = document.getElementById('nt-title').value.trim(), body = document.getElementById('nt-body').value.trim();
         if (!title) { this.toast('Title required', 'error'); return; }
         await db.ref(`messes/${this.messId}/notices`).push({ title, body, author: this.currentUser.displayName || 'Admin', createdAt: Date.now() });
-        this.closeModal(); this.loadNotices(); this.toast('Posted', 'success');
+        this.closeModal(); this.loadNotices();
     },
 
     async deleteNotice(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/notices/${id}`).remove(); this.loadNotices(); },
 
     // REPORTS
     async loadDailyReport() {
-        const key = this.dateKey(this.reportDate);
-        document.getElementById('report-date-label').textContent = this.formatDate(this.reportDate);
-        const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-        const members = membersSnap.val() || {};
-        const mealsSnap = await db.ref(`messes/${this.messId}/meals/${key}`).once('value');
-        const meals = mealsSnap.val() || {};
-        const bazarSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
-        let totalMeals = 0, totalBazar = 0, rows = '';
-        Object.entries(members).forEach(([id, m]) => {
-            const ml = meals[id] || {}, t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0);
-            totalMeals += t;
-            rows += `<div class="report-row"><span>${m.name}</span><span>${t} meals (B:${ml.breakfast || 0} L:${ml.lunch || 0} D:${ml.dinner || 0})</span></div>`;
-        });
-        bazarSnap.forEach(s => { totalBazar += s.val().amount || 0; });
-        document.getElementById('daily-report').innerHTML = `
-            <div class="report-section"><h5>Meals</h5>${rows || '<p>No meals</p>'}<div class="report-row report-total"><span>Total</span><span>${totalMeals}</span></div></div>
-            <div class="report-section"><h5>Bazaar</h5><div class="report-row"><span>Total</span><span>৳${totalBazar}</span></div></div>
-            ${totalMeals > 0 ? `<div class="report-section"><h5>Rate</h5><div class="report-row"><span>Per meal</span><span>৳${(totalBazar / totalMeals).toFixed(2)}</span></div></div>` : ''}`;
+        const key = this.dk(this.reportDate); document.getElementById('report-date-label').textContent = this.fmtDate(this.reportDate);
+        const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
+        const meals = (await db.ref(`messes/${this.messId}/meals/${key}`).once('value')).val() || {};
+        let totalMeals = 0, rows = '';
+        Object.entries(members).forEach(([id, m]) => { const ml = meals[id] || {}; const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); totalMeals += t; rows += `<div class="report-row"><span>${m.name}</span><span>${t} (B:${ml.breakfast || 0} L:${ml.lunch || 0} D:${ml.dinner || 0})</span></div>`; });
+        let totalBazar = 0; const bs = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
+        bs.forEach(s => { totalBazar += s.val().amount || 0; });
+        document.getElementById('daily-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows || '<p>No data</p>'}</div><div class="report-section"><h5>Bazaar: ৳${totalBazar}</h5></div>${totalMeals > 0 ? `<div class="report-section"><h5>Rate: ৳${(totalBazar / totalMeals).toFixed(2)}/meal</h5></div>` : ''}`;
     },
 
     async loadMonthlyReport() {
-        const month = this.monthKey(this.reportMonth);
-        document.getElementById('report-month-label').textContent = this.formatMonth(this.reportMonth);
-        const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-        const members = membersSnap.val() || {};
-        let totalMeals = 0, totalBazar = 0, totalExp = 0, rows = '';
-        const mm = {};
-        const mealsSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
-        mealsSnap.forEach(d => { Object.entries(d.val() || {}).forEach(([mid, ml]) => { if (!mm[mid]) mm[mid] = 0; mm[mid] += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); }); });
-        Object.entries(mm).forEach(([mid, t]) => { totalMeals += t; });
-        Object.entries(members).forEach(([id, m]) => { rows += `<div class="report-row"><span>${m.name}</span><span>${mm[id] || 0} meals</span></div>`; });
-        const bs = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        bs.forEach(s => { totalBazar += s.val().amount || 0; });
-        const es = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        es.forEach(s => { totalExp += s.val().amount || 0; });
+        const month = this.mk(this.reportMonth); document.getElementById('report-month-label').textContent = this.fmtMonth(this.reportMonth);
+        const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
+        const mm = {}; let totalBazar = 0, totalExp = 0;
+        const mlS = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
+        mlS.forEach(d => { Object.entries(d.val() || {}).forEach(([mid, ml]) => { if (!mm[mid]) mm[mid] = 0; mm[mid] += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); }); });
+        let totalMeals = 0; Object.values(mm).forEach(t => { totalMeals += t; });
+        let rows = ''; Object.entries(members).forEach(([id, m]) => { rows += `<div class="report-row"><span>${m.name}</span><span>${mm[id] || 0}</span></div>`; });
+        const bs = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value'); bs.forEach(s => { totalBazar += s.val().amount || 0; });
+        const es = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value'); es.forEach(s => { totalExp += s.val().amount || 0; });
         const tc = totalBazar + totalExp, rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
-        let totalDep = 0;
-        const ds = await db.ref(`messes/${this.messId}/deposits`).once('value');
-        ds.forEach(s => { totalDep += s.val().amount || 0; });
-        document.getElementById('monthly-report').innerHTML = `
-            <div class="report-section"><h5>Meals</h5>${rows || '<p>No data</p>'}<div class="report-row report-total"><span>Total</span><span>${totalMeals}</span></div></div>
-            <div class="report-section"><h5>Finance</h5>
-            <div class="report-row"><span>Bazaar</span><span>৳${totalBazar}</span></div><div class="report-row"><span>Expenses</span><span>৳${totalExp}</span></div>
-            <div class="report-row report-total"><span>Total Cost</span><span>৳${tc}</span></div><div class="report-row"><span>Deposits</span><span>৳${totalDep}</span></div>
-            <div class="report-row"><span>Balance</span><span>৳${totalDep - tc}</span></div></div>
-            <div class="report-section"><h5>Rate</h5><div class="report-row report-total"><span>Per meal</span><span>৳${rate}</span></div></div>`;
+        document.getElementById('monthly-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows}</div><div class="report-section"><h5>Finance</h5><div class="report-row"><span>Bazaar</span><span>৳${totalBazar}</span></div><div class="report-row"><span>Expenses</span><span>৳${totalExp}</span></div><div class="report-row report-total"><span>Total</span><span>৳${tc}</span></div></div><div class="report-section"><h5>Rate: ৳${rate}/meal</h5></div>`;
     },
 
-    exportDailyPDF() {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFontSize(16); doc.text('Mess Manager - Daily Report', 20, 20);
-        doc.setFontSize(10); doc.text(`Date: ${this.formatDate(this.reportDate)}`, 20, 30);
-        doc.text(document.getElementById('daily-report').innerText, 20, 42);
-        doc.save(`mess-daily-${this.dateKey(this.reportDate)}.pdf`); this.toast('PDF exported', 'success');
+    // MONTHLY OVERVIEW
+    async loadMonthlyOverview() {
+        const month = this.mk(this.monthlyDate); document.getElementById('monthly-label').textContent = this.fmtMonth(this.monthlyDate);
+        const year = this.monthlyDate.getFullYear();
+        document.getElementById('monthly-year-select').value = year;
+
+        const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
+        let totalMeals = 0, totalBazar = 0, totalExp = 0;
+        const memberMeals = {};
+
+        // Get all days in this month
+        const daysInMonth = new Date(year, this.monthlyDate.getMonth() + 1, 0).getDate();
+        const firstDay = `${month}-01`;
+        const lastDay = `${month}-${String(daysInMonth).padStart(2, '0')}`;
+
+        const mlS = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(firstDay).endAt(lastDay).once('value');
+        const dailyMeals = {};
+        mlS.forEach(d => {
+            const dayMeals = d.val() || {};
+            Object.entries(dayMeals).forEach(([mid, ml]) => {
+                const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0);
+                totalMeals += t;
+                if (!memberMeals[mid]) memberMeals[mid] = 0;
+                memberMeals[mid] += t;
+                const dk = d.key;
+                if (!dailyMeals[dk]) dailyMeals[dk] = 0;
+                dailyMeals[dk] += t;
+            });
+        });
+
+        const bzS = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
+        bzS.forEach(s => { totalBazar += s.val().amount || 0; });
+        const exS = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
+        exS.forEach(s => { totalExp += s.val().amount || 0; });
+
+        const tc = totalBazar + totalExp;
+        const rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
+        const avgDailyMeals = daysInMonth > 0 ? (totalMeals / daysInMonth).toFixed(1) : 0;
+
+        document.getElementById('monthly-overview').innerHTML = `
+            <div class="summary-row"><span>Total Days Active</span><strong>${Object.keys(dailyMeals).length}</strong></div>
+            <div class="summary-row"><span>Total Meals</span><strong>${totalMeals}</strong></div>
+            <div class="summary-row"><span>Avg Daily Meals</span><strong>${avgDailyMeals}</strong></div>
+            <div class="summary-row"><span>Total Bazaar</span><strong>৳${totalBazar}</strong></div>
+            <div class="summary-row"><span>Total Expenses</span><strong>৳${totalExp}</strong></div>
+            <div class="summary-row"><span>Total Cost</span><strong>৳${tc}</strong></div>
+            <div class="summary-row"><span>Meal Rate</span><strong>৳${rate}/meal</strong></div>`;
+
+        const mids = Object.keys(members);
+        let mhtml = '';
+        mids.forEach(mid => { const m = members[mid]; const mm = memberMeals[mid] || 0;
+            mhtml += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals (${totalMeals > 0 ? ((mm / totalMeals) * 100).toFixed(1) : 0}%)</p></div><div class="due-amount">৳${(mm * parseFloat(rate)).toFixed(0)}</div></div>`;
+        });
+        document.getElementById('monthly-members').innerHTML = mhtml || '<p class="empty-state">No data</p>';
     },
 
-    exportMonthlyPDF() {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFontSize(16); doc.text('Mess Manager - Monthly Report', 20, 20);
-        doc.setFontSize(10); doc.text(`Month: ${this.formatMonth(this.reportMonth)}`, 20, 30);
-        doc.text(document.getElementById('monthly-report').innerText, 20, 42);
-        doc.save(`mess-monthly-${this.monthKey(this.reportMonth)}.pdf`); this.toast('PDF exported', 'success');
+    // PDF EXPORT
+    exportPDF(type) {
+        const { jsPDF } = window.jspdf; const doc = new.jsPDF();
+        doc.setFontSize(14); doc.text(`Mess Manager - ${type === 'daily' ? 'Daily' : 'Monthly'} Report`, 20, 20);
+        doc.setFontSize(10);
+        const content = type === 'daily' ? document.getElementById('daily-report').innerText : document.getElementById('monthly-report').innerText;
+        doc.text(content, 20, 35);
+        doc.save(`mess-${type}-${type === 'daily' ? this.dk(this.reportDate) : this.mk(this.reportMonth)}.pdf`);
+        this.toast('PDF exported', 'success');
     },
 
     // HELPERS
-    dateKey(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
-    monthKey(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; },
-    formatDate(d) { return d.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }); },
-    formatMonth(d) { return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }); },
+    dk(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
+    mk(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; },
+    fmtDate(d) { return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }); },
+    fmtMonth(d) { return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }); },
     timeAgo(ts) { if (!ts) return ''; const d = Date.now() - ts, m = Math.floor(d / 60000); if (m < 1) return 'now'; if (m < 60) return m + 'm'; const h = Math.floor(m / 60); if (h < 24) return h + 'h'; const dy = Math.floor(h / 24); return dy < 7 ? dy + 'd' : new Date(ts).toLocaleDateString(); },
-    esc(s) { return s ? s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : ''; },
+    esc(s) { return s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : ''; },
     openModal() { document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
     toast(msg, type = 'info') { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t); setTimeout(() => t.remove(), 3500); }
