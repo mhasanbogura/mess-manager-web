@@ -496,7 +496,7 @@ const App = {
 
         const colors = ['#388e3c','#1976d2','#f57c00','#c62828','#7b1fa2','#00838f','#4e342e','#37474f'];
         const viewDays = daysInMonth;
-        let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead><tr><th class="mg-sticky-corner"><span class="material-icons-round" style="font-size:16px">tune</span> View</th>';
+        let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead><tr><th class="mg-sticky-corner"></th><th class="mg-sticky-label"><span class="material-icons-round" style="font-size:16px">tune</span> View</th>';
         for (let d = 1; d <= viewDays; d++) html += `<th class="mg-day">${d}</th>`;
         html += '</tr></thead><tbody>';
 
@@ -517,8 +517,10 @@ const App = {
                     const dk = `${month}-${String(d).padStart(2, '0')}`;
                     rowTotal += (mData[dk] && mData[dk][meal]) || 0;
                 }
+                const namePos = mi === 0 ? ' mg-name-first' : mi === 3 ? ' mg-name-last' : ' mg-name-mid';
+                const memberSep = (mi === 0 && idx > 0) ? ' mg-member-sep' : '';
                 html += '<tr>';
-                if (mi === 0) html += `<td class="mg-name" style="background:${memberColor}" rowspan="4"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></td>`;
+                html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor}">${mi === 0 ? `<strong>${this.esc(m.name)}</strong><small>(${mTotal})</small>` : '&nbsp;'}</td>`;
                 html += `<td class="mg-type" style="background:${bgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mi===0?'#FFC107':mi===1?'#4CAF50':mi===2?'#42a5f5':'#26a69a'}">${icons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${labels[mi]}</span></td>`;
                 for (let d = 1; d <= viewDays; d++) {
                     const dk = `${month}-${String(d).padStart(2, '0')}`;
