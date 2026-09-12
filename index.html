@@ -20,12 +20,58 @@
                 <p>Manage your mess easily</p>
             </div>
             <div class="auth-card">
-                <button class="btn-google" id="google-login">
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Continue with Google
-                </button>
-                <button type="button" class="btn-link" id="forgot-password-link">Forgot Password?</button>
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-tab="login-email">Email</button>
+                    <button class="auth-tab" data-tab="login-google">Google</button>
+                </div>
+
+                <!-- Email Login -->
+                <div id="login-email-tab">
+                    <div class="input-group">
+                        <span class="material-icons-round">email</span>
+                        <input type="email" id="login-email" placeholder="Email address">
+                    </div>
+                    <div class="input-group">
+                        <span class="material-icons-round">lock</span>
+                        <input type="password" id="login-password" placeholder="Password">
+                    </div>
+                    <button class="btn-primary" id="login-btn">Login</button>
+                    <div class="auth-links">
+                        <button type="button" class="btn-link-inline" id="forgot-password-link">Forgot Password?</button>
+                        <button type="button" class="btn-link-inline" id="show-register">Create Account</button>
+                    </div>
+                </div>
+
+                <!-- Google Login -->
+                <div id="login-google-tab" style="display:none">
+                    <button class="btn-google" id="google-login">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Continue with Google
+                    </button>
+                </div>
             </div>
-            <p class="auth-footer-text">Sign in to continue. If you don't have an account, one will be created automatically.</p>
+
+            <!-- Register (hidden by default) -->
+            <div class="auth-card" id="register-card" style="display:none">
+                <h3 style="margin-bottom:16px;font-size:16px">Create Account</h3>
+                <div class="input-group">
+                    <span class="material-icons-round">person</span>
+                    <input type="text" id="reg-name" placeholder="Full name">
+                </div>
+                <div class="input-group">
+                    <span class="material-icons-round">email</span>
+                    <input type="email" id="reg-email" placeholder="Email address">
+                </div>
+                <div class="input-group">
+                    <span class="material-icons-round">phone</span>
+                    <input type="tel" id="reg-phone" placeholder="Phone number">
+                </div>
+                <div class="input-group">
+                    <span class="material-icons-round">lock</span>
+                    <input type="password" id="reg-password" placeholder="Password (min 6 chars)">
+                </div>
+                <button class="btn-primary" id="register-btn">Create Account</button>
+                <button class="btn-link-inline" id="back-to-login" style="margin-top:12px">Back to Login</button>
+            </div>
         </div>
     </div>
 

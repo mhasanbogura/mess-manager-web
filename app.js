@@ -34,10 +34,31 @@ const App = {
     },
 
     bindEvents() {
+        // Auth tabs
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const isEmail = tab.dataset.tab === 'login-email';
+                document.getElementById('login-email-tab').style.display = isEmail ? 'block' : 'none';
+                document.getElementById('login-google-tab').style.display = isEmail ? 'none' : 'block';
+                document.getElementById('register-card').style.display = 'none';
+            });
+        });
+
         // Auth
+        document.getElementById('login-btn').addEventListener('click', () => this.emailLogin());
         document.getElementById('google-login').addEventListener('click', () => this.googleLogin());
+        document.getElementById('show-register').addEventListener('click', () => {
+            document.getElementById('login-email-tab').style.display = 'none';
+            document.getElementById('register-card').style.display = 'block';
+        });
+        document.getElementById('back-to-login').addEventListener('click', () => {
+            document.getElementById('register-card').style.display = 'none';
+            document.getElementById('login-email-tab').style.display = 'block';
+        });
+        document.getElementById('register-btn').addEventListener('click', () => this.emailRegister());
         document.getElementById('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
-        document.getElementById('back-to-login').addEventListener('click', () => this.showScreen('auth-screen'));
         document.getElementById('send-reset-btn').addEventListener('click', () => this.sendResetEmail());
         document.getElementById('logout-from-setup').addEventListener('click', () => auth.signOut());
 
@@ -97,6 +118,46 @@ const App = {
     },
 
     // AUTH
+    async emailLogin() {
+        const email = document.getElementById('login-email').value.trim();
+        const pass = document.getElementById('login-password').value;
+        if (!email || !pass) { this.toast('Please fill in all fields', 'error'); return; }
+        const btn = document.getElementById('login-btn');
+        btn.textContent = 'Logging in...'; btn.disabled = true;
+        try {
+            await auth.signInWithEmailAndPassword(email, pass);
+            this.toast('Login successful!', 'success');
+        } catch (e) {
+            let msg = e.message;
+            if (e.code === 'auth/user-not-found') msg = 'No account found with this email';
+            else if (e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') msg = 'Invalid email or password';
+            else if (e.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later';
+            this.toast(msg, 'error');
+        } finally { btn.textContent = 'Login'; btn.disabled = false; }
+    },
+
+    async emailRegister() {
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const phone = document.getElementById('reg-phone').value.trim();
+        const pass = document.getElementById('reg-password').value;
+        if (!name || !email || !pass) { this.toast('Please fill in name, email and password', 'error'); return; }
+        if (pass.length < 6) { this.toast('Password must be at least 6 characters', 'error'); return; }
+        const btn = document.getElementById('register-btn');
+        btn.textContent = 'Creating...'; btn.disabled = true;
+        try {
+            const cred = await auth.createUserWithEmailAndPassword(email, pass);
+            await cred.user.updateProfile({ displayName: name });
+            await db.ref(`users/${cred.user.uid}`).set({ name, email, phone, role: 'admin', createdAt: Date.now() });
+            this.toast('Account created!', 'success');
+        } catch (e) {
+            let msg = e.message;
+            if (e.code === 'auth/email-already-in-use') msg = 'Email already registered. Try logging in.';
+            else if (e.code === 'auth/weak-password') msg = 'Password is too weak';
+            this.toast(msg, 'error');
+        } finally { btn.textContent = 'Create Account'; btn.disabled = false; }
+    },
+
     async googleLogin() {
         const btn = document.getElementById('google-login');
         const origHTML = btn.innerHTML;
