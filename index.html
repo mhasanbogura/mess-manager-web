@@ -263,16 +263,30 @@
 
             <!-- BAZAAR -->
             <div class="page" id="page-bazaar">
-                <div class="page-header"><h3>Bazaar</h3><button class="btn-primary btn-sm" id="add-bazar-btn"><span class="material-icons-round">add</span> Add</button></div>
-                <div class="card"><div class="card-header"><div class="date-nav">
-                    <button class="icon-btn" id="bazar-prev-day"><span class="material-icons-round">chevron_left</span></button>
-                    <h4 id="bazar-date-label">Today</h4>
-                    <button class="icon-btn" id="bazar-next-day"><span class="material-icons-round">chevron_right</span></button>
-                </div></div><div class="card-body" id="bazar-list"><p class="empty-state">No bazaar items</p></div></div>
-                <div class="card"><div class="card-header"><h4>Summary</h4></div><div class="card-body">
-                    <div class="summary-row"><span>Today</span><strong id="bazar-total-today">৳0</strong></div>
-                    <div class="summary-row"><span>Month</span><strong id="bazar-total-month">৳0</strong></div>
-                </div></div>
+                <div class="page-header">
+                    <h3>Bazaar</h3>
+                    <button class="btn-primary btn-sm" id="add-bazar-btn"><span class="material-icons-round">add</span> Add</button>
+                </div>
+                <div class="dash-today-card">
+                    <div class="dash-date-header">
+                        <button class="icon-btn" id="bazar-prev-day"><span class="material-icons-round">chevron_left</span></button>
+                        <h4 id="bazar-date-label" style="color:white">Today</h4>
+                        <button class="icon-btn" id="bazar-next-day"><span class="material-icons-round">chevron_right</span></button>
+                    </div>
+                </div>
+                <div id="bazar-list">
+                    <div class="dash-today-card"><p class="empty-state" style="color:#888">No items</p></div>
+                </div>
+                <div class="dash-finance-row" style="margin-top:12px">
+                    <div class="dash-finance-box">
+                        <small>Today</small>
+                        <strong id="bazar-total-today">৳0</strong>
+                    </div>
+                    <div class="dash-finance-box">
+                        <small>Month</small>
+                        <strong id="bazar-total-month">৳0</strong>
+                    </div>
+                </div>
             </div>
 
             <!-- EXPENSES -->

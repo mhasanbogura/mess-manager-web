@@ -631,7 +631,7 @@ select.input-sm { cursor: pointer; }
 .modal-overlay.active { display: flex; }
 
 .modal {
-    background: white;
+    background: #1e1e30;
     border-radius: var(--radius);
     width: 100%;
     max-width: 480px;
@@ -645,7 +645,8 @@ select.input-sm { cursor: pointer; }
     align-items: center;
     justify-content: space-between;
     padding: 16px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid #2a2a40;
+    color: white;
 }
 
 .modal-header h3 { font-size: 16px; font-weight: 600; }
@@ -653,7 +654,7 @@ select.input-sm { cursor: pointer; }
 
 .modal-footer {
     padding: 16px;
-    border-top: 1px solid var(--border);
+    border-top: 1px solid #2a2a40;
     display: flex;
     gap: 12px;
     justify-content: flex-end;
@@ -674,11 +675,13 @@ select.input-sm { cursor: pointer; }
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid var(--border);
+    border: 1px solid #3a3a50;
     border-radius: var(--radius-sm);
     font-size: 14px;
     font-family: inherit;
     outline: none;
+    background: #2a2a3e;
+    color: white;
 }
 
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
@@ -1068,7 +1071,163 @@ select.input-sm { cursor: pointer; }
     .btn-promote, .btn-remove { flex: 1; justify-content: center; }
 }
 
-/* END DASHBOARD MEMBER CARD */
+/* BAZAAR DARK THEME */
+.bazar-cat-tabs {
+    display: flex;
+    gap: 8px;
+    margin-left: 12px;
+}
+
+.bazar-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    background: #2a2a3e;
+    border: 1px solid #3a3a50;
+    border-radius: 20px;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.bazar-tab.active {
+    background: #FFC107;
+    color: #1a1a1a;
+    border-color: #FFC107;
+}
+
+.bazar-tab .material-icons-round { font-size: 14px; }
+
+.bazar-member-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.member-chip {
+    padding: 8px 16px;
+    background: #2a2a3e;
+    border: 1px solid #3a3a50;
+    border-radius: 20px;
+    color: #ccc;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+
+.member-chip:hover { border-color: #FFC107; color: white; }
+.member-chip.active { background: #FFC107; color: #1a1a1a; border-color: #FFC107; }
+
+.bazar-item-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    margin-bottom: 8px;
+}
+
+.bazar-item-row .form-group { margin-bottom: 0; }
+
+.btn-remove-row {
+    background: none;
+    border: none;
+    color: #F44336;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+}
+
+.btn-remove-row:hover { background: rgba(244,67,54,0.1); }
+.btn-remove-row .material-icons-round { font-size: 20px; }
+
+.btn-add-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #FFC107;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 8px 0;
+}
+
+.btn-add-item:hover { color: #FFD54F; }
+.btn-add-item .material-icons-round { font-size: 18px; }
+
+.bazar-footer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.bazar-footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.bazar-footer-info strong { font-size: 14px; color: white; }
+
+.bazar-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bazar-item-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.bazar-cat-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.bazar-cat-dot.bazar { background: #4CAF50; }
+.bazar-cat-dot.utility { background: #FFC107; }
+.bazar-cat-dot.special { background: #9c8ce0; }
+
+.bazar-cat-label {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.bazar-cat-label.bazar { background: rgba(76,175,80,0.15); color: #4CAF50; }
+.bazar-cat-label.utility { background: rgba(255,193,7,0.15); color: #FFC107; }
+.bazar-cat-label.special { background: rgba(156,140,224,0.15); color: #9c8ce0; }
+
+.bazar-item-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.bazar-item-actions { display: flex; gap: 2px; }
+
+.dash-date-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* END BAZAAR */
 .mess-item {
     display: flex;
     align-items: center;

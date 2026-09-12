@@ -450,10 +450,27 @@ const App = {
         const key = this.dk(this.bazarDate); document.getElementById('bazar-date-label').textContent = this.fmtDate(this.bazarDate);
         const snap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
         const div = document.getElementById('bazar-list');
-        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No items</p>'; document.getElementById('bazar-total-today').textContent = '\u09F30'; return; }
+        if (!snap.exists()) { div.innerHTML = '<div class="dash-today-card"><p class="empty-state" style="color:#888">No items</p></div>'; document.getElementById('bazar-total-today').textContent = '\u09F30'; return; }
         let total = 0, html = '';
         snap.forEach(s => { const b = s.val(); total += b.amount || 0;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(b.item || '')}</h4><span class="amount">\u09F3${b.amount || 0}</span></div><div class="item-card-details"><span>Qty: ${b.quantity || '-'}</span><span>Buyer: ${this.esc(b.buyer || '')}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editBazar('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteBazar('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
+            const cat = b.category || 'Bazar';
+            const catClass = cat === 'Utility' ? 'utility' : cat === 'Special' ? 'special' : 'bazar';
+            html += `<div class="dash-today-card">
+                <div class="bazar-item">
+                    <div class="bazar-item-left">
+                        <span class="bazar-cat-dot ${catClass}"></span>
+                        <div><h4 style="color:white;font-size:14px">${this.esc(b.item || '')}</h4>
+                        <p style="color:#888;font-size:12px">${this.esc(b.buyer || '')} ${b.quantity ? '\u00B7 Qty: ' + this.esc(b.quantity) : ''} <span class="bazar-cat-label ${catClass}">${cat}</span></p></div>
+                    </div>
+                    <div class="bazar-item-right">
+                        <span style="color:#4CAF50;font-weight:700;font-size:15px">\u09F3${b.amount || 0}</span>
+                        <div class="bazar-item-actions">
+                            <button class="icon-btn" onclick="App.editBazar('${s.key}')"><span class="material-icons-round" style="font-size:18px;color:#888">edit</span></button>
+                            <button class="icon-btn" onclick="App.deleteBazar('${s.key}')"><span class="material-icons-round" style="font-size:18px;color:#F44336">delete</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
         });
         div.innerHTML = html; document.getElementById('bazar-total-today').textContent = '\u09F3' + total;
         const month = this.mk(this.bazarDate); let mt = 0;
@@ -462,18 +479,76 @@ const App = {
     },
 
     showBazarModal(id = null, data = null) {
-        document.getElementById('modal-title').textContent = id ? 'Edit Bazaar' : 'Add Bazaar';
-        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Item</label><input id="bz-item" value="${data?.item || ''}"></div><div class="form-group"><label>Amount (\u09F3)</label><input type="number" id="bz-amount" min="0" value="${data?.amount || ''}"></div><div class="form-group"><label>Quantity</label><input id="bz-qty" value="${data?.quantity || ''}"></div><div class="form-group"><label>Buyer</label><input id="bz-buyer" value="${data?.buyer || ''}"></div>`;
-        document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveBazar('${id || ''}')">${id ? 'Update' : 'Add'}</button>`;
-        this.openModal();
+        document.getElementById('modal-title').textContent = id ? 'Edit Item' : 'Add Bazaar';
+        document.getElementById('modal-title').innerHTML += '<div class="bazar-cat-tabs" id="bazar-cat-tabs"><button class="bazar-tab active" data-cat="Bazar" onclick="App.setBazarCat(\'Bazar\')"><span class="material-icons-round">shopping_cart</span> Bazar</button><button class="bazar-tab" data-cat="Utility" onclick="App.setBazarCat(\'Utility\')"><span class="material-icons-round">lightbulb</span> Utility</button><button class="bazar-tab" data-cat="Special" onclick="App.setBazarCat(\'Special\')"><span class="material-icons-round">star</span> Special</button></div>';
+        db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
+            const m = snap.val() || {}; let chips = '';
+            Object.entries(m).forEach(([mid, v]) => { chips += `<button class="member-chip" data-mid="${mid}" onclick="App.selectBazarMember(this)">${this.esc(v.name)}</button>`; });
+            document.getElementById('modal-body').innerHTML = `
+                <div class="form-group"><label style="color:#888">Money paid by</label><div class="bazar-member-chips" id="bazar-member-chips">${chips}</div></div>
+                <div id="bazar-items-list">
+                    <div class="bazar-item-row">
+                        <div class="form-group" style="flex:2"><label style="color:#888">Item name</label><input class="bazar-item-name" placeholder="e.g. Rice"></div>
+                        <div class="form-group" style="flex:1"><label style="color:#888">Cost (\u09F3)</label><input type="number" class="bazar-item-cost" min="0" placeholder="0" oninput="App.updateBazarTotal()"></div>
+                    </div>
+                </div>
+                <button class="btn-add-item" onclick="App.addBazarItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                <p style="font-size:12px;color:#888;margin-top:8px">Add each item on its own line for better analysis.</p>
+            `;
+            document.getElementById('modal-footer').innerHTML = `<div class="bazar-footer-bar"><div class="bazar-footer-info"><strong id="bazar-item-count">0 items</strong><span style="color:#888">Pick whose money it is</span></div><strong id="bazar-total-input" style="color:#4CAF50;font-size:18px">\u09F30</strong></div><div style="display:flex;gap:10px;margin-top:12px"><button class="btn-primary" style="background:#FFC107;color:#1a1a1a;flex:1" onclick="App.saveBazarMulti('${id || ''}')">${id ? 'Update' : 'Add'}</button><button class="btn-danger" style="flex:1" onclick="App.closeModal()">Cancel</button></div>`;
+            this.bazarCat = 'Bazar';
+            this.bazarSelectedMember = null;
+            this.openModal();
+        });
     },
 
-    async saveBazar(id) {
-        const data = { item: document.getElementById('bz-item').value.trim(), amount: parseFloat(document.getElementById('bz-amount').value) || 0, quantity: document.getElementById('bz-qty').value.trim(), buyer: document.getElementById('bz-buyer').value.trim(), dateKey: this.dk(this.bazarDate), updatedAt: Date.now() };
-        if (!data.item) { this.toast('Item required', 'error'); return; }
-        if (id) await db.ref(`messes/${this.messId}/bazaar/${id}`).update(data);
-        else { data.createdAt = Date.now(); await db.ref(`messes/${this.messId}/bazaar`).push(data); }
-        this.closeModal(); this.loadBazaar(); this.toast('Saved', 'success');
+    bazarCat: 'Bazar',
+    bazarSelectedMember: null,
+
+    setBazarCat(cat) {
+        this.bazarCat = cat;
+        document.querySelectorAll('.bazar-tab').forEach(t => { t.classList.toggle('active', t.dataset.cat === cat); });
+    },
+
+    selectBazarMember(btn) {
+        document.querySelectorAll('.member-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        this.bazarSelectedMember = btn.dataset.mid;
+    },
+
+    addBazarItemRow() {
+        const list = document.getElementById('bazar-items-list');
+        const row = document.createElement('div');
+        row.className = 'bazar-item-row';
+        row.innerHTML = `<div class="form-group" style="flex:2"><input class="bazar-item-name" placeholder="Item name"></div><div class="form-group" style="flex:1"><input type="number" class="bazar-item-cost" min="0" placeholder="0" oninput="App.updateBazarTotal()"></div><button class="btn-remove-row" onclick="this.parentElement.remove();App.updateBazarTotal()"><span class="material-icons-round">close</span></button>`;
+        list.appendChild(row);
+    },
+
+    updateBazarTotal() {
+        let total = 0, count = 0;
+        document.querySelectorAll('.bazar-item-cost').forEach(el => { const v = parseFloat(el.value) || 0; if (v > 0) { total += v; count++; } });
+        document.getElementById('bazar-item-count').textContent = count + ' item' + (count !== 1 ? 's' : '');
+        document.getElementById('bazar-total-input').textContent = '\u09F3' + total;
+    },
+
+    async saveBazarMulti(editId) {
+        if (!this.bazarSelectedMember) { this.toast('Select who paid', 'error'); return; }
+        const names = document.querySelectorAll('.bazar-item-name');
+        const costs = document.querySelectorAll('.bazar-item-cost');
+        const buyer = (await db.ref(`messes/${this.messId}/members/${this.bazarSelectedMember}/name`).once('value')).val() || '';
+        const dk = this.dk(this.bazarDate);
+        let saved = 0;
+        for (let i = 0; i < names.length; i++) {
+            const item = names[i].value.trim();
+            const amount = parseFloat(costs[i].value) || 0;
+            if (!item || amount <= 0) continue;
+            const data = { item, amount, buyer, category: this.bazarCat, dateKey: dk, updatedAt: Date.now() };
+            if (editId) await db.ref(`messes/${this.messId}/bazaar/${editId}`).update(data);
+            else { data.createdAt = Date.now(); await db.ref(`messes/${this.messId}/bazaar`).push(data); }
+            saved++;
+        }
+        if (saved === 0) { this.toast('Add at least one item with cost', 'error'); return; }
+        this.closeModal(); this.loadBazaar(); this.toast(saved + ' item(s) saved!', 'success');
     },
 
     async editBazar(id) { const s = await db.ref(`messes/${this.messId}/bazaar/${id}`).once('value'); this.showBazarModal(id, s.val()); },
