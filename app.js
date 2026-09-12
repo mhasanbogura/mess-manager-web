@@ -112,6 +112,7 @@ const App = {
 
     // MULTI-MESS
     async loadMyMesses() {
+        this.showScreen('mess-select-screen');
         const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
         const data = snap.val() || {};
         const ids = Object.keys(data);
