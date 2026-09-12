@@ -1,24 +1,12 @@
-// ============================================================
-// MESS MANAGER - FIREBASE CONFIGURATION
-// ============================================================
-// Step 1: Go to https://console.firebase.google.com
-// Step 2: Create a project (or use existing)
-// Step 3: Go to Project Settings > General > Your apps
-// Step 4: Add a Web App > Copy the config object below
-// Step 5: Go to Authentication > Sign-in method > Enable:
-//         - Email/Password
-//         - Google
-// Step 6: Go to Realtime Database > Create Database > Start in test mode
-// ============================================================
-
+// Firebase Config
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAGSes0nNoGWzgweoYrta99oRU_fKxkZCc",
+    authDomain: "mess-manager-a91c8.firebaseapp.com",
+    projectId: "mess-manager-a91c8",
+    storageBucket: "mess-manager-a91c8.firebasestorage.app",
+    messagingSenderId: "714155755588",
+    appId: "1:714155755588:web:83b0064016bf657a789411",
+    measurementId: "G-YRZQHP98SF"
 };
 
 firebase.initializeApp(firebaseConfig);
