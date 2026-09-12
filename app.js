@@ -66,8 +66,8 @@ const App = {
         $('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
         $('monthly-year-select').addEventListener('change', () => this.loadMonthlyOverview());
         $('monthly-month-select').addEventListener('change', () => this.loadMonthlyOverview());
-        $('export-daily-pdf').addEventListener('click', () => this.exportPDF('daily'));
-        $('export-monthly-pdf').addEventListener('click', () => this.exportPDF('monthly'));
+        $('export-daily-pdf')?.addEventListener('click', () => this.exportPDF('daily'));
+        $('export-monthly-pdf')?.addEventListener('click', () => this.exportPDF('monthly'));
     },
 
     showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
