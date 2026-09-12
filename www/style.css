@@ -323,13 +323,13 @@ body {
 .dash-live-bazar strong { display: block; font-size: 12px; color: #4CAF50; }
 
 .dash-finance-row {
-    display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
     align-items: center; background: var(--card); border-radius: var(--radius);
-    padding: 14px; margin-bottom: 10px; border: 1px solid var(--card-border);
+    padding: 12px; margin-bottom: 10px; border: 1px solid var(--card-border);
 }
 
 .dash-finance-box small { font-size: 11px; color: #888; display: block; }
-.dash-finance-box strong { font-size: 15px; color: white; font-weight: 700; }
+.dash-finance-box strong { font-size: 14px; color: white; font-weight: 700; }
 .balance-green { color: #4CAF50 !important; }
 .balance-red { color: #F44336 !important; }
 
@@ -784,25 +784,23 @@ select.input-sm { cursor: pointer; }
 }
 .meal-month-bar strong { color: #F44336; font-size: 14px; }
 
-.meal-grid-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; }
-.meal-table { min-width: 100%; }
-.meal-table-inner { display: inline-flex; flex-direction: column; min-width: 100%; }
+.meal-grid-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 8px; border-radius: var(--radius-sm); }
+.meal-table { border-collapse: collapse; }
+.meal-table-inner { display: inline-block; }
 
-.meal-header-row { display: flex; }
-.meal-header-row .meal-name-col { min-width: 100px; padding: 8px 10px; background: var(--card); color: #888; font-size: 11px; font-weight: 600; border: 1px solid var(--card-border); }
-.meal-day-col { min-width: 48px; padding: 8px 6px; background: #FFC107; color: #1a1a1a; font-size: 12px; font-weight: 700; text-align: center; border: 1px solid #e0a800; }
+.meal-header-row, .meal-row { display: flex; white-space: nowrap; }
+.meal-header-row .meal-name-col { min-width: 90px; max-width: 90px; padding: 8px 6px; background: var(--card); color: #888; font-size: 11px; font-weight: 600; border: 1px solid var(--card-border); }
+.meal-day-col { min-width: 44px; padding: 8px 4px; background: #FFC107; color: #1a1a1a; font-size: 12px; font-weight: 700; text-align: center; border: 1px solid #e0a800; }
 
-.meal-row { display: flex; }
-.meal-name-col { min-width: 100px; padding: 6px 10px; display: flex; flex-direction: column; justify-content: center; color: white; font-size: 12px; border: 1px solid var(--card-border); }
-.meal-name-col strong { font-size: 12px; }
-.meal-name-col small { font-size: 10px; opacity: 0.8; }
-.meal-type-col { min-width: 80px; padding: 4px 8px; display: flex; flex-direction: column; justify-content: center; border: 1px solid var(--card-border); }
-.meal-type-col small { font-size: 10px; color: #aaa; }
-.meal-type-col strong { font-size: 12px; color: white; }
-.meal-cell { min-width: 48px; padding: 6px; text-align: center; font-size: 12px; color: #888; background: #1a1a2e; border: 1px solid var(--card-border); }
+.meal-name-col { min-width: 90px; max-width: 90px; padding: 4px 6px; display: flex; flex-direction: column; justify-content: center; color: white; font-size: 11px; border: 1px solid var(--card-border); overflow: hidden; }
+.meal-name-col strong { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.meal-name-col small { font-size: 9px; opacity: 0.8; }
+.meal-type-col { min-width: 72px; max-width: 72px; padding: 3px 6px; display: flex; flex-direction: column; justify-content: center; border: 1px solid var(--card-border); }
+.meal-type-col small { font-size: 9px; color: #aaa; }
+.meal-type-col strong { font-size: 11px; color: white; }
+.meal-cell { min-width: 44px; max-width: 44px; padding: 4px; text-align: center; font-size: 11px; color: #555; background: #1a1a2e; border: 1px solid var(--card-border); }
 .meal-cell.filled { color: white; font-weight: 600; }
-.meal-row-first .meal-name-col { border-top-left-radius: 6px; }
-.meal-member-divider { height: 4px; }
+.meal-member-divider { height: 2px; }
 
 .meal-summary-bar {
     display: flex; gap: 20px; padding: 8px 0; font-size: 13px; color: #888;
@@ -842,13 +840,13 @@ select.input-sm { cursor: pointer; }
     border: 1px solid var(--card-border); overflow: hidden;
 }
 .collapse-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 14px; cursor: pointer; transition: background 0.2s;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: 12px 14px; cursor: pointer; transition: background 0.2s; gap: 8px;
 }
 .collapse-header:hover { background: rgba(255,255,255,0.03); }
-.collapse-header strong { font-size: 14px; color: white; }
-.collapse-sub { font-size: 12px; color: #888; margin-top: 2px; }
-.collapse-right { display: flex; align-items: center; gap: 8px; }
+.collapse-header strong { font-size: 13px; color: white; }
+.collapse-sub { font-size: 11px; color: #888; margin-top: 2px; }
+.collapse-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .collapse-arrow { color: #888; font-size: 20px !important; transition: transform 0.2s; }
 .collapse-card.collapsed .collapse-arrow { transform: rotate(180deg); }
 .collapse-card.collapsed .collapse-body { display: none; }
@@ -863,14 +861,14 @@ select.input-sm { cursor: pointer; }
 .collapse-table-header span:last-child { width: 70px; text-align: right; }
 
 .collapse-row {
-    display: flex; align-items: center; padding: 12px 14px;
+    display: flex; align-items: center; padding: 10px 14px;
     border-top: 1px solid rgba(255,255,255,0.03); cursor: pointer;
     transition: background 0.15s;
 }
 .collapse-row:hover { background: rgba(255,255,255,0.03); }
-.collapse-row-name { flex: 1; font-size: 13px; color: white; }
-.collapse-row-sub { flex: 1; font-size: 12px; color: #888; }
-.collapse-row-amt { width: 70px; text-align: right; font-size: 13px; font-weight: 700; }
+.collapse-row-name { flex: 1; font-size: 13px; color: white; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.collapse-row-sub { flex: 1; font-size: 12px; color: #888; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.collapse-row-amt { width: 70px; text-align: right; font-size: 13px; font-weight: 700; flex-shrink: 0; }
 
 /* BOTTOM NAV (mobile) */
 .bottom-nav {

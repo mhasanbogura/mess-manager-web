@@ -110,10 +110,8 @@
                 <a href="#" class="nav-item" data-page="members"><span class="material-icons-round">group</span> Flat</a>
                 <a href="#" class="nav-item" data-page="meals"><span class="material-icons-round">restaurant_menu</span> Meals</a>
                 <a href="#" class="nav-item" data-page="bazaar"><span class="material-icons-round">shopping_cart</span> Bazaar</a>
-                <a href="#" class="nav-item" data-page="expenses"><span class="material-icons-round">receipt_long</span> Expenses</a>
                 <a href="#" class="nav-item" data-page="balance"><span class="material-icons-round">account_balance_wallet</span> Balance</a>
                 <a href="#" class="nav-item" data-page="notices"><span class="material-icons-round">campaign</span> Notices</a>
-                <a href="#" class="nav-item" data-page="reports"><span class="material-icons-round">assessment</span> Reports</a>
                 <a href="#" class="nav-item" data-page="monthly"><span class="material-icons-round">insights</span> Analysis</a>
                 <div class="nav-divider"></div>
                 <a href="#" class="nav-item" id="leave-mess-btn"><span class="material-icons-round">logout</span> Leave Mess</a>
@@ -323,25 +321,6 @@
                 <button class="btn-fab" onclick="App.showBazarModal()"><span class="material-icons-round">add</span> Add</button>
             </div>
 
-            <!-- EXPENSES / MANAGER MONEY -->
-            <div class="page" id="page-expenses">
-                <div class="page-header">
-                    <h3>Manager Money</h3>
-                    <button class="btn-fab-sm" id="add-expense-btn" onclick="App.showExpenseModal()"><span class="material-icons-round">add</span></button>
-                </div>
-                <div class="meal-month-bar">
-                    <span>Current Month:</span>
-                    <strong id="expense-month-label">September, 2026</strong>
-                </div>
-                <div id="expenses-list">
-                    <p class="empty-state" style="color:#888">No expenses</p>
-                </div>
-                <div class="meal-summary-bar">
-                    <span>Month Total: <strong id="expense-total-month">৳0</strong></span>
-                </div>
-                <button class="btn-fab" onclick="App.showExpenseModal()"><span class="material-icons-round">add</span> Add</button>
-            </div>
-
             <!-- BALANCE -->
             <div class="page" id="page-balance">
                 <div class="page-header"><h3>Balance & Dues</h3><button class="btn-primary btn-sm" id="add-deposit-btn"><span class="material-icons-round">add</span> Deposit</button></div>
@@ -353,23 +332,6 @@
             <div class="page" id="page-notices">
                 <div class="page-header"><h3>Notices</h3><button class="btn-primary btn-sm" id="add-notice-btn"><span class="material-icons-round">post_add</span> Post</button></div>
                 <div id="notices-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No notices</p></div></div>
-            </div>
-
-            <!-- REPORTS -->
-            <div class="page" id="page-reports">
-                <div class="page-header"><h3>Reports</h3></div>
-                <div class="dash-today-card">
-                    <h4 style="color:white;font-size:14px;margin-bottom:10px">Daily Report</h4>
-                    <div class="date-nav"><button class="icon-btn" id="report-prev-day"><span class="material-icons-round">chevron_left</span></button><h4 id="report-date-label" style="color:white;font-size:13px">Today</h4><button class="icon-btn" id="report-next-day"><span class="material-icons-round">chevron_right</span></button></div>
-                    <div id="daily-report" class="report-content"><p class="empty-state" style="color:#888">No data</p></div>
-                    <button class="btn-primary btn-sm" id="export-daily-pdf" style="margin-top:10px" onclick="App.toast('Use Analysis page for PDF export','info')"><span class="material-icons-round">picture_as_pdf</span> PDF</button>
-                </div>
-                <div class="dash-today-card">
-                    <h4 style="color:white;font-size:14px;margin-bottom:10px">Monthly Report</h4>
-                    <div class="date-nav"><button class="icon-btn" id="report-prev-month"><span class="material-icons-round">chevron_left</span></button><select id="report-year-select" class="input-sm" style="width:auto"></select><h4 id="report-month-label" style="color:white;font-size:13px">This Month</h4><button class="icon-btn" id="report-next-month"><span class="material-icons-round">chevron_right</span></button></div>
-                    <div id="monthly-report" class="report-content"><p class="empty-state" style="color:#888">No data</p></div>
-                    <button class="btn-primary btn-sm" id="export-monthly-pdf" style="margin-top:10px" onclick="App.navigate('monthly')"><span class="material-icons-round">picture_as_pdf</span> Go to Analysis</button>
-                </div>
             </div>
 
             <!-- MONTHLY OVERVIEW / ANALYSIS -->

@@ -61,15 +61,9 @@ const App = {
         $('bulk-meal-btn')?.addEventListener('click', () => this.showBulkMealModal());
         $('add-bazar-btn')?.addEventListener('click', () => this.showBazarModal());
         $('add-expense-btn')?.addEventListener('click', () => this.showExpenseModal());
-        $('add-deposit-btn').addEventListener('click', () => this.showDepositModal());
         $('add-notice-btn').addEventListener('click', () => this.showNoticeModal());
         $('modal-close').addEventListener('click', () => this.closeModal());
         $('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
-        $('report-prev-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() - 1); this.loadDailyReport(); });
-        $('report-next-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() + 1); this.loadDailyReport(); });
-        $('report-prev-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() - 1); $('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
-        $('report-next-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() + 1); $('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
-        $('report-year-select').addEventListener('change', e => { this.reportMonth.setFullYear(+e.target.value); this.loadMonthlyReport(); });
         $('monthly-year-select').addEventListener('change', () => this.loadMonthlyOverview());
         $('monthly-month-select').addEventListener('change', () => this.loadMonthlyOverview());
         $('export-daily-pdf').addEventListener('click', () => this.exportPDF('daily'));
@@ -254,10 +248,10 @@ const App = {
         const ni = document.querySelector(`.nav-item[data-page="${page}"]`); if (ni) ni.classList.add('active');
         document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
         const bni = document.querySelector(`.bottom-nav-item[data-page="${page}"]`); if (bni) bni.classList.add('active');
-        const titles = { dashboard: this.messName || 'My Mess', members: 'Members', meals: 'Meals', bazaar: 'Bazaar', expenses: 'Expenses', balance: 'Balance', notices: 'Notices', reports: 'Reports', monthly: 'Analysis' };
+        const titles = { dashboard: this.messName || 'My Mess', members: 'Flat', meals: 'Meals', bazaar: 'Bazar', balance: 'Balance', notices: 'Notices', monthly: 'Analysis' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         this.closeSidebar();
-        const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), expenses: () => this.loadExpenses(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), reports: () => { this.loadDailyReport(); this.loadMonthlyReport(); }, monthly: () => this.loadMonthlyOverview() };
+        const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), monthly: () => this.loadMonthlyOverview() };
         if (loaders[page]) loaders[page]();
     },
 
