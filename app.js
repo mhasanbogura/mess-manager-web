@@ -540,8 +540,9 @@ const App = {
                     const isLast = vi === visibleMeals.length - 1;
                     const namePos = isFirst ? ' mg-name-first' : isLast ? ' mg-name-last' : ' mg-name-mid';
                     const rowSep = (isFirst && idx > 0) ? ' mg-row-sep' : '';
+                    const nameContent = isFirst ? `<div class="mg-name-inner"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></div>` : '';
                     html += '<tr>';
-                    html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor};${!isFirst ? 'border-top:none;' : ''}${!isLast ? 'border-bottom:none;' : ''}">${isFirst ? `<strong>${this.esc(m.name)}</strong><small>(${mTotal})</small>` : '&nbsp;'}</td>`;
+                    html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor}">${nameContent}</td>`;
                     html += `<td class="mg-type${rowSep}" style="background:${mealBgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mealColors[mi]}">${mealIcons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${mealLabels[mi]}</span></td>`;
                     for (let d = 1; d <= viewDays; d++) {
                         const dk = `${month}-${String(d).padStart(2, '0')}`;
