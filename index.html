@@ -56,7 +56,7 @@
         </div>
     </div>
 
-    <!-- MESS SELECTOR (after login, before entering a mess) -->
+    <!-- MESS SELECTOR -->
     <div id="mess-select-screen" class="screen">
         <div class="auth-container" style="max-width:500px">
             <div class="auth-header">
@@ -91,263 +91,14 @@
         </header>
 
         <main class="main-content">
-            <!-- DASHBOARD -->
-            <div class="page active" id="page-dashboard">
-                <div class="dash-greeting" id="dash-greeting">Good day</div>
-
-                <div class="dash-mess-card">
-                    <div class="dash-mess-top">
-                        <div>
-                            <h2 id="dash-mess-name">Mess Name</h2>
-                            <p class="dash-mess-sub">Calculated meal rate</p>
-                        </div>
-                        <button class="btn-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Code</button>
-                    </div>
-                    <div class="dash-mess-info-row">
-                        <div class="dash-info-box">
-                            <span class="material-icons-round">person</span>
-                            <div><small>Manager</small><strong id="dash-manager">-</strong></div>
-                        </div>
-                        <div class="dash-info-box">
-                            <span class="material-icons-round">calendar_month</span>
-                            <div><small>Current month</small><strong id="dash-month">-</strong></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="dash-notice-bar" onclick="App.navigate('notices')">
-                    <span class="material-icons-round">campaign</span>
-                    <div><strong>Notice Board</strong><p id="dash-notice-preview">Pin a notice for the whole house</p></div>
-                    <span class="material-icons-round">chevron_right</span>
-                </div>
-
-                <div class="dash-today-card">
-                    <div class="dash-today-header">
-                        <strong id="dash-date">Today</strong>
-                        <span class="dash-online"><span class="dot-green"></span> <span id="dash-online-count">0</span> online</span>
-                    </div>
-        <div class="dash-meal-grid">
-            <div class="dash-meal-box breakfast">
-                <span class="material-icons-round" style="color:#FFC107;font-size:22px">local_cafe</span>
-                <small>Breakfast</small>
-                <strong id="dash-breakfast">0</strong>
-            </div>
-            <div class="dash-meal-box lunch">
-                <span class="material-icons-round" style="color:#4CAF50;font-size:22px">lunch_dining</span>
-                <small>Lunch</small>
-                <strong id="dash-lunch">0</strong>
-            </div>
-            <div class="dash-meal-box dinner">
-                <span class="material-icons-round" style="color:#42a5f5;font-size:22px">dinner_dining</span>
-                <small>Dinner</small>
-                <strong id="dash-dinner">0</strong>
-            </div>
-        </div>
-        <div class="dash-action-row">
-            <div class="dash-bazar-duty">
-                <span class="material-icons-round">assignment</span>
-                <div><strong>Not assigned</strong><p id="dash-bazar-duty" style="margin:0;font-size:11px;color:#888">Bazar duty today</p></div>
-            </div>
-            <div class="dash-live-bazar" onclick="App.navigate('bazaar')">
-                <span class="material-icons-round">note</span>
-                <div><strong>Bazar note</strong><p id="dash-live-count" style="margin:0;font-size:11px;color:#4CAF50">Nothing on the list</p></div>
-            </div>
-        </div>
-                </div>
-
-                <div class="dash-finance-row">
-                    <div class="dash-finance-box">
-                        <small>Deposit</small>
-                        <strong id="dash-deposit">৳0</strong>
-                    </div>
-                    <div class="dash-finance-box">
-                        <small>Balance</small>
-                        <strong id="dash-balance" class="balance-green">৳0</strong>
-                    </div>
-                    <div class="dash-finance-box">
-                        <small>Cost/meal</small>
-                        <strong id="dash-rate">৳0</strong>
-                    </div>
-                    <button class="btn-analyse" onclick="App.navigate('monthly')"><span class="material-icons-round">insights</span> Analyse</button>
-                </div>
-
-    <div class="dash-member-stats">
-        <div class="dash-stats-header">
-            <span class="material-icons-round">group</span>
-            <strong>Member Stats :</strong>
-            <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);cursor:pointer" onclick="App.navigate('monthly')">Customise table <span class="material-icons-round" style="font-size:16px;vertical-align:middle">tune</span></span>
-        </div>
-                    <div class="dash-table-wrap">
-                        <table class="dash-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Meals</th>
-                                    <th>Cost(৳)</th>
-                                    <th>Deposit(৳)</th>
-                                    <th>Balance(৳)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dash-member-rows">
-                                <tr><td colspan="5" class="empty-state">No data</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MEMBERS / FLAT -->
-            <div class="page" id="page-members">
-                <div class="page-header">
-                    <h3>Flat</h3>
-                    <button class="btn-leave-top" id="leave-mess-top" onclick="App.leaveMess()"><span class="material-icons-round">logout</span> Leave</button>
-                </div>
-                <div class="flat-mess-card">
-                    <div class="flat-mess-top">
-                        <div class="flat-mess-icon"><span class="material-icons-round">home</span></div>
-                        <div class="flat-mess-info">
-                            <h2 id="flat-mess-name">Mess</h2>
-                            <span class="flat-rate-badge"><span class="material-icons-round">calculate</span> Calculated meal rate</span>
-                        </div>
-                    </div>
-                    <div class="flat-mess-row">
-                        <div class="flat-id-box">
-                            <div><small>Flat ID</small><strong id="flat-id-code">------</strong></div>
-                            <button class="icon-btn-sm" onclick="App.shareMessCode()"><span class="material-icons-round">share</span></button>
-                        </div>
-                        <div class="flat-manager-box">
-                            <div><small>Manager</small><strong id="flat-manager-name">-</strong></div>
-                            <span class="material-icons-round" style="color:rgba(255,255,255,0.4)">chevron_right</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flat-tabs">
-                    <button class="flat-tab active" data-tab="members" onclick="App.switchFlatTab('members')">Members</button>
-                    <button class="flat-tab" data-tab="peoples" onclick="App.switchFlatTab('peoples')">Peoples</button>
-                    <button class="flat-tab" data-tab="permissions" onclick="App.switchFlatTab('permissions')">Permissions</button>
-                </div>
-                <div class="flat-tab-content" id="flat-tab-members">
-                    <div class="flat-info-box"><span class="material-icons-round">restaurant</span><p>Members are the names your meals, shopping and balances are counted against. Add everyone who eats in this flat &mdash; they do not need the app.</p></div>
-                    <div class="flat-add-row">
-                        <input type="text" id="flat-add-member-name" placeholder="Add Member" maxlength="20">
-                        <button class="btn-flat-add" onclick="App.quickAddMember()">ADD</button>
-                    </div>
-                    <p class="flat-hint">Unique name; letters, numbers & spaces only</p>
-                    <p class="flat-total">Total Flat Members: <strong id="member-count">0</strong></p>
-                    <div id="members-list"></div>
-                </div>
-                <div class="flat-tab-content" id="flat-tab-peoples" style="display:none">
-                    <div class="flat-info-box"><span class="material-icons-round">phone_android</span><p>Peoples have the app and have joined this flat. Joining does not put anyone on the meal list &mdash; add them under Members for that.</p></div>
-                    <p class="flat-total">Flat Peoples <strong id="peoples-count">0</strong></p>
-                    <div id="peoples-list"></div>
-                </div>
-                <div class="flat-tab-content" id="flat-tab-permissions" style="display:none">
-                    <div class="flat-info-box" style="border-color:#5a3d20;background:#2a1e10"><span class="material-icons-round" style="color:#FFC107">lock</span><p style="color:#ccc">What each People is allowed to do &mdash; add meals, add shopping, manage the lists. Only Peoples appear here.</p></div>
-                    <div id="permissions-list"></div>
-                    <p class="flat-hint" style="margin-top:10px"><span class="material-icons-round" style="font-size:14px;vertical-align:middle">info</span> The manager always has every permission.</p>
-                </div>
-            </div>
-
-            <!-- MEALS -->
-            <div class="page" id="page-meals">
-                <div class="page-header">
-                    <h3>Meal Entry</h3>
-                    <div style="display:flex;gap:6px">
-                        <button class="btn-icon-top" onclick="App.showBulkMealModal()"><span class="material-icons-round">edit</span><small>Bulk</small></button>
-                        <button class="btn-fab-sm" id="add-meal-btn"><span class="material-icons-round">add</span></button>
-                    </div>
-                </div>
-                <div class="meal-month-bar">
-                    <span>Current Month:</span>
-                    <strong id="meal-month-label">September, 2026</strong>
-                </div>
-                <div class="meal-grid-wrap" id="meal-grid-wrap">
-                    <p class="empty-state" style="color:#888">No meals recorded</p>
-                </div>
-                <div class="meal-summary-bar">
-                    <span>Today: <strong id="meal-total-today">0</strong></span>
-                    <span>Month: <strong id="meal-total-month">0</strong></span>
-                </div>
-                <button class="btn-fab" id="add-meal-fab" onclick="App.showMealModal()"><span class="material-icons-round">add</span> Add</button>
-            </div>
-
-            <!-- BAZAAR -->
-            <div class="page" id="page-bazaar">
-                <div class="page-header">
-                    <h3>Shopping List</h3>
-                    <div style="display:flex;gap:6px">
-                        <button class="btn-icon-top" onclick="App.showExpenseModal()"><span class="material-icons-round">receipt_long</span><small>Utility</small></button>
-                    </div>
-                </div>
-                <div class="meal-month-bar">
-                    <span>Current Month:</span>
-                    <strong id="bazar-month-label">September, 2026</strong>
-                </div>
-                <div id="bazar-list">
-                    <p class="empty-state" style="color:#888">No items</p>
-                </div>
-                <div class="meal-summary-bar">
-                    <span>Month: <strong id="bazar-total-month">৳0</strong></span>
-                </div>
-                <button class="btn-fab" onclick="App.showBazarModal()"><span class="material-icons-round">add</span> Add</button>
-            </div>
-
-            <!-- BALANCE -->
-            <div class="page" id="page-balance">
-                <div class="page-header"><h3>Balance & Dues</h3><button class="btn-primary btn-sm" id="add-deposit-btn"><span class="material-icons-round">add</span> Deposit</button></div>
-                <div class="dash-finance-row"><div class="dash-finance-box"><small>Deposits</small><strong id="balance-income">\u09F30</strong></div><div class="dash-finance-box"><small>Expense</small><strong id="balance-expense">\u09F30</strong></div><div class="dash-finance-box"><small>Balance</small><strong id="balance-remaining" class="balance-green">\u09F30</strong></div><div class="dash-finance-box"><small>Rate</small><strong id="balance-rate">\u09F30</strong></div></div>
-                <div class="dash-today-card"><div class="dash-stats-header"><span class="material-icons-round">group</span><strong>Member Dues</strong></div><div id="member-dues-list"><p class="empty-state" style="color:#888">No data</p></div></div>
-            </div>
-
-            <!-- NOTICES -->
-            <div class="page" id="page-notices">
-                <div class="page-header"><h3>Notice Board</h3><button class="btn-primary btn-sm" id="add-notice-btn"><span class="material-icons-round">post_add</span> Post</button></div>
-                <div id="notices-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No notices</p></div></div>
-            </div>
-
-            <!-- MONTHLY OVERVIEW / ANALYSIS -->
-            <div class="page" id="page-monthly">
-                <div class="page-header"><h3>Analysis</h3></div>
-                <div class="analysis-card">
-                    <div class="analysis-month-select">
-                        <label>Month</label>
-                        <select id="monthly-year-select" class="input-sm" style="width:auto"></select>
-                        <select id="monthly-month-select" class="input-sm" style="width:auto">
-                            <option value="01">January</option><option value="02">February</option><option value="03">March</option>
-                            <option value="04">April</option><option value="05">May</option><option value="06">June</option>
-                            <option value="07">July</option><option value="08">August</option><option value="09" selected>September</option>
-                            <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="analysis-summary" class="analysis-grid-3"></div>
-                <div id="analysis-collection" class="analysis-card"></div>
-                <div id="analysis-paidin" class="analysis-card"></div>
-                <div class="analysis-card"><h4>Cost per meal trend</h4><p id="analysis-trend-label" class="analysis-sub"></p><div class="chart-wrap"><canvas id="chart-trend"></canvas></div></div>
-                <div class="analysis-card"><h4>Shopping by day</h4><p id="analysis-bazar-day-total" class="analysis-sub"></p><div class="chart-wrap"><canvas id="chart-bazar-day"></canvas></div></div>
-                <div class="analysis-card"><h4>Meals by day</h4><p id="analysis-meals-day-total" class="analysis-sub"></p><div class="chart-wrap"><canvas id="chart-meals-day"></canvas></div></div>
-                <div id="analysis-top-items" class="analysis-card"></div>
-                <div id="analysis-member-balances" class="analysis-card"></div>
-                <div id="analysis-meal-share" class="analysis-card"></div>
-                <div class="analysis-export-wrap"><button class="btn-export-pdf" onclick="App.exportAnalysisPDF()"><span class="material-icons-round">picture_as_pdf</span> Export PDF</button></div>
-            </div>
-
-            <!-- PROFILE -->
-            <div class="page" id="page-profile">
-                <div class="profile-card" style="text-align:center;padding:30px 20px">
-                    <div style="width:80px;height:80px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><span class="material-icons-round" style="font-size:40px;color:white">account_circle</span></div>
-                    <h2 id="profile-name" style="margin-bottom:4px">User</h2>
-                    <p id="profile-email" style="color:var(--text-secondary);font-size:13px;margin-bottom:20px">email</p>
-                    <div style="background:var(--card);border-radius:var(--radius);padding:16px;text-align:left;margin-bottom:16px">
-                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:var(--text-secondary);font-size:13px">Mess</span><strong id="profile-mess" style="font-size:13px">-</strong></div>
-                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:var(--text-secondary);font-size:13px">Code</span><strong id="profile-code" style="font-size:13px;display:flex;align-items:center;gap:6px">------ <button class="icon-btn-sm" onclick="App.copyCode()" style="padding:2px"><span class="material-icons-round" style="font-size:14px">content_copy</span></button></strong></div>
-                        <div style="display:flex;justify-content:space-between;padding:8px 0"><span style="color:var(--text-secondary);font-size:13px">Role</span><strong id="profile-role" style="font-size:13px">-</strong></div>
-                    </div>
-                    <button class="btn-export-pdf" onclick="App.navigate('monthly')" style="width:100%;margin-bottom:10px"><span class="material-icons-round">insights</span> Analysis</button>
-                    <button id="profile-leave-btn" class="btn-danger" style="width:100%;margin-bottom:10px;padding:14px" onclick="App.leaveMess()"><span class="material-icons-round">logout</span> Leave Mess</button>
-                    <button id="profile-logout-btn" class="btn-modal-cancel" style="width:100%;padding:14px" onclick="App.signOut()"><span class="material-icons-round">power_settings_new</span> Sign Out</button>
-                </div>
-            </div>
+            <div class="page active" id="page-dashboard"></div>
+            <div class="page" id="page-members"></div>
+            <div class="page" id="page-meals"></div>
+            <div class="page" id="page-bazaar"></div>
+            <div class="page" id="page-balance"></div>
+            <div class="page" id="page-notices"></div>
+            <div class="page" id="page-monthly"></div>
+            <div class="page" id="page-profile"></div>
         </main>
     </div>
 
@@ -374,8 +125,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="firebase-config.js"></script>
     <script src="app.js"></script>
 </body>
