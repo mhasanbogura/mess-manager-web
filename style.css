@@ -805,20 +805,21 @@ select.input-sm { cursor: pointer; }
 .mg-name {
     position: sticky; left: 4px; z-index: 2;
     min-width: 90px; max-width: 90px; padding: 4px; color: white; font-size: 12px;
-    border: 1px solid var(--card-border); text-align: center;
+    border: none; text-align: center;
     vertical-align: middle;
 }
-.mg-name-first { border-radius: 6px 0 0 0; padding: 6px 4px; }
-.mg-name-mid { border-radius: 0; padding: 2px 4px; }
-.mg-name-last { border-radius: 0 0 0 6px; padding: 2px 4px; }
+.mg-name-first { border-radius: 8px 0 0 0; padding: 6px 4px; border-bottom: none; }
+.mg-name-mid { border-radius: 0; padding: 2px 4px; border-top: none; border-bottom: none; }
+.mg-name-last { border-radius: 0 0 0 8px; padding: 2px 4px; border-top: none; }
+.mg-member-sep { box-shadow: inset 0 -3px 0 0 rgba(255,255,255,0.25); border-top: 3px solid rgba(255,255,255,0.15) !important; }
 .mg-name strong { font-size: 12px; display: block; }
 .mg-name small { font-size: 10px; opacity: 0.8; }
-.mg-member-sep { box-shadow: inset 0 2px 0 0 rgba(255,255,255,0.3); }
 .mg-type {
     position: sticky; left: 94px; z-index: 2;
     min-width: 100px; max-width: 100px; padding: 4px 6px; white-space: nowrap;
     border: 1px solid var(--card-border); display: flex; align-items: center; gap: 4px;
 }
+.mg-row-sep { border-top: 3px solid rgba(255,255,255,0.15) !important; }
 .mg-type-icon { font-size: 16px; flex-shrink: 0; }
 .mg-type-label { font-size: 11px; color: #aaa; margin-left: auto; }
 .mg-type strong { font-size: 12px; color: white; min-width: 18px; }

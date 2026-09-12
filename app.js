@@ -519,13 +519,14 @@ const App = {
                 }
                 const namePos = mi === 0 ? ' mg-name-first' : mi === 3 ? ' mg-name-last' : ' mg-name-mid';
                 const memberSep = (mi === 0 && idx > 0) ? ' mg-member-sep' : '';
+                const rowSep = (mi === 0 && idx > 0) ? ' mg-row-sep' : '';
                 html += '<tr>';
                 html += `<td class="mg-name${namePos}${memberSep}" style="background:${memberColor}">${mi === 0 ? `<strong>${this.esc(m.name)}</strong><small>(${mTotal})</small>` : '&nbsp;'}</td>`;
-                html += `<td class="mg-type" style="background:${bgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mi===0?'#FFC107':mi===1?'#4CAF50':mi===2?'#42a5f5':'#26a69a'}">${icons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${labels[mi]}</span></td>`;
+                html += `<td class="mg-type${rowSep}" style="background:${bgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mi===0?'#FFC107':mi===1?'#4CAF50':mi===2?'#42a5f5':'#26a69a'}">${icons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${labels[mi]}</span></td>`;
                 for (let d = 1; d <= viewDays; d++) {
                     const dk = `${month}-${String(d).padStart(2, '0')}`;
                     const val = (mData[dk] && mData[dk][meal]) || 0;
-                    html += `<td class="mg-cell${val ? ' filled' : ''}">${val || ''}</td>`;
+                    html += `<td class="mg-cell${val ? ' filled' : ''}${rowSep}">${val || ''}</td>`;
                 }
                 html += '</tr>';
             });
