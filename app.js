@@ -58,19 +58,13 @@ const App = {
         $('copy-mess-code').addEventListener('click', () => { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); });
         $('add-member-btn')?.addEventListener('click', () => this.showMemberModal());
         $('add-meal-btn').addEventListener('click', () => this.showMealModal());
-        $('bulk-meal-btn').addEventListener('click', () => this.showBulkMealModal());
-        $('add-bazar-btn').addEventListener('click', () => this.showBazarModal());
-        $('add-expense-btn').addEventListener('click', () => this.showExpenseModal());
+        $('bulk-meal-btn')?.addEventListener('click', () => this.showBulkMealModal());
+        $('add-bazar-btn')?.addEventListener('click', () => this.showBazarModal());
+        $('add-expense-btn')?.addEventListener('click', () => this.showExpenseModal());
         $('add-deposit-btn').addEventListener('click', () => this.showDepositModal());
         $('add-notice-btn').addEventListener('click', () => this.showNoticeModal());
         $('modal-close').addEventListener('click', () => this.closeModal());
         $('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
-        $('meal-prev-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() - 1); this.loadMeals(); });
-        $('meal-next-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() + 1); this.loadMeals(); });
-        $('bazar-prev-day').addEventListener('click', () => { this.bazarDate.setDate(this.bazarDate.getDate() - 1); this.loadBazaar(); });
-        $('bazar-next-day').addEventListener('click', () => { this.bazarDate.setDate(this.bazarDate.getDate() + 1); this.loadBazaar(); });
-        $('expense-prev-month').addEventListener('click', () => { this.expenseMonth.setMonth(this.expenseMonth.getMonth() - 1); this.loadExpenses(); });
-        $('expense-next-month').addEventListener('click', () => { this.expenseMonth.setMonth(this.expenseMonth.getMonth() + 1); this.loadExpenses(); });
         $('report-prev-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() - 1); this.loadDailyReport(); });
         $('report-next-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() + 1); this.loadDailyReport(); });
         $('report-prev-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() - 1); $('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
@@ -483,22 +477,74 @@ const App = {
     async deleteMember(id) { if (!confirm('Remove member?')) return; await db.ref(`messes/${this.messId}/members/${id}`).remove(); this.loadMembers(); },
 
     async loadMeals() {
-        const key = this.dk(this.mealDate); document.getElementById('meal-date-label').textContent = this.fmtDate(this.mealDate);
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        document.getElementById('meal-month-label').textContent = this.fmtMonth(now);
+
         const mbrs = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = mbrs.val() || {};
-        const mlSnap = await db.ref(`messes/${this.messId}/meals/${key}`).once('value');
-        const meals = mlSnap.val() || {};
-        const div = document.getElementById('meals-list'); const mids = Object.keys(members);
-        if (!mids.length) { div.innerHTML = '<p class="empty-state">Add members first</p>'; return; }
-        let html = '', totalToday = 0;
-        mids.forEach(mid => { const m = members[mid], ml = meals[mid] || {}; const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); totalToday += t;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(m.name)}</h4><span class="amount">${t}</span></div><div class="item-card-details"><span>B:${ml.breakfast || 0} L:${ml.lunch || 0} D:${ml.dinner || 0}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editMeal('${mid}','${key}')"><span class="material-icons-round">edit</span></button></div></div>`;
+        const mids = Object.keys(members);
+        if (!mids.length) { document.getElementById('meal-grid-wrap').innerHTML = '<p class="empty-state" style="color:#888">Add members first</p>'; return; }
+
+        const mlSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-' + String(daysInMonth).padStart(2, '0')).once('value');
+        const allMeals = {};
+        let totalMonth = 0;
+        mlSnap.forEach(d => {
+            const dayMeals = d.val() || {};
+            const dk = d.key;
+            Object.entries(dayMeals).forEach(([mid, ml]) => {
+                if (!allMeals[mid]) allMeals[mid] = {};
+                allMeals[mid][dk] = ml;
+                totalMonth += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0);
+            });
         });
-        div.innerHTML = html; document.getElementById('meal-total-today').textContent = totalToday;
-        const month = this.mk(this.mealDate); let totalMonth = 0;
-        const ms = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
-        ms.forEach(d => { Object.values(d.val() || {}).forEach(ml => { totalMonth += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); }); });
+
+        const today = this.dk(now);
+        let totalToday = 0;
+        Object.values(allMeals).forEach(m => { const ml = m[today]; if (ml) totalToday += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); });
+        document.getElementById('meal-total-today').textContent = totalToday;
         document.getElementById('meal-total-month').textContent = totalMonth;
+
+        const colors = ['#388e3c','#1976d2','#f57c00','#c62828','#7b1fa2','#00838f','#4e342e','#37474f'];
+        const viewDays = Math.min(daysInMonth, 10);
+        let html = '<div class="meal-table"><div class="meal-table-inner"><div class="meal-header-row"><div class="meal-name-col">View</div>';
+        for (let d = 1; d <= viewDays; d++) html += `<div class="meal-day-col">${d}</div>`;
+        if (daysInMonth > viewDays) html += `<div class="meal-day-col">...</div>`;
+        html += '</div>';
+
+        mids.forEach((mid, idx) => {
+            const m = members[mid];
+            const mData = allMeals[mid] || {};
+            let mTotal = 0;
+            Object.values(mData).forEach(ml => { mTotal += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); });
+            const meals = ['breakfast', 'lunch', 'dinner'];
+            const labels = ['☕ Morning', '🍛 Noon', '🌙 Night'];
+            const bgs = ['#3d2b1a', '#1a2e1a', '#1a1e3a'];
+
+            meals.forEach((meal, mi) => {
+                let rowTotal = 0;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dk = `${month}-${String(d).padStart(2, '0')}`;
+                    rowTotal += (mData[dk] && mData[dk][meal]) || 0;
+                }
+                html += `<div class="meal-row ${mi === 0 ? 'meal-row-first' : ''}">`;
+                if (mi === 0) html += `<div class="meal-name-col" style="background:${colors[idx % colors.length]}"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></div>`;
+                else html += `<div class="meal-name-col"></div>`;
+                html += `<div class="meal-type-col" style="background:${bgs[mi]}"><small>${labels[mi]}</small><strong>${rowTotal}</strong></div>`;
+                for (let d = 1; d <= viewDays; d++) {
+                    const dk = `${month}-${String(d).padStart(2, '0')}`;
+                    const val = (mData[dk] && mData[dk][meal]) || 0;
+                    html += `<div class="meal-cell${val ? ' filled' : ''}">${val || ''}</div>`;
+                }
+                if (daysInMonth > viewDays) html += '<div class="meal-cell"></div>';
+                html += '</div>';
+            });
+            html += `<div class="meal-member-divider"></div>`;
+        });
+        html += '</div></div>';
+        document.getElementById('meal-grid-wrap').innerHTML = html;
     },
 
     showMealModal(mid = null, dk = null, data = null) {
@@ -552,35 +598,54 @@ const App = {
     },
 
     async loadBazaar() {
-        const key = this.dk(this.bazarDate); document.getElementById('bazar-date-label').textContent = this.fmtDate(this.bazarDate);
-        const snap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        document.getElementById('bazar-month-label').textContent = this.fmtMonth(now);
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+        const snap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-' + String(daysInMonth).padStart(2, '0')).once('value');
         const div = document.getElementById('bazar-list');
-        if (!snap.exists()) { div.innerHTML = '<div class="dash-today-card"><p class="empty-state" style="color:#888">No items</p></div>'; document.getElementById('bazar-total-today').textContent = '\u09F30'; return; }
-        let total = 0, html = '';
-        snap.forEach(s => { const b = s.val(); total += b.amount || 0;
-            const cat = b.category || 'Bazar';
-            const catClass = cat === 'Utility' ? 'utility' : cat === 'Special' ? 'special' : 'bazar';
-            html += `<div class="dash-today-card">
-                <div class="bazar-item">
-                    <div class="bazar-item-left">
-                        <span class="bazar-cat-dot ${catClass}"></span>
-                        <div><h4 style="color:white;font-size:14px">${this.esc(b.item || '')}</h4>
-                        <p style="color:#888;font-size:12px">${this.esc(b.buyer || '')} ${b.quantity ? '\u00B7 Qty: ' + this.esc(b.quantity) : ''} <span class="bazar-cat-label ${catClass}">${cat}</span></p></div>
-                    </div>
-                    <div class="bazar-item-right">
-                        <span style="color:#4CAF50;font-weight:700;font-size:15px">\u09F3${b.amount || 0}</span>
-                        <div class="bazar-item-actions">
-                            <button class="icon-btn" onclick="App.editBazar('${s.key}')"><span class="material-icons-round" style="font-size:18px;color:#888">edit</span></button>
-                            <button class="icon-btn" onclick="App.deleteBazar('${s.key}')"><span class="material-icons-round" style="font-size:18px;color:#F44336">delete</span></button>
-                        </div>
-                    </div>
+        if (!snap.exists()) { div.innerHTML = '<p class="empty-state" style="color:#888">No items this month</p>'; document.getElementById('bazar-total-month').textContent = '৳0'; return; }
+
+        const byDate = {};
+        let totalMonth = 0;
+        snap.forEach(s => {
+            const b = s.val();
+            const dk = b.dateKey;
+            if (!byDate[dk]) byDate[dk] = [];
+            byDate[dk].push({ key: s.key, ...b });
+            totalMonth += b.amount || 0;
+        });
+        document.getElementById('bazar-total-month').textContent = '৳' + totalMonth;
+
+        const sortedDates = Object.keys(byDate).sort().reverse();
+        let html = '';
+        sortedDates.forEach(dk => {
+            const items = byDate[dk];
+            const dayTotal = items.reduce((s, b) => s + (b.amount || 0), 0);
+            const d = new Date(dk + 'T00:00:00');
+            const dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+            const catBazar = items.filter(b => (b.category || 'Bazar') === 'Bazar').reduce((s, b) => s + (b.amount || 0), 0);
+            const catUtility = items.filter(b => b.category === 'Utility').reduce((s, b) => s + (b.amount || 0), 0);
+
+            html += `<div class="collapse-card" id="bazar-${dk}">
+                <div class="collapse-header" onclick="App.toggleCollapse('bazar-${dk}')">
+                    <div><strong>${dateStr}</strong><p class="collapse-sub">Bazar ৳${catBazar} · ${items.length} item${items.length > 1 ? 's' : ''}${catUtility > 0 ? ' · <span style="color:#FFC107">Utility ৳' + catUtility + '</span>' : ''}</p></div>
+                    <div class="collapse-right"><span style="color:#F44336;font-weight:700">৳${dayTotal}</span><span class="material-icons-round collapse-arrow">expand_less</span></div>
+                </div>
+                <div class="collapse-body">
+                    <div class="collapse-table-header"><span>ITEM</span><span>MONEY FROM</span><span>COST</span></div>
+                    ${items.map(b => `<div class="collapse-row" onclick="App.editBazar('${b.key}')">
+                        <span class="collapse-row-name">${this.esc(b.item || '')}</span>
+                        <span class="collapse-row-sub">${this.esc(b.buyer || '')}</span>
+                        <span class="collapse-row-amt" style="color:#F44336">৳${b.amount || 0}</span>
+                        <span class="material-icons-round" style="font-size:16px;color:#555">chevron_right</span>
+                    </div>`).join('')}
                 </div>
             </div>`;
         });
-        div.innerHTML = html; document.getElementById('bazar-total-today').textContent = '\u09F3' + total;
-        const month = this.mk(this.bazarDate); let mt = 0;
-        const ms = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        ms.forEach(s => { mt += s.val().amount || 0; }); document.getElementById('bazar-total-month').textContent = '\u09F3' + mt;
+        div.innerHTML = html;
     },
 
     showBazarModal(id = null, data = null) {
@@ -660,15 +725,52 @@ const App = {
     async deleteBazar(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/bazaar/${id}`).remove(); this.loadBazaar(); },
 
     async loadExpenses() {
-        const month = this.mk(this.expenseMonth); document.getElementById('expense-month-label').textContent = this.fmtMonth(this.expenseMonth);
-        const snap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        document.getElementById('expense-month-label').textContent = this.fmtMonth(now);
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+        const snap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-' + String(daysInMonth).padStart(2, '0')).once('value');
         const div = document.getElementById('expenses-list');
-        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No expenses</p>'; document.getElementById('expense-total-month').textContent = '\u09F30'; return; }
-        let total = 0, html = '';
-        snap.forEach(s => { const e = s.val(); total += e.amount || 0;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(e.category || '')} - ${this.esc(e.description || '')}</h4><span class="amount">\u09F3${e.amount || 0}</span></div><div class="item-card-details"><span>${e.paidBy || ''}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editExpense('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteExpense('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
+        if (!snap.exists()) { div.innerHTML = '<p class="empty-state" style="color:#888">No expenses this month</p>'; document.getElementById('expense-total-month').textContent = '৳0'; return; }
+
+        const byDate = {};
+        let totalMonth = 0;
+        snap.forEach(s => {
+            const e = s.val();
+            const dk = e.dateKey;
+            if (!byDate[dk]) byDate[dk] = [];
+            byDate[dk].push({ key: s.key, ...e });
+            totalMonth += e.amount || 0;
         });
-        div.innerHTML = html; document.getElementById('expense-total-month').textContent = '\u09F3' + total;
+        document.getElementById('expense-total-month').textContent = '৳' + totalMonth;
+
+        const sortedDates = Object.keys(byDate).sort().reverse();
+        let html = '';
+        sortedDates.forEach(dk => {
+            const items = byDate[dk];
+            const dayTotal = items.reduce((s, e) => s + (e.amount || 0), 0);
+            const d = new Date(dk + 'T00:00:00');
+            const dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+            const names = [...new Set(items.map(e => e.paidBy || 'Unknown'))];
+
+            html += `<div class="collapse-card" id="exp-${dk}">
+                <div class="collapse-header" onclick="App.toggleCollapse('exp-${dk}')">
+                    <div><strong>${dateStr}</strong><p class="collapse-sub">${names.join(', ')} · ${items.length} entr${items.length > 1 ? 'ies' : 'y'}</p></div>
+                    <div class="collapse-right"><span style="color:#F44336;font-weight:700">৳${dayTotal}</span><span class="material-icons-round collapse-arrow">expand_less</span></div>
+                </div>
+                <div class="collapse-body">
+                    <div class="collapse-table-header"><span>MONEY OF</span><span>AMOUNT</span></div>
+                    ${items.map(e => `<div class="collapse-row" onclick="App.editExpense('${e.key}')">
+                        <span class="collapse-row-name">${this.esc(e.paidBy || 'Unknown')}</span>
+                        <span class="collapse-row-amt" style="color:#F44336">৳${e.amount || 0}</span>
+                        <span class="material-icons-round" style="font-size:16px;color:#555">chevron_right</span>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+        });
+        div.innerHTML = html;
     },
 
     showExpenseModal(id = null, data = null) {
@@ -1050,6 +1152,13 @@ const App = {
     esc(s) { return s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : ''; },
     openModal() { document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
+
+    toggleCollapse(id) {
+        const card = document.getElementById(id);
+        if (!card) return;
+        card.classList.toggle('collapsed');
+    },
+
     toast(msg, type = 'info') { const c = document.getElementById('toast-container'); const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t); setTimeout(() => t.remove(), 3500); }
 };
 

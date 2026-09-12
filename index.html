@@ -282,60 +282,64 @@
             <!-- MEALS -->
             <div class="page" id="page-meals">
                 <div class="page-header">
-                    <h3>Meals</h3>
-                    <div style="display:flex;gap:8px">
-                        <button class="btn-primary btn-sm" id="bulk-meal-btn"><span class="material-icons-round">fastfood</span> Bulk</button>
-                        <button class="btn-primary btn-sm" id="add-meal-btn"><span class="material-icons-round">add</span> Add</button>
+                    <h3>Meal Entry</h3>
+                    <div style="display:flex;gap:6px">
+                        <button class="btn-icon-top" onclick="App.showBulkMealModal()"><span class="material-icons-round">edit</span><small>Bulk</small></button>
+                        <button class="btn-fab-sm" id="add-meal-btn"><span class="material-icons-round">add</span></button>
                     </div>
                 </div>
-                <div class="dash-today-card">
-                    <div class="date-nav">
-                        <button class="icon-btn" id="meal-prev-day"><span class="material-icons-round">chevron_left</span></button>
-                        <h4 id="meal-date-label" style="color:white">Today</h4>
-                        <button class="icon-btn" id="meal-next-day"><span class="material-icons-round">chevron_right</span></button>
-                    </div>
+                <div class="meal-month-bar">
+                    <span>Current Month:</span>
+                    <strong id="meal-month-label">September, 2026</strong>
                 </div>
-                <div id="meals-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No meals recorded</p></div></div>
-                <div class="dash-finance-row" style="margin-top:10px">
-                    <div class="dash-finance-box"><small>Today</small><strong id="meal-total-today">0</strong></div>
-                    <div class="dash-finance-box"><small>Month</small><strong id="meal-total-month">0</strong></div>
+                <div class="meal-grid-wrap" id="meal-grid-wrap">
+                    <p class="empty-state" style="color:#888">No meals recorded</p>
                 </div>
+                <div class="meal-summary-bar">
+                    <span>Today: <strong id="meal-total-today">0</strong></span>
+                    <span>Month: <strong id="meal-total-month">0</strong></span>
+                </div>
+                <button class="btn-fab" id="add-meal-fab" onclick="App.showMealModal()"><span class="material-icons-round">add</span> Add</button>
             </div>
 
             <!-- BAZAAR -->
             <div class="page" id="page-bazaar">
                 <div class="page-header">
-                    <h3>Bazaar</h3>
-                    <button class="btn-primary btn-sm" id="add-bazar-btn"><span class="material-icons-round">add</span> Add</button>
-                </div>
-                <div class="dash-today-card">
-                    <div class="dash-date-header">
-                        <button class="icon-btn" id="bazar-prev-day"><span class="material-icons-round">chevron_left</span></button>
-                        <h4 id="bazar-date-label" style="color:white">Today</h4>
-                        <button class="icon-btn" id="bazar-next-day"><span class="material-icons-round">chevron_right</span></button>
+                    <h3>Bazar List</h3>
+                    <div style="display:flex;gap:6px">
+                        <button class="btn-icon-top" onclick="App.navigate('expenses')"><span class="material-icons-round">receipt_long</span><small>Utility</small></button>
                     </div>
+                </div>
+                <div class="meal-month-bar">
+                    <span>Current Month:</span>
+                    <strong id="bazar-month-label">September, 2026</strong>
                 </div>
                 <div id="bazar-list">
-                    <div class="dash-today-card"><p class="empty-state" style="color:#888">No items</p></div>
+                    <p class="empty-state" style="color:#888">No items</p>
                 </div>
-                <div class="dash-finance-row" style="margin-top:12px">
-                    <div class="dash-finance-box">
-                        <small>Today</small>
-                        <strong id="bazar-total-today">৳0</strong>
-                    </div>
-                    <div class="dash-finance-box">
-                        <small>Month</small>
-                        <strong id="bazar-total-month">৳0</strong>
-                    </div>
+                <div class="meal-summary-bar">
+                    <span>Month: <strong id="bazar-total-month">৳0</strong></span>
                 </div>
+                <button class="btn-fab" onclick="App.showBazarModal()"><span class="material-icons-round">add</span> Add</button>
             </div>
 
-            <!-- EXPENSES -->
+            <!-- EXPENSES / MANAGER MONEY -->
             <div class="page" id="page-expenses">
-                <div class="page-header"><h3>Expenses</h3><button class="btn-primary btn-sm" id="add-expense-btn"><span class="material-icons-round">add</span> Add</button></div>
-                <div class="dash-today-card"><div class="date-nav"><button class="icon-btn" id="expense-prev-month"><span class="material-icons-round">chevron_left</span></button><h4 id="expense-month-label" style="color:white">This Month</h4><button class="icon-btn" id="expense-next-month"><span class="material-icons-round">chevron_right</span></button></div></div>
-                <div id="expenses-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No expenses</p></div></div>
-                <div class="dash-finance-row" style="margin-top:10px"><div class="dash-finance-box"><small>Month Total</small><strong id="expense-total-month">\u09F30</strong></div></div>
+                <div class="page-header">
+                    <h3>Manager Money</h3>
+                    <button class="btn-fab-sm" id="add-expense-btn" onclick="App.showExpenseModal()"><span class="material-icons-round">add</span></button>
+                </div>
+                <div class="meal-month-bar">
+                    <span>Current Month:</span>
+                    <strong id="expense-month-label">September, 2026</strong>
+                </div>
+                <div id="expenses-list">
+                    <p class="empty-state" style="color:#888">No expenses</p>
+                </div>
+                <div class="meal-summary-bar">
+                    <span>Month Total: <strong id="expense-total-month">৳0</strong></span>
+                </div>
+                <button class="btn-fab" onclick="App.showExpenseModal()"><span class="material-icons-round">add</span> Add</button>
             </div>
 
             <!-- BALANCE -->
