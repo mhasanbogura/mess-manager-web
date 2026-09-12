@@ -153,11 +153,22 @@ const App = {
         btn.disabled = true;
         try {
             const provider = new firebase.auth.GoogleAuthProvider();
-            await auth.signInWithPopup(provider);
+            const cred = await auth.signInWithPopup(provider);
+            // Save user profile (non-blocking — don't wait)
+            db.ref(`users/${cred.user.uid}`).once('value').then(snap => {
+                if (!snap.exists()) {
+                    db.ref(`users/${cred.user.uid}`).set({
+                        name: cred.user.displayName, email: cred.user.email,
+                        role: 'admin', createdAt: Date.now()
+                    });
+                }
+            }).catch(e => console.warn('DB write skipped:', e));
         } catch (e) {
             let msg = e.message;
             if (e.code === 'auth/popup-closed-by-user') msg = 'Login cancelled';
             else if (e.code === 'auth/popup-blocked') msg = 'Popup blocked. Allow popups for this site.';
+            else if (e.code === 'auth/cancelled-popup-request') msg = 'Login cancelled';
+            console.error('Google login error:', e);
             this.toast(msg, 'error');
         } finally {
             btn.innerHTML = origHTML;
@@ -179,16 +190,20 @@ const App = {
 
     // MESS MEMBERSHIP CHECK
     async checkMessMembership() {
-        const snap = await db.ref(`users/${this.currentUser.uid}/messId`).once('value');
-        if (snap.exists()) {
-            this.messId = snap.val();
-            // Get mess code
-            const messSnap = await db.ref(`messes/${this.messId}/settings`).once('value');
-            const settings = messSnap.val() || {};
-            this.messCode = settings.messCode || null;
-            this.userRole = settings.owner === this.currentUser.uid ? 'admin' : 'member';
-            this.showApp();
-        } else {
+        try {
+            const snap = await db.ref(`users/${this.currentUser.uid}/messId`).once('value');
+            if (snap.exists()) {
+                this.messId = snap.val();
+                const messSnap = await db.ref(`messes/${this.messId}/settings`).once('value');
+                const settings = messSnap.val() || {};
+                this.messCode = settings.messCode || null;
+                this.userRole = settings.owner === this.currentUser.uid ? 'admin' : 'member';
+                this.showApp();
+            } else {
+                this.showScreen('mess-setup-screen');
+            }
+        } catch (e) {
+            console.error('checkMessMembership error:', e);
             this.showScreen('mess-setup-screen');
         }
     },
