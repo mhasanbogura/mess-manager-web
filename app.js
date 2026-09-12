@@ -552,7 +552,7 @@ const App = {
 
     // PDF EXPORT
     exportPDF(type) {
-        const { jsPDF } = window.jspdf; const doc = new.jsPDF();
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
         doc.setFontSize(14); doc.text(`Mess Manager - ${type === 'daily' ? 'Daily' : 'Monthly'} Report`, 20, 20);
         doc.setFontSize(10);
         const content = type === 'daily' ? document.getElementById('daily-report').innerText : document.getElementById('monthly-report').innerText;
