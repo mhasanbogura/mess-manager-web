@@ -495,11 +495,10 @@ const App = {
         document.getElementById('meal-total-month').textContent = totalMonth;
 
         const colors = ['#388e3c','#1976d2','#f57c00','#c62828','#7b1fa2','#00838f','#4e342e','#37474f'];
-        const viewDays = Math.min(daysInMonth, 10);
-        let html = '<div class="meal-table"><div class="meal-table-inner"><div class="meal-header-row"><div class="meal-name-col"><span class="material-icons-round" style="font-size:16px">tune</span> View</div>';
-        for (let d = 1; d <= viewDays; d++) html += `<div class="meal-day-col">${d}</div>`;
-        if (daysInMonth > viewDays) html += `<div class="meal-day-col">...</div>`;
-        html += '</div>';
+        const viewDays = daysInMonth;
+        let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead><tr><th class="mg-sticky-corner"><span class="material-icons-round" style="font-size:16px">tune</span> View</th>';
+        for (let d = 1; d <= viewDays; d++) html += `<th class="mg-day">${d}</th>`;
+        html += '</tr></thead><tbody>';
 
         mids.forEach((mid, idx) => {
             const m = members[mid];
@@ -516,25 +515,20 @@ const App = {
                 let rowTotal = 0;
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dk = `${month}-${String(d).padStart(2, '0')}`;
-                    if (meal === 'special') { const ml = mData[dk]; rowTotal += ml ? ((ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0) > 0 && ml.special ? 1 : 0) : 0; }
-                    else rowTotal += (mData[dk] && mData[dk][meal]) || 0;
+                    rowTotal += (mData[dk] && mData[dk][meal]) || 0;
                 }
-                html += `<div class="meal-row${mi === 0 ? ' meal-row-first' : ''}${mi === 3 ? ' meal-row-special' : ''}">`;
-                if (mi === 0) html += `<div class="meal-name-col" style="background:${memberColor};grid-row:span 4"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></div>`;
-                html += `<div class="meal-type-col" style="background:${bgs[mi]}"><span class="material-icons-round meal-type-icon" style="color:${mi===0?'#FFC107':mi===1?'#4CAF50':mi===2?'#42a5f5':'#26a69a'}">${icons[mi]}</span><strong>${rowTotal}</strong><span class="meal-type-label">${labels[mi]}</span></div>`;
+                html += '<tr>';
+                if (mi === 0) html += `<td class="mg-name" style="background:${memberColor}" rowspan="4"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></td>`;
+                html += `<td class="mg-type" style="background:${bgs[mi]}"><span class="material-icons-round mg-type-icon" style="color:${mi===0?'#FFC107':mi===1?'#4CAF50':mi===2?'#42a5f5':'#26a69a'}">${icons[mi]}</span><strong>${rowTotal}</strong><span class="mg-type-label">${labels[mi]}</span></td>`;
                 for (let d = 1; d <= viewDays; d++) {
                     const dk = `${month}-${String(d).padStart(2, '0')}`;
-                    let val = 0;
-                    if (meal === 'special') { const ml = mData[dk]; val = ml ? ((ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0) > 0 && ml.special ? 1 : 0) : 0; }
-                    else val = (mData[dk] && mData[dk][meal]) || 0;
-                    html += `<div class="meal-cell${val ? ' filled' : ''}">${val || ''}</div>`;
+                    const val = (mData[dk] && mData[dk][meal]) || 0;
+                    html += `<td class="mg-cell${val ? ' filled' : ''}">${val || ''}</td>`;
                 }
-                if (daysInMonth > viewDays) html += '<div class="meal-cell"></div>';
-                html += '</div>';
+                html += '</tr>';
             });
-            html += `<div class="meal-member-divider"></div>`;
         });
-        html += '</div></div>';
+        html += '</tbody></table></div>';
         document.getElementById('meal-grid-wrap').innerHTML = html;
     },
 
