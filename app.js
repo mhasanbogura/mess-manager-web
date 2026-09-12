@@ -506,7 +506,7 @@ const App = {
         const nm = visibleMeals.length || 1;
         const totalCols = viewDays + 2;
 
-        let html = `<div class="mg-grid-wrap"><div class="mg-grid" style="grid-template-columns: 110px 110px repeat(${viewDays}, 50px)">`;
+        let html = `<div class="mg-grid-wrap"><div class="mg-grid" style="grid-template-columns: var(--mg-name-w) var(--mg-type-w) repeat(${viewDays}, var(--mg-cell-w))">`;
         html += `<div class="mg-g-corner"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></div>`;
         for (let d = 1; d <= viewDays; d++) html += `<div class="mg-g-day" style="grid-column:${d + 2}">${d}</div>`;
 

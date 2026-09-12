@@ -791,6 +791,9 @@ select.input-sm { cursor: pointer; }
 .mg-grid {
     display: grid;
     width: max-content;
+    --mg-name-w: 110px;
+    --mg-type-w: 110px;
+    --mg-cell-w: 50px;
 }
 .mg-g-corner {
     position: sticky; left: 0; top: 0; z-index: 3; background: var(--bg);
@@ -814,26 +817,26 @@ select.input-sm { cursor: pointer; }
 }
 .mg-g-name {
     position: sticky; left: 0; z-index: 2;
-    color: white; font-size: 13px;
+    color: white; font-size: 12px;
     text-align: center; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     border-right: 1px solid var(--card-border);
 }
-.mg-g-name strong { font-size: 13px; }
-.mg-g-name small { font-size: 11px; opacity: 0.8; }
+.mg-g-name strong { font-size: 12px; }
+.mg-g-name small { font-size: 10px; opacity: 0.8; }
 .mg-g-member-sep { box-shadow: inset 0 -3px 0 0 rgba(255,255,255,0.3); }
 .mg-g-type {
-    position: sticky; left: 110px; z-index: 2;
+    position: sticky; left: var(--mg-name-w); z-index: 2;
     height: 36px; padding: 0 6px; white-space: nowrap;
     border: 1px solid var(--card-border);
     display: flex; align-items: center; gap: 4px;
 }
 .mg-g-row-sep { border-top: 3px solid rgba(255,255,255,0.15) !important; }
 .mg-g-type-icon { font-size: 16px; flex-shrink: 0; }
-.mg-g-type-label { font-size: 12px; color: #aaa; margin-left: auto; }
-.mg-g-type strong { font-size: 13px; color: white; min-width: 20px; }
+.mg-g-type-label { font-size: 11px; color: #aaa; margin-left: auto; }
+.mg-g-type strong { font-size: 12px; color: white; min-width: 18px; }
 .mg-g-cell {
-    height: 36px; padding: 0 4px; text-align: center; font-size: 12px;
+    height: 36px; padding: 0 4px; text-align: center; font-size: 11px;
     color: #555; background: #1a1a2e; border: 1px solid var(--card-border);
     display: flex; align-items: center; justify-content: center;
 }
@@ -1014,6 +1017,20 @@ select.input-sm { cursor: pointer; }
     .bazar-item-row { flex-wrap: wrap; }
     .bazar-item-row .form-group { flex: 1 1 45% !important; min-width: 100px; }
     .bazar-cat-tabs { flex-wrap: wrap; }
+
+    .mg-grid { --mg-name-w: 80px; --mg-type-w: 90px; --mg-cell-w: 40px; }
+    .mg-g-name { font-size: 11px; }
+    .mg-g-name strong { font-size: 11px; }
+    .mg-g-name small { font-size: 9px; }
+    .mg-g-corner { height: 36px; }
+    .mg-g-day { height: 36px; font-size: 12px; }
+    .mg-g-type { height: 32px; }
+    .mg-g-type-icon { font-size: 14px; }
+    .mg-g-type strong { font-size: 11px; min-width: 16px; }
+    .mg-g-type-label { font-size: 10px; }
+    .mg-g-cell { height: 32px; font-size: 10px; }
+    .mg-view-btn { font-size: 11px; gap: 4px; }
+    .mg-view-btn .material-icons-round { font-size: 16px; }
 
     .dash-member-card { flex-direction: column; align-items: flex-start; gap: 10px; }
     .dash-member-actions { width: 100%; }
