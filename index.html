@@ -20,34 +20,23 @@
                 <p>Manage your mess easily</p>
             </div>
             <div class="auth-card">
-                <div class="auth-tabs">
-                    <button class="auth-tab active" data-tab="login-email">Email</button>
-                    <button class="auth-tab" data-tab="login-google">Google</button>
+                <div class="input-group">
+                    <span class="material-icons-round">email</span>
+                    <input type="email" id="login-email" placeholder="Email address">
                 </div>
-
-                <!-- Email Login -->
-                <div id="login-email-tab">
-                    <div class="input-group">
-                        <span class="material-icons-round">email</span>
-                        <input type="email" id="login-email" placeholder="Email address">
-                    </div>
-                    <div class="input-group">
-                        <span class="material-icons-round">lock</span>
-                        <input type="password" id="login-password" placeholder="Password">
-                    </div>
-                    <button class="btn-primary" id="login-btn">Login</button>
-                    <div class="auth-links">
-                        <button type="button" class="btn-link-inline" id="forgot-password-link">Forgot Password?</button>
-                        <button type="button" class="btn-link-inline" id="show-register">Create Account</button>
-                    </div>
+                <div class="input-group">
+                    <span class="material-icons-round">lock</span>
+                    <input type="password" id="login-password" placeholder="Password">
                 </div>
-
-                <!-- Google Login -->
-                <div id="login-google-tab" style="display:none">
-                    <button class="btn-google" id="google-login">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Continue with Google
-                    </button>
+                <button class="btn-primary" id="login-btn">Login</button>
+                <div class="auth-links">
+                    <button type="button" class="btn-link-inline" id="forgot-password-link">Forgot Password?</button>
+                    <button type="button" class="btn-link-inline" id="show-register">Create Account</button>
                 </div>
+                <div class="auth-divider"><span>or</span></div>
+                <button class="btn-google" id="google-login">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Continue with Google
+                </button>
             </div>
 
             <!-- Register (hidden by default) -->

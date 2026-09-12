@@ -34,28 +34,16 @@ const App = {
     },
 
     bindEvents() {
-        // Auth tabs
-        document.querySelectorAll('.auth-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                const isEmail = tab.dataset.tab === 'login-email';
-                document.getElementById('login-email-tab').style.display = isEmail ? 'block' : 'none';
-                document.getElementById('login-google-tab').style.display = isEmail ? 'none' : 'block';
-                document.getElementById('register-card').style.display = 'none';
-            });
-        });
-
         // Auth
         document.getElementById('login-btn').addEventListener('click', () => this.emailLogin());
         document.getElementById('google-login').addEventListener('click', () => this.googleLogin());
         document.getElementById('show-register').addEventListener('click', () => {
-            document.getElementById('login-email-tab').style.display = 'none';
+            document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'none';
             document.getElementById('register-card').style.display = 'block';
         });
         document.getElementById('back-to-login').addEventListener('click', () => {
             document.getElementById('register-card').style.display = 'none';
-            document.getElementById('login-email-tab').style.display = 'block';
+            document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'block';
         });
         document.getElementById('register-btn').addEventListener('click', () => this.emailRegister());
         document.getElementById('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
