@@ -5,7 +5,7 @@ const App = {
     reportDate: new Date(), reportMonth: new Date(), monthlyDate: new Date(),
 
     init() {
-        if (firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
+        if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
             return;
@@ -13,8 +13,14 @@ const App = {
         this.bindEvents();
         this.populateYearSelects();
         auth.onAuthStateChanged(user => {
-            if (user) { this.currentUser = user; this.loadMyMesses().catch(e => { console.error('loadMyMesses error:', e); this.showScreen('mess-select-screen'); }); }
-            else { this.currentUser = null; this.showScreen('auth-screen'); }
+            if (user) {
+                this.currentUser = user;
+                this.loadMyMesses();
+            } else {
+                this.currentUser = null;
+                this.messId = null;
+                this.showScreen('auth-screen');
+            }
         });
     },
 
@@ -28,54 +34,54 @@ const App = {
     },
 
     bindEvents() {
-        document.getElementById('login-btn').addEventListener('click', () => this.emailLogin());
-        document.getElementById('google-login').addEventListener('click', () => this.googleLogin());
-        document.getElementById('show-register').addEventListener('click', () => { document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'none'; document.getElementById('register-card').style.display = 'block'; });
-        document.getElementById('back-to-login').addEventListener('click', () => { document.getElementById('register-card').style.display = 'none'; document.getElementById('auth-screen').querySelector('.auth-card').style.display = 'block'; });
-        document.getElementById('register-btn').addEventListener('click', () => this.emailRegister());
-        document.getElementById('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
-        document.getElementById('forgot-back-login').addEventListener('click', () => this.showScreen('auth-screen'));
-        document.getElementById('send-reset-btn').addEventListener('click', () => this.sendResetEmail());
-        document.getElementById('create-mess-btn').addEventListener('click', () => this.createMess());
-        document.getElementById('join-mess-btn').addEventListener('click', () => this.joinMess());
-        document.getElementById('logout-from-setup').addEventListener('click', () => auth.signOut());
-        document.getElementById('menu-toggle').addEventListener('click', () => this.toggleSidebar());
-        document.getElementById('sidebar-overlay').addEventListener('click', () => this.closeSidebar());
+        const $ = id => document.getElementById(id);
+        $('login-btn').addEventListener('click', () => this.emailLogin());
+        $('google-login').addEventListener('click', () => this.googleLogin());
+        $('show-register').addEventListener('click', () => { document.querySelector('#auth-screen .auth-card').style.display = 'none'; $('register-card').style.display = 'block'; });
+        $('back-to-login').addEventListener('click', () => { $('register-card').style.display = 'none'; document.querySelector('#auth-screen .auth-card').style.display = 'block'; });
+        $('register-btn').addEventListener('click', () => this.emailRegister());
+        $('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
+        $('forgot-back-login').addEventListener('click', () => this.showScreen('auth-screen'));
+        $('send-reset-btn').addEventListener('click', () => this.sendResetEmail());
+        $('create-mess-btn').addEventListener('click', () => this.createMess());
+        $('join-mess-btn').addEventListener('click', () => this.joinMess());
+        $('logout-from-setup').addEventListener('click', () => auth.signOut());
+        $('menu-toggle').addEventListener('click', () => this.toggleSidebar());
+        $('sidebar-overlay').addEventListener('click', () => this.closeSidebar());
         document.querySelectorAll('.nav-item[data-page]').forEach(i => i.addEventListener('click', e => { e.preventDefault(); this.navigate(i.dataset.page); }));
-        document.getElementById('switch-mess-btn').addEventListener('click', e => { e.preventDefault(); this.showScreen('mess-select-screen'); this.loadMyMesses(); this.closeSidebar(); });
-        document.getElementById('logout-btn').addEventListener('click', e => { e.preventDefault(); auth.signOut(); });
-        document.getElementById('user-avatar').addEventListener('click', () => this.navigate('dashboard'));
-        document.getElementById('copy-mess-code').addEventListener('click', () => { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); });
-        document.getElementById('add-member-btn').addEventListener('click', () => this.showMemberModal());
-        document.getElementById('add-meal-btn').addEventListener('click', () => this.showMealModal());
-        document.getElementById('bulk-meal-btn').addEventListener('click', () => this.showBulkMealModal());
-        document.getElementById('add-bazar-btn').addEventListener('click', () => this.showBazarModal());
-        document.getElementById('add-expense-btn').addEventListener('click', () => this.showExpenseModal());
-        document.getElementById('add-deposit-btn').addEventListener('click', () => this.showDepositModal());
-        document.getElementById('add-notice-btn').addEventListener('click', () => this.showNoticeModal());
-        document.getElementById('modal-close').addEventListener('click', () => this.closeModal());
-        document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
-        document.getElementById('meal-prev-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() - 1); this.loadMeals(); });
-        document.getElementById('meal-next-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() + 1); this.loadMeals(); });
-        document.getElementById('bazar-prev-day').addEventListener('click', () => { this.bazarDate.setDate(this.bazarDate.getDate() - 1); this.loadBazaar(); });
-        document.getElementById('bazar-next-day').addEventListener('click', () => { this.bazarDate.setDate(this.bazarDate.getDate() + 1); this.loadBazaar(); });
-        document.getElementById('expense-prev-month').addEventListener('click', () => { this.expenseMonth.setMonth(this.expenseMonth.getMonth() - 1); this.loadExpenses(); });
-        document.getElementById('expense-next-month').addEventListener('click', () => { this.expenseMonth.setMonth(this.expenseMonth.getMonth() + 1); this.loadExpenses(); });
-        document.getElementById('report-prev-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() - 1); this.loadDailyReport(); });
-        document.getElementById('report-next-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() + 1); this.loadDailyReport(); });
-        document.getElementById('report-prev-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() - 1); document.getElementById('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
-        document.getElementById('report-next-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() + 1); document.getElementById('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
-        document.getElementById('report-year-select').addEventListener('change', e => { this.reportMonth.setFullYear(+e.target.value); this.loadMonthlyReport(); });
-        document.getElementById('monthly-prev').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() - 1); document.getElementById('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
-        document.getElementById('monthly-next').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() + 1); document.getElementById('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
-        document.getElementById('monthly-year-select').addEventListener('change', e => { this.monthlyDate.setFullYear(+e.target.value); this.loadMonthlyOverview(); });
-        document.getElementById('export-daily-pdf').addEventListener('click', () => this.exportPDF('daily'));
-        document.getElementById('export-monthly-pdf').addEventListener('click', () => this.exportPDF('monthly'));
+        $('switch-mess-btn').addEventListener('click', e => { e.preventDefault(); this.showScreen('mess-select-screen'); this.loadMyMesses(); this.closeSidebar(); });
+        $('logout-btn').addEventListener('click', e => { e.preventDefault(); auth.signOut(); });
+        $('user-avatar').addEventListener('click', () => this.navigate('dashboard'));
+        $('copy-mess-code').addEventListener('click', () => { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); });
+        $('add-member-btn').addEventListener('click', () => this.showMemberModal());
+        $('add-meal-btn').addEventListener('click', () => this.showMealModal());
+        $('bulk-meal-btn').addEventListener('click', () => this.showBulkMealModal());
+        $('add-bazar-btn').addEventListener('click', () => this.showBazarModal());
+        $('add-expense-btn').addEventListener('click', () => this.showExpenseModal());
+        $('add-deposit-btn').addEventListener('click', () => this.showDepositModal());
+        $('add-notice-btn').addEventListener('click', () => this.showNoticeModal());
+        $('modal-close').addEventListener('click', () => this.closeModal());
+        $('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
+        $('meal-prev-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() - 1); this.loadMeals(); });
+        $('meal-next-day').addEventListener('click', () => { this.mealDate.setDate(this.mealDate.getDate() + 1); this.loadMeals(); });
+        $('bazar-prev-day').addEventListener('click', () => { this.bazarDate.setDate(this.bazarDate.getDate() - 1); this.loadBazaar(); });
+        $('bazar-next-day').addEventListener('click', () => { this.bazarDate.setDate(this.bazarDate.getDate() + 1); this.loadBazaar(); });
+        $('expense-prev-month').addEventListener('click', () => { this.expenseMonth.setMonth(this.expenseMonth.getMonth() - 1); this.loadExpenses(); });
+        $('expense-next-month').addEventListener('click', () => { this.expenseMonth.setMonth(this.expenseMonth.getMonth() + 1); this.loadExpenses(); });
+        $('report-prev-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() - 1); this.loadDailyReport(); });
+        $('report-next-day').addEventListener('click', () => { this.reportDate.setDate(this.reportDate.getDate() + 1); this.loadDailyReport(); });
+        $('report-prev-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() - 1); $('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
+        $('report-next-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() + 1); $('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
+        $('report-year-select').addEventListener('change', e => { this.reportMonth.setFullYear(+e.target.value); this.loadMonthlyReport(); });
+        $('monthly-prev').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() - 1); $('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
+        $('monthly-next').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() + 1); $('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
+        $('monthly-year-select').addEventListener('change', e => { this.monthlyDate.setFullYear(+e.target.value); this.loadMonthlyOverview(); });
+        $('export-daily-pdf').addEventListener('click', () => this.exportPDF('daily'));
+        $('export-monthly-pdf').addEventListener('click', () => this.exportPDF('monthly'));
     },
 
     showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
 
-    // AUTH
     async emailLogin() {
         const email = document.getElementById('login-email').value.trim(), pass = document.getElementById('login-password').value;
         if (!email || !pass) { this.toast('Fill all fields', 'error'); return; }
@@ -90,7 +96,11 @@ const App = {
         if (!name || !email || !pass) { this.toast('Fill name, email, password', 'error'); return; }
         if (pass.length < 6) { this.toast('Password min 6 chars', 'error'); return; }
         const btn = document.getElementById('register-btn'); btn.textContent = 'Creating...'; btn.disabled = true;
-        try { const c = await auth.createUserWithEmailAndPassword(email, pass); await c.user.updateProfile({ displayName: name }); await db.ref(`users/${c.user.uid}`).set({ name, email, phone, createdAt: Date.now() }); }
+        try {
+            const c = await auth.createUserWithEmailAndPassword(email, pass);
+            await c.user.updateProfile({ displayName: name });
+            await db.ref(`users/${c.user.uid}`).set({ name, email, phone, createdAt: Date.now() });
+        }
         catch (e) { let m = e.message; if (e.code === 'auth/email-already-in-use') m = 'Already registered'; this.toast(m, 'error'); }
         finally { btn.textContent = 'Create Account'; btn.disabled = false; }
     },
@@ -98,7 +108,12 @@ const App = {
     async googleLogin() {
         const btn = document.getElementById('google-login'); const orig = btn.innerHTML;
         btn.innerHTML = '<span class="material-icons-round" style="animation:spin 1s linear infinite">refresh</span> Connecting...'; btn.disabled = true;
-        try { const p = new firebase.auth.GoogleAuthProvider(); const c = await auth.signInWithPopup(p); const s = await db.ref(`users/${c.user.uid}`).once('value'); if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() }); }
+        try {
+            const p = new firebase.auth.GoogleAuthProvider();
+            const c = await auth.signInWithPopup(p);
+            const s = await db.ref(`users/${c.user.uid}`).once('value');
+            if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() });
+        }
         catch (e) { let m = e.message; if (e.code === 'auth/popup-closed-by-user') m = 'Cancelled'; this.toast(m, 'error'); }
         finally { btn.innerHTML = orig; btn.disabled = false; }
     },
@@ -110,63 +125,83 @@ const App = {
         catch (e) { this.toast(e.message, 'error'); }
     },
 
-    // MULTI-MESS
     async loadMyMesses() {
+        if (!this.currentUser) return;
         this.showScreen('mess-select-screen');
-        const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
-        const data = snap.val() || {};
-        const ids = Object.keys(data);
-        const div = document.getElementById('my-messes-list');
-        if (!ids.length) { div.innerHTML = '<div class="card-body"><p class="empty-state">No messes yet. Create or join one below.</p></div>'; return; }
-        let html = '<div class="card-body">';
-        for (const mid of ids) {
-            const ms = await db.ref(`messes/${mid}/settings`).once('value');
-            const s = ms.val() || {};
-            html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
-                <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
-                <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
-                <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
-            </div>`;
+        try {
+            const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
+            const data = snap.val() || {};
+            const ids = Object.keys(data);
+            const div = document.getElementById('my-messes-list');
+            if (!ids.length) { div.innerHTML = '<div class="card-body"><p class="empty-state">No messes yet. Create or join one below.</p></div>'; return; }
+            let html = '<div class="card-body">';
+            for (const mid of ids) {
+                const ms = await db.ref(`messes/${mid}/settings`).once('value');
+                const s = ms.val() || {};
+                html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
+                    <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
+                    <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
+                    <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
+                </div>`;
+            }
+            div.innerHTML = html + '</div>';
+        } catch (e) {
+            console.error('loadMyMesses error:', e);
+            document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">Error loading messes. Check connection.</p></div>';
         }
-        div.innerHTML = html + '</div>';
     },
 
     enterMess(mid) {
         this.messId = mid;
         this.messCode = null;
-        const ref = db.ref(`messes/${mid}/settings`);
-        ref.once('value').then(s => { const v = s.val() || {}; this.messCode = v.messCode; this.messName = v.messName; this.showApp(); });
+        db.ref(`messes/${mid}/settings`).once('value').then(s => {
+            const v = s.val() || {};
+            this.messCode = v.messCode;
+            this.messName = v.messName;
+            this.showApp();
+        }).catch(e => { console.error('enterMess error:', e); this.toast('Error loading mess', 'error'); });
     },
 
     async createMess() {
         const name = document.getElementById('create-mess-name').value.trim();
-        if (!name) { this.toast('Enter name', 'error'); return; }
-        const btn = document.getElementById('create-mess-btn'); btn.textContent = 'Creating...'; btn.disabled = true;
+        if (!name) { this.toast('Enter mess name', 'error'); return; }
+        const btn = document.getElementById('create-mess-btn');
+        btn.textContent = 'Creating...'; btn.disabled = true;
         try {
             const code = this.genCode(6);
             const ref = db.ref('messes').push();
-            await ref.set({ settings: { messName: name, messCode: code, owner: this.currentUser.uid, createdAt: Date.now() }, members: { [this.currentUser.uid]: { name: this.currentUser.displayName || 'Admin', email: this.currentUser.email, role: 'admin', joinedAt: Date.now() } } });
+            await ref.set({
+                settings: { messName: name, messCode: code, owner: this.currentUser.uid, createdAt: Date.now() },
+                members: { [this.currentUser.uid]: { name: this.currentUser.displayName || 'Admin', email: this.currentUser.email, role: 'admin', joinedAt: Date.now() } }
+            });
             await db.ref(`users/${this.currentUser.uid}/messes/${ref.key}`).set({ role: 'admin', joinedAt: Date.now() });
             this.toast('Mess created!', 'success');
+            document.getElementById('create-mess-name').value = '';
             this.enterMess(ref.key);
-        } catch (e) { this.toast(e.message, 'error'); }
-        finally { btn.textContent = 'Create Mess'; btn.disabled = false; }
+        } catch (e) {
+            console.error('createMess error:', e);
+            this.toast('Error: ' + e.message, 'error');
+        } finally { btn.textContent = 'Create Mess'; btn.disabled = false; }
     },
 
     async joinMess() {
         const code = document.getElementById('join-mess-code').value.trim().toUpperCase();
         if (!code || code.length !== 6) { this.toast('Enter 6-digit code', 'error'); return; }
-        const btn = document.getElementById('join-mess-btn'); btn.textContent = 'Joining...'; btn.disabled = true;
+        const btn = document.getElementById('join-mess-btn');
+        btn.textContent = 'Joining...'; btn.disabled = true;
         try {
             const snap = await db.ref('messes').orderByChild('settings/messCode').equalTo(code).once('value');
-            if (!snap.exists()) { this.toast('Mess not found', 'error'); return; }
+            if (!snap.exists()) { this.toast('Mess not found', 'error'); btn.textContent = 'Join Mess'; btn.disabled = false; return; }
             let mid = null; snap.forEach(s => { mid = s.key; });
             await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).set({ name: this.currentUser.displayName || 'Member', email: this.currentUser.email, role: 'member', joinedAt: Date.now() });
             await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).set({ role: 'member', joinedAt: Date.now() });
             this.toast('Joined!', 'success');
+            document.getElementById('join-mess-code').value = '';
             this.enterMess(mid);
-        } catch (e) { this.toast(e.message, 'error'); }
-        finally { btn.textContent = 'Join Mess'; btn.disabled = false; }
+        } catch (e) {
+            console.error('joinMess error:', e);
+            this.toast('Error: ' + e.message, 'error');
+        } finally { btn.textContent = 'Join Mess'; btn.disabled = false; }
     },
 
     genCode(n) { const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let r = ''; for (let i = 0; i < n; i++) r += c[Math.floor(Math.random() * c.length)]; return r; },
@@ -195,7 +230,6 @@ const App = {
         if (loaders[page]) loaders[page]();
     },
 
-    // DASHBOARD
     async loadDashboard() {
         if (!this.messId) return;
         const today = this.dk(new Date()), month = this.mk(new Date());
@@ -205,15 +239,14 @@ const App = {
         let tm = 0; ml.forEach(s => { const v = s.val(); tm += (v.breakfast || 0) + (v.lunch || 0) + (v.dinner || 0); });
         document.getElementById('stat-today-meals').textContent = tm;
         const bz = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let mb = 0; bz.forEach(s => { mb += s.val().amount || 0; }); document.getElementById('stat-month-bazar').textContent = '৳' + mb;
+        let mb = 0; bz.forEach(s => { mb += s.val().amount || 0; }); document.getElementById('stat-month-bazar').textContent = '\u09F3' + mb;
         const ex = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        let me = 0; ex.forEach(s => { me += s.val().amount || 0; }); document.getElementById('stat-month-expense').textContent = '৳' + me;
+        let me = 0; ex.forEach(s => { me += s.val().amount || 0; }); document.getElementById('stat-month-expense').textContent = '\u09F3' + me;
         const ac = await db.ref(`messes/${this.messId}/activity`).orderByChild('ts').limitToLast(10).once('value');
         const ad = document.getElementById('recent-activity');
         if (ac.exists()) { let h = ''; ac.forEach(s => { const a = s.val(); h += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(a.text || '')}</h4></div><div class="item-card-details"><span>${this.timeAgo(a.ts)}</span></div></div>`; }); ad.innerHTML = h; } else ad.innerHTML = '<p class="empty-state">No recent activity</p>';
     },
 
-    // MEMBERS
     async loadMembers() {
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         this.allMembers = snap.val() || {};
@@ -257,7 +290,6 @@ const App = {
     async editMember(id) { this.showMemberModal(id, this.allMembers[id]); },
     async deleteMember(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/members/${id}`).remove(); this.loadMembers(); },
 
-    // MEALS
     async loadMeals() {
         const key = this.dk(this.mealDate); document.getElementById('meal-date-label').textContent = this.fmtDate(this.mealDate);
         const mbrs = await db.ref(`messes/${this.messId}/members`).once('value');
@@ -327,25 +359,24 @@ const App = {
         this.closeModal(); this.loadMeals(); this.toast('Saved', 'success');
     },
 
-    // BAZAAR
     async loadBazaar() {
         const key = this.dk(this.bazarDate); document.getElementById('bazar-date-label').textContent = this.fmtDate(this.bazarDate);
         const snap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
         const div = document.getElementById('bazar-list');
-        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No items</p>'; document.getElementById('bazar-total-today').textContent = '৳0'; return; }
+        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No items</p>'; document.getElementById('bazar-total-today').textContent = '\u09F30'; return; }
         let total = 0, html = '';
         snap.forEach(s => { const b = s.val(); total += b.amount || 0;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(b.item || '')}</h4><span class="amount">৳${b.amount || 0}</span></div><div class="item-card-details"><span>Qty: ${b.quantity || '-'}</span><span>Buyer: ${this.esc(b.buyer || '')}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editBazar('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteBazar('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
+            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(b.item || '')}</h4><span class="amount">\u09F3${b.amount || 0}</span></div><div class="item-card-details"><span>Qty: ${b.quantity || '-'}</span><span>Buyer: ${this.esc(b.buyer || '')}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editBazar('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteBazar('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
         });
-        div.innerHTML = html; document.getElementById('bazar-total-today').textContent = '৳' + total;
+        div.innerHTML = html; document.getElementById('bazar-total-today').textContent = '\u09F3' + total;
         const month = this.mk(this.bazarDate); let mt = 0;
         const ms = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
-        ms.forEach(s => { mt += s.val().amount || 0; }); document.getElementById('bazar-total-month').textContent = '৳' + mt;
+        ms.forEach(s => { mt += s.val().amount || 0; }); document.getElementById('bazar-total-month').textContent = '\u09F3' + mt;
     },
 
     showBazarModal(id = null, data = null) {
         document.getElementById('modal-title').textContent = id ? 'Edit Bazaar' : 'Add Bazaar';
-        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Item</label><input id="bz-item" value="${data?.item || ''}"></div><div class="form-group"><label>Amount (৳)</label><input type="number" id="bz-amount" min="0" value="${data?.amount || ''}"></div><div class="form-group"><label>Quantity</label><input id="bz-qty" value="${data?.quantity || ''}"></div><div class="form-group"><label>Buyer</label><input id="bz-buyer" value="${data?.buyer || ''}"></div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Item</label><input id="bz-item" value="${data?.item || ''}"></div><div class="form-group"><label>Amount (\u09F3)</label><input type="number" id="bz-amount" min="0" value="${data?.amount || ''}"></div><div class="form-group"><label>Quantity</label><input id="bz-qty" value="${data?.quantity || ''}"></div><div class="form-group"><label>Buyer</label><input id="bz-buyer" value="${data?.buyer || ''}"></div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveBazar('${id || ''}')">${id ? 'Update' : 'Add'}</button>`;
         this.openModal();
     },
@@ -361,22 +392,21 @@ const App = {
     async editBazar(id) { const s = await db.ref(`messes/${this.messId}/bazaar/${id}`).once('value'); this.showBazarModal(id, s.val()); },
     async deleteBazar(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/bazaar/${id}`).remove(); this.loadBazaar(); },
 
-    // EXPENSES
     async loadExpenses() {
         const month = this.mk(this.expenseMonth); document.getElementById('expense-month-label').textContent = this.fmtMonth(this.expenseMonth);
         const snap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value');
         const div = document.getElementById('expenses-list');
-        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No expenses</p>'; document.getElementById('expense-total-month').textContent = '৳0'; return; }
+        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No expenses</p>'; document.getElementById('expense-total-month').textContent = '\u09F30'; return; }
         let total = 0, html = '';
         snap.forEach(s => { const e = s.val(); total += e.amount || 0;
-            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(e.category || '')} - ${this.esc(e.description || '')}</h4><span class="amount">৳${e.amount || 0}</span></div><div class="item-card-details"><span>${e.paidBy || ''}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editExpense('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteExpense('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
+            html += `<div class="item-card"><div class="item-card-header"><h4>${this.esc(e.category || '')} - ${this.esc(e.description || '')}</h4><span class="amount">\u09F3${e.amount || 0}</span></div><div class="item-card-details"><span>${e.paidBy || ''}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.editExpense('${s.key}')"><span class="material-icons-round">edit</span></button><button class="icon-btn" onclick="App.deleteExpense('${s.key}')"><span class="material-icons-round">delete</span></button></div></div>`;
         });
-        div.innerHTML = html; document.getElementById('expense-total-month').textContent = '৳' + total;
+        div.innerHTML = html; document.getElementById('expense-total-month').textContent = '\u09F3' + total;
     },
 
     showExpenseModal(id = null, data = null) {
         document.getElementById('modal-title').textContent = id ? 'Edit Expense' : 'Add Expense';
-        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Category</label><select id="ex-cat"><option ${data?.category === 'Food' ? 'selected' : ''}>Food</option><option ${data?.category === 'Utility' ? 'selected' : ''}>Utility</option><option ${data?.category === 'Rent' ? 'selected' : ''}>Rent</option><option ${data?.category === 'Salary' ? 'selected' : ''}>Salary</option><option ${data?.category === 'Maintenance' ? 'selected' : ''}>Maintenance</option><option ${data?.category === 'Other' ? 'selected' : ''}>Other</option></select></div><div class="form-group"><label>Description</label><input id="ex-desc" value="${data?.description || ''}"></div><div class="form-group"><label>Amount (৳)</label><input type="number" id="ex-amount" min="0" value="${data?.amount || ''}"></div><div class="form-group"><label>Paid By</label><input id="ex-paidby" value="${data?.paidBy || ''}"></div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Category</label><select id="ex-cat"><option ${data?.category === 'Food' ? 'selected' : ''}>Food</option><option ${data?.category === 'Utility' ? 'selected' : ''}>Utility</option><option ${data?.category === 'Rent' ? 'selected' : ''}>Rent</option><option ${data?.category === 'Salary' ? 'selected' : ''}>Salary</option><option ${data?.category === 'Maintenance' ? 'selected' : ''}>Maintenance</option><option ${data?.category === 'Other' ? 'selected' : ''}>Other</option></select></div><div class="form-group"><label>Description</label><input id="ex-desc" value="${data?.description || ''}"></div><div class="form-group"><label>Amount (\u09F3)</label><input type="number" id="ex-amount" min="0" value="${data?.amount || ''}"></div><div class="form-group"><label>Paid By</label><input id="ex-paidby" value="${data?.paidBy || ''}"></div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveExpense('${id || ''}')">${id ? 'Update' : 'Add'}</button>`;
         this.openModal();
     },
@@ -392,7 +422,6 @@ const App = {
     async editExpense(id) { const s = await db.ref(`messes/${this.messId}/expenses/${id}`).once('value'); this.showExpenseModal(id, s.val()); },
     async deleteExpense(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/expenses/${id}`).remove(); this.loadExpenses(); },
 
-    // BALANCE
     async loadBalance() {
         const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
         const deposits = (await db.ref(`messes/${this.messId}/deposits`).once('value')).val() || {};
@@ -404,21 +433,21 @@ const App = {
         bzS.forEach(s => { totalBazar += s.val().amount || 0; });
         Object.values(deposits).forEach(d => { totalDep += d.amount || 0; });
         const tc = totalExp + totalBazar;
-        document.getElementById('balance-income').textContent = '৳' + totalDep;
-        document.getElementById('balance-expense').textContent = '৳' + tc;
-        document.getElementById('balance-remaining').textContent = '৳' + (totalDep - tc);
+        document.getElementById('balance-income').textContent = '\u09F3' + totalDep;
+        document.getElementById('balance-expense').textContent = '\u09F3' + tc;
+        document.getElementById('balance-remaining').textContent = '\u09F3' + (totalDep - tc);
         let totalMeals = 0;
         const mlS = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-31').once('value');
         mlS.forEach(d => { Object.values(d.val() || {}).forEach(ml => { totalMeals += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); }); });
         const rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
-        document.getElementById('balance-rate').textContent = '৳' + rate;
+        document.getElementById('balance-rate').textContent = '\u09F3' + rate;
         const div = document.getElementById('member-dues-list'); const mids = Object.keys(members);
         if (!mids.length) { div.innerHTML = '<p class="empty-state">No members</p>'; return; }
         let html = '';
         mids.forEach(mid => { const m = members[mid], dep = deposits[mid]?.amount || 0;
             let mm = 0; mlS.forEach(d => { const ml = (d.val() || {})[mid] || {}; mm += (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); });
             const cost = (mm * parseFloat(rate)).toFixed(2); const due = (dep - parseFloat(cost)).toFixed(2);
-            html += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals | Dep: ৳${dep}</p></div><div class="due-amount ${parseFloat(due) >= 0 ? 'positive' : 'negative'}">৳${due}</div></div>`;
+            html += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals | Dep: \u09F3${dep}</p></div><div class="due-amount ${parseFloat(due) >= 0 ? 'positive' : 'negative'}">\u09F3${due}</div></div>`;
         });
         div.innerHTML = html;
     },
@@ -428,7 +457,7 @@ const App = {
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
             const m = snap.val() || {}; let opts = '<option value="">Select</option>';
             Object.entries(m).forEach(([id, v]) => { opts += `<option value="${id}">${v.name}</option>`; });
-            document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Member</label><select id="dp-member">${opts}</select></div><div class="form-group"><label>Amount (৳)</label><input type="number" id="dp-amount" min="0"></div><div class="form-group"><label>Note</label><input id="dp-note" placeholder="Optional"></div>`;
+            document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Member</label><select id="dp-member">${opts}</select></div><div class="form-group"><label>Amount (\u09F3)</label><input type="number" id="dp-amount" min="0"></div><div class="form-group"><label>Note</label><input id="dp-note" placeholder="Optional"></div>`;
             document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveDeposit()">Save</button>`;
             this.openModal();
         });
@@ -442,7 +471,6 @@ const App = {
         this.closeModal(); this.loadBalance(); this.toast('Recorded', 'success');
     },
 
-    // NOTICES
     async loadNotices() {
         const snap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(50).once('value');
         const div = document.getElementById('notices-list');
@@ -468,7 +496,6 @@ const App = {
 
     async deleteNotice(id) { if (!confirm('Delete?')) return; await db.ref(`messes/${this.messId}/notices/${id}`).remove(); this.loadNotices(); },
 
-    // REPORTS
     async loadDailyReport() {
         const key = this.dk(this.reportDate); document.getElementById('report-date-label').textContent = this.fmtDate(this.reportDate);
         const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
@@ -477,7 +504,7 @@ const App = {
         Object.entries(members).forEach(([id, m]) => { const ml = meals[id] || {}; const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0); totalMeals += t; rows += `<div class="report-row"><span>${m.name}</span><span>${t} (B:${ml.breakfast || 0} L:${ml.lunch || 0} D:${ml.dinner || 0})</span></div>`; });
         let totalBazar = 0; const bs = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').equalTo(key).once('value');
         bs.forEach(s => { totalBazar += s.val().amount || 0; });
-        document.getElementById('daily-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows || '<p>No data</p>'}</div><div class="report-section"><h5>Bazaar: ৳${totalBazar}</h5></div>${totalMeals > 0 ? `<div class="report-section"><h5>Rate: ৳${(totalBazar / totalMeals).toFixed(2)}/meal</h5></div>` : ''}`;
+        document.getElementById('daily-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows || '<p>No data</p>'}</div><div class="report-section"><h5>Bazaar: \u09F3${totalBazar}</h5></div>${totalMeals > 0 ? `<div class="report-section"><h5>Rate: \u09F3${(totalBazar / totalMeals).toFixed(2)}/meal</h5></div>` : ''}`;
     },
 
     async loadMonthlyReport() {
@@ -491,24 +518,19 @@ const App = {
         const bs = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value'); bs.forEach(s => { totalBazar += s.val().amount || 0; });
         const es = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(month + '-01').endAt(month + '-31').once('value'); es.forEach(s => { totalExp += s.val().amount || 0; });
         const tc = totalBazar + totalExp, rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
-        document.getElementById('monthly-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows}</div><div class="report-section"><h5>Finance</h5><div class="report-row"><span>Bazaar</span><span>৳${totalBazar}</span></div><div class="report-row"><span>Expenses</span><span>৳${totalExp}</span></div><div class="report-row report-total"><span>Total</span><span>৳${tc}</span></div></div><div class="report-section"><h5>Rate: ৳${rate}/meal</h5></div>`;
+        document.getElementById('monthly-report').innerHTML = `<div class="report-section"><h5>Meals (${totalMeals})</h5>${rows}</div><div class="report-section"><h5>Finance</h5><div class="report-row"><span>Bazaar</span><span>\u09F3${totalBazar}</span></div><div class="report-row"><span>Expenses</span><span>\u09F3${totalExp}</span></div><div class="report-row report-total"><span>Total</span><span>\u09F3${tc}</span></div></div><div class="report-section"><h5>Rate: \u09F3${rate}/meal</h5></div>`;
     },
 
-    // MONTHLY OVERVIEW
     async loadMonthlyOverview() {
         const month = this.mk(this.monthlyDate); document.getElementById('monthly-label').textContent = this.fmtMonth(this.monthlyDate);
         const year = this.monthlyDate.getFullYear();
         document.getElementById('monthly-year-select').value = year;
-
         const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
         let totalMeals = 0, totalBazar = 0, totalExp = 0;
         const memberMeals = {};
-
-        // Get all days in this month
         const daysInMonth = new Date(year, this.monthlyDate.getMonth() + 1, 0).getDate();
         const firstDay = `${month}-01`;
         const lastDay = `${month}-${String(daysInMonth).padStart(2, '0')}`;
-
         const mlS = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(firstDay).endAt(lastDay).once('value');
         const dailyMeals = {};
         mlS.forEach(d => {
@@ -523,37 +545,34 @@ const App = {
                 dailyMeals[dk] += t;
             });
         });
-
         const bzS = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
         bzS.forEach(s => { totalBazar += s.val().amount || 0; });
         const exS = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
         exS.forEach(s => { totalExp += s.val().amount || 0; });
-
         const tc = totalBazar + totalExp;
         const rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
         const avgDailyMeals = daysInMonth > 0 ? (totalMeals / daysInMonth).toFixed(1) : 0;
-
         document.getElementById('monthly-overview').innerHTML = `
             <div class="summary-row"><span>Total Days Active</span><strong>${Object.keys(dailyMeals).length}</strong></div>
             <div class="summary-row"><span>Total Meals</span><strong>${totalMeals}</strong></div>
             <div class="summary-row"><span>Avg Daily Meals</span><strong>${avgDailyMeals}</strong></div>
-            <div class="summary-row"><span>Total Bazaar</span><strong>৳${totalBazar}</strong></div>
-            <div class="summary-row"><span>Total Expenses</span><strong>৳${totalExp}</strong></div>
-            <div class="summary-row"><span>Total Cost</span><strong>৳${tc}</strong></div>
-            <div class="summary-row"><span>Meal Rate</span><strong>৳${rate}/meal</strong></div>`;
-
+            <div class="summary-row"><span>Total Bazaar</span><strong>\u09F3${totalBazar}</strong></div>
+            <div class="summary-row"><span>Total Expenses</span><strong>\u09F3${totalExp}</strong></div>
+            <div class="summary-row"><span>Total Cost</span><strong>\u09F3${tc}</strong></div>
+            <div class="summary-row"><span>Meal Rate</span><strong>\u09F3${rate}/meal</strong></div>`;
         const mids = Object.keys(members);
         let mhtml = '';
         mids.forEach(mid => { const m = members[mid]; const mm = memberMeals[mid] || 0;
-            mhtml += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals (${totalMeals > 0 ? ((mm / totalMeals) * 100).toFixed(1) : 0}%)</p></div><div class="due-amount">৳${(mm * parseFloat(rate)).toFixed(0)}</div></div>`;
+            mhtml += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals (${totalMeals > 0 ? ((mm / totalMeals) * 100).toFixed(1) : 0}%)</p></div><div class="due-amount">\u09F3${(mm * parseFloat(rate)).toFixed(0)}</div></div>`;
         });
         document.getElementById('monthly-members').innerHTML = mhtml || '<p class="empty-state">No data</p>';
     },
 
-    // PDF EXPORT
     exportPDF(type) {
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setFontSize(14); doc.text(`Mess Manager - ${type === 'daily' ? 'Daily' : 'Monthly'} Report`, 20, 20);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.setFontSize(14);
+        doc.text(`Mess Manager - ${type === 'daily' ? 'Daily' : 'Monthly'} Report`, 20, 20);
         doc.setFontSize(10);
         const content = type === 'daily' ? document.getElementById('daily-report').innerText : document.getElementById('monthly-report').innerText;
         doc.text(content, 20, 35);
@@ -561,7 +580,6 @@ const App = {
         this.toast('PDF exported', 'success');
     },
 
-    // HELPERS
     dk(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
     mk(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; },
     fmtDate(d) { return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }); },
