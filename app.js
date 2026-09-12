@@ -13,8 +13,8 @@ const App = {
         this.bindEvents();
         this.populateYearSelects();
         auth.onAuthStateChanged(user => {
-            if (user) { this.currentUser = user; this.loadMyMesses(); }
-            else { this.showScreen('auth-screen'); }
+            if (user) { this.currentUser = user; this.loadMyMesses().catch(e => { console.error('loadMyMesses error:', e); this.showScreen('mess-select-screen'); }); }
+            else { this.currentUser = null; this.showScreen('auth-screen'); }
         });
     },
 
