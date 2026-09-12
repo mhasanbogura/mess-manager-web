@@ -1093,65 +1093,268 @@ const App = {
         document.getElementById('analysis-meal-share').innerHTML = html;
     },
 
-    exportAnalysisPDF() {
+    async exportAnalysisPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        const year = document.getElementById('monthly-year-select').value;
+        const W = 210, H = 297, ML = 15, CW = 180, MR = ML + CW;
+        const year = +document.getElementById('monthly-year-select').value;
         const mon = document.getElementById('monthly-month-select').value;
+        const monthStr = `${year}-${mon}`;
+        const daysInMonth = new Date(year, parseInt(mon), 0).getDate();
+        const firstDay = `${monthStr}-01`;
+        const lastDay = `${monthStr}-${String(daysInMonth).padStart(2,'0')}`;
         const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-        const monthLabel = `${monthNames[parseInt(mon) - 1]} ${year}`;
+        const monthLabel = `${monthNames[parseInt(mon)-1]}, ${year}`;
+        const now = new Date();
+        const userName = this.currentUser?.displayName || 'User';
 
-        doc.setFillColor(30, 30, 48);
-        doc.rect(0, 0, 210, 297, 'F');
-        doc.setTextColor(255, 193, 7);
-        doc.setFontSize(20);
-        doc.text('Mess Manager - Analysis', 20, 20);
-        doc.setFontSize(12);
-        doc.setTextColor(200, 200, 200);
-        doc.text(monthLabel, 20, 28);
-        doc.text(this.messName || 'My Mess', 20, 35);
+        const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
+        const allMeals = (await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(firstDay).endAt(lastDay).once('value')).val() || {};
+        const bzSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
+        const bazaarItems = []; bzSnap.forEach(s => bazaarItems.push({ key: s.key, ...s.val() }));
+        const exSnap = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
+        let totalExp = 0; const expenseBreakdown = {};
+        exSnap.forEach(s => { const e = s.val(); totalExp += e.amount||0; expenseBreakdown[e.category||'Other'] = (expenseBreakdown[e.category||'Other']||0) + (e.amount||0); });
+        const deposits = (await db.ref(`messes/${this.messId}/deposits`).once('value')).val() || {};
 
-        let y = 45;
-        const sections = ['analysis-summary', 'analysis-collection', 'analysis-paidin'];
-        sections.forEach(id => {
-            const el = document.getElementById(id);
-            if (el && el.innerText) {
-                doc.setFillColor(40, 40, 60);
-                doc.roundedRect(15, y - 2, 180, el.offsetHeight * 0.5 + 8, 3, 3, 'F');
-                doc.setTextColor(255, 255, 255);
-                doc.setFontSize(10);
-                const lines = doc.splitTextToSize(el.innerText, 170);
-                lines.forEach(line => { doc.text(line, 20, y + 5); y += 5; });
-                y += 10;
-            }
+        let totalMeals = 0, normalMeals = 0, totalBazar = 0;
+        const memberMeals = {};
+        Object.entries(allMeals).forEach(([dk, dayMeals]) => {
+            Object.entries(dayMeals).forEach(([mid, ml]) => {
+                const t = (ml.breakfast||0)+(ml.lunch||0)+(ml.dinner||0);
+                totalMeals += t; normalMeals += t;
+                memberMeals[mid] = (memberMeals[mid]||0) + t;
+            });
+        });
+        bzSnap.forEach(s => { totalBazar += s.val().amount||0; });
+        let totalDep = 0; Object.values(deposits).forEach(d => { totalDep += d.amount||0; });
+
+        let y = 20, totalPages = 0;
+        const pages = [];
+
+        function newPage() {
+            if (pages.length > 0) { addFooter(); doc.addPage(); }
+            pages.push(true);
+            y = 20;
+        }
+        function addFooter() {
+            doc.setFontSize(7); doc.setTextColor(150); doc.setFont('helvetica', 'normal');
+            doc.text(`Page ${pages.length}`, W / 2, H - 8, { align: 'center' });
+        }
+        function checkPage(need) { if (y + need > H - 15) { addFooter(); doc.addPage(); pages.push(true); y = 20; } }
+        function line(color, thickness) {
+            doc.setDrawColor(...(color || [200,200,200])); doc.setLineWidth(thickness || 0.2);
+            doc.line(ML, y, MR, y); y += 2;
+        }
+        function thickLine() {
+            doc.setDrawColor(255, 193, 7); doc.setLineWidth(0.8);
+            doc.line(ML, y, MR, y); y += 3;
+        }
+        function sectionTitle(t) {
+            checkPage(12);
+            doc.setFontSize(15); doc.setFont('helvetica', 'bold'); doc.setTextColor(0);
+            doc.text(t, ML, y); y += 3; thickLine(); y += 3;
+        }
+        function subSectionTitle(t) {
+            checkPage(8);
+            doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(0);
+            doc.text(t, ML, y); y += 6;
+        }
+        function row(label, value, valColor) {
+            checkPage(6);
+            doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(80);
+            doc.text(label, ML + 2, y);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(...(valColor || [0]));
+            doc.text(String(value), MR - 2, y, { align: 'right' });
+            y += 5;
+        }
+        function tableHeader(cols, widths) {
+            doc.setFillColor(255, 193, 7);
+            doc.rect(ML, y, CW, 7, 'F');
+            doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(0);
+            let x = ML + 2;
+            cols.forEach((c, i) => { doc.text(c, x, y + 5); x += widths[i]; });
+            y += 7;
+        }
+        function tableRow(vals, widths, colors) {
+            checkPage(5);
+            let x = ML + 2;
+            doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+            vals.forEach((v, i) => {
+                doc.setTextColor(...(colors?.[i] || [60]));
+                doc.text(String(v), x, y + 3.5);
+                x += widths[i];
+            });
+            y += 5;
+        }
+
+        try {
+        newPage();
+
+        // === PAGE 1: HEADER ===
+        doc.setFontSize(18); doc.setFont('helvetica', 'bold'); doc.setTextColor(50, 50, 50);
+        doc.text('Bachelors\' Meal Manager', ML, y); y += 8;
+        doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(80);
+        doc.text(`House: ${this.messName || 'My Mess'}    Month: ${monthLabel}`, ML, y); y += 5;
+        doc.text(`Report generated on ${now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}, ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`, ML, y); y += 5;
+        doc.text(`Report generated by ${userName}`, ML, y); y += 5;
+        thickLine(); y += 2;
+
+        // === SUMMARY ===
+        sectionTitle('Summary');
+        const rate = totalMeals > 0 ? (totalBazar / totalMeals).toFixed(1) : 0;
+        row('Total meals', totalMeals);
+        row(`Cost per meal`, `\u09F3 ${rate}`);
+        row('Total shopping (expense)', `\u09F3 ${totalBazar}`);
+        row('Total utility (expense)', `\u09F3 ${totalExp}`);
+        row('Manager collection', `\u09F3 ${totalDep}`);
+        row('Remaining money on manager', `\u09F3 ${(totalDep - totalBazar - totalExp).toFixed(1)}`,
+            (totalDep - totalBazar - totalExp) >= 0 ? [76, 175, 80] : [244, 67, 54]);
+        y += 5;
+
+        // === ANALYSIS ===
+        sectionTitle('Analysis');
+        doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(0);
+        doc.text(`Cost per meal: \u09F3 ${rate}    (Total shopping \u09F3 ${totalBazar} / ${totalMeals} meals)`, ML, y); y += 8;
+
+        // 6-month trend table
+        subSectionTitle('Cost per meal trend \u2014 last 6 months');
+        const trendData = [];
+        const trendPromises = [];
+        for (let i = 5; i >= 0; i--) {
+            const td = new Date(year, parseInt(mon) - 1 - i, 1);
+            const tm = `${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}`;
+            const tdDays = new Date(td.getFullYear(), td.getMonth()+1, 0).getDate();
+            trendPromises.push(
+                Promise.all([
+                    db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(`${tm}-01`).endAt(`${tm}-${String(tdDays).padStart(2,'0')}`).once('value'),
+                    db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(`${tm}-01`).endAt(`${tm}-${String(tdDays).padStart(2,'0')}`).once('value')
+                ]).then(([mSnap, bSnap]) => {
+                    let tm2 = 0, tb2 = 0;
+                    mSnap.forEach(d => { Object.values(d.val()||{}).forEach(ml => { tm2 += (ml.breakfast||0)+(ml.lunch||0)+(ml.dinner||0); }); });
+                    bSnap.forEach(s => { tb2 += s.val().amount||0; });
+                    trendData.push({ label: `${monthNames[td.getMonth()]}, ${td.getFullYear()}`, meals: tm2, bazar: tb2, rate: tm2 > 0 ? (tb2/tm2).toFixed(1) : '0' });
+                })
+            );
+        }
+        await Promise.all(trendPromises);
+
+        const tCols = ['Month', 'Meals', 'Shopping', 'Cost/meal'];
+        const tWidths = [55, 30, 50, 45];
+        tableHeader(tCols, tWidths);
+        trendData.forEach(t => {
+            tableRow([t.label, t.meals, `\u09F3 ${t.bazar}`, `\u09F3 ${t.rate}`], tWidths);
+        });
+        y += 5;
+
+        // Member balances table
+        subSectionTitle('Member balances (negative = owes)');
+        const mbCols = ['Member', 'Meals', 'Deposited', 'Meal cost', 'Utility', 'Balance'];
+        const mbWidths = [35, 18, 32, 32, 28, 35];
+        tableHeader(mbCols, mbWidths);
+        const memberEntries = Object.entries(memberMeals);
+        const utilityPerMember = memberEntries.length > 0 ? (totalExp / memberEntries.length).toFixed(0) : 0;
+        memberEntries.forEach(([mid, mm]) => {
+            const dep = deposits[mid]?.amount || 0;
+            const cost = mm * parseFloat(rate);
+            const util = utilityPerMember;
+            const bal = dep - cost - util;
+            const mname = members[mid]?.name || mid;
+            tableRow([mname, String(mm), `\u09F3 ${dep}`, `\u09F3 ${cost.toFixed(1)}`, `\u09F3 ${util}`, `\u09F3 ${bal.toFixed(1)}`],
+                mbWidths, [null, null, null, null, null, bal >= 0 ? [76,175,80] : [244,67,54]]);
+        });
+        y += 5;
+
+        // === MEAL SECTION ===
+        newPage();
+        sectionTitle('Meal');
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(0);
+        doc.text(`Grand total Meals: ${totalMeals}`, ML, y); y += 8;
+
+        const mCols = ['Total', '1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31'];
+        const typeW = 14, totalW = 10, dayW = (CW - typeW - totalW) / 31;
+        const mWidths = [typeW, totalW, ...Array(31).fill(dayW)];
+
+        for (const [mid, mm] of memberEntries) {
+            const mname = members[mid]?.name || mid;
+            checkPage(22);
+            subSectionTitle(`${mname}  (Total meals: ${mm})`);
+            tableHeader(mCols, mWidths);
+            ['breakfast', 'lunch', 'dinner'].forEach(meal => {
+                const label = meal === 'breakfast' ? 'B.Fast' : meal === 'lunch' ? 'Lunch' : 'Dinner';
+                let total = 0;
+                const cells = [];
+                for (let d = 1; d <= 31; d++) {
+                    const dk = `${monthStr}-${String(d).padStart(2,'0')}`;
+                    const dayMeals = allMeals[dk] || {};
+                    const val = (dayMeals[mid] && dayMeals[mid][meal]) || 0;
+                    total += val;
+                    cells.push(val > 0 ? String(val) : '');
+                }
+                tableRow([label, String(total), ...cells], mWidths);
+            });
+            y += 4;
+        }
+
+        // === SHOPPING SECTION ===
+        newPage();
+        sectionTitle('Shopping');
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(0);
+        doc.text(`Total Shopping Cost: \u09F3 ${totalBazar}`, ML, y); y += 5;
+        const buyerTotals = {};
+        bazaarItems.forEach(b => { const n = b.buyer || 'Unknown'; buyerTotals[n] = (buyerTotals[n]||0) + (b.amount||0); });
+        Object.entries(buyerTotals).forEach(([name, amt]) => {
+            doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(60);
+            doc.text(`${name}: \u09F3 ${amt}`, ML + 2, y); y += 5;
+        });
+        y += 2;
+
+        const bCols = ['Date', 'Money from', 'Added by', 'Item', 'Cost'];
+        const bWidths = [38, 35, 40, 42, 25];
+        tableHeader(bCols, bWidths);
+        bazaarItems.forEach(b => {
+            const d = new Date(b.dateKey + 'T00:00:00');
+            const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            checkPage(5);
+            tableRow([dateStr, b.buyer || '', b.doneBy || '', b.item || '', `\u09F3 ${b.amount||0}`], bWidths);
+        });
+        y += 5;
+
+        // === MANAGER MONEY ===
+        newPage();
+        sectionTitle('Manager money');
+        doc.setFontSize(11); doc.setFont('helvetica', 'bold'); doc.setTextColor(0);
+        doc.text(`Total Manager Money: \u09F3 ${totalDep}`, ML, y); y += 5;
+        const remaining = totalDep - totalBazar - totalExp;
+        doc.setTextColor(remaining >= 0 ? 76 : 244, remaining >= 0 ? 175 : 67, remaining >= 0 ? 80 : 54);
+        doc.text(`Remaining Money on Manager: \u09F3 ${remaining.toFixed(1)}`, ML, y); y += 6;
+        Object.entries(deposits).forEach(([mid, dep]) => {
+            const mname = members[mid]?.name || mid;
+            doc.setFontSize(9); doc.setFont('helvetica', 'normal'); doc.setTextColor(60);
+            doc.text(`${mname}: \u09F3 ${dep.amount||0}`, ML + 2, y); y += 5;
+        });
+        y += 2;
+
+        const dCols = ['Member', 'Amount'];
+        const dWidths = [120, 60];
+        tableHeader(dCols, dWidths);
+        Object.entries(deposits).forEach(([mid, dep]) => {
+            const mname = members[mid]?.name || mid;
+            tableRow([mname, `\u09F3 ${dep.amount||0}`], dWidths);
         });
 
-        try {
-            const trendCanvas = document.getElementById('chart-trend');
-            const trendImg = trendCanvas.toDataURL('image/png');
-            doc.addImage(trendImg, 'PNG', 15, y, 180, 60);
-            y += 70;
-        } catch (e) {}
+        // Page numbers
+        totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(7); doc.setTextColor(150); doc.setFont('helvetica', 'normal');
+            doc.text(`Page ${i} of ${totalPages}`, W / 2, H - 8, { align: 'center' });
+        }
 
-        try {
-            const bzCanvas = document.getElementById('chart-bazar-day');
-            const bzImg = bzCanvas.toDataURL('image/png');
-            doc.addImage(bzImg, 'PNG', 15, y, 180, 60);
-            y += 70;
-        } catch (e) {}
-
-        try {
-            const mlCanvas = document.getElementById('chart-meals-day');
-            const mlImg = mlCanvas.toDataURL('image/png');
-            doc.addImage(mlImg, 'PNG', 15, y, 180, 60);
-        } catch (e) {}
-
-        doc.setTextColor(100, 100, 100);
-        doc.setFontSize(8);
-        doc.text('Generated by Mess Manager', 20, 290);
-
-        doc.save(`Mess-Manager-Analysis-${mon}-${year}.pdf`);
+        doc.save(`Mess Manager_${this.messName || 'Mess'}_${monthNames[parseInt(mon)-1]}_${year}.pdf`);
         this.toast('PDF exported!', 'success');
+        } catch (e) { console.error('PDF export error:', e); this.toast('PDF export failed: ' + e.message, 'error'); }
     },
 
     dk(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
