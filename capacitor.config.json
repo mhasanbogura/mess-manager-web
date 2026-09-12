@@ -1,0 +1,13 @@
+{
+  "appId": "com.mahmuduls.messmanager",
+  "appName": "Mess Manager",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https",
+    "url": "https://mhasanbogura.github.io/mess-manager-web/",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

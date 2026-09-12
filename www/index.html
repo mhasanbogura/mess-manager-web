@@ -250,18 +250,15 @@
                         <button class="btn-primary btn-sm" id="add-meal-btn"><span class="material-icons-round">add</span> Add</button>
                     </div>
                 </div>
-                <div class="dash-today-card">
-                    <div class="date-nav">
-                        <button class="icon-btn" id="meal-prev-day"><span class="material-icons-round">chevron_left</span></button>
-                        <h4 id="meal-date-label" style="color:white">Today</h4>
-                        <button class="icon-btn" id="meal-next-day"><span class="material-icons-round">chevron_right</span></button>
-                    </div>
-                </div>
-                <div id="meals-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No meals recorded</p></div></div>
-                <div class="dash-finance-row" style="margin-top:10px">
-                    <div class="dash-finance-box"><small>Today</small><strong id="meal-total-today">0</strong></div>
-                    <div class="dash-finance-box"><small>Month</small><strong id="meal-total-month">0</strong></div>
-                </div>
+                <div class="card"><div class="card-header"><div class="date-nav">
+                    <button class="icon-btn" id="meal-prev-day"><span class="material-icons-round">chevron_left</span></button>
+                    <h4 id="meal-date-label">Today</h4>
+                    <button class="icon-btn" id="meal-next-day"><span class="material-icons-round">chevron_right</span></button>
+                </div></div><div class="card-body" id="meals-list"><p class="empty-state">No meals recorded</p></div></div>
+                <div class="card"><div class="card-header"><h4>Meal Summary</h4></div><div class="card-body">
+                    <div class="summary-row"><span>Total Meals Today</span><strong id="meal-total-today">0</strong></div>
+                    <div class="summary-row"><span>Meals This Month</span><strong id="meal-total-month">0</strong></div>
+                </div></div>
             </div>
 
             <!-- BAZAAR -->
@@ -295,48 +292,66 @@
             <!-- EXPENSES -->
             <div class="page" id="page-expenses">
                 <div class="page-header"><h3>Expenses</h3><button class="btn-primary btn-sm" id="add-expense-btn"><span class="material-icons-round">add</span> Add</button></div>
-                <div class="dash-today-card"><div class="date-nav"><button class="icon-btn" id="expense-prev-month"><span class="material-icons-round">chevron_left</span></button><h4 id="expense-month-label" style="color:white">This Month</h4><button class="icon-btn" id="expense-next-month"><span class="material-icons-round">chevron_right</span></button></div></div>
-                <div id="expenses-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No expenses</p></div></div>
-                <div class="dash-finance-row" style="margin-top:10px"><div class="dash-finance-box"><small>Month Total</small><strong id="expense-total-month">\u09F30</strong></div></div>
+                <div class="card"><div class="card-header"><div class="date-nav">
+                    <button class="icon-btn" id="expense-prev-month"><span class="material-icons-round">chevron_left</span></button>
+                    <h4 id="expense-month-label">This Month</h4>
+                    <button class="icon-btn" id="expense-next-month"><span class="material-icons-round">chevron_right</span></button>
+                </div></div><div class="card-body" id="expenses-list"><p class="empty-state">No expenses</p></div></div>
+                <div class="card"><div class="card-header"><h4>Summary</h4></div><div class="card-body">
+                    <div class="summary-row"><span>Month Total</span><strong id="expense-total-month">৳0</strong></div>
+                </div></div>
             </div>
 
             <!-- BALANCE -->
             <div class="page" id="page-balance">
                 <div class="page-header"><h3>Balance & Dues</h3><button class="btn-primary btn-sm" id="add-deposit-btn"><span class="material-icons-round">add</span> Deposit</button></div>
-                <div class="dash-finance-row"><div class="dash-finance-box"><small>Deposits</small><strong id="balance-income">\u09F30</strong></div><div class="dash-finance-box"><small>Expense</small><strong id="balance-expense">\u09F30</strong></div><div class="dash-finance-box"><small>Balance</small><strong id="balance-remaining" class="balance-green">\u09F30</strong></div><div class="dash-finance-box"><small>Rate</small><strong id="balance-rate">\u09F30</strong></div></div>
-                <div class="dash-today-card"><div class="dash-stats-header"><span class="material-icons-round">group</span><strong>Member Dues</strong></div><div id="member-dues-list"><p class="empty-state" style="color:#888">No data</p></div></div>
+                <div class="card"><div class="card-header"><h4>Summary</h4></div><div class="card-body" id="balance-overview">
+                    <div class="summary-row"><span>Total Deposits</span><strong id="balance-income">৳0</strong></div>
+                    <div class="summary-row"><span>Total Expense</span><strong id="balance-expense">৳0</strong></div>
+                    <div class="summary-row"><span>Balance</span><strong id="balance-remaining">৳0</strong></div>
+                    <div class="summary-row"><span>Meal Rate</span><strong id="balance-rate">৳0</strong></div>
+                </div></div>
+                <div class="card"><div class="card-header"><h4>Member Dues</h4></div><div class="card-body" id="member-dues-list"><p class="empty-state">No data</p></div></div>
             </div>
 
             <!-- NOTICES -->
             <div class="page" id="page-notices">
                 <div class="page-header"><h3>Notices</h3><button class="btn-primary btn-sm" id="add-notice-btn"><span class="material-icons-round">post_add</span> Post</button></div>
-                <div id="notices-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No notices</p></div></div>
+                <div class="card"><div class="card-body" id="notices-list"><p class="empty-state">No notices</p></div></div>
             </div>
 
             <!-- REPORTS -->
             <div class="page" id="page-reports">
                 <div class="page-header"><h3>Reports</h3></div>
-                <div class="dash-today-card">
-                    <h4 style="color:white;font-size:14px;margin-bottom:10px">Daily Report</h4>
-                    <div class="date-nav"><button class="icon-btn" id="report-prev-day"><span class="material-icons-round">chevron_left</span></button><h4 id="report-date-label" style="color:white;font-size:13px">Today</h4><button class="icon-btn" id="report-next-day"><span class="material-icons-round">chevron_right</span></button></div>
-                    <div id="daily-report" class="report-content"><p class="empty-state" style="color:#888">No data</p></div>
-                    <button class="btn-primary btn-sm" id="export-daily-pdf" style="margin-top:10px"><span class="material-icons-round">picture_as_pdf</span> PDF</button>
-                </div>
-                <div class="dash-today-card">
-                    <h4 style="color:white;font-size:14px;margin-bottom:10px">Monthly Report</h4>
-                    <div class="date-nav"><button class="icon-btn" id="report-prev-month"><span class="material-icons-round">chevron_left</span></button><select id="report-year-select" class="input-sm" style="width:auto"></select><h4 id="report-month-label" style="color:white;font-size:13px">This Month</h4><button class="icon-btn" id="report-next-month"><span class="material-icons-round">chevron_right</span></button></div>
-                    <div id="monthly-report" class="report-content"><p class="empty-state" style="color:#888">No data</p></div>
-                    <button class="btn-primary btn-sm" id="export-monthly-pdf" style="margin-top:10px"><span class="material-icons-round">picture_as_pdf</span> PDF</button>
-                </div>
+                <div class="card"><div class="card-header"><h4>Daily Report</h4></div><div class="card-body">
+                    <div class="date-nav"><button class="icon-btn" id="report-prev-day"><span class="material-icons-round">chevron_left</span></button><h4 id="report-date-label">Today</h4><button class="icon-btn" id="report-next-day"><span class="material-icons-round">chevron_right</span></button></div>
+                    <div id="daily-report" class="report-content"><p class="empty-state">No data</p></div>
+                    <button class="btn-primary btn-sm" id="export-daily-pdf" style="margin-top:12px"><span class="material-icons-round">picture_as_pdf</span> PDF</button>
+                </div></div>
+                <div class="card"><div class="card-header"><h4>Monthly Report</h4></div><div class="card-body">
+                    <div class="date-nav">
+                        <button class="icon-btn" id="report-prev-month"><span class="material-icons-round">chevron_left</span></button>
+                        <select id="report-year-select" class="input-sm" style="width:auto"></select>
+                        <h4 id="report-month-label">This Month</h4>
+                        <button class="icon-btn" id="report-next-month"><span class="material-icons-round">chevron_right</span></button>
+                    </div>
+                    <div id="monthly-report" class="report-content"><p class="empty-state">No data</p></div>
+                    <button class="btn-primary btn-sm" id="export-monthly-pdf" style="margin-top:12px"><span class="material-icons-round">picture_as_pdf</span> PDF</button>
+                </div></div>
             </div>
 
             <!-- MONTHLY OVERVIEW -->
             <div class="page" id="page-monthly">
                 <div class="page-header"><h3>Monthly Overview</h3></div>
-                <div class="dash-today-card"><div class="date-nav"><button class="icon-btn" id="monthly-prev"><span class="material-icons-round">chevron_left</span></button><select id="monthly-year-select" class="input-sm" style="width:auto"></select><h4 id="monthly-label" style="color:white;font-size:13px">This Month</h4><button class="icon-btn" id="monthly-next"><span class="material-icons-round">chevron_right</span></button></div>
-                    <div id="monthly-overview"><p class="empty-state" style="color:#888">No data</p></div>
-                </div>
-                <div class="dash-today-card"><div class="dash-stats-header"><span class="material-icons-round">group</span><strong>Per Member Breakdown</strong></div><div id="monthly-members"><p class="empty-state" style="color:#888">No data</p></div></div>
+                <div class="card"><div class="card-header">
+                    <div class="date-nav">
+                        <button class="icon-btn" id="monthly-prev"><span class="material-icons-round">chevron_left</span></button>
+                        <select id="monthly-year-select" class="input-sm" style="width:auto"></select>
+                        <h4 id="monthly-label">This Month</h4>
+                        <button class="icon-btn" id="monthly-next"><span class="material-icons-round">chevron_right</span></button>
+                    </div>
+                </div><div class="card-body" id="monthly-overview"><p class="empty-state">No data</p></div></div>
+                <div class="card"><div class="card-header"><h4>Per Member Breakdown</h4></div><div class="card-body" id="monthly-members"><p class="empty-state">No data</p></div></div>
             </div>
         </main>
     </div>
