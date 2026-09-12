@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
 <body>
-    <!-- AUTH SCREENS -->
+    <!-- AUTH: LOGIN -->
     <div id="auth-screen" class="screen active">
         <div class="auth-container">
             <div class="auth-header">
@@ -19,45 +19,75 @@
                 <h1>Mess Manager</h1>
                 <p>Manage your mess easily</p>
             </div>
-            <div class="auth-tabs">
-                <button class="auth-tab active" data-tab="login">Login</button>
-                <button class="auth-tab" data-tab="register">Register</button>
-            </div>
-            <form id="login-form" class="auth-form active">
-                <div class="input-group">
-                    <span class="material-icons-round">email</span>
-                    <input type="email" id="login-email" placeholder="Email" required>
-                </div>
-                <div class="input-group">
-                    <span class="material-icons-round">lock</span>
-                    <input type="password" id="login-password" placeholder="Password" required>
-                </div>
-                <button type="submit" class="btn-primary">Login</button>
-                <div class="auth-divider"><span>or</span></div>
-                <button type="button" class="btn-google" id="google-login">
+            <div class="auth-card">
+                <button class="btn-google" id="google-login">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G"> Continue with Google
                 </button>
-                <button type="button" class="btn-link" id="forgot-password">Forgot Password?</button>
-            </form>
-            <form id="register-form" class="auth-form">
-                <div class="input-group">
-                    <span class="material-icons-round">person</span>
-                    <input type="text" id="reg-name" placeholder="Full Name" required>
+                <button type="button" class="btn-link" id="forgot-password-link">Forgot Password?</button>
+            </div>
+            <p class="auth-footer-text">Sign in to continue. If you don't have an account, one will be created automatically.</p>
+        </div>
+    </div>
+
+    <!-- FORGOT PASSWORD PAGE -->
+    <div id="forgot-screen" class="screen">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <span class="material-icons-round">lock_reset</span>
                 </div>
+                <h1>Reset Password</h1>
+                <p>Enter your email to receive a reset link</p>
+            </div>
+            <div class="auth-card">
                 <div class="input-group">
                     <span class="material-icons-round">email</span>
-                    <input type="email" id="reg-email" placeholder="Email" required>
+                    <input type="email" id="reset-email" placeholder="Your email address">
+                </div>
+                <button class="btn-primary" id="send-reset-btn">Send Reset Link</button>
+                <button class="btn-text" id="back-to-login">Back to Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MESS SETUP: CREATE or JOIN -->
+    <div id="mess-setup-screen" class="screen">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <span class="material-icons-round">home_work</span>
+                </div>
+                <h1>Welcome!</h1>
+                <p>Create a new mess or join an existing one</p>
+            </div>
+
+            <div class="setup-tabs">
+                <button class="setup-tab active" data-tab="create">Create Mess</button>
+                <button class="setup-tab" data-tab="join">Join Mess</button>
+            </div>
+
+            <div class="auth-card" id="create-mess-card">
+                <div class="input-group">
+                    <span class="material-icons-round">badge</span>
+                    <input type="text" id="create-mess-name" placeholder="Mess Name (e.g. My Mess)">
                 </div>
                 <div class="input-group">
-                    <span class="material-icons-round">phone</span>
-                    <input type="tel" id="reg-phone" placeholder="Phone Number" required>
+                    <span class="material-icons-round">location_on</span>
+                    <input type="text" id="create-mess-address" placeholder="Address (optional)">
                 </div>
+                <button class="btn-primary" id="create-mess-btn">Create Mess</button>
+            </div>
+
+            <div class="auth-card" id="join-mess-card" style="display:none">
                 <div class="input-group">
-                    <span class="material-icons-round">lock</span>
-                    <input type="password" id="reg-password" placeholder="Password (min 6 chars)" required minlength="6">
+                    <span class="material-icons-round">vpn_key</span>
+                    <input type="text" id="join-mess-code" placeholder="Enter Mess Code" maxlength="6" style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:18px;font-weight:600">
                 </div>
-                <button type="submit" class="btn-primary">Create Account</button>
-            </form>
+                <button class="btn-primary" id="join-mess-btn">Join Mess</button>
+                <p class="hint-text">Ask your mess admin for the 6-digit code</p>
+            </div>
+
+            <button class="btn-text" id="logout-from-setup">Switch Account</button>
         </div>
     </div>
 
@@ -70,10 +100,6 @@
             </button>
             <h2 id="page-title">Dashboard</h2>
             <div class="topbar-actions">
-                <button class="icon-btn" id="notifications-btn">
-                    <span class="material-icons-round">notifications</span>
-                    <span class="badge" id="notif-badge" style="display:none">0</span>
-                </button>
                 <div class="avatar" id="user-avatar" title="Profile">
                     <span class="material-icons-round">account_circle</span>
                 </div>
@@ -89,6 +115,11 @@
                         <h3 id="sidebar-name">User</h3>
                         <p id="sidebar-email">user@email.com</p>
                     </div>
+                </div>
+                <div class="mess-code-box">
+                    <span>Mess Code:</span>
+                    <strong id="sidebar-mess-code">------</strong>
+                    <button class="icon-btn-sm" id="copy-mess-code" title="Copy code"><span class="material-icons-round">content_copy</span></button>
                 </div>
             </div>
             <nav class="sidebar-nav">
@@ -116,12 +147,12 @@
                 <a href="#" class="nav-item" data-page="reports">
                     <span class="material-icons-round">assessment</span> Reports
                 </a>
-                <a href="#" class="nav-item" data-page="settings">
-                    <span class="material-icons-round">settings</span> Settings
-                </a>
                 <div class="nav-divider"></div>
+                <a href="#" class="nav-item" id="leave-mess-btn">
+                    <span class="material-icons-round">logout</span> Leave Mess
+                </a>
                 <a href="#" class="nav-item" id="logout-btn">
-                    <span class="material-icons-round">logout</span> Logout
+                    <span class="material-icons-round">power_settings_new</span> Sign Out
                 </a>
             </nav>
         </aside>
@@ -136,64 +167,38 @@
                         <div class="stat-icon" style="background:#e3f2fd;color:#1976d2">
                             <span class="material-icons-round">group</span>
                         </div>
-                        <div class="stat-info">
-                            <h3 id="stat-members">0</h3>
-                            <p>Members</p>
-                        </div>
+                        <div class="stat-info"><h3 id="stat-members">0</h3><p>Members</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon" style="background:#e8f5e9;color:#388e3c">
                             <span class="material-icons-round">restaurant_menu</span>
                         </div>
-                        <div class="stat-info">
-                            <h3 id="stat-today-meals">0</h3>
-                            <p>Today's Meals</p>
-                        </div>
+                        <div class="stat-info"><h3 id="stat-today-meals">0</h3><p>Today's Meals</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon" style="background:#fff3e0;color:#f57c00">
                             <span class="material-icons-round">shopping_cart</span>
                         </div>
-                        <div class="stat-info">
-                            <h3 id="stat-month-bazar">৳0</h3>
-                            <p>Month Bazaar</p>
-                        </div>
+                        <div class="stat-info"><h3 id="stat-month-bazar">৳0</h3><p>Month Bazaar</p></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon" style="background:#fce4ec;color:#c62828">
                             <span class="material-icons-round">receipt_long</span>
                         </div>
-                        <div class="stat-info">
-                            <h3 id="stat-month-expense">৳0</h3>
-                            <p>Month Expense</p>
-                        </div>
+                        <div class="stat-info"><h3 id="stat-month-expense">৳0</h3><p>Month Expense</p></div>
                     </div>
                 </div>
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Recent Activity</h3>
-                    </div>
-                    <div class="card-body" id="recent-activity">
-                        <p class="empty-state">No recent activity</p>
-                    </div>
+                    <div class="card-header"><h3>Recent Activity</h3></div>
+                    <div class="card-body" id="recent-activity"><p class="empty-state">No recent activity</p></div>
                 </div>
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Quick Actions</h3>
-                    </div>
+                    <div class="card-header"><h3>Quick Actions</h3></div>
                     <div class="card-body quick-actions">
-                        <button class="quick-btn" onclick="App.navigate('meals')">
-                            <span class="material-icons-round">add_circle</span> Add Meal
-                        </button>
-                        <button class="quick-btn" onclick="App.navigate('bazaar')">
-                            <span class="material-icons-round">add_shopping_cart</span> Add Bazaar
-                        </button>
-                        <button class="quick-btn" onclick="App.navigate('expenses')">
-                            <span class="material-icons-round">add_card</span> Add Expense
-                        </button>
-                        <button class="quick-btn" onclick="App.navigate('notices')">
-                            <span class="material-icons-round">post_add</span> Post Notice
-                        </button>
+                        <button class="quick-btn" onclick="App.navigate('meals')"><span class="material-icons-round">add_circle</span> Add Meal</button>
+                        <button class="quick-btn" onclick="App.navigate('bazaar')"><span class="material-icons-round">add_shopping_cart</span> Add Bazaar</button>
+                        <button class="quick-btn" onclick="App.navigate('expenses')"><span class="material-icons-round">add_card</span> Add Expense</button>
+                        <button class="quick-btn" onclick="App.navigate('notices')"><span class="material-icons-round">post_add</span> Post Notice</button>
                     </div>
                 </div>
             </div>
@@ -202,24 +207,16 @@
             <div class="page" id="page-members">
                 <div class="page-header">
                     <h3>Members</h3>
-                    <button class="btn-primary btn-sm" id="add-member-btn">
-                        <span class="material-icons-round">person_add</span> Add Member
-                    </button>
+                    <button class="btn-primary btn-sm" id="add-member-btn"><span class="material-icons-round">person_add</span> Add</button>
                 </div>
-                <div class="card">
-                    <div class="card-body" id="members-list">
-                        <p class="empty-state">No members yet</p>
-                    </div>
-                </div>
+                <div class="card"><div class="card-body" id="members-list"><p class="empty-state">No members yet</p></div></div>
             </div>
 
             <!-- MEALS -->
             <div class="page" id="page-meals">
                 <div class="page-header">
                     <h3>Meal Management</h3>
-                    <button class="btn-primary btn-sm" id="add-meal-btn">
-                        <span class="material-icons-round">add</span> Add Meal
-                    </button>
+                    <button class="btn-primary btn-sm" id="add-meal-btn"><span class="material-icons-round">add</span> Add Meal</button>
                 </div>
                 <div class="card">
                     <div class="card-header">
@@ -229,13 +226,11 @@
                             <button class="icon-btn" id="meal-next-day"><span class="material-icons-round">chevron_right</span></button>
                         </div>
                     </div>
-                    <div class="card-body" id="meals-list">
-                        <p class="empty-state">No meals recorded</p>
-                    </div>
+                    <div class="card-body" id="meals-list"><p class="empty-state">No meals recorded</p></div>
                 </div>
                 <div class="card">
                     <div class="card-header"><h4>Meal Summary</h4></div>
-                    <div class="card-body" id="meal-summary">
+                    <div class="card-body">
                         <div class="summary-row"><span>Total Meals Today</span><strong id="meal-total-today">0</strong></div>
                         <div class="summary-row"><span>Meals This Month</span><strong id="meal-total-month">0</strong></div>
                     </div>
@@ -246,9 +241,7 @@
             <div class="page" id="page-bazaar">
                 <div class="page-header">
                     <h3>Bazaar / Shopping</h3>
-                    <button class="btn-primary btn-sm" id="add-bazar-btn">
-                        <span class="material-icons-round">add</span> Add Item
-                    </button>
+                    <button class="btn-primary btn-sm" id="add-bazar-btn"><span class="material-icons-round">add</span> Add</button>
                 </div>
                 <div class="card">
                     <div class="card-header">
@@ -258,9 +251,7 @@
                             <button class="icon-btn" id="bazar-next-day"><span class="material-icons-round">chevron_right</span></button>
                         </div>
                     </div>
-                    <div class="card-body" id="bazar-list">
-                        <p class="empty-state">No bazaar items</p>
-                    </div>
+                    <div class="card-body" id="bazar-list"><p class="empty-state">No bazaar items</p></div>
                 </div>
                 <div class="card">
                     <div class="card-header"><h4>Bazaar Summary</h4></div>
@@ -275,9 +266,7 @@
             <div class="page" id="page-expenses">
                 <div class="page-header">
                     <h3>Expenses</h3>
-                    <button class="btn-primary btn-sm" id="add-expense-btn">
-                        <span class="material-icons-round">add</span> Add Expense
-                    </button>
+                    <button class="btn-primary btn-sm" id="add-expense-btn"><span class="material-icons-round">add</span> Add</button>
                 </div>
                 <div class="card">
                     <div class="card-header">
@@ -287,9 +276,7 @@
                             <button class="icon-btn" id="expense-next-month"><span class="material-icons-round">chevron_right</span></button>
                         </div>
                     </div>
-                    <div class="card-body" id="expenses-list">
-                        <p class="empty-state">No expenses recorded</p>
-                    </div>
+                    <div class="card-body" id="expenses-list"><p class="empty-state">No expenses recorded</p></div>
                 </div>
                 <div class="card">
                     <div class="card-header"><h4>Expense Summary</h4></div>
@@ -303,9 +290,7 @@
             <div class="page" id="page-balance">
                 <div class="page-header">
                     <h3>Balance & Dues</h3>
-                    <button class="btn-primary btn-sm" id="add-deposit-btn">
-                        <span class="material-icons-round">add</span> Record Deposit
-                    </button>
+                    <button class="btn-primary btn-sm" id="add-deposit-btn"><span class="material-icons-round">add</span> Deposit</button>
                 </div>
                 <div class="card">
                     <div class="card-header"><h4>Overall Summary</h4></div>
@@ -318,9 +303,7 @@
                 </div>
                 <div class="card">
                     <div class="card-header"><h4>Member Dues</h4></div>
-                    <div class="card-body" id="member-dues-list">
-                        <p class="empty-state">No data available</p>
-                    </div>
+                    <div class="card-body" id="member-dues-list"><p class="empty-state">No data available</p></div>
                 </div>
             </div>
 
@@ -328,22 +311,14 @@
             <div class="page" id="page-notices">
                 <div class="page-header">
                     <h3>Notice Board</h3>
-                    <button class="btn-primary btn-sm" id="add-notice-btn">
-                        <span class="material-icons-round">post_add</span> Post Notice
-                    </button>
+                    <button class="btn-primary btn-sm" id="add-notice-btn"><span class="material-icons-round">post_add</span> Post</button>
                 </div>
-                <div class="card">
-                    <div class="card-body" id="notices-list">
-                        <p class="empty-state">No notices posted</p>
-                    </div>
-                </div>
+                <div class="card"><div class="card-body" id="notices-list"><p class="empty-state">No notices posted</p></div></div>
             </div>
 
             <!-- REPORTS -->
             <div class="page" id="page-reports">
-                <div class="page-header">
-                    <h3>Reports & Summaries</h3>
-                </div>
+                <div class="page-header"><h3>Reports & Summaries</h3></div>
                 <div class="card">
                     <div class="card-header"><h4>Daily Report</h4></div>
                     <div class="card-body">
@@ -352,12 +327,8 @@
                             <h4 id="report-date-label">Today</h4>
                             <button class="icon-btn" id="report-next-day"><span class="material-icons-round">chevron_right</span></button>
                         </div>
-                        <div id="daily-report" class="report-content">
-                            <p class="empty-state">Select a date to view report</p>
-                        </div>
-                        <button class="btn-primary btn-sm" id="export-daily-pdf" style="margin-top:12px">
-                            <span class="material-icons-round">picture_as_pdf</span> Export PDF
-                        </button>
+                        <div id="daily-report" class="report-content"><p class="empty-state">Select a date to view report</p></div>
+                        <button class="btn-primary btn-sm" id="export-daily-pdf" style="margin-top:12px"><span class="material-icons-round">picture_as_pdf</span> Export PDF</button>
                     </div>
                 </div>
                 <div class="card">
@@ -368,54 +339,8 @@
                             <h4 id="report-month-label">This Month</h4>
                             <button class="icon-btn" id="report-next-month"><span class="material-icons-round">chevron_right</span></button>
                         </div>
-                        <div id="monthly-report" class="report-content">
-                            <p class="empty-state">Select a month to view report</p>
-                        </div>
-                        <button class="btn-primary btn-sm" id="export-monthly-pdf" style="margin-top:12px">
-                            <span class="material-icons-round">picture_as_pdf</span> Export PDF
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SETTINGS -->
-            <div class="page" id="page-settings">
-                <div class="page-header"><h3>Settings</h3></div>
-                <div class="card">
-                    <div class="card-body">
-                        <div class="settings-section">
-                            <h4>Profile</h4>
-                            <div class="setting-item">
-                                <span>Display Name</span>
-                                <input type="text" id="setting-name" class="input-sm" placeholder="Your name">
-                            </div>
-                            <button class="btn-primary btn-sm" id="save-profile-btn">Save Profile</button>
-                        </div>
-                        <div class="settings-section">
-                            <h4>Change Password</h4>
-                            <div class="setting-item">
-                                <span>New Password</span>
-                                <input type="password" id="setting-new-pass" class="input-sm" placeholder="New password">
-                            </div>
-                            <button class="btn-primary btn-sm" id="change-pass-btn">Update Password</button>
-                        </div>
-                        <div class="settings-section">
-                            <h4>Mess Settings (Admin)</h4>
-                            <div class="setting-item">
-                                <span>Mess Name</span>
-                                <input type="text" id="setting-mess-name" class="input-sm" placeholder="My Mess">
-                            </div>
-                            <button class="btn-primary btn-sm" id="save-mess-btn">Save Settings</button>
-                        </div>
-                        <div class="settings-section">
-                            <h4>Data</h4>
-                            <button class="btn-danger btn-sm" id="export-data-btn">
-                                <span class="material-icons-round">download</span> Export All Data
-                            </button>
-                            <button class="btn-danger btn-sm" id="delete-account-btn" style="margin-top:8px">
-                                <span class="material-icons-round">delete_forever</span> Delete Account
-                            </button>
-                        </div>
+                        <div id="monthly-report" class="report-content"><p class="empty-state">Select a month to view report</p></div>
+                        <button class="btn-primary btn-sm" id="export-monthly-pdf" style="margin-top:12px"><span class="material-icons-round">picture_as_pdf</span> Export PDF</button>
                     </div>
                 </div>
             </div>
