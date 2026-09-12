@@ -504,11 +504,13 @@ const App = {
         const mealBgs = ['#3d2b1a', '#1a2e1a', '#1a1e3a', '#1a2a2a'];
         const visibleMeals = mealKeys.filter(k => vis[k]);
         const nm = visibleMeals.length || 1;
+        const totalCols = viewDays + 2;
 
-        let html = '<div class="mg-grid-wrap"><div class="mg-grid">';
-        html += '<div class="mg-g-corner"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></div>';
-        for (let d = 1; d <= viewDays; d++) html += `<div class="mg-g-day">${d}</div>`;
+        let html = `<div class="mg-grid-wrap"><div class="mg-grid" style="grid-template-columns: 110px 110px repeat(${viewDays}, 50px)">`;
+        html += `<div class="mg-g-corner"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></div>`;
+        for (let d = 1; d <= viewDays; d++) html += `<div class="mg-g-day" style="grid-column:${d + 2}">${d}</div>`;
 
+        let gridRow = 2;
         mids.forEach((mid, idx) => {
             const m = members[mid];
             const mData = allMeals[mid] || {};
@@ -518,16 +520,17 @@ const App = {
             const memberSep = idx > 0 ? ' mg-g-member-sep' : '';
 
             if (visibleMeals.length === 0) {
-                html += `<div class="mg-g-name${memberSep}" style="background:${memberColor};grid-row:span 1"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></div>`;
-                html += `<div class="mg-g-type" style="background:#333"><span class="material-icons-round mg-g-type-icon" style="color:#aaa">restaurant</span><strong>${mTotal}</strong><span class="mg-g-type-label">Total</span></div>`;
+                html += `<div class="mg-g-name${memberSep}" style="background:${memberColor};grid-column:1;grid-row:${gridRow}"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></div>`;
+                html += `<div class="mg-g-type" style="background:#333;grid-column:2;grid-row:${gridRow}"><span class="material-icons-round mg-g-type-icon" style="color:#aaa">restaurant</span><strong>${mTotal}</strong><span class="mg-g-type-label">Total</span></div>`;
                 for (let d = 1; d <= viewDays; d++) {
                     const dk = `${month}-${String(d).padStart(2, '0')}`;
                     const ml = mData[dk];
                     const val = ml ? (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0) : 0;
-                    html += `<div class="mg-g-cell${val ? ' filled' : ''}">${val || ''}</div>`;
+                    html += `<div class="mg-g-cell${val ? ' filled' : ''}" style="grid-column:${d + 2};grid-row:${gridRow}">${val || ''}</div>`;
                 }
+                gridRow++;
             } else {
-                html += `<div class="mg-g-name${memberSep}" style="background:${memberColor};grid-row:span ${nm}"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></div>`;
+                html += `<div class="mg-g-name${memberSep}" style="background:${memberColor};grid-column:1;grid-row:${gridRow} / span ${nm}"><strong>${this.esc(m.name)}</strong><small>(${mTotal})</small></div>`;
                 visibleMeals.forEach((meal, vi) => {
                     const mi = mealKeys.indexOf(meal);
                     let rowTotal = 0;
@@ -536,18 +539,19 @@ const App = {
                         rowTotal += (mData[dk] && mData[dk][meal]) || 0;
                     }
                     const rowSep = (vi === 0 && idx > 0) ? ' mg-g-row-sep' : '';
-                    html += `<div class="mg-g-type${rowSep}" style="background:${mealBgs[mi]}"><span class="material-icons-round mg-g-type-icon" style="color:${mealColors[mi]}">${mealIcons[mi]}</span><strong>${rowTotal}</strong><span class="mg-g-type-label">${mealLabels[mi]}</span></div>`;
+                    const r = gridRow + vi;
+                    html += `<div class="mg-g-type${rowSep}" style="background:${mealBgs[mi]};grid-column:2;grid-row:${r}"><span class="material-icons-round mg-g-type-icon" style="color:${mealColors[mi]}">${mealIcons[mi]}</span><strong>${rowTotal}</strong><span class="mg-g-type-label">${mealLabels[mi]}</span></div>`;
                     for (let d = 1; d <= viewDays; d++) {
                         const dk = `${month}-${String(d).padStart(2, '0')}`;
                         const val = (mData[dk] && mData[dk][meal]) || 0;
-                        html += `<div class="mg-g-cell${val ? ' filled' : ''}${rowSep}">${val || ''}</div>`;
+                        html += `<div class="mg-g-cell${val ? ' filled' : ''}${rowSep}" style="grid-column:${d + 2};grid-row:${r}">${val || ''}</div>`;
                     }
                 });
+                gridRow += nm;
             }
         });
         html += '</div></div>';
         document.getElementById('meal-grid-wrap').innerHTML = html;
-        document.querySelector('.mg-grid').style.setProperty('--mg-days', viewDays);
     },
 
     toggleMealView() {
