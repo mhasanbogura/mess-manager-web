@@ -838,6 +838,7 @@ select.input-sm { cursor: pointer; }
 }
 .mg-g-cell.filled { color: white; font-weight: 600; }
 
+.gv-handle { width: 40px; height: 4px; background: #555; border-radius: 2px; margin: 0 auto 12px; }
 .gv-title { font-size: 18px; font-weight: 700; color: white; margin-bottom: 4px; }
 .gv-subtitle { font-size: 13px; color: #888; margin-bottom: 16px; }
 .gv-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; cursor: pointer; }

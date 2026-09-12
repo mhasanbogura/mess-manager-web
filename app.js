@@ -556,7 +556,7 @@ const App = {
         const labels = ['Morning', 'Noon', 'Night', 'Special'];
         const icons = ['coffee', 'lunch_dining', 'dinner_dining', 'star'];
         const colors = ['#FFC107', '#4CAF50', '#42a5f5', '#26a69a'];
-        let html = '<div class="gv-title">Grid view</div><div class="gv-subtitle">Show meals</div>';
+        let html = '<div class="gv-handle"></div><div class="gv-title">Grid view</div><div class="gv-subtitle">Show meals</div>';
         meals.forEach((meal, i) => {
             const checked = this.mealVisibility[meal];
             const c = colors[i];
