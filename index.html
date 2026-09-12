@@ -84,41 +84,11 @@
     <!-- MAIN APP -->
     <div id="app-screen" class="screen">
         <header class="topbar">
-            <button class="menu-btn" id="menu-toggle"><span class="material-icons-round">menu</span></button>
             <div class="topbar-title" id="topbar-mess-name">
                 <h2 id="page-title">Dashboard</h2>
                 <small id="topbar-mess-label" style="color:var(--text-secondary);font-size:11px">My Mess</small>
             </div>
-            <div class="topbar-actions">
-                <div class="avatar" id="user-avatar"><span class="material-icons-round">account_circle</span></div>
-            </div>
         </header>
-
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-user">
-                    <span class="material-icons-round sidebar-avatar">account_circle</span>
-                    <div><h3 id="sidebar-name">User</h3><p id="sidebar-email">email</p></div>
-                </div>
-                <div class="mess-code-box">
-                    <span>Code:</span><strong id="sidebar-mess-code">------</strong>
-                    <button class="icon-btn-sm" id="copy-mess-code" title="Copy"><span class="material-icons-round">content_copy</span></button>
-                </div>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-page="dashboard"><span class="material-icons-round">dashboard</span> Dashboard</a>
-                <a href="#" class="nav-item" data-page="members"><span class="material-icons-round">group</span> Flat</a>
-                <a href="#" class="nav-item" data-page="meals"><span class="material-icons-round">restaurant_menu</span> Meals</a>
-                <a href="#" class="nav-item" data-page="bazaar"><span class="material-icons-round">shopping_cart</span> Shopping</a>
-                <a href="#" class="nav-item" data-page="balance"><span class="material-icons-round">account_balance_wallet</span> Balance</a>
-                <a href="#" class="nav-item" data-page="notices"><span class="material-icons-round">campaign</span> Notices</a>
-                <a href="#" class="nav-item" data-page="monthly"><span class="material-icons-round">insights</span> Analysis</a>
-                <div class="nav-divider"></div>
-                <a href="#" class="nav-item" id="leave-mess-btn"><span class="material-icons-round">logout</span> Leave Mess</a>
-                <a href="#" class="nav-item" id="logout-btn"><span class="material-icons-round">power_settings_new</span> Sign Out</a>
-            </nav>
-        </aside>
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <main class="main-content">
             <!-- DASHBOARD -->
@@ -305,7 +275,7 @@
                 <div class="page-header">
                     <h3>Shopping List</h3>
                     <div style="display:flex;gap:6px">
-                        <button class="btn-icon-top" onclick="App.navigate('expenses')"><span class="material-icons-round">receipt_long</span><small>Utility</small></button>
+                        <button class="btn-icon-top" onclick="App.showExpenseModal()"><span class="material-icons-round">receipt_long</span><small>Utility</small></button>
                     </div>
                 </div>
                 <div class="meal-month-bar">
@@ -330,7 +300,7 @@
 
             <!-- NOTICES -->
             <div class="page" id="page-notices">
-                <div class="page-header"><h3>Notices</h3><button class="btn-primary btn-sm" id="add-notice-btn"><span class="material-icons-round">post_add</span> Post</button></div>
+                <div class="page-header"><h3>Notice Board</h3><button class="btn-primary btn-sm" id="add-notice-btn"><span class="material-icons-round">post_add</span> Post</button></div>
                 <div id="notices-list"><div class="dash-today-card"><p class="empty-state" style="color:#888">No notices</p></div></div>
             </div>
 
@@ -360,6 +330,23 @@
                 <div id="analysis-meal-share" class="analysis-card"></div>
                 <div class="analysis-export-wrap"><button class="btn-export-pdf" onclick="App.exportAnalysisPDF()"><span class="material-icons-round">picture_as_pdf</span> Export PDF</button></div>
             </div>
+
+            <!-- PROFILE -->
+            <div class="page" id="page-profile">
+                <div class="profile-card" style="text-align:center;padding:30px 20px">
+                    <div style="width:80px;height:80px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><span class="material-icons-round" style="font-size:40px;color:white">account_circle</span></div>
+                    <h2 id="profile-name" style="margin-bottom:4px">User</h2>
+                    <p id="profile-email" style="color:var(--text-secondary);font-size:13px;margin-bottom:20px">email</p>
+                    <div style="background:var(--card);border-radius:var(--radius);padding:16px;text-align:left;margin-bottom:16px">
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:var(--text-secondary);font-size:13px">Mess</span><strong id="profile-mess" style="font-size:13px">-</strong></div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><span style="color:var(--text-secondary);font-size:13px">Code</span><strong id="profile-code" style="font-size:13px;display:flex;align-items:center;gap:6px">------ <button class="icon-btn-sm" onclick="App.copyCode()" style="padding:2px"><span class="material-icons-round" style="font-size:14px">content_copy</span></button></strong></div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0"><span style="color:var(--text-secondary);font-size:13px">Role</span><strong id="profile-role" style="font-size:13px">-</strong></div>
+                    </div>
+                    <button class="btn-export-pdf" onclick="App.navigate('monthly')" style="width:100%;margin-bottom:10px"><span class="material-icons-round">insights</span> Analysis</button>
+                    <button id="profile-leave-btn" class="btn-danger" style="width:100%;margin-bottom:10px;padding:14px" onclick="App.leaveMess()"><span class="material-icons-round">logout</span> Leave Mess</button>
+                    <button id="profile-logout-btn" class="btn-modal-cancel" style="width:100%;padding:14px" onclick="App.signOut()"><span class="material-icons-round">power_settings_new</span> Sign Out</button>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -378,7 +365,8 @@
             <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">group</span>Flat</button>
             <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Shopping</button>
             <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant_menu</span>Meal</button>
-            <button class="bottom-nav-item" data-page="monthly" onclick="App.navigate('monthly')"><span class="material-icons-round">insights</span>Analyse</button>
+            <button class="bottom-nav-item" data-page="balance" onclick="App.navigate('balance')"><span class="material-icons-round">account_balance_wallet</span>Manager</button>
+            <button class="bottom-nav-item" data-page="profile" onclick="App.navigate('profile')"><span class="material-icons-round">person</span>Profile</button>
         </div>
     </nav>
 

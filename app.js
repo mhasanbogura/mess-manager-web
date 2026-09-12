@@ -49,13 +49,6 @@ const App = {
         $('create-mess-btn').addEventListener('click', () => this.createMess());
         $('join-mess-btn').addEventListener('click', () => this.joinMess());
         $('logout-from-setup').addEventListener('click', () => auth.signOut());
-        $('menu-toggle').addEventListener('click', () => this.toggleSidebar());
-        $('sidebar-overlay').addEventListener('click', () => this.closeSidebar());
-        document.querySelectorAll('.nav-item[data-page]').forEach(i => i.addEventListener('click', e => { e.preventDefault(); this.navigate(i.dataset.page); }));
-        $('leave-mess-btn').addEventListener('click', e => { e.preventDefault(); this.leaveMess(); });
-        $('logout-btn').addEventListener('click', e => { e.preventDefault(); auth.signOut(); });
-        $('user-avatar').addEventListener('click', () => this.navigate('dashboard'));
-        $('copy-mess-code').addEventListener('click', () => { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); });
         $('add-member-btn')?.addEventListener('click', () => this.showMemberModal());
         $('add-meal-btn').addEventListener('click', () => this.showMealModal());
         $('bulk-meal-btn')?.addEventListener('click', () => this.showBulkMealModal());
@@ -153,10 +146,12 @@ const App = {
     enterMess(mid) {
         this.messId = mid;
         this.messCode = null;
-        db.ref(`messes/${mid}/settings`).once('value').then(s => {
+        db.ref(`messes/${mid}/settings`).once('value').then(async s => {
             const v = s.val() || {};
             this.messCode = v.messCode;
             this.messName = v.messName;
+            const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
+            this.userRole = roleSnap.val() || 'member';
             this.showApp();
         }).catch(e => { console.error('enterMess error:', e); this.toast('Error loading mess', 'error'); });
     },
@@ -171,7 +166,6 @@ const App = {
             this.messId = null;
             this.messCode = null;
             this.messName = null;
-            this.closeSidebar();
             this.loadMyMesses();
         } catch (e) {
             console.error('leaveMess error:', e);
@@ -228,32 +222,31 @@ const App = {
 
     showApp() {
         this.showScreen('app-screen');
-        document.getElementById('sidebar-name').textContent = this.currentUser.displayName || 'User';
-        document.getElementById('sidebar-email').textContent = this.currentUser.email || '';
-        document.getElementById('sidebar-mess-code').textContent = this.messCode || '------';
-        document.getElementById('page-title').textContent = this.messName || 'My Mess';
-        document.getElementById('topbar-mess-label').textContent = this.messCode || '';
-        document.querySelector('.nav-item[data-page="dashboard"]').classList.add('active');
         this.navigate('dashboard');
     },
-
-    toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebar-overlay').classList.toggle('active'); },
-    closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebar-overlay').classList.remove('active'); },
 
     navigate(page) {
         this.currentPage = page;
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('page-' + page).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        const ni = document.querySelector(`.nav-item[data-page="${page}"]`); if (ni) ni.classList.add('active');
         document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
         const bni = document.querySelector(`.bottom-nav-item[data-page="${page}"]`); if (bni) bni.classList.add('active');
-        const titles = { dashboard: this.messName || 'My Mess', members: 'Flat', meals: 'Meals', bazaar: 'Shopping', balance: 'Balance', notices: 'Notices', monthly: 'Analysis' };
+        const titles = { dashboard: this.messName || 'My Mess', members: 'Flat', meals: 'Meal Entry', bazaar: 'Shopping', balance: 'Manager Money', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
-        this.closeSidebar();
-        const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), monthly: () => this.loadMonthlyOverview() };
+        const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), monthly: () => this.loadMonthlyOverview(), profile: () => this.loadProfile() };
         if (loaders[page]) loaders[page]();
     },
+
+    loadProfile() {
+        document.getElementById('profile-name').textContent = this.currentUser?.displayName || 'User';
+        document.getElementById('profile-email').textContent = this.currentUser?.email || '';
+        document.getElementById('profile-mess').textContent = this.messName || '-';
+        document.getElementById('profile-code').innerHTML = (this.messCode || '------') + ' <button class="icon-btn-sm" onclick="App.copyCode()" style="padding:2px"><span class="material-icons-round" style="font-size:14px">content_copy</span></button>';
+        document.getElementById('profile-role').textContent = this.userRole || 'member';
+    },
+
+    copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
+    signOut() { auth.signOut(); },
 
     async loadDashboard() {
         if (!this.messId) return;
@@ -286,7 +279,7 @@ const App = {
         document.getElementById('dash-live-count').textContent = bazarCount + ' items';
 
         const noticeSnap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(1).once('value');
-        if (noticeSnap.exists()) { const n = noticeSnap.val(); const k = Object.keys(n)[0]; document.getElementById('dash-notice-preview').textContent = n[k].title || 'Pin a notice for the whole house'; }
+        if (noticeSnap.exists()) { const n = noticeSnap.val(); const k = Object.keys(n)[0]; document.getElementById('dash-notice-preview').textContent = n[k].body || n[k].title || 'Pin a notice for the whole house'; }
 
         let totalDep = 0;
         const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
@@ -545,7 +538,7 @@ const App = {
         document.getElementById('modal-title').textContent = data ? 'Edit Meal' : 'Add Meal';
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
             const m = snap.val() || {}; let opts = '<option value="">Select</option>';
-            Object.entries(m).forEach(([id, v]) => { opts += `<option value="${id}" ${id === mid ? 'selected' : ''}>${v.name}</option>`; });
+            this.sortedMembers(m).forEach(([id, v]) => { opts += `<option value="${id}" ${id === mid ? 'selected' : ''}>${v.name}</option>`; });
             document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Member</label><select id="ml-member">${opts}</select></div><div class="form-group"><label>Breakfast</label><input type="number" id="ml-b" min="0" value="${data?.breakfast || 0}"></div><div class="form-group"><label>Lunch</label><input type="number" id="ml-l" min="0" value="${data?.lunch || 0}"></div><div class="form-group"><label>Dinner</label><input type="number" id="ml-d" min="0" value="${data?.dinner || 0}"></div>`;
             document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveMeal('${dk || this.dk(this.mealDate)}')">Save</button>`;
             this.openModal();
@@ -555,10 +548,10 @@ const App = {
     showBulkMealModal() {
         document.getElementById('modal-title').textContent = 'Bulk Meal Entry';
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
-            const m = snap.val() || {}; const mids = Object.keys(m);
-            if (!mids.length) { this.toast('No members', 'error'); return; }
+            const m = snap.val() || {}; const sorted = this.sortedMembers(m);
+            if (!sorted.length) { this.toast('No members', 'error'); return; }
             let rows = '';
-            mids.forEach(id => { const v = m[id]; rows += `<div class="bulk-row" data-mid="${id}"><span style="min-width:100px;font-size:13px">${this.esc(v.name)}</span><input type="number" min="0" value="0" class="bulk-b" style="width:50px" placeholder="B"><input type="number" min="0" value="0" class="bulk-l" style="width:50px" placeholder="L"><input type="number" min="0" value="0" class="bulk-d" style="width:50px" placeholder="D"></div>`; });
+            sorted.forEach(([id, v]) => { rows += `<div class="bulk-row" data-mid="${id}"><span style="min-width:100px;font-size:13px">${this.esc(v.name)}</span><input type="number" min="0" value="0" class="bulk-b" style="width:50px" placeholder="B"><input type="number" min="0" value="0" class="bulk-l" style="width:50px" placeholder="L"><input type="number" min="0" value="0" class="bulk-d" style="width:50px" placeholder="D"></div>`; });
             document.getElementById('modal-body').innerHTML = `<p style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">B=Breakfast, L=Lunch, D=Dinner</p><div style="max-height:400px;overflow-y:auto">${rows}</div>`;
             document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveBulkMeals()">Save All</button>`;
             this.openModal();
@@ -646,7 +639,7 @@ const App = {
         document.getElementById('modal-title').innerHTML = (id ? 'Edit Item' : 'Add Shopping') + '<div class="bazar-cat-tabs" id="bazar-cat-tabs"><button class="bazar-tab active" data-cat="Shopping" onclick="App.setBazarCat(\'Shopping\')"><span class="material-icons-round">shopping_cart</span> Shopping</button><button class="bazar-tab" data-cat="Utility" onclick="App.setBazarCat(\'Utility\')"><span class="material-icons-round">lightbulb</span> Utility</button><button class="bazar-tab" data-cat="Special" onclick="App.setBazarCat(\'Special\')"><span class="material-icons-round">star</span> Special</button></div>';
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
             const m = snap.val() || {}; let payChips = '', doneChips = '';
-            Object.entries(m).forEach(([mid, v]) => {
+            this.sortedMembers(m).forEach(([mid, v]) => {
                 payChips += `<button class="member-chip" data-mid="${mid}" onclick="App.selectBazarMember(this)">${this.esc(v.name)}</button>`;
                 doneChips += `<button class="member-chip" data-mid="${mid}" onclick="App.selectBazarDoneBy(this)">${this.esc(v.name)}</button>`;
             });
@@ -835,7 +828,7 @@ const App = {
         document.getElementById('modal-title').textContent = 'Record Deposit';
         db.ref(`messes/${this.messId}/members`).once('value').then(snap => {
             const m = snap.val() || {}; let opts = '<option value="">Select</option>';
-            Object.entries(m).forEach(([id, v]) => { opts += `<option value="${id}">${v.name}</option>`; });
+            this.sortedMembers(m).forEach(([id, v]) => { opts += `<option value="${id}">${v.name}</option>`; });
             document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Member</label><select id="dp-member">${opts}</select></div><div class="form-group"><label>Amount (\u09F3)</label><input type="number" id="dp-amount" min="0"></div><div class="form-group"><label>Note</label><input id="dp-note" placeholder="Optional"></div>`;
             document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveDeposit()">Save</button>`;
             this.openModal();
@@ -853,23 +846,23 @@ const App = {
     async loadNotices() {
         const snap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(50).once('value');
         const div = document.getElementById('notices-list');
-        if (!snap.exists()) { div.innerHTML = '<p class="empty-state">No notices</p>'; return; }
+        if (!snap.exists()) { div.innerHTML = '<div style="text-align:center;padding:60px 20px"><span class="material-icons-round" style="font-size:48px;color:#555">push_pin</span><h3 style="color:#aaa;margin:16px 0 8px">The board is empty</h3><p style="color:#888;font-size:13px">Pin a notice and everyone in the house gets a notification.</p></div>'; return; }
         let html = ''; const arr = []; snap.forEach(s => { arr.unshift({ key: s.key, ...s.val() }); });
-        arr.forEach(n => { html += `<div class="notice-item"><h4>${this.esc(n.title || '')}</h4><p>${this.esc(n.body || '')}</p><div class="notice-meta"><span>${this.esc(n.author || '')}</span><span>${this.timeAgo(n.createdAt)}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.deleteNotice('${n.key}')"><span class="material-icons-round">delete</span></button></div></div>`; });
+        arr.forEach(n => { html += `<div class="notice-item"><p style="font-size:14px;line-height:1.6;margin:0">${this.esc(n.body || '')}</p><div class="notice-meta"><span>${this.esc(n.author || '')}</span><span>${this.timeAgo(n.createdAt)}</span></div><div class="item-card-actions"><button class="icon-btn" onclick="App.deleteNotice('${n.key}')"><span class="material-icons-round">delete</span></button></div></div>`; });
         div.innerHTML = html;
     },
 
     showNoticeModal() {
         document.getElementById('modal-title').textContent = 'Post Notice';
-        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Title</label><input id="nt-title"></div><div class="form-group"><label>Message</label><textarea id="nt-body"></textarea></div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="form-group"><label>Message</label><textarea id="nt-body" rows="4" placeholder="Write your notice..."></textarea></div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-primary" onclick="App.saveNotice()">Post</button>`;
         this.openModal();
     },
 
     async saveNotice() {
-        const title = document.getElementById('nt-title').value.trim(), body = document.getElementById('nt-body').value.trim();
-        if (!title) { this.toast('Title required', 'error'); return; }
-        await db.ref(`messes/${this.messId}/notices`).push({ title, body, author: this.currentUser.displayName || 'Admin', createdAt: Date.now() });
+        const body = document.getElementById('nt-body').value.trim();
+        if (!body) { this.toast('Enter a message', 'error'); return; }
+        await db.ref(`messes/${this.messId}/notices`).push({ body, author: this.currentUser.displayName || 'Admin', createdAt: Date.now() });
         this.closeModal(); this.loadNotices();
     },
 
@@ -1363,6 +1356,17 @@ const App = {
     fmtMonth(d) { return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' }); },
     timeAgo(ts) { if (!ts) return ''; const d = Date.now() - ts, m = Math.floor(d / 60000); if (m < 1) return 'now'; if (m < 60) return m + 'm'; const h = Math.floor(m / 60); if (h < 24) return h + 'h'; const dy = Math.floor(h / 24); return dy < 7 ? dy + 'd' : new Date(ts).toLocaleDateString(); },
     esc(s) { return s ? String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') : ''; },
+
+    sortedMembers(members) {
+        const entries = Object.entries(members);
+        entries.sort((a, b) => {
+            const aAdmin = a[1].role === 'admin' ? 0 : 1;
+            const bAdmin = b[1].role === 'admin' ? 0 : 1;
+            if (aAdmin !== bAdmin) return aAdmin - bAdmin;
+            return (a[1].name || '').localeCompare(b[1].name || '');
+        });
+        return entries;
+    },
     openModal() { document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
 
