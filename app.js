@@ -10,6 +10,7 @@ const App = {
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
             return;
         }
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         this.bindEvents();
         this.populateYearSelects();
         auth.onAuthStateChanged(user => {
@@ -31,6 +32,8 @@ const App = {
         ['report-year-select', 'monthly-year-select'].forEach(id => {
             const el = document.getElementById(id); if (el) el.innerHTML = opts;
         });
+        const monthSelect = document.getElementById('monthly-month-select');
+        if (monthSelect) monthSelect.value = String(now.getMonth() + 1).padStart(2, '0');
     },
 
     bindEvents() {
@@ -53,7 +56,7 @@ const App = {
         $('logout-btn').addEventListener('click', e => { e.preventDefault(); auth.signOut(); });
         $('user-avatar').addEventListener('click', () => this.navigate('dashboard'));
         $('copy-mess-code').addEventListener('click', () => { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); });
-        $('add-member-btn').addEventListener('click', () => this.showMemberModal());
+        $('add-member-btn')?.addEventListener('click', () => this.showMemberModal());
         $('add-meal-btn').addEventListener('click', () => this.showMealModal());
         $('bulk-meal-btn').addEventListener('click', () => this.showBulkMealModal());
         $('add-bazar-btn').addEventListener('click', () => this.showBazarModal());
@@ -73,9 +76,8 @@ const App = {
         $('report-prev-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() - 1); $('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
         $('report-next-month').addEventListener('click', () => { this.reportMonth.setMonth(this.reportMonth.getMonth() + 1); $('report-year-select').value = this.reportMonth.getFullYear(); this.loadMonthlyReport(); });
         $('report-year-select').addEventListener('change', e => { this.reportMonth.setFullYear(+e.target.value); this.loadMonthlyReport(); });
-        $('monthly-prev').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() - 1); $('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
-        $('monthly-next').addEventListener('click', () => { this.monthlyDate.setMonth(this.monthlyDate.getMonth() + 1); $('monthly-year-select').value = this.monthlyDate.getFullYear(); this.loadMonthlyOverview(); });
-        $('monthly-year-select').addEventListener('change', e => { this.monthlyDate.setFullYear(+e.target.value); this.loadMonthlyOverview(); });
+        $('monthly-year-select').addEventListener('change', () => this.loadMonthlyOverview());
+        $('monthly-month-select').addEventListener('change', () => this.loadMonthlyOverview());
         $('export-daily-pdf').addEventListener('click', () => this.exportPDF('daily'));
         $('export-monthly-pdf').addEventListener('click', () => this.exportPDF('monthly'));
     },
@@ -256,7 +258,9 @@ const App = {
         document.getElementById('page-' + page).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         const ni = document.querySelector(`.nav-item[data-page="${page}"]`); if (ni) ni.classList.add('active');
-        const titles = { dashboard: this.messName || 'My Mess', members: 'Members', meals: 'Meals', bazaar: 'Bazaar', expenses: 'Expenses', balance: 'Balance', notices: 'Notices', reports: 'Reports', monthly: 'Monthly' };
+        document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
+        const bni = document.querySelector(`.bottom-nav-item[data-page="${page}"]`); if (bni) bni.classList.add('active');
+        const titles = { dashboard: this.messName || 'My Mess', members: 'Members', meals: 'Meals', bazaar: 'Bazaar', expenses: 'Expenses', balance: 'Balance', notices: 'Notices', reports: 'Reports', monthly: 'Analysis' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         this.closeSidebar();
         const loaders = { dashboard: () => this.loadDashboard(), members: () => this.loadMembers(), meals: () => this.loadMeals(), bazaar: () => this.loadBazaar(), expenses: () => this.loadExpenses(), balance: () => this.loadBalance(), notices: () => this.loadNotices(), reports: () => { this.loadDailyReport(); this.loadMonthlyReport(); }, monthly: () => this.loadMonthlyOverview() };
@@ -345,8 +349,35 @@ const App = {
     async loadMembers() {
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         this.allMembers = snap.val() || {};
-        document.getElementById('member-count').textContent = `(${Object.keys(this.allMembers).length}/30)`;
+        document.getElementById('member-count').textContent = Object.keys(this.allMembers).length;
+        document.getElementById('flat-mess-name').textContent = this.messName || 'My Mess';
+        document.getElementById('flat-id-code').textContent = this.messCode || '------';
+        const adminId = Object.entries(this.allMembers).find(([, m]) => m.role === 'admin')?.[0];
+        document.getElementById('flat-manager-name').textContent = adminId ? this.allMembers[adminId].name : '-';
         this.renderMembers(this.allMembers);
+        this.loadPeoples();
+        this.loadPermissions();
+    },
+
+    switchFlatTab(tab) {
+        document.querySelectorAll('.flat-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.querySelectorAll('.flat-tab-content').forEach(c => c.style.display = 'none');
+        document.getElementById('flat-tab-' + tab).style.display = '';
+        if (tab === 'members') this.renderMembers(this.allMembers);
+        if (tab === 'peoples') this.loadPeoples();
+        if (tab === 'permissions') this.loadPermissions();
+    },
+
+    async quickAddMember() {
+        const name = document.getElementById('flat-add-member-name').value.trim();
+        if (!name) { this.toast('Enter a name', 'error'); return; }
+        if (Object.keys(this.allMembers).length >= 30) { this.toast('Max 30 members', 'error'); return; }
+        const exists = Object.values(this.allMembers).some(m => (m.name || '').toLowerCase() === name.toLowerCase());
+        if (exists) { this.toast('Name already exists', 'error'); return; }
+        await db.ref(`messes/${this.messId}/members`).push({ name, email: '', role: 'member', createdAt: Date.now() });
+        document.getElementById('flat-add-member-name').value = '';
+        this.loadMembers();
+        this.toast('Member added!', 'success');
     },
 
     filterMembers() {
@@ -358,32 +389,76 @@ const App = {
     renderMembers(members) {
         const div = document.getElementById('members-list');
         const ids = Object.keys(members);
-        if (!ids.length) { div.innerHTML = '<p class="empty-state" style="color:#888">No members</p>'; return; }
+        if (!ids.length) { div.innerHTML = '<p class="empty-state" style="color:#666">No members yet</p>'; return; }
+        let html = '';
+        ids.forEach(id => {
+            const m = members[id];
+            const isManager = m.role === 'admin';
+            html += `<div class="flat-member-row">
+                <div class="flat-member-name">${this.esc(m.name)} ${isManager ? '<span style="color:#FFC107;font-size:11px">(Manager)</span>' : ''}</div>
+                <button class="flat-member-remove" onclick="App.deleteMember('${id}')"><span class="material-icons-round">close</span></button>
+            </div>`;
+        });
+        div.innerHTML = html;
+    },
+
+    async loadPeoples() {
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const mids = Object.keys(members);
+        document.getElementById('peoples-count').textContent = mids.length;
+        const div = document.getElementById('peoples-list');
+        if (!mids.length) { div.innerHTML = '<p class="empty-state" style="color:#666">No peoples yet</p>'; return; }
         const colors = ['#1976d2','#388e3c','#f57c00','#c62828','#7b1fa2','#00838f','#4e342e','#37474f'];
         let html = '';
-        ids.forEach((id, i) => {
+        mids.forEach((id, i) => {
             const m = members[id];
             const init = (m.name || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
             const bg = colors[i % colors.length];
             const isManager = m.role === 'admin';
-            const roleBadge = isManager ? '<span class="member-role-badge manager">Manager</span>' : '<span class="member-role-badge member">Member</span>';
             const isYou = id === this.currentUser?.uid;
-            const youLabel = isYou ? ', You' : '';
-            html += `<div class="dash-member-card">
-                <div class="dash-member-left">
-                    <div class="dash-member-avatar" style="background:${bg}">${init}</div>
-                    <div class="dash-member-info">
-                        <h4>${this.esc(m.name)} ${roleBadge}${isYou ? '<span style="color:#4CAF50;font-size:12px">' + youLabel + '</span>' : ''}</h4>
-                        <p class="dash-member-email">${this.esc(m.email || '')}</p>
-                    </div>
+            html += `<div class="flat-people-card">
+                <div class="flat-people-avatar" style="background:${bg}">${init}</div>
+                <div class="flat-people-info">
+                    <h4>${this.esc(m.name)} ${isManager ? '<span style="color:#FFC107;font-size:11px">(Manager' + (isYou ? ', You' : '') + ')</span>' : isYou ? '<span style="color:#4CAF50;font-size:11px">(You)</span>' : ''}</h4>
+                    <p>${this.esc(m.email || '')}</p>
                 </div>
-                <div class="dash-member-actions">
-                    ${!isManager ? `<button class="btn-promote" onclick="App.promoteMember('${id}')"><span class="material-icons-round">workspace_premium</span> Promote</button>` : ''}
-                    <button class="btn-remove" onclick="App.deleteMember('${id}')"><span class="material-icons-round">delete</span> Remove</button>
-                </div>
+                <span class="material-icons-round" style="color:#555">chevron_right</span>
             </div>`;
         });
         div.innerHTML = html;
+    },
+
+    async loadPermissions() {
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const permSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
+        const allPerms = permSnap.val() || {};
+        const div = document.getElementById('permissions-list');
+        const mids = Object.keys(members);
+        if (!mids.length) { div.innerHTML = '<p class="empty-state" style="color:#666">No peoples</p>'; return; }
+        const permKeys = ['manage_members', 'meal_entry', 'meal_edit', 'bazar_entry', 'special_meal', 'manage_permissions'];
+        const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Bazar Entry', 'Special Meal Management', 'Turn on/off Permissions'];
+        let html = '';
+        mids.forEach(id => {
+            const m = members[id];
+            const isManager = m.role === 'admin';
+            const perms = allPerms[id] || {};
+            const isYou = id === this.currentUser?.uid;
+            html += `<div class="perm-card"><div class="perm-header"><h4>${this.esc(m.name)} ${isManager ? '<span style="color:#FFC107;font-size:11px">(Manager' + (isYou ? ', You' : '') + ')</span>' : ''}</h4></div><div class="perm-list">`;
+            permKeys.forEach((key, i) => {
+                const checked = isManager || perms[key] ? 'checked' : '';
+                const disabled = isManager ? 'disabled' : '';
+                html += `<label class="perm-row"><input type="checkbox" ${checked} ${disabled} onchange="App.togglePermission('${id}','${key}',this.checked)"><span class="perm-check"></span><span>${permLabels[i]}</span></label>`;
+            });
+            html += '</div></div>';
+        });
+        div.innerHTML = html;
+    },
+
+    async togglePermission(mid, key, val) {
+        await db.ref(`messes/${this.messId}/permissions/${mid}/${key}`).set(val);
+        this.toast(val ? 'Permission granted' : 'Permission revoked', 'info');
     },
 
     showMemberModal(id = null, data = null) {
@@ -404,6 +479,7 @@ const App = {
 
     async editMember(id) { this.showMemberModal(id, this.allMembers[id]); },
     async promoteMember(id) { if (!confirm('Promote to manager?')) return; await db.ref(`messes/${this.messId}/members/${id}/role`).set('admin'); this.loadMembers(); this.toast('Promoted!', 'success'); },
+    async demoteMember(id) { if (!confirm('Step down from manager role?')) return; await db.ref(`messes/${this.messId}/members/${id}/role`).set('member'); this.loadMembers(); this.toast('Stepped down', 'success'); },
     async deleteMember(id) { if (!confirm('Remove member?')) return; await db.ref(`messes/${this.messId}/members/${id}`).remove(); this.loadMembers(); },
 
     async loadMeals() {
@@ -713,62 +789,257 @@ const App = {
     },
 
     async loadMonthlyOverview() {
-        const month = this.mk(this.monthlyDate); document.getElementById('monthly-label').textContent = this.fmtMonth(this.monthlyDate);
-        const year = this.monthlyDate.getFullYear();
-        document.getElementById('monthly-year-select').value = year;
-        const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
-        let totalMeals = 0, totalBazar = 0, totalExp = 0;
-        const memberMeals = {};
-        const daysInMonth = new Date(year, this.monthlyDate.getMonth() + 1, 0).getDate();
+        if (!this.messId) return;
+        const year = +document.getElementById('monthly-year-select').value;
+        const mon = document.getElementById('monthly-month-select').value;
+        const month = `${year}-${mon}`;
+        const daysInMonth = new Date(year, parseInt(mon), 0).getDate();
         const firstDay = `${month}-01`;
         const lastDay = `${month}-${String(daysInMonth).padStart(2, '0')}`;
+
+        const members = (await db.ref(`messes/${this.messId}/members`).once('value')).val() || {};
+        const deposits = (await db.ref(`messes/${this.messId}/deposits`).once('value')).val() || {};
+
+        let totalMeals = 0, totalBazar = 0, totalExp = 0, normalMeals = 0, specialMeals = 0;
+        const memberMeals = {}, dailyMeals = {}, dailyBazar = {}, itemMap = {};
+
         const mlS = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(firstDay).endAt(lastDay).once('value');
-        const dailyMeals = {};
         mlS.forEach(d => {
             const dayMeals = d.val() || {};
+            const dk = d.key;
+            if (!dailyMeals[dk]) dailyMeals[dk] = 0;
             Object.entries(dayMeals).forEach(([mid, ml]) => {
                 const t = (ml.breakfast || 0) + (ml.lunch || 0) + (ml.dinner || 0);
                 totalMeals += t;
+                normalMeals += t;
+                dailyMeals[dk] += t;
                 if (!memberMeals[mid]) memberMeals[mid] = 0;
                 memberMeals[mid] += t;
-                const dk = d.key;
-                if (!dailyMeals[dk]) dailyMeals[dk] = 0;
-                dailyMeals[dk] += t;
             });
         });
+
         const bzS = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
-        bzS.forEach(s => { totalBazar += s.val().amount || 0; });
-        const exS = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
-        exS.forEach(s => { totalExp += s.val().amount || 0; });
-        const tc = totalBazar + totalExp;
-        const rate = totalMeals > 0 ? (tc / totalMeals).toFixed(2) : 0;
-        const avgDailyMeals = daysInMonth > 0 ? (totalMeals / daysInMonth).toFixed(1) : 0;
-        document.getElementById('monthly-overview').innerHTML = `
-            <div class="summary-row"><span>Total Days Active</span><strong>${Object.keys(dailyMeals).length}</strong></div>
-            <div class="summary-row"><span>Total Meals</span><strong>${totalMeals}</strong></div>
-            <div class="summary-row"><span>Avg Daily Meals</span><strong>${avgDailyMeals}</strong></div>
-            <div class="summary-row"><span>Total Bazaar</span><strong>\u09F3${totalBazar}</strong></div>
-            <div class="summary-row"><span>Total Expenses</span><strong>\u09F3${totalExp}</strong></div>
-            <div class="summary-row"><span>Total Cost</span><strong>\u09F3${tc}</strong></div>
-            <div class="summary-row"><span>Meal Rate</span><strong>\u09F3${rate}/meal</strong></div>`;
-        const mids = Object.keys(members);
-        let mhtml = '';
-        mids.forEach(mid => { const m = members[mid]; const mm = memberMeals[mid] || 0;
-            mhtml += `<div class="due-item"><div class="due-info"><h4>${this.esc(m.name)}</h4><p>${mm} meals (${totalMeals > 0 ? ((mm / totalMeals) * 100).toFixed(1) : 0}%)</p></div><div class="due-amount">\u09F3${(mm * parseFloat(rate)).toFixed(0)}</div></div>`;
+        bzS.forEach(s => {
+            const b = s.val();
+            totalBazar += b.amount || 0;
+            const dk = b.dateKey;
+            if (!dailyBazar[dk]) dailyBazar[dk] = 0;
+            dailyBazar[dk] += b.amount || 0;
+            const item = (b.item || '').toLowerCase();
+            if (!itemMap[item]) itemMap[item] = { name: b.item, amount: 0, count: 0 };
+            itemMap[item].amount += b.amount || 0;
+            itemMap[item].count++;
         });
-        document.getElementById('monthly-members').innerHTML = mhtml || '<p class="empty-state">No data</p>';
+
+        const exS = await db.ref(`messes/${this.messId}/expenses`).orderByChild('dateKey').startAt(firstDay).endAt(lastDay).once('value');
+        const expenseBreakdown = {};
+        exS.forEach(s => {
+            const e = s.val();
+            totalExp += e.amount || 0;
+            const cat = e.category || 'Other';
+            expenseBreakdown[cat] = (expenseBreakdown[cat] || 0) + (e.amount || 0);
+        });
+
+        const tc = totalBazar + totalExp;
+        const rate = totalMeals > 0 ? (tc / totalMeals).toFixed(1) : 0;
+        let totalDep = 0;
+        Object.values(deposits).forEach(d => { totalDep += d.amount || 0; });
+
+        document.getElementById('analysis-summary').innerHTML = `
+            <div class="analysis-stat-card"><p>Total meals</p><strong>${totalMeals}</strong><span>Normal ${normalMeals}</span><span>Special ${specialMeals}</span></div>
+            <div class="analysis-stat-card"><p>Total bazar</p><strong>\u09F3${totalBazar}</strong><span>Members \u09F3${totalBazar}</span><span>Manager \u09F30</span></div>
+            <div class="analysis-stat-card"><p>Cost per meal</p><strong>\u09F3${rate}</strong><span>Bazar \u09F3${totalBazar}</span><span>\u00F7 Meals ${totalMeals}</span></div>`;
+
+        const spendBreakdown = Object.entries(expenseBreakdown).map(([k, v]) => `${k}: \u09F3${v}`).join('  ');
+        document.getElementById('analysis-collection').innerHTML = `
+            <h4>Manager collection \u2013 Spending = Balance</h4>
+            <div class="analysis-equation">
+                <div><strong>\u09F3${totalDep}</strong><small>Collection</small></div>
+                <span>\u2013</span>
+                <div><strong>\u09F3${tc.toFixed(1)}</strong><small>Spending</small></div>
+                <span>=</span>
+                <div><strong class="${(totalDep - tc) >= 0 ? 'positive' : 'negative'}">\u09F3${(totalDep - tc).toFixed(1)}</strong><small>Balance</small></div>
+            </div>
+            <p class="analysis-sub" style="margin-top:10px">Spending breakdown</p>
+            <p class="analysis-sub">\u09F3${totalBazar} bazar${spendBreakdown ? ' + ' + spendBreakdown : ''}</p>`;
+
+        let paidIn = 0;
+        Object.values(deposits).forEach(d => { paidIn += d.amount || 0; });
+        document.getElementById('analysis-paidin').innerHTML = `
+            <h4>Members paid in \u2013 Charged = Balance</h4>
+            <p class="analysis-sub">What the house took in, and what it actually spent</p>
+            <div class="analysis-equation">
+                <div><strong>\u09F3${paidIn}</strong><small>Paid in</small></div>
+                <span>\u2013</span>
+                <div><strong>\u09F3${tc.toFixed(1)}</strong><small>Charged</small></div>
+                <span>=</span>
+                <div><strong class="${(paidIn - tc) >= 0 ? 'positive' : 'negative'}">\u09F3${(paidIn - tc).toFixed(1)}</strong><small>Balance</small></div>
+            </div>
+            <p class="analysis-sub" style="margin-top:10px">Charged breakdown</p>
+            <p class="analysis-sub">Meals: \u09F3${totalBazar}  Utility: \u09F3${totalExp}</p>`;
+
+        this.renderCharts(year, mon, dailyMeals, dailyBazar, rate);
+        this.renderTopItems(itemMap);
+        this.renderMemberBalances(memberMeals, deposits, rate);
+        this.renderMealShare(memberMeals, totalMeals);
     },
 
-    exportPDF(type) {
+    renderCharts(year, mon, dailyMeals, dailyBazar, currentRate) {
+        const daysInMonth = new Date(year, parseInt(mon), 0).getDate();
+        const labels = Array.from({ length: daysInMonth }, (_, i) => String(i + 1));
+        const mealData = labels.map(d => { const dk = `${year}-${mon}-${String(d).padStart(2, '0')}`; return dailyMeals[dk] || 0; });
+        const bazarData = labels.map(d => { const dk = `${year}-${mon}-${String(d).padStart(2, '0')}`; return dailyBazar[dk] || 0; });
+
+        const chartOpts = { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#888', font: { size: 10 } }, grid: { color: '#2a2a40' } }, y: { ticks: { color: '#888', font: { size: 10 } }, grid: { color: '#2a2a40' } } } };
+
+        const trendCtx = document.getElementById('chart-trend');
+        if (trendCtx._chart) trendCtx._chart.destroy();
+        trendCtx._chart = new Chart(trendCtx, {
+            type: 'line', data: { labels, datasets: [{ data: mealData.map((m, i) => { const b = bazarData[i]; return m > 0 ? +(b / m).toFixed(1) : 0; }), borderColor: '#42a5f5', backgroundColor: 'rgba(66,165,245,0.1)', fill: true, tension: 0.3, pointRadius: 3, pointBackgroundColor: '#42a5f5' }] },
+            options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, beginAtZero: true } } }
+        });
+
+        const bzCtx = document.getElementById('chart-bazar-day');
+        if (bzCtx._chart) bzCtx._chart.destroy();
+        bzCtx._chart = new Chart(bzCtx, {
+            type: 'bar', data: { labels, datasets: [{ data: bazarData, backgroundColor: '#FFC107', borderRadius: 4 }] },
+            options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, beginAtZero: true } } }
+        });
+
+        const mlCtx = document.getElementById('chart-meals-day');
+        if (mlCtx._chart) mlCtx._chart.destroy();
+        mlCtx._chart = new Chart(mlCtx, {
+            type: 'bar', data: { labels, datasets: [{ data: mealData, backgroundColor: '#4CAF50', borderRadius: 4 }] },
+            options: { ...chartOpts, scales: { ...chartOpts.scales, y: { ...chartOpts.scales.y, beginAtZero: true } } }
+        });
+
+        document.getElementById('analysis-bazar-day-total').textContent = `\u09F3${bazarData.reduce((a, b) => a + b, 0)} spent across the month`;
+        document.getElementById('analysis-meals-day-total').textContent = `${mealData.reduce((a, b) => a + b, 0)} meals across the month`;
+
+        let prevRate = 0;
+        document.getElementById('analysis-trend-label').textContent = prevRate > 0 ? `${Math.abs(((currentRate - prevRate) / prevRate) * 100).toFixed(0)}% vs last month` : '';
+    },
+
+    renderTopItems(itemMap) {
+        const sorted = Object.values(itemMap).sort((a, b) => b.amount - a.amount).slice(0, 10);
+        const max = sorted[0]?.amount || 1;
+        const colors = ['#42a5f5', '#4CAF50', '#FFC107', '#26a69a', '#ab47bc', '#ef5350', '#ec407a', '#ff7043', '#78909c', '#5c6bc0'];
+        let html = `<h4>Top items by cost</h4><p class="analysis-sub">${sorted.length} items</p>`;
+        sorted.forEach((item, i) => {
+            const pct = (item.amount / max * 100).toFixed(0);
+            html += `<div class="analysis-bar-row"><span class="analysis-bar-name">${this.esc(item.name)}${item.count > 1 ? ' \u00D7' + item.count : ''}</span><div class="analysis-bar-track"><div class="analysis-bar-fill" style="width:${pct}%;background:${colors[i % colors.length]}"></div></div><span class="analysis-bar-amount">\u09F3${item.amount}</span></div>`;
+        });
+        document.getElementById('analysis-top-items').innerHTML = html || '<p class="empty-state">No bazar data</p>';
+    },
+
+    renderMemberBalances(memberMeals, deposits, rate) {
+        const maxAbs = Math.max(...Object.keys(memberMeals).map(mid => Math.abs((deposits[mid]?.amount || 0) - (memberMeals[mid] || 0) * parseFloat(rate))), 1);
+        let html = '<h4>Member balances</h4><p class="analysis-sub">Green = in credit \u00B7 Red = owes (deposit \u2013 meal cost)</p>';
+        Object.entries(memberMeals).forEach(([mid, mm]) => {
+            const dep = deposits[mid]?.amount || 0;
+            const cost = mm * parseFloat(rate);
+            const bal = dep - cost;
+            const pct = Math.min(Math.abs(bal) / maxAbs * 50, 50);
+            const cls = bal >= 0 ? 'positive' : 'negative';
+            const color = bal >= 0 ? '#4CAF50' : '#F44336';
+            const align = bal >= 0 ? 'right' : 'left';
+            html += `<div class="analysis-balance-row"><span class="analysis-balance-name">${this.esc((memberMeals[mid] !== undefined ? '' : ''))}</span>`;
+            html += `<div class="analysis-balance-bar-wrap"><div class="analysis-balance-bar" style="width:${pct}%;background:${color};float:${align}"></div></div>`;
+            html += `<span class="analysis-balance-amount ${cls}">\u09F3${bal.toFixed(1)}</span></div>`;
+        });
+        document.getElementById('analysis-member-balances').innerHTML = html || '<p class="empty-state">No data</p>';
+    },
+
+    renderMealShare(memberMeals, totalMeals) {
+        if (totalMeals === 0) { document.getElementById('analysis-meal-share').innerHTML = '<p class="empty-state">No meal data</p>'; return; }
+        const colors = ['#42a5f5', '#4CAF50', '#FFC107', '#ab47bc', '#ef5350', '#26a69a', '#ec407a', '#ff7043'];
+        const entries = Object.entries(memberMeals).sort((a, b) => b[1] - a[1]);
+        let html = '<h4>Meal share by member</h4><p class="analysis-sub">Who ate how much of the ' + totalMeals + ' meals</p><div class="analysis-donut-wrap">';
+
+        const canvasSize = 140;
+        const cx = canvasSize / 2, cy = canvasSize / 2, r = 55, inner = 35;
+        let angle = -Math.PI / 2;
+        let paths = '';
+        entries.forEach(([mid, mm], i) => {
+            const pct = mm / totalMeals;
+            const sweep = pct * 2 * Math.PI;
+            const x1 = cx + r * Math.cos(angle), y1 = cy + r * Math.sin(angle);
+            const x2 = cx + r * Math.cos(angle + sweep), y2 = cy + r * Math.sin(angle + sweep);
+            const ix1 = cx + inner * Math.cos(angle), iy1 = cy + inner * Math.sin(angle);
+            const ix2 = cx + inner * Math.cos(angle + sweep), iy2 = cy + inner * Math.sin(angle + sweep);
+            const large = sweep > Math.PI ? 1 : 0;
+            paths += `<path d="M${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} L${ix2},${iy2} A${inner},${inner} 0 ${large} 0 ${ix1},${iy1} Z" fill="${colors[i % colors.length]}"/>`;
+            angle += sweep;
+        });
+        html += `<svg viewBox="0 0 ${canvasSize} ${canvasSize}" width="${canvasSize}" height="${canvasSize}">${paths}<circle cx="${cx}" cy="${cy}" r="${inner}" fill="#1e1e30"/></svg>`;
+        html += '<div class="analysis-donut-legend">';
+        entries.forEach(([mid, mm], i) => {
+            const pct = ((mm / totalMeals) * 100).toFixed(1);
+            html += `<div class="analysis-legend-item"><span class="analysis-legend-dot" style="background:${colors[i % colors.length]}"></span><span class="analysis-legend-name">${this.esc(mid)}</span><span class="analysis-legend-val">${mm} (${pct}%)</span></div>`;
+        });
+        html += '</div></div>';
+        document.getElementById('analysis-meal-share').innerHTML = html;
+    },
+
+    exportAnalysisPDF() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(14);
-        doc.text(`Mess Manager - ${type === 'daily' ? 'Daily' : 'Monthly'} Report`, 20, 20);
-        doc.setFontSize(10);
-        const content = type === 'daily' ? document.getElementById('daily-report').innerText : document.getElementById('monthly-report').innerText;
-        doc.text(content, 20, 35);
-        doc.save(`mess-${type}-${type === 'daily' ? this.dk(this.reportDate) : this.mk(this.reportMonth)}.pdf`);
-        this.toast('PDF exported', 'success');
+        const doc = new jsPDF('p', 'mm', 'a4');
+        const year = document.getElementById('monthly-year-select').value;
+        const mon = document.getElementById('monthly-month-select').value;
+        const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const monthLabel = `${monthNames[parseInt(mon) - 1]} ${year}`;
+
+        doc.setFillColor(30, 30, 48);
+        doc.rect(0, 0, 210, 297, 'F');
+        doc.setTextColor(255, 193, 7);
+        doc.setFontSize(20);
+        doc.text('Mess Manager - Analysis', 20, 20);
+        doc.setFontSize(12);
+        doc.setTextColor(200, 200, 200);
+        doc.text(monthLabel, 20, 28);
+        doc.text(this.messName || 'My Mess', 20, 35);
+
+        let y = 45;
+        const sections = ['analysis-summary', 'analysis-collection', 'analysis-paidin'];
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.innerText) {
+                doc.setFillColor(40, 40, 60);
+                doc.roundedRect(15, y - 2, 180, el.offsetHeight * 0.5 + 8, 3, 3, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(10);
+                const lines = doc.splitTextToSize(el.innerText, 170);
+                lines.forEach(line => { doc.text(line, 20, y + 5); y += 5; });
+                y += 10;
+            }
+        });
+
+        try {
+            const trendCanvas = document.getElementById('chart-trend');
+            const trendImg = trendCanvas.toDataURL('image/png');
+            doc.addImage(trendImg, 'PNG', 15, y, 180, 60);
+            y += 70;
+        } catch (e) {}
+
+        try {
+            const bzCanvas = document.getElementById('chart-bazar-day');
+            const bzImg = bzCanvas.toDataURL('image/png');
+            doc.addImage(bzImg, 'PNG', 15, y, 180, 60);
+            y += 70;
+        } catch (e) {}
+
+        try {
+            const mlCanvas = document.getElementById('chart-meals-day');
+            const mlImg = mlCanvas.toDataURL('image/png');
+            doc.addImage(mlImg, 'PNG', 15, y, 180, 60);
+        } catch (e) {}
+
+        doc.setTextColor(100, 100, 100);
+        doc.setFontSize(8);
+        doc.text('Generated by Mess Manager', 20, 290);
+
+        doc.save(`Mess-Manager-Analysis-${mon}-${year}.pdf`);
+        this.toast('PDF exported!', 'success');
     },
 
     dk(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; },
