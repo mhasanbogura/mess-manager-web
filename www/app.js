@@ -503,18 +503,11 @@ const App = {
         const mealColors = ['#FFC107', '#4CAF50', '#42a5f5', '#26a69a'];
         const mealBgs = ['#3d2b1a', '#1a2e1a', '#1a1e3a', '#1a2a2a'];
         const visibleMeals = mealKeys.filter(k => vis[k]);
-        const headerRows = Math.max(visibleMeals.length, 1);
 
-        let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead>';
-        for (let r = 0; r < headerRows; r++) {
-            html += '<tr>';
-            if (r === 0) html += `<th class="mg-sticky-corner" rowspan="${headerRows}"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></th>`;
-            for (let d = 1; d <= viewDays; d++) {
-                if (r === 0) html += `<th class="mg-day" rowspan="${headerRows}">${d}</th>`;
-            }
-            html += '</tr>';
-        }
-        html += '</thead><tbody>';
+        let html = '<div class="meal-table-wrap"><table class="meal-grid"><thead><tr>';
+        html += '<th class="mg-sticky-corner"><button class="mg-view-btn" onclick="App.toggleMealView()"><span class="material-icons-round">tune</span><span>View</span></button></th>';
+        for (let d = 1; d <= viewDays; d++) html += `<th class="mg-day">${d}</th>`;
+        html += '</tr></thead><tbody>';
 
         mids.forEach((mid, idx) => {
             const m = members[mid];
