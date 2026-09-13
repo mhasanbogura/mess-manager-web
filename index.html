@@ -293,7 +293,24 @@
                     <p class="aflat-perm-note"><span class="material-icons-round">info</span> The manager always has every permission, whether these are checked or not.</p>
                 </div>
             </div>
-            <div class="page" id="page-meals"></div>
+            <div class="page" id="page-meals">
+                <div class="ameal-head">
+                    <h2>Meal Entry</h2>
+                    <div class="ameal-actions">
+                        <button class="ameal-action" onclick="App.toast('Special Meals coming soon','info')"><span class="material-icons-round">star</span><small>Special Meals</small></button>
+                        <button class="ameal-action" onclick="App.toast('Month History coming soon','info')"><span class="material-icons-round">history</span><small>Month History</small></button>
+                        <button class="ameal-action" onclick="App.toast('Edit History coming soon','info')"><span class="material-icons-round">edit</span><small>Edit History</small></button>
+                    </div>
+                </div>
+                <div class="ameal-month-row"><span>Current Month:</span><strong id="ameal-month">-</strong></div>
+                <div class="ameal-grid-wrap">
+                    <div class="ameal-loader" id="ameal-loader"><div class="ameal-spinner"></div></div>
+                    <div class="ameal-grid-scroll" id="ameal-grid-scroll" style="display:none">
+                        <table class="ameal-table" id="ameal-table"></table>
+                    </div>
+                </div>
+                <button class="abazar-fab" onclick="App.showAddMeal()"><span class="material-icons-round">add</span> Add</button>
+            </div>
             <div class="page" id="page-bazaar">
                 <div class="abazar-head">
                     <h2>Bazar List</h2>

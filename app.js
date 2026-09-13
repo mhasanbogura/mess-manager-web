@@ -244,6 +244,7 @@ const App = {
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
         if (page === 'members') this.loadFlat();
+        if (page === 'meals') this.loadMeals();
         if (page === 'bazaar') this.loadBazarList();
         if (page === 'balance') this.loadManagerMoney();
         if (page === 'profile') this.loadProfile();
@@ -731,6 +732,102 @@ const App = {
             });
             rowsEl.innerHTML = html;
         } catch (e) { console.error('loadDashboard error:', e); }
+    },
+
+    async loadMeals() {
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        const year = now.getFullYear();
+        const mon = now.getMonth();
+        const daysInMonth = new Date(year, mon + 1, 0).getDate();
+        document.getElementById('ameal-month').textContent = this.fmtMonth(now);
+        const loader = document.getElementById('ameal-loader');
+        const scroll = document.getElementById('ameal-grid-scroll');
+        loader.style.display = 'flex';
+        scroll.style.display = 'none';
+        try {
+            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const members = membersSnap.val() || {};
+            const mids = Object.keys(members);
+            if (!mids.length) { loader.innerHTML = '<p class="empty-state">No members</p>'; return; }
+            const mealsSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-' + String(daysInMonth).padStart(2,'0')).once('value');
+            const allMeals = mealsSnap.val() || {};
+            const memberData = {};
+            mids.forEach(mid => {
+                const m = members[mid] || {};
+                memberData[mid] = { name: m.name || 'Unknown', noon: new Array(daysInMonth).fill(0), night: new Array(daysInMonth).fill(0), noonTotal: 0, nightTotal: 0 };
+            });
+            Object.entries(allMeals).forEach(([dateKey, dayMeals]) => {
+                const day = parseInt(dateKey.slice(8, 10), 10) - 1;
+                if (day < 0 || day >= daysInMonth) return;
+                Object.entries(dayMeals || {}).forEach(([mid, m]) => {
+                    if (!memberData[mid]) return;
+                    const lunch = m.lunch || 0;
+                    const dinner = m.dinner || 0;
+                    memberData[mid].noon[day] += lunch;
+                    memberData[mid].night[day] += dinner;
+                    memberData[mid].noonTotal += lunch;
+                    memberData[mid].nightTotal += dinner;
+                });
+            });
+            let html = '<thead><tr><th><span class="ameal-row-label"><span class="material-icons-round" style="font-size:16px">tune</span> View</span></th>';
+            for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+            html += '</tr></thead><tbody>';
+            mids.forEach(mid => {
+                const md = memberData[mid];
+                const colors = ['#43A047','#2E7D32','#1B5E20','#388E3C','#4CAF50','#66BB6A'];
+                const bg = colors[mids.indexOf(mid) % colors.length];
+                html += `<tr><td rowspan="2" style="background:${bg};vertical-align:middle;padding:8px 10px"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${md.noonTotal + md.nightTotal})</div></td>`;
+                html += `<td style="background:#E8F5E9;text-align:left;padding:4px 8px"><div class="ameal-row-label"><span style="font-size:16px">🍜</span><span class="ameal-row-count${md.noonTotal===0?' zero':''}">${md.noonTotal}</span><span style="color:#888;font-size:12px">Noon</span></div></td>`;
+                for (let d = 0; d < daysInMonth; d++) {
+                    const v = md.noon[d];
+                    html += `<td style="${v?'color:#333;font-weight:600':'color:#ccc'}">${v || ''}</td>`;
+                }
+                html += '</tr><tr>';
+                html += `<td style="background:#E3F2FD;text-align:left;padding:4px 8px"><div class="ameal-row-label"><span style="font-size:16px">🍽</span><span class="ameal-row-count dinner${md.nightTotal===0?' zero':''}">${md.nightTotal}</span><span style="color:#888;font-size:12px">Night</span></div></td>`;
+                for (let d = 0; d < daysInMonth; d++) {
+                    const v = md.night[d];
+                    html += `<td style="${v?'color:#333;font-weight:600':'color:#ccc'}">${v || ''}</td>`;
+                }
+                html += '</tr>';
+            });
+            html += '</tbody>';
+            document.getElementById('ameal-table').innerHTML = html;
+            loader.style.display = 'none';
+            scroll.style.display = 'block';
+        } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
+    },
+
+    async showAddMeal() {
+        if (!this.messId) return;
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const opts = Object.entries(members).map(([, v]) => `<option value="${this.esc(v.name)}">${this.esc(v.name)}</option>`).join('');
+        const now = new Date();
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        let dayOpts = '';
+        for (let d = 1; d <= daysInMonth; d++) dayOpts += `<option value="${d}" ${d===now.getDate()?'selected':''}>${d}</option>`;
+        document.getElementById('modal-title').textContent = 'Add Meal';
+        document.getElementById('modal-body').innerHTML = `
+            <label class="am-label">Member</label><select class="am-input" id="meal-member"><option value="">-- select --</option>${opts}</select>
+            <label class="am-label">Day</label><select class="am-input" id="meal-day">${dayOpts}</select>
+            <label class="am-label">Lunch (Noon)</label><input class="am-input" id="meal-lunch" type="number" min="0" max="3" value="1" placeholder="0">
+            <label class="am-label">Dinner (Night)</label><input class="am-input" id="meal-dinner" type="number" min="0" max="3" value="1" placeholder="0">`;
+        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.saveMeal()">Save</button>`;
+        this.openModal();
+    },
+
+    async saveMeal() {
+        const memberName = document.getElementById('meal-member')?.value;
+        const day = parseInt(document.getElementById('meal-day')?.value) || 1;
+        const lunch = parseInt(document.getElementById('meal-lunch')?.value) || 0;
+        const dinner = parseInt(document.getElementById('meal-dinner')?.value) || 0;
+        if (!memberName) { this.toast('Select a member', 'error'); return; }
+        const now = new Date();
+        const dateKey = this.mk(now) + '-' + String(day).padStart(2, '0');
+        await db.ref(`messes/${this.messId}/meals/${dateKey}/${memberName}`).set({ lunch, dinner, breakfast: 0 });
+        this.closeModal(); this.loadMeals(); this.toast('Meal saved!', 'success');
     },
 
     async loadBazarList() {
