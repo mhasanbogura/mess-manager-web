@@ -3,15 +3,18 @@ const App = {
     currentPage: 'dashboard', userRole: 'member',
 
     async init() {
+        const splash = document.getElementById('splash-screen');
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
+            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             return;
         }
         try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { /* ignore */ }
         this.bindEvents();
         this.bindBackButton();
         auth.onAuthStateChanged(user => {
+            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             if (user) {
                 this.currentUser = user;
                 this.loadMyMesses();

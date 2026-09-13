@@ -34,6 +34,15 @@
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { -webkit-text-size-adjust: 100%; }
 
+.splash-screen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.3s ease;
+}
+.splash-screen.hidden { opacity: 0; pointer-events: none; }
+.splash-icon { width: 120px; height: 120px; border-radius: 24px; object-fit: contain; }
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
