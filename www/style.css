@@ -1621,7 +1621,7 @@ select.input-sm { cursor: pointer; }
 }
 .ameal-table thead th.am-col-view {
     position: sticky; left: 0; z-index: 4;
-    text-align: center; min-width: 140px; background: #FFC107;
+    text-align: center; background: #FFC107;
 }
 .ameal-table tbody td {
     text-align: center; border: 1px solid #ddd;
@@ -1631,14 +1631,14 @@ select.input-sm { cursor: pointer; }
 }
 .ameal-table tbody td.am-col-name {
     position: sticky; left: 0; z-index: 2;
-    width: auto; min-width: 0; max-width: none; height: auto;
-    font-weight: 700; font-size: 14px; color: #fff; padding: 8px 10px;
-    vertical-align: middle; text-align: left;
+    width: 110px; min-width: 110px; max-width: 110px; height: auto;
+    font-weight: 700; font-size: 14px; color: #fff; padding: 8px 6px;
+    vertical-align: middle; text-align: center;
 }
 .ameal-table tbody td.am-col-type {
-    position: sticky; left: 140px; z-index: 2;
-    width: auto; min-width: 0; max-width: none; height: auto;
-    text-align: left; padding: 4px 8px; vertical-align: middle;
+    position: sticky; left: 110px; z-index: 2;
+    width: 120px; min-width: 120px; max-width: 120px; height: auto;
+    text-align: left; padding: 4px 6px; vertical-align: middle;
 }
 .ameal-table .ameal-mname { font-weight: 700; font-size: 14px; color: #fff; line-height: 1.2; }
 .ameal-table .ameal-mtotal { font-size: 11px; color: rgba(255,255,255,.8); }
