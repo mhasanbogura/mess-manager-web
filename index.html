@@ -91,7 +91,131 @@
         </header>
 
         <main class="main-content">
-            <div class="page active" id="page-dashboard"></div>
+            <div class="page active" id="page-dashboard">
+                <div class="adash-head">
+                    <div class="adash-user">
+                        <div class="adash-avatar" id="dash-avatar">M</div>
+                        <div>
+                            <h2 id="dash-greeting">Good morning</h2>
+                            <p id="dash-user-name">User</p>
+                        </div>
+                    </div>
+                    <div class="adash-head-actions">
+                        <button class="icon-btn" onclick="App.toast('PDF export coming soon', 'info')"><span class="material-icons-round">picture_as_pdf</span></button>
+                        <button class="icon-btn" onclick="App.toast('Calculator coming soon', 'info')"><span class="material-icons-round">calculate</span></button>
+                        <button class="icon-btn" onclick="App.shareMessCode()"><span class="material-icons-round">share</span></button>
+                    </div>
+                </div>
+
+                <div class="adash-mess-card">
+                    <div class="adash-mess-top">
+                        <h2 id="dash-mess-name">My Mess</h2>
+                        <span class="adash-talk"><span class="material-icons-round">headset_mic</span> Talk to us</span>
+                    </div>
+                    <button class="adash-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Flat ID</button>
+                    <p class="adash-flat-type">Flat Type: <span>Calculated meal rate</span></p>
+                    <div class="adash-mess-grid">
+                        <div class="adash-mess-box">
+                            <div class="adash-mess-box-top">
+                                <span class="material-icons-round">person</span>
+                                <small>Manager</small>
+                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
+                            </div>
+                            <strong id="dash-manager">-</strong>
+                        </div>
+                        <div class="adash-mess-box">
+                            <div class="adash-mess-box-top">
+                                <span class="material-icons-round">calendar_month</span>
+                                <small>Current month</small>
+                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
+                            </div>
+                            <strong id="dash-month">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="adash-notice" onclick="App.navigate('notices')">
+                    <span class="material-icons-round">push_pin</span>
+                    <div>
+                        <strong>Notice Board</strong>
+                        <p id="dash-notice-preview">Pin a notice for the whole house</p>
+                    </div>
+                    <span class="material-icons-round">chevron_right</span>
+                </div>
+
+                <div class="adash-today">
+                    <div class="adash-today-top">
+                        <strong id="dash-date">Today</strong>
+                        <span class="adash-online">
+                            <span class="adash-mini-avatar" id="dash-mini-avatar">M</span>
+                            <span class="dot-green"></span>
+                            <span id="dash-online-count">0</span> online
+                            <span class="material-icons-round">chevron_right</span>
+                        </span>
+                    </div>
+                    <div class="adash-meals">
+                        <div class="adash-meal breakfast">
+                            <small>Breakfast</small>
+                            <div><span class="material-icons-round">coffee</span><strong id="dash-breakfast">0</strong></div>
+                        </div>
+                        <div class="adash-meal lunch">
+                            <small>Lunch</small>
+                            <div><span class="material-icons-round">lunch_dining</span><strong id="dash-lunch">0</strong></div>
+                        </div>
+                        <div class="adash-meal dinner">
+                            <small>Dinner</small>
+                            <div><span class="material-icons-round">dinner_dining</span><strong id="dash-dinner">0</strong></div>
+                        </div>
+                    </div>
+                    <div class="adash-duo">
+                        <div class="adash-duo-box">
+                            <span class="material-icons-round">event_available</span>
+                            <div><strong>Not assigned</strong><p>Bazar duty today</p></div>
+                        </div>
+                        <div class="adash-duo-box" onclick="App.navigate('bazaar')">
+                            <span class="material-icons-round">receipt_long</span>
+                            <div><strong>Bazar note</strong><p id="dash-live-count">Nothing on the list</p></div>
+                        </div>
+                    </div>
+                    <div class="adash-dinner-row">
+                        <span class="material-icons-round">restaurant</span>
+                        <div class="adash-dinner-text"><strong>Dinner</strong><span>after 8:00pm</span></div>
+                        <span class="adash-edit sm"><span class="material-icons-round">edit</span></span>
+                        <p class="adash-dinner-sub">Not set</p>
+                    </div>
+                </div>
+
+                <div class="adash-finance">
+                    <div class="adash-fin-box"><small>Deposit</small><strong id="dash-deposit">৳ 0</strong></div>
+                    <div class="adash-fin-box"><small>Balance</small><strong id="dash-balance" class="pos">৳ 0</strong></div>
+                    <div class="adash-fin-box"><small>Cost per meal</small><strong id="dash-rate">৳ 0</strong></div>
+                    <button class="adash-analyse" onclick="App.navigate('monthly')"><span class="material-icons-round">auto_graph</span> Analyse</button>
+                </div>
+
+                <div class="adash-stats">
+                    <div class="adash-stats-head">
+                        <span class="material-icons-round">groups</span>
+                        <strong>Member Stats :</strong>
+                        <span class="adash-custom" onclick="App.navigate('monthly')">Customise table <span class="material-icons-round">tune</span></span>
+                    </div>
+                    <div class="adash-table-wrap">
+                        <table class="adash-table">
+                            <thead>
+                                <tr>
+                                    <th>Name <span class="sort-arrow">↑</span></th>
+                                    <th><small>Meal+Special</small>Total</th>
+                                    <th><small>Meal+Special+Utility</small>Cost(৳)</th>
+                                    <th><small>Bazar+Manager</small>Deposit(৳)</th>
+                                    <th>Balance(৳)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-member-rows">
+                                <tr><td colspan="5" class="empty-state">No data</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <div class="page" id="page-members"></div>
             <div class="page" id="page-meals"></div>
             <div class="page" id="page-bazaar"></div>
@@ -113,11 +237,11 @@
 
     <nav class="bottom-nav" id="bottom-nav">
         <div class="bottom-nav-items">
-            <button class="bottom-nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')"><span class="material-icons-round">dashboard</span>Home</button>
-            <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">group</span>Flat</button>
-            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Shopping</button>
-            <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant_menu</span>Meal</button>
-            <button class="bottom-nav-item" data-page="balance" onclick="App.navigate('balance')"><span class="material-icons-round">account_balance_wallet</span>Money</button>
+            <button class="bottom-nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')"><span class="material-icons-round">dashboard</span>Dashboard</button>
+            <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">home</span>Flat</button>
+            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Bazar</button>
+            <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant</span>Meal</button>
+            <button class="bottom-nav-item" data-page="balance" onclick="App.navigate('balance')"><span class="material-icons-round">account_balance_wallet</span>Manager</button>
             <button class="bottom-nav-item" data-page="profile" onclick="App.navigate('profile')"><span class="material-icons-round">person</span>Profile</button>
         </div>
     </nav>

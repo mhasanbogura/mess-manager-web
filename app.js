@@ -196,8 +196,149 @@ const App = {
         document.querySelectorAll('.bottom-nav-item').forEach(n => n.classList.remove('active'));
         const bni = document.querySelector(`.bottom-nav-item[data-page="${page}"]`);
         if (bni) bni.classList.add('active');
-        const titles = { dashboard: this.messName || 'My Mess', members: 'Flat', meals: 'Meal Entry', bazaar: 'Shopping', balance: 'Manager Money', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile' };
+        document.getElementById('app-screen').classList.toggle('on-dashboard', page === 'dashboard');
+        const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
+        if (page === 'dashboard') this.loadDashboard();
+    },
+
+    dk(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
+    mk(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); },
+    fmtMonth(d) { return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); },
+    fmtNum(n) { const r = Math.round((n || 0) * 10) / 10; return Number.isInteger(r) ? String(r) : r.toFixed(1); },
+
+    async shareMessCode() {
+        if (!this.messCode) { this.toast('No mess code', 'error'); return; }
+        const text = `Join my mess "${this.messName || ''}" with code: ${this.messCode}`;
+        try { await navigator.clipboard.writeText(text); this.toast('Invite copied!', 'success'); }
+        catch (e) { prompt('Copy mess code:', this.messCode); }
+    },
+
+    async loadDashboard() {
+        if (!this.messId) return;
+        try {
+            const now = new Date();
+            const month = this.mk(now);
+            const todayKey = this.dk(now);
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
+
+            const hour = now.getHours();
+            const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+            const userName = this.currentUser?.displayName || 'User';
+            document.getElementById('dash-greeting').textContent = greet;
+            document.getElementById('dash-user-name').textContent = userName;
+            const initial = ((userName.trim()[0] || 'U')).toUpperCase();
+            document.getElementById('dash-avatar').textContent = initial;
+            document.getElementById('dash-mini-avatar').textContent = initial;
+
+            document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
+
+            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const members = membersSnap.val() || {};
+            const mids = Object.keys(members);
+            let managerName = '-';
+            const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
+            if (adminFound) managerName = adminFound[1].name || '-';
+            else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
+            document.getElementById('dash-manager').textContent = managerName;
+            document.getElementById('dash-month').textContent = this.fmtMonth(now);
+            document.getElementById('dash-online-count').textContent = mids.length;
+
+            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('dash-date').textContent = `Today is ${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()} (${weekdays[now.getDay()]})`;
+
+            const mlSnap = await db.ref(`messes/${this.messId}/meals/${todayKey}`).once('value');
+            const todayMeals = mlSnap.val() || {};
+            let bf = 0, ln = 0, dn = 0;
+            Object.values(todayMeals).forEach(m => { bf += (m.breakfast || 0); ln += (m.lunch || 0); dn += (m.dinner || 0); });
+            document.getElementById('dash-breakfast').textContent = bf;
+            document.getElementById('dash-lunch').textContent = ln;
+            document.getElementById('dash-dinner').textContent = dn;
+
+            let preview = 'Pin a notice for the whole house';
+            try {
+                const nSnap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(1).once('value');
+                if (nSnap.exists()) { const v = nSnap.val(); const k = Object.keys(v)[0]; preview = v[k].body || v[k].title || preview; }
+            } catch (e) { /* notices may not exist */ }
+            document.getElementById('dash-notice-preview').textContent = preview;
+
+            let noteTxt = 'Nothing on the list';
+            try {
+                const noteSnap = await db.ref(`messes/${this.messId}/bazarNote`).once('value');
+                if (noteSnap.val()) noteTxt = noteSnap.val();
+            } catch (e) { /* ignore */ }
+            document.getElementById('dash-live-count').textContent = noteTxt;
+
+            const bzSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(monthEnd).once('value');
+            let bazTotal = 0, utilTotal = 0;
+            const paidBy = {};
+            bzSnap.forEach(s => {
+                const b = s.val() || {}; const amt = b.amount || 0;
+                if ((b.category || 'Shopping') === 'Utility') utilTotal += amt;
+                else { bazTotal += amt; const n = (b.buyer || '').trim(); if (n) paidBy[n] = (paidBy[n] || 0) + amt; }
+            });
+
+            const mlMSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(monthEnd).once('value');
+            const memberMeals = {}, memberSpecial = {};
+            let totalMeals = 0;
+            mlMSnap.forEach(d => {
+                Object.entries(d.val() || {}).forEach(([mid, m]) => {
+                    const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
+                    const sp = (m.special || 0);
+                    memberMeals[mid] = (memberMeals[mid] || 0) + base;
+                    memberSpecial[mid] = (memberSpecial[mid] || 0) + sp;
+                    totalMeals += base + sp;
+                });
+            });
+            const rate = totalMeals > 0 ? bazTotal / totalMeals : 0;
+            const utilShare = mids.length ? utilTotal / mids.length : 0;
+
+            const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
+            const depAll = depSnap.val() || {};
+            const depByMid = {}; let totalDep = 0;
+            Object.entries(depAll).forEach(([mid, v]) => {
+                if (!v || typeof v !== 'object') return;
+                if (typeof v.amount === 'number') { depByMid[mid] = (depByMid[mid] || 0) + v.amount; totalDep += v.amount; return; }
+                Object.values(v).forEach(e => {
+                    if (e && typeof e.amount === 'number' && (!e.dateKey || String(e.dateKey).startsWith(month))) {
+                        depByMid[mid] = (depByMid[mid] || 0) + e.amount; totalDep += e.amount;
+                    }
+                });
+            });
+
+            document.getElementById('dash-deposit').textContent = '৳ ' + this.fmtNum(totalDep);
+            const finBal = totalDep - utilTotal;
+            const balEl = document.getElementById('dash-balance');
+            balEl.textContent = '৳ ' + this.fmtNum(finBal);
+            balEl.className = finBal < 0 ? 'neg' : 'pos';
+            document.getElementById('dash-rate').textContent = '৳ ' + rate.toFixed(2);
+
+            const rowsEl = document.getElementById('dash-member-rows');
+            if (!mids.length) { rowsEl.innerHTML = '<tr><td colspan="5" class="empty-state">No data</td></tr>'; return; }
+            let html = '';
+            mids.forEach(mid => {
+                const m = members[mid] || {};
+                const name = m.name || 'Unknown';
+                const base = memberMeals[mid] || 0;
+                const sp = memberSpecial[mid] || 0;
+                const mealCost = base * rate, spCost = sp * rate;
+                const cost = mealCost + spCost + utilShare;
+                const paid = paidBy[name] || 0;
+                const dep = depByMid[mid] || 0;
+                const depTot = paid + dep;
+                const bal = depTot - cost;
+                html += `<tr>
+                    <td class="c-name">${this.esc(name)}</td>
+                    <td><small>${this.fmtNum(base)}+${this.fmtNum(sp)}</small><strong>${this.fmtNum(base + sp)}</strong></td>
+                    <td><small>${this.fmtNum(mealCost)}+${this.fmtNum(spCost)}+${this.fmtNum(utilShare)}</small><strong>${this.fmtNum(cost)}</strong></td>
+                    <td><small>${this.fmtNum(paid)}+${this.fmtNum(dep)}</small><strong>${this.fmtNum(depTot)}</strong></td>
+                    <td class="${bal < 0 ? 'neg' : 'pos'}"><strong>${this.fmtNum(bal)}</strong></td>
+                </tr>`;
+            });
+            rowsEl.innerHTML = html;
+        } catch (e) { console.error('loadDashboard error:', e); }
     },
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
