@@ -476,6 +476,7 @@ const App = {
                     const m = members[id] || {};
                     return `<div class="aflat-member-item">
                         <span class="name">${this.esc(m.name || 'Unknown')}</span>
+                        <button class="aflat-remove" onclick="App.editFlatMember('${id}','${this.esc(m.name || '')}')"><span class="material-icons-round">edit</span></button>
                         <button class="aflat-remove" onclick="App.removeFlatMember('${id}')"><span class="material-icons-round">close</span></button>
                     </div>`;
                 }).join('');
@@ -506,6 +507,17 @@ const App = {
             await db.ref(`messes/${this.messId}/members/${tempId}`).set({ name, addedBy: this.currentUser.uid, addedAt: Date.now() });
             this.toast('Member added!', 'success');
             this.loadFlat();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async editFlatMember(id, currentName) {
+        const name = prompt('Rename member:', currentName);
+        if (!name || !name.trim()) return;
+        if (name.trim() === currentName) return;
+        try {
+            await db.ref(`messes/${this.messId}/members/${id}/name`).set(name.trim());
+            this.loadFlat();
+            this.toast('Member renamed', 'success');
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
@@ -838,65 +850,31 @@ const App = {
     },
 
     async showAddMeal() {
-        this.navigate('addmeal');
-    },
-
-    async loadAddMeal() {
         if (!this.messId) return;
-        const now = new Date();
-        this._aamDate = this.mk(now) + '-' + String(now.getDate()).padStart(2, '0');
-        document.getElementById('aam-date-text').textContent = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'short'})} ${now.getFullYear()}`;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
-        const colors = ['#E53935','#FF9800','#4CAF50','#2196F3','#9C27B0','#00BCD4'];
-        const div = document.getElementById('aam-member-cards');
+        const now = new Date();
+        this._aamDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
+        const colors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2'];
         this._aamData = {};
-        let html = '';
+        let cardsHtml = '';
         mids.forEach((mid, idx) => {
             const m = members[mid] || {};
             const name = m.name || 'Unknown';
             const bg = colors[idx % colors.length];
             this._aamData[name] = { breakfast: 0, lunch: 0, dinner: 0 };
-            html += `<div class="aam-card">
-                <div class="aam-card-top">
-                    <div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:20px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div>
-                    <span class="aam-name">${this.esc(name)}</span>
-                    <span class="aam-total" id="aam-total-${idx}">Total: 0</span>
-                </div>
-                <div class="aam-meals-row">
-                    <div class="aam-meal-col">
-                        <label>Breakfast</label>
-                        <div class="aam-counter">
-                            <button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button>
-                            <span class="aam-val" id="aam-bf-${idx}">0</span>
-                            <button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button>
-                        </div>
-                    </div>
-                    <div class="aam-meal-col">
-                        <label>Lunch</label>
-                        <div class="aam-counter">
-                            <button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button>
-                            <span class="aam-val" id="aam-ln-${idx}">0</span>
-                            <button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button>
-                        </div>
-                    </div>
-                    <div class="aam-meal-col">
-                        <label>Dinner</label>
-                        <div class="aam-counter">
-                            <button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button>
-                            <span class="aam-val" id="aam-dn-${idx}">0</span>
-                            <button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+            cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:20px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: 0</span></div><div class="aam-meals-row"><div class="aam-meal-col"><label>Breakfast</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button><span class="aam-val" id="aam-bf-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button></div></div><div class="aam-meal-col"><label>Lunch</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button><span class="aam-val" id="aam-ln-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button></div></div><div class="aam-meal-col"><label>Dinner</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button><span class="aam-val" id="aam-dn-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button></div></div></div></div>`;
         });
-        div.innerHTML = html || '<p class="empty-state">No members</p>';
+        document.getElementById('modal-title').textContent = 'Add Meal';
+        document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="cursor:pointer" onclick="App.aamPickDate()"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
+        document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.aamSave()">Add</button></div>`;
+        this.openModal();
     },
 
     aamAdjust(idx, name, field, delta) {
-        if (!this._aamData[name]) return;
+        if (!this._aamData || !this._aamData[name]) return;
         const v = Math.max(0, (this._aamData[name][field] || 0) + delta);
         this._aamData[name][field] = v;
         const map = { breakfast: 'bf', lunch: 'ln', dinner: 'dn' };
@@ -910,8 +888,7 @@ const App = {
     aamPickDate() {
         const input = document.createElement('input');
         input.type = 'date';
-        const d = new Date();
-        input.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        input.value = this._aamDate;
         input.addEventListener('change', () => {
             const v = input.value;
             if (v) {
@@ -1243,10 +1220,11 @@ const App = {
         const mids = Object.keys(members);
         const names = mids.map(id => members[id]?.name || 'Unknown');
         const now = new Date();
+        this._depDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
         document.getElementById('modal-title').textContent = 'Add Deposit';
         document.getElementById('modal-body').innerHTML = `
-            <div class="dep-date"><span class="material-icons-round">calendar_month</span> ${dateStr}</div>
+            <div class="dep-date" style="cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span></div>
             <div class="dep-label">Money of:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
@@ -1277,13 +1255,27 @@ const App = {
         if (el) el.textContent = '৳ ' + this.fmtNum(amt);
     },
 
+    depPickDate() {
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.value = this._depDate;
+        input.addEventListener('change', () => {
+            if (input.value) {
+                this._depDate = input.value;
+                const dd = new Date(input.value + 'T00:00:00');
+                const el = document.getElementById('dep-date-text');
+                if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
+            }
+        });
+        input.click();
+    },
+
     async saveDeposit() {
         const memberName = this._depSelected;
         const amount = parseFloat(document.getElementById('dep-amount')?.value) || 0;
         if (!memberName) { this.toast('Pick whose money it is', 'error'); return; }
         if (!amount) { this.toast('Enter an amount', 'error'); return; }
-        const now = new Date();
-        await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this.mk(now) + '-' + String(now.getDate()).padStart(2,'0'), createdAt: Date.now() });
+        await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, createdAt: Date.now() });
         this.closeModal(); this.loadManagerMoney(); this.toast('Deposit added!', 'success');
     },
 
