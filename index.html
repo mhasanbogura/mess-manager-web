@@ -106,7 +106,10 @@
                     <div class="adash-mess-top">
                         <h2 id="dash-mess-name">My Mess</h2>
                     </div>
-                    <button class="adash-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Flat ID</button>
+                    <div class="adash-share-row">
+                        <button class="adash-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Flat ID</button>
+                        <span class="adash-share-name" id="dash-mess-name-right">My Mess</span>
+                    </div>
                     <p class="adash-flat-type">Flat Type: <span>Calculated meal rate</span></p>
                     <div class="adash-mess-grid">
                         <div class="adash-mess-box">
@@ -196,10 +199,10 @@
                         <table class="adash-table">
                             <thead>
                                 <tr>
-                                    <th>Name <span class="sort-arrow">↑</span></th>
-                                    <th><small>Meal+Special</small>Total</th>
-                                    <th><small>Meal+Special+Utility</small>Cost(৳)</th>
-                                    <th><small>Bazar+Manager</small>Deposit(৳)</th>
+                                    <th>Name</th>
+                                    <th>Total</th>
+                                    <th>Cost(৳)</th>
+                                    <th>Deposit(৳)</th>
                                     <th>Balance(৳)</th>
                                 </tr>
                             </thead>

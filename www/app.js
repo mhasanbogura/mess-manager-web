@@ -602,6 +602,7 @@ const App = {
             document.getElementById('dash-mini-avatar').textContent = initial;
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
+            document.getElementById('dash-mess-name-right').textContent = this.messName || 'My Mess';
 
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
@@ -708,9 +709,9 @@ const App = {
                 const bal = depTot - cost;
                 html += `<tr>
                     <td class="c-name">${this.esc(name)}</td>
-                    <td><small>${this.fmtNum(base)}+${this.fmtNum(sp)}</small><strong>${this.fmtNum(base + sp)}</strong></td>
-                    <td><small>${this.fmtNum(mealCost)}+${this.fmtNum(spCost)}+${this.fmtNum(utilShare)}</small><strong>${this.fmtNum(cost)}</strong></td>
-                    <td><small>${this.fmtNum(paid)}+${this.fmtNum(dep)}</small><strong>${this.fmtNum(depTot)}</strong></td>
+                    <td><strong>${this.fmtNum(base + sp)}</strong></td>
+                    <td><strong>${this.fmtNum(cost)}</strong></td>
+                    <td><strong>${this.fmtNum(depTot)}</strong></td>
                     <td class="${bal < 0 ? 'neg' : 'pos'}"><strong>${this.fmtNum(bal)}</strong></td>
                 </tr>`;
             });

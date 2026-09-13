@@ -1379,7 +1379,7 @@ select.input-sm { cursor: pointer; }
     padding: 14px 16px 16px; gap: 8px;
 }
 .adash-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-.adash-app-icon { width: 48px; height: 48px; border-radius: 14px; object-fit: cover; flex-shrink: 0; }
+.adash-app-icon { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
 .adash-brand h2 { font-size: 22px; font-weight: 800; color: #111; line-height: 1.2; white-space: nowrap; }
 .adash-user { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .adash-avatar {
@@ -1411,7 +1411,9 @@ select.input-sm { cursor: pointer; }
     cursor: pointer;
 }
 .adash-share .material-icons-round { font-size: 18px; }
-.adash-flat-type { margin-top: 10px; font-size: 15px; opacity: .95; }
+.adash-share-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.adash-share-name { font-size: 16px; font-weight: 700; color: #fff; }
+.adash-flat-type { margin-top: 8px; font-size: 15px; opacity: .95; }
 .adash-flat-type span { margin-left: 6px; }
 .adash-mess-grid { display: grid; grid-template-columns: 1fr 1fr; margin-top: 10px; border: 1.5px solid rgba(255,255,255,.5); border-radius: 14px; overflow: hidden; }
 .adash-mess-box { padding: 10px 12px; }
