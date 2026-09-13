@@ -53,6 +53,9 @@ const App = {
         });
         const hwBack = () => {
             const appActive = document.getElementById('app-screen')?.classList.contains('active');
+            if (document.getElementById('bz-overlay')) { this.bzClose(); return; }
+            const modal = document.getElementById('modal-overlay');
+            if (modal && modal.classList.contains('active')) { this.closeModal(); return; }
             if (appActive && this.currentPage && this.currentPage !== 'dashboard') {
                 this.navigate('dashboard');
             } else if (appActive && this.currentPage === 'dashboard') {
@@ -63,9 +66,6 @@ const App = {
         try {
             if (window.Capacitor?.Plugins?.App) {
                 window.Capacitor.Plugins.App.addListener('backButton', hwBack);
-                window.Capacitor.Plugins.App.addListener('backButton', ({ url }) => {
-                    if (url && url.startsWith('https://mhasanbogura.github.io')) return;
-                });
             }
         } catch (e) { /* not running in Capacitor */ }
     },
