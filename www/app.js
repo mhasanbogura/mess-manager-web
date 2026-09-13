@@ -482,32 +482,32 @@ const App = {
         const div = document.getElementById('flat-peoples-list');
         try {
             const mids = Object.keys(members);
-            const appUsers = mids.filter(id => id.startsWith('member_') === false);
+            const appUsers = mids.filter(id => !id.startsWith('member_'));
+            appUsers.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             document.getElementById('flat-peoples-count').textContent = appUsers.length;
             if (!appUsers.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples have joined yet</p>'; return; }
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
-            div.innerHTML = await Promise.all(appUsers.map(async (id, i) => {
+            let html = '';
+            for (let i = 0; i < appUsers.length; i++) {
+                const id = appUsers[i];
                 const m = members[id] || {};
-                const uSnap = await db.ref(`users/${id}`).once('value');
-                const u = uSnap.val() || {};
+                let u = {};
+                try { const uSnap = await db.ref(`users/${id}`).once('value'); u = uSnap.val() || {}; } catch (e) { /* user record may not exist */ }
                 const initial = ((m.name || u.name || '?')[0] || '?').toUpperCase();
                 const isAdmin = m.role === 'admin';
                 const color = colors[i % colors.length];
-                const lastSeen = u.lastSeen ? new Date(u.lastSeen) : null;
-                const isOnline = lastSeen && (Date.now() - lastSeen.getTime() < 5 * 60 * 1000);
-                const statusHtml = isOnline
-                    ? `<div class="status"><span class="dot"></span> Online now</div>`
-                    : `<div class="status offline">Last seen: ${lastSeen ? this.timeAgo(lastSeen) : 'Unknown'}</div>`;
-                return `<div class="aflat-people-item">
+                const email = u.email || m.email || '';
+                const isYou = id === this.currentUser.uid;
+                html += `<div class="aflat-people-item">
                     <div class="aflat-people-avatar" style="background:${color}">${initial}</div>
                     <div class="aflat-people-info">
-                        <h4>${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager, You)' + (id === this.currentUser.uid ? '' : '') + '</span>' : ''}</h4>
-                        ${statusHtml}
-                        <div class="email">${this.esc(u.email || '')}</div>
+                        <h4>${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager' + (isYou ? ', You' : '') + ')</span>' : ''}</h4>
+                        <div class="email">${this.esc(email)}</div>
                     </div>
                     <span class="material-icons-round chevron">chevron_right</span>
                 </div>`;
-            })).join('');
+            }
+            div.innerHTML = html;
         } catch (e) { console.error('loadFlatPeoples error:', e); }
     },
 
@@ -516,6 +516,7 @@ const App = {
         const div = document.getElementById('flat-permissions-list');
         try {
             const mids = Object.keys(members).filter(id => !id.startsWith('member_'));
+            mids.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
             const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = pSnap.val() || {};
