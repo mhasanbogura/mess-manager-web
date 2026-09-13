@@ -931,13 +931,17 @@ const App = {
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members);
-        const names = mids.map(id => members[id]?.name || 'Unknown');
+        const names = mids.map(id => members[id]?.name || 'Unknown').sort((a, b) => a.localeCompare(b));
+        let managerName = 'Manager';
+        const adminFound = mids.find(id => members[id] && members[id].role === 'admin');
+        if (adminFound && members[adminFound].name) managerName = members[adminFound].name;
         const now = new Date();
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
 
         this._bzMembers = names;
         this._bzItems = [{ name: '', cost: '' }];
         this._bzMoneyBy = '';
+        this._bzDoneBy = '';
         this._bzTab = 'bazar';
         this._bzUtilType = '';
         this._bzUtilAmount = '';
@@ -955,9 +959,14 @@ const App = {
             <div class="bz-body">
                 <div class="bz-date"><span class="material-icons-round">calendar_month</span> ${dateStr}</div>
                 <div id="bz-bazar-section">
-                    <div class="bz-label">Money:</div>
+                    <div class="bz-label">Money from:</div>
                     <div class="bz-chips" id="bz-money-chips">
+                        <button class="bz-chip" data-name="${managerName}" onclick="App.bzPickMoney(this)">${managerName}</button>
                         ${names.map(n => `<button class="bz-chip" data-name="${n}" onclick="App.bzPickMoney(this)">${n}</button>`).join('')}
+                    </div>
+                    <div class="bz-label">Done by:</div>
+                    <div class="bz-chips" id="bz-done-chips">
+                        ${names.map(n => `<button class="bz-chip" data-name="${n}" onclick="App.bzPickDone(this)">${n}</button>`).join('')}
                     </div>
                     <div id="bz-item-rows">
                         <div class="bz-item-row">
@@ -1011,6 +1020,13 @@ const App = {
         this.bzRenderFooter();
     },
 
+    bzPickDone(el) {
+        document.querySelectorAll('#bz-done-chips .bz-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        this._bzDoneBy = el.dataset.name;
+        this.bzRenderFooter();
+    },
+
     bzPickType(el) {
         document.querySelectorAll('#bz-type-chips .bz-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
@@ -1057,7 +1073,7 @@ const App = {
         if (this._bzTab === 'bazar') {
             const items = this._bzItems.filter(i => i.name || i.cost);
             const sum = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
-            left.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}  ${this._bzMoneyBy || 'Pick whose money it is'}`;
+            left.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}  ${this._bzMoneyBy || 'Pick whose money it is'}${this._bzDoneBy ? ' / ' + this._bzDoneBy : ''}`;
             total.textContent = '৳ ' + this.fmtNum(sum);
         } else {
             const amt = parseFloat(this._bzUtilAmount) || 0;
@@ -1077,7 +1093,7 @@ const App = {
             for (const item of items) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
                     name: item.name, cost: parseFloat(item.cost) || 0,
-                    memberId: this._bzMoneyBy, date: dateKey, category: 'bazar', createdAt: Date.now()
+                    memberId: this._bzMoneyBy, doneBy: this._bzDoneBy || '', date: dateKey, category: 'bazar', createdAt: Date.now()
                 });
             }
         } else {
