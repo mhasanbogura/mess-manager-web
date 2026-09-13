@@ -136,10 +136,12 @@ const App = {
                 div.innerHTML = html + '</div>';
                 return;
             }
+            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             this.showScreen('mess-select-screen');
             document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">No mess yet. Create or join one below.</p></div>';
         } catch (e) {
             console.error('loadMyMesses error:', e);
+            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             this.showScreen('mess-select-screen');
             document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">Error loading mess. Check connection.</p></div>';
         }
