@@ -1056,62 +1056,57 @@ const App = {
         this._bzUtilAmount = '';
         this._bzUtilSelected = names.slice();
 
-        const overlay = document.createElement('div');
-        overlay.id = 'bz-overlay';
-        overlay.className = 'bz-overlay';
-        overlay.innerHTML = `
-        <div class="bz-page">
-            <div class="bz-tabs">
+        document.getElementById('modal-title').textContent = 'Add Bazar';
+        document.getElementById('modal-body').innerHTML = `
+            <div class="bz-tabs" style="padding:0 0 12px">
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Bazar</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility</button>
             </div>
-            <div class="bz-body">
-                <div class="bz-date"><span class="material-icons-round">calendar_month</span> ${dateStr}</div>
-                <div id="bz-bazar-section">
-                    <div class="bz-label">Money from:</div>
-                    <div class="bz-chips" id="bz-money-chips">
-                        <button class="bz-chip" data-name="Manager" onclick="App.bzPickMoney(this)">Manager</button>
-                        ${names.map(n => `<button class="bz-chip" data-name="${n}" onclick="App.bzPickMoney(this)">${n}</button>`).join('')}
-                    </div>
-                    <div class="bz-label">Done by:</div>
-                    <div class="bz-chips" id="bz-done-chips">
-                        ${names.map(n => `<button class="bz-chip" data-name="${n}" onclick="App.bzPickDone(this)">${n}</button>`).join('')}
-                    </div>
-                    <div id="bz-item-rows">
-                        <div class="bz-item-row">
-                            <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
-                            <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
-                        </div>
-                    </div>
-                    <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
-                    <p class="bz-hint">💡 Add each item on its own line. The Analysis page can then show which items cost you the most.</p>
+            <div class="dep-date"><span class="material-icons-round">calendar_month</span> ${dateStr}</div>
+            <div id="bz-bazar-section">
+                <div class="dep-label">Money from:</div>
+                <div class="dep-chips" id="bz-money-chips">
+                    <button class="dep-chip" data-name="Manager" onclick="App.bzPickMoney(this)">Manager</button>
+                    ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.bzPickMoney(this)">${n}</button>`).join('')}
                 </div>
-                <div id="bz-utility-section" style="display:none">
-                    <div class="bz-label">Type:</div>
-                    <div class="bz-chips" id="bz-type-chips">
-                        ${['Rent','Wi-Fi'].map(t => `<button class="bz-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
-                        <button class="bz-chip bz-chip-add" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Add suggestion</button>
-                    </div>
-                    <div class="bz-input-wrap" style="margin:12px 0"><span class="material-icons-round" style="color:#E53935">attach_money</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App.bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                    <div class="bz-util-members">
-                        <div class="bz-util-selectall" onclick="App.bzToggleAll()">
-                            <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
-                            <span>Select all</span>
-                            <span class="bz-util-count" id="bz-util-count">${names.length}/${names.length} selected</span>
-                        </div>
-                        ${names.map(n => `<label class="bz-util-member"><input type="checkbox" checked data-member="${n}" onchange="App.bzUpdateUtilCount()"><span>${n}</span></label>`).join('')}
+                <div class="dep-label">Done by:</div>
+                <div class="dep-chips" id="bz-done-chips">
+                    ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.bzPickDone(this)">${n}</button>`).join('')}
+                </div>
+                <div id="bz-item-rows">
+                    <div class="bz-item-row">
+                        <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
+                        <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
+                <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                <p class="bz-hint">Add each item on its own line. The Analysis page can then show which items cost you the most.</p>
             </div>
-            <div class="bz-footer">
-                <span id="bz-footer-left">0 items &nbsp; Pick whose money it is</span>
-                <span class="bz-footer-total" id="bz-footer-total">৳ 0</span>
+            <div id="bz-utility-section" style="display:none">
+                <div class="dep-label">Type:</div>
+                <div class="dep-chips" id="bz-type-chips">
+                    ${['Rent','Wi-Fi'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
+                    <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Add suggestion</button>
+                </div>
+                <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App.bzUtilAmount=this.value;App.bzRenderFooter()"></div>
+                <div class="bz-util-members">
+                    <div class="bz-util-selectall" onclick="App.bzToggleAll()">
+                        <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
+                        <span>Select all</span>
+                        <span class="bz-util-count" id="bz-util-count">${names.length}/${names.length} selected</span>
+                    </div>
+                    ${names.map(n => `<label class="bz-util-member"><input type="checkbox" checked data-member="${n}" onchange="App.bzUpdateUtilCount()"><span>${n}</span></label>`).join('')}
+                </div>
+            </div>`;
+        document.getElementById('modal-footer').innerHTML = `
+            <div class="dep-footer-row">
+                <span class="dep-footer-hint" id="bz-footer-left">0 items &nbsp; Pick whose money it is</span>
+                <span class="dep-footer-total" id="bz-footer-total">৳ 0</span>
             </div>
-            <div class="bz-actions">
-                <button class="bz-btn-add" onclick="App.bzSave()">Add</button>
-            </div>
-        </div>`;
-        document.body.appendChild(overlay);
+            <div class="dep-footer-btns">
+                <button class="btn-modal-add" onclick="App.bzSave()">Add</button>
+            </div>`;
+        this.openModal();
     },
 
     bzSwitchTab(tab) {
@@ -1219,12 +1214,12 @@ const App = {
                 });
             }
         }
-        this.bzClose();
+        this.closeModal();
         this.loadBazarList();
         this.toast('Added!', 'success');
     },
 
-    bzClose() { const o = document.getElementById('bz-overlay'); if (o) o.remove(); },
+    bzClose() { this.closeModal(); },
 
     async showAddDeposit() {
         if (!this.messId) return;
