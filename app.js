@@ -1048,6 +1048,7 @@ const App = {
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
 
         this._bzMembers = names;
+        this._bzDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         this._bzItems = [{ name: '', cost: '' }];
         this._bzMoneyBy = '';
         this._bzDoneBy = '';
@@ -1062,7 +1063,7 @@ const App = {
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Bazar</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility</button>
             </div>
-            <div class="dep-date"><span class="material-icons-round">calendar_month</span> ${dateStr}</div>
+            <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span></div>
             <div id="bz-bazar-section">
                 <div class="dep-label">Money from:</div>
                 <div class="dep-chips" id="bz-money-chips">
@@ -1190,8 +1191,7 @@ const App = {
     },
 
     async bzSave() {
-        const now = new Date();
-        const dateKey = this.mk(now) + '-' + String(now.getDate()).padStart(2, '0');
+        const dateKey = this._bzDate;
         if (this._bzTab === 'bazar') {
             const items = this._bzItems.filter(i => i.name && i.cost);
             if (!items.length) { this.toast('Add at least one item', 'error'); return; }
@@ -1220,6 +1220,21 @@ const App = {
     },
 
     bzClose() { this.closeModal(); },
+
+    bzPickDate() {
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.value = this._bzDate;
+        input.addEventListener('change', () => {
+            if (input.value) {
+                this._bzDate = input.value;
+                const dd = new Date(input.value + 'T00:00:00');
+                const el = document.getElementById('bz-date-text');
+                if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
+            }
+        });
+        input.click();
+    },
 
     async showAddDeposit() {
         if (!this.messId) return;

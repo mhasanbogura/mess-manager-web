@@ -677,11 +677,11 @@ select.input-sm { cursor: pointer; }
 
 .modal-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 18px; border-bottom: 1px solid var(--card-border); color: white;
+    padding: 16px 18px; border-bottom: 1px solid var(--card-border); color: #14181f;
     flex-wrap: wrap; gap: 8px;
 }
 .modal-header h3 { font-size: 17px; font-weight: 700; }
-.modal-body { padding: 18px; }
+.modal-body { padding: 18px; color: #14181f; }
 
 .modal-footer {
     padding: 14px 18px; border-top: 1px solid var(--card-border);
