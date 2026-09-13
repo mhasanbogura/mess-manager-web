@@ -1629,3 +1629,81 @@ select.input-sm { cursor: pointer; }
 }
 .anotice-fab:hover { background: #EC5F49; }
 .anotice-fab .material-icons-round { font-size: 26px; }
+
+/* ==================== BAZAR DUTY ROSTER ==================== */
+#app-screen.on-duty .topbar { display: none; }
+#app-screen.on-duty .main-content { margin-top: 0; padding: 0 0 72px; }
+#page-duty {
+    font-family: Georgia, 'Times New Roman', serif;
+    background: #F3F0E9;
+    min-height: calc(100vh - 72px);
+    color: #2b2b2b;
+}
+.aduty-head {
+    background: #FFC107;
+    display: flex; align-items: center; gap: 24px;
+    padding: 18px 16px 20px;
+}
+.aduty-head .icon-btn { color: #111; min-width: 40px; min-height: 40px; }
+.aduty-head .icon-btn:hover { background: rgba(0,0,0,.08); }
+.aduty-head .material-icons-round { font-size: 32px; }
+.aduty-head h2 { font-size: 28px; font-weight: 500; color: #111; }
+.aduty-banner {
+    background: #E4F2E7; border: 1.5px solid #2E9E44; border-radius: 18px;
+    margin: 12px 12px 0; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+}
+.aduty-banner .material-icons-round { font-size: 28px; color: #2E9E44; }
+.aduty-banner p { font-size: 19px; color: #555; }
+.aduty-banner strong { color: #111; font-weight: 800; }
+.aduty-banner .unassigned { color: #777; }
+.aduty-card {
+    background: #fff; border-radius: 20px; margin: 12px 12px 0;
+    padding: 16px 14px; border: 1px solid #E7E2D5;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.aduty-card h3 { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 12px; font-family: 'Inter', sans-serif; letter-spacing: -.2px; }
+.aduty-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.aduty-chip {
+    background: #FDF3E3; border: 1.5px solid #E8B96A; border-radius: 14px;
+    padding: 8px 16px; font-size: 17px; color: #333;
+}
+.aduty-chip.mine {
+    background: #E4F2E7; border-color: #2E9E44;
+}
+.aduty-none { font-size: 16px; color: #999; }
+.aduty-member {
+    background: #fff; border-radius: 20px; margin: 12px 12px 0;
+    padding: 14px; border: 1px solid #E7E2D5;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.aduty-member-top { display: flex; align-items: center; gap: 8px; }
+.aduty-member-top .person { font-size: 28px; color: #E53935; }
+.aduty-member-top strong { font-size: 21px; font-weight: 500; color: #222; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aduty-days { font-size: 16px; color: #999; font-family: 'Inter', sans-serif; white-space: nowrap; }
+.aduty-member-top .icon-btn { min-width: 40px; min-height: 40px; }
+.aduty-member-top .icon-btn.red { color: #E53935; }
+.aduty-member-top .icon-btn.red:hover { background: rgba(229,57,53,.08); }
+.aduty-member-top .icon-btn.dark { color: #3d3d3d; }
+.aduty-member-top .icon-btn.dark:hover { background: rgba(0,0,0,.06); }
+.aduty-member-top .material-icons-round { font-size: 30px; }
+.aduty-member .aduty-chips { margin-top: 10px; }
+/* duty day picker (inside dark modal) */
+.aduty-legend { display: flex; gap: 14px; font-size: 12px; color: #888; margin-bottom: 10px; font-family: 'Inter', sans-serif; }
+.aduty-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 4px; vertical-align: baseline; }
+.aduty-pick-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.aduty-pick {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: rgba(42,42,62,.8); border: 1px solid rgba(255,255,255,.1);
+    color: #ccc; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: all .15s;
+}
+.aduty-pick.mine { background: linear-gradient(135deg, #43A047, #2E7D32); color: #fff; border-color: transparent; }
+.aduty-pick.taken { opacity: .45; border-style: dashed; }
+
+@media (max-width: 480px) {
+    .aduty-head h2 { font-size: 24px; }
+    .aduty-banner p { font-size: 16px; }
+    .aduty-chip { font-size: 15px; padding: 7px 13px; }
+    .aduty-member-top strong { font-size: 18px; }
+}

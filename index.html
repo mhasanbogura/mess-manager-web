@@ -168,9 +168,9 @@
                         </div>
                     </div>
                     <div class="adash-duo">
-                        <div class="adash-duo-box">
+                        <div class="adash-duo-box" onclick="App.navigate('duty')">
                             <span class="material-icons-round">event_available</span>
-                            <div><strong>Not assigned</strong><p>Bazar duty today</p></div>
+                            <div><strong id="dash-duty-name">Not assigned</strong><p>Bazar duty today</p></div>
                         </div>
                         <div class="adash-duo-box" onclick="App.navigate('bazaar')">
                             <span class="material-icons-round">receipt_long</span>
@@ -215,6 +215,18 @@
                         </table>
                     </div>
                 </div>
+            </div>
+            <div class="page" id="page-duty">
+                <div class="aduty-head">
+                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Bazar Today</h2>
+                </div>
+                <div class="aduty-banner" id="duty-banner"></div>
+                <div class="aduty-card">
+                    <h3>Unassigned dates</h3>
+                    <div class="aduty-chips" id="duty-unassigned"></div>
+                </div>
+                <div id="duty-members"></div>
             </div>
             <div class="page" id="page-members"></div>
             <div class="page" id="page-meals"></div>

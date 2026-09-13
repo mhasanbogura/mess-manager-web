@@ -198,10 +198,12 @@ const App = {
         if (bni) bni.classList.add('active');
         document.getElementById('app-screen').classList.toggle('on-dashboard', page === 'dashboard');
         document.getElementById('app-screen').classList.toggle('on-notices', page === 'notices');
-        const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile' };
+        document.getElementById('app-screen').classList.toggle('on-duty', page === 'duty');
+        const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Bazar Today' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
+        if (page === 'duty') this.loadDuty();
     },
 
     async loadNotices() {
@@ -259,6 +261,117 @@ const App = {
         try {
             await db.ref(`messes/${this.messId}/notices/${key}`).remove();
             this.loadNotices(); this.toast('Notice removed', 'success');
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    shortMon(d) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()]; },
+
+    async loadDuty() {
+        if (!this.messId) return;
+        try {
+            const now = new Date();
+            const month = this.mk(now);
+            const shortMon = this.shortMon(now);
+            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const members = membersSnap.val() || {};
+            const mids = Object.keys(members);
+            const dutySnap = await db.ref(`messes/${this.messId}/bazarDuty`).once('value');
+            const dutyAll = dutySnap.val() || {};
+            const duty = {};
+            Object.entries(dutyAll).forEach(([dk, mid]) => { if (dk.startsWith(month)) duty[dk] = mid; });
+
+            const todayKey = this.dk(now);
+            const tMid = duty[todayKey];
+            const tName = (tMid && members[tMid] && members[tMid].name) || null;
+            document.getElementById('duty-banner').innerHTML =
+                `<span class="material-icons-round">event</span><p><strong>Bazar today (${now.getDate()} ${shortMon}):</strong> ` +
+                (tName ? this.esc(tName) : '<span class="unassigned">Nobody assigned</span>') + `</p>`;
+
+            const assignedDays = new Set(Object.keys(duty).map(dk => parseInt(dk.slice(8, 10), 10)));
+            let chips = '';
+            for (let d = 1; d <= daysInMonth; d++) {
+                if (!assignedDays.has(d)) chips += `<span class="aduty-chip">${d} ${shortMon}</span>`;
+            }
+            document.getElementById('duty-unassigned').innerHTML = chips || '<p class="aduty-none">All dates assigned</p>';
+
+            const byMid = {};
+            Object.entries(duty).forEach(([dk, mid]) => { (byMid[mid] = byMid[mid] || []).push(dk); });
+            document.getElementById('duty-members').innerHTML = mids.map(mid => {
+                const name = (members[mid] || {}).name || 'Unknown';
+                const days = (byMid[mid] || []).sort();
+                const body = days.length
+                    ? `<div class="aduty-chips">` + days.map(dk => `<span class="aduty-chip mine">${parseInt(dk.slice(8, 10), 10)} ${shortMon}</span>`).join('') + `</div>`
+                    : `<p class="aduty-none">No dates yet — tap edit to assign</p>`;
+                return `<div class="aduty-member">
+                    <div class="aduty-member-top">
+                        <span class="material-icons-round person">person</span>
+                        <strong>${this.esc(name)}</strong>
+                        <span class="aduty-days">${days.length} day${days.length === 1 ? '' : 's'}</span>
+                        <button class="icon-btn red" onclick="App.openDutyEditor('${mid}')"><span class="material-icons-round">edit_calendar</span></button>
+                        ${days.length ? `<button class="icon-btn dark" onclick="App.clearDuty('${mid}')"><span class="material-icons-round">delete</span></button>` : ''}
+                    </div>
+                    ${body}
+                </div>`;
+            }).join('') || '<p class="empty-state">No members</p>';
+        } catch (e) { console.error('loadDuty error:', e); }
+    },
+
+    async openDutyEditor(mid) {
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        const mSnap = await db.ref(`messes/${this.messId}/members/${mid}/name`).once('value');
+        const dutySnap = await db.ref(`messes/${this.messId}/bazarDuty`).once('value');
+        const dutyAll = dutySnap.val() || {};
+        const duty = {};
+        Object.entries(dutyAll).forEach(([dk, m]) => { if (dk.startsWith(month)) duty[dk] = m; });
+        this.dutyEdit = { mid, month, daysInMonth, name: mSnap.val() || 'Member', duty };
+        this.renderDutyEditor();
+        this.openModal();
+    },
+
+    renderDutyEditor() {
+        const { mid, month, daysInMonth, name, duty } = this.dutyEdit;
+        let chips = '';
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dk = `${month}-${String(d).padStart(2, '0')}`;
+            const assigned = duty[dk];
+            const cls = assigned === mid ? 'mine' : (assigned ? 'taken' : '');
+            chips += `<button class="aduty-pick ${cls}" onclick="App.toggleDutyDay('${dk}')">${d}</button>`;
+        }
+        document.getElementById('modal-title').textContent = `Assign dates — ${name}`;
+        document.getElementById('modal-body').innerHTML = `
+            <div class="aduty-legend"><span><i style="background:#43A047"></i>yours</span><span><i style="background:transparent;border:1px dashed #888"></i>taken (tap to take over)</span></div>
+            <div class="aduty-pick-grid">${chips}</div>`;
+        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.closeModal();App.loadDuty()">Done</button>`;
+    },
+
+    async toggleDutyDay(dk) {
+        const { mid, duty } = this.dutyEdit;
+        try {
+            if (duty[dk] === mid) {
+                delete duty[dk];
+                await db.ref(`messes/${this.messId}/bazarDuty/${dk}`).remove();
+            } else {
+                duty[dk] = mid;
+                await db.ref(`messes/${this.messId}/bazarDuty/${dk}`).set(mid);
+            }
+            this.renderDutyEditor();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async clearDuty(mid) {
+        if (!confirm('Remove all bazar dates for this member?')) return;
+        try {
+            const now = new Date();
+            const month = this.mk(now);
+            const snap = await db.ref(`messes/${this.messId}/bazarDuty`).once('value');
+            const removals = [];
+            snap.forEach(s => { if (s.key.startsWith(month) && s.val() === mid) removals.push(db.ref(`messes/${this.messId}/bazarDuty/${s.key}`).remove()); });
+            await Promise.all(removals);
+            this.loadDuty(); this.toast('Dates cleared', 'success');
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
@@ -330,6 +443,14 @@ const App = {
                 if (noteSnap.val()) noteTxt = noteSnap.val();
             } catch (e) { /* ignore */ }
             document.getElementById('dash-live-count').textContent = noteTxt;
+
+            let dutyName = 'Not assigned';
+            try {
+                const dSnap = await db.ref(`messes/${this.messId}/bazarDuty/${todayKey}`).once('value');
+                const dutyMid = dSnap.val();
+                if (dutyMid && members[dutyMid] && members[dutyMid].name) dutyName = members[dutyMid].name;
+            } catch (e) { /* duty may not exist */ }
+            document.getElementById('dash-duty-name').textContent = dutyName;
 
             const bzSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(monthEnd).once('value');
             let bazTotal = 0, utilTotal = 0;
