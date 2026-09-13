@@ -425,18 +425,18 @@ const App = {
             const userName = this.currentUser?.displayName || 'User';
             const initial = ((userName.trim()[0] || 'U')).toUpperCase();
             document.getElementById('dash-mini-avatar').textContent = initial;
+            document.getElementById('dash-avatar').textContent = initial;
 
-            document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
+            const hour = now.getHours();
+            let greet = 'Good morning';
+            if (hour >= 12 && hour < 17) greet = 'Good afternoon';
+            else if (hour >= 17) greet = 'Good evening';
+            document.getElementById('dash-greeting').textContent = greet;
+            document.getElementById('dash-user-name').textContent = userName;
 
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
             const mids = Object.keys(members);
-            let managerName = '-';
-            const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
-            if (adminFound) managerName = adminFound[1].name || '-';
-            else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
-            document.getElementById('dash-manager').textContent = managerName;
-            document.getElementById('dash-month').textContent = this.fmtMonth(now);
             document.getElementById('dash-online-count').textContent = mids.length;
 
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

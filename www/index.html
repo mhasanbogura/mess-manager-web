@@ -93,40 +93,15 @@
         <main class="main-content">
             <div class="page active" id="page-dashboard">
                 <div class="adash-head">
-                    <div class="adash-brand">
-                        <img src="app-icon.png" alt="icon" class="adash-app-icon">
+                    <div class="adash-user">
+                        <div class="adash-avatar" id="dash-avatar">M</div>
                         <div>
-                            <h2>Mess Manager</h2>
+                            <h2 id="dash-greeting">Good morning</h2>
+                            <p id="dash-user-name">User</p>
                         </div>
                     </div>
                     <div class="adash-head-actions">
                         <button class="icon-btn" onclick="App.toast('PDF export coming soon', 'info')"><span class="material-icons-round">picture_as_pdf</span></button>
-                    </div>
-                </div>
-
-                <div class="adash-mess-card">
-                    <div class="adash-mess-top">
-                        <h2 id="dash-mess-name">My Mess</h2>
-                    </div>
-                    <button class="adash-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Flat ID</button>
-                    <p class="adash-flat-type">Flat Type: <span>Calculated meal rate</span></p>
-                    <div class="adash-mess-grid">
-                        <div class="adash-mess-box">
-                            <div class="adash-mess-box-top">
-                                <span class="material-icons-round">person</span>
-                                <small>Manager</small>
-                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
-                            </div>
-                            <strong id="dash-manager">-</strong>
-                        </div>
-                        <div class="adash-mess-box">
-                            <div class="adash-mess-box-top">
-                                <span class="material-icons-round">calendar_month</span>
-                                <small>Current month</small>
-                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
-                            </div>
-                            <strong id="dash-month">-</strong>
-                        </div>
                     </div>
                 </div>
 
