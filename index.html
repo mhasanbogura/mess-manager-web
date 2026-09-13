@@ -293,8 +293,44 @@
                 </div>
             </div>
             <div class="page" id="page-meals"></div>
-            <div class="page" id="page-bazaar"></div>
-            <div class="page" id="page-balance"></div>
+            <div class="page" id="page-bazaar">
+                <div class="abazar-head">
+                    <h2>Bazar List</h2>
+                    <div class="abazar-actions">
+                        <button class="abazar-action" onclick="App.toast('Receipts coming soon','info')"><span class="material-icons-round">receipt</span><small>Receipts</small></button>
+                        <button class="abazar-action" onclick="App.toast('Bazar Note coming soon','info')"><span class="material-icons-round">note</span><small>Bazar Note</small></button>
+                        <button class="abazar-action" onclick="App.toast('History coming soon','info')"><span class="material-icons-round">history</span><small>Month History</small></button>
+                        <button class="abazar-action" onclick="App.toast('Trash coming soon','info')"><span class="material-icons-round">delete</span><small>Trash</small></button>
+                    </div>
+                </div>
+                <div class="abazar-month-row"><span>Current Month:</span><strong id="abazar-month">-</strong></div>
+                <div class="abazar-filters">
+                    <div class="abazar-filter-btn"><span class="material-icons-round">filter_list</span> No Filter <span class="material-icons-round">expand_more</span></div>
+                    <div class="abazar-filter-btn"><span class="material-icons-round">arrow_downward</span> Recently ad... <span class="material-icons-round">expand_more</span></div>
+                    <button class="abazar-view-btn active"><span class="material-icons-round">calendar_month</span></button>
+                    <button class="abazar-view-btn"><span class="material-icons-round">view_list</span></button>
+                </div>
+                <div id="abazar-list"></div>
+                <button class="abazar-fab" onclick="App.showAddBazar()"><span class="material-icons-round">add</span> Add</button>
+            </div>
+            <div class="page" id="page-balance">
+                <div class="abazar-head">
+                    <h2>Manager Money</h2>
+                    <div class="abazar-actions">
+                        <button class="abazar-action" onclick="App.toast('History coming soon','info')"><span class="material-icons-round">history</span><small>Month History</small></button>
+                        <button class="abazar-action" onclick="App.toast('Trash coming soon','info')"><span class="material-icons-round">delete</span><small>Trash</small></button>
+                    </div>
+                </div>
+                <div class="abazar-month-row"><span>Current Month:</span><strong id="abalance-month">-</strong></div>
+                <div class="abazar-filters">
+                    <div class="abazar-filter-btn"><span class="material-icons-round">filter_list</span> No Filter <span class="material-icons-round">expand_more</span></div>
+                    <div class="abazar-filter-btn"><span class="material-icons-round">arrow_downward</span> Recently ad... <span class="material-icons-round">expand_more</span></div>
+                    <button class="abazar-view-btn active"><span class="material-icons-round">calendar_month</span></button>
+                    <button class="abazar-view-btn"><span class="material-icons-round">view_list</span></button>
+                </div>
+                <div id="abalance-list"></div>
+                <button class="abazar-fab" onclick="App.showAddDeposit()"><span class="material-icons-round">add</span> Add</button>
+            </div>
             <div class="page" id="page-notices">
                 <div class="anotice-head">
                     <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
@@ -310,7 +346,57 @@
                 <button class="anotice-fab" onclick="App.showNoticeModal()"><span class="material-icons-round">push_pin</span> Pin a notice</button>
             </div>
             <div class="page" id="page-monthly"></div>
-            <div class="page" id="page-profile"></div>
+            <div class="page" id="page-profile">
+                <div class="aprof-head"><h2>Profile & Settings</h2></div>
+                <div class="aprof-card">
+                    <div class="aprof-avatar" id="prof-avatar">M</div>
+                    <div class="aprof-info">
+                        <h3 id="prof-name">User</h3>
+                        <p id="prof-email">-</p>
+                        <p class="aprof-uid" id="prof-uid" onclick="App.copyUid()"><span id="prof-uid-text">-</span> <span class="material-icons-round" style="font-size:14px">content_copy</span></p>
+                    </div>
+                </div>
+                <div class="aprof-section">
+                    <div class="aprof-section-title">APP USE GUIDE</div>
+                    <div class="aprof-card">
+                        <div class="aprof-row" onclick="App.toast('Tour coming soon','info')"><span class="material-icons-round">menu_book</span><span class="aprof-label">A quick guided tour</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.toast('Guide coming soon','info')"><span class="material-icons-round">auto_stories</span><span class="aprof-label">The full illustrated guide</span><span class="material-icons-round">open_in_new</span></div>
+                    </div>
+                </div>
+                <div class="aprof-section">
+                    <div class="aprof-section-title">APPEARANCE</div>
+                    <div class="aprof-card">
+                        <div class="aprof-row"><span class="material-icons-round">brightness_6</span><span class="aprof-label">Theme</span><span class="aprof-value">Light <span class="material-icons-round" style="font-size:18px">expand_more</span></span></div>
+                        <div class="aprof-row"><span class="material-icons-round">language</span><span class="aprof-label">Language</span><span class="aprof-value">English <span class="material-icons-round" style="font-size:18px">expand_more</span></span></div>
+                        <div class="aprof-row"><span class="material-icons-round">attach_money</span><span class="aprof-label">Currency symbol</span><span class="aprof-value">Taka ৳ <span class="material-icons-round" style="font-size:18px">expand_more</span></span></div>
+                    </div>
+                </div>
+                <div class="aprof-section">
+                    <div class="aprof-section-title">MEAL REMINDERS</div>
+                    <div class="aprof-card">
+                        <p class="aprof-desc">You'll get a daily reminder to add your meals at these two times. Reminders can be rescheduled but can't be turned off.</p>
+                        <div class="aprof-row"><span class="aprof-label">First reminder</span><span class="aprof-value">8:00 PM</span></div>
+                        <div class="aprof-row"><span class="aprof-label">Second reminder</span><span class="aprof-value">10:00 PM</span></div>
+                    </div>
+                </div>
+                <div class="aprof-section">
+                    <div class="aprof-section-title">MORE</div>
+                    <div class="aprof-card">
+                        <div class="aprof-row" onclick="App.toast('About coming soon','info')"><span class="material-icons-round">info</span><span class="aprof-label">About us</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.toast('What\'s New coming soon','info')"><span class="material-icons-round">campaign</span><span class="aprof-label">What's New</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.shareMessCode()"><span class="material-icons-round">share</span><span class="aprof-label">Share app</span><span class="material-icons-round">chevron_right</span></div>
+                    </div>
+                </div>
+                <div class="aprof-section">
+                    <div class="aprof-section-title">ACCOUNT</div>
+                    <div class="aprof-card">
+                        <div class="aprof-row" onclick="App.toast('Profile picture coming soon','info')"><span class="material-icons-round">person</span><span class="aprof-label">Profile picture</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.sendResetFromProfile()"><span class="material-icons-round">lock_reset</span><span class="aprof-label">Reset password</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.signOut()"><span class="material-icons-round">logout</span><span class="aprof-label">Log out</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row danger" onclick="App.toast('Delete account coming soon','info')"><span class="material-icons-round">delete_forever</span><span class="aprof-label">Delete account</span><span class="material-icons-round">chevron_right</span></div>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 

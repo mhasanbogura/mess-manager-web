@@ -228,10 +228,16 @@ const App = {
         const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Bazar Today' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
+        document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
+        document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
+        document.getElementById('app-screen').classList.toggle('on-profile', page === 'profile');
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
         if (page === 'members') this.loadFlat();
+        if (page === 'bazaar') this.loadBazarList();
+        if (page === 'balance') this.loadManagerMoney();
+        if (page === 'profile') this.loadProfile();
     },
 
     async loadNotices() {
@@ -719,7 +725,170 @@ const App = {
         } catch (e) { console.error('loadDashboard error:', e); }
     },
 
+    async loadBazarList() {
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        document.getElementById('abazar-month').textContent = month;
+        const div = document.getElementById('abazar-list');
+        div.innerHTML = '<p class="empty-state">Loading...</p>';
+        try {
+            const [bazarSnap, membersSnap] = await Promise.all([
+                db.ref(`messes/${this.messId}/bazarItems`).orderByChild('date').once('value'),
+                db.ref(`messes/${this.messId}/members`).once('value')
+            ]);
+            const members = membersSnap.val() || {};
+            const allItems = bazarSnap.val() || {};
+            const filtered = Object.entries(allItems)
+                .filter(([, v]) => v.date && v.date.startsWith(month))
+                .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
+            if (!filtered.length) { div.innerHTML = '<p class="empty-state">No bazar items this month</p>'; return; }
+            const grouped = {};
+            filtered.forEach(([k, v]) => {
+                const day = v.date.slice(0, 10);
+                (grouped[day] = grouped[day] || []).push({ key: k, ...v });
+            });
+            let html = '';
+            Object.entries(grouped).forEach(([day, items]) => {
+                const d = new Date(day + 'T00:00:00');
+                const dayTotal = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
+                const expanded = day === Object.keys(grouped)[0];
+                html += `<div class="abazar-day-card">
+                    <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
+                        <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${items.length} item${items.length>1?'s':''}</p></div>
+                        <span class="abazar-day-total">৳${this.fmtNum(dayTotal)}</span>
+                        <span class="material-icons-round">expand_more</span>
+                    </div>
+                    <div class="abazar-day-items" style="${expanded?'':'display:none'}">
+                        <div class="abazar-day-items-head"><span>ITEM</span><span>MONEY FROM</span><span>COST</span></div>
+                        ${items.map(i => `<div class="abazar-item-row">
+                            <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
+                            <span class="abazar-item-buyer">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
+                            <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)}</span>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        } catch (e) { console.error('loadBazarList error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
+    },
+
+    async loadManagerMoney() {
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        document.getElementById('abalance-month').textContent = month;
+        const div = document.getElementById('abalance-list');
+        div.innerHTML = '<p class="empty-state">Loading...</p>';
+        try {
+            const [depSnap, membersSnap] = await Promise.all([
+                db.ref(`messes/${this.messId}/deposits`).orderByChild('date').once('value'),
+                db.ref(`messes/${this.messId}/members`).once('value')
+            ]);
+            const members = membersSnap.val() || {};
+            const allDeps = depSnap.val() || {};
+            const filtered = Object.entries(allDeps)
+                .filter(([, v]) => v.date && v.date.startsWith(month))
+                .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
+            if (!filtered.length) { div.innerHTML = '<p class="empty-state">No deposits this month</p>'; return; }
+            const grouped = {};
+            filtered.forEach(([k, v]) => {
+                const day = v.date.slice(0, 10);
+                (grouped[day] = grouped[day] || []).push({ key: k, ...v });
+            });
+            let html = '';
+            Object.entries(grouped).forEach(([day, deps]) => {
+                const d = new Date(day + 'T00:00:00');
+                const dayTotal = deps.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+                const expanded = day === Object.keys(grouped)[0];
+                html += `<div class="abazar-day-card">
+                    <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
+                        <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${deps.length} entr${deps.length>1?'ies':'y'} &middot; Total: ৳${this.fmtNum(dayTotal)}</p></div>
+                        <span class="material-icons-round">expand_more</span>
+                    </div>
+                    <div class="abazar-day-items" style="${expanded?'':'display:none'}">
+                        <div class="abazar-day-items-head"><span>MONEY OF</span><span></span><span>AMOUNT</span></div>
+                        ${deps.map(i => `<div class="abazar-item-row">
+                            <span class="abazar-item-name">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
+                            <span></span>
+                            <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)}</span>
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        } catch (e) { console.error('loadManagerMoney error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
+    },
+
+    toggleDayCard(head) {
+        head.classList.toggle('expanded');
+        const items = head.nextElementSibling;
+        if (items) items.style.display = items.style.display === 'none' ? '' : 'none';
+    },
+
+    async showAddBazar() {
+        if (!this.messId) return;
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const opts = Object.entries(members).map(([, v]) => `<option value="${this.esc(v.name)}">${this.esc(v.name)}</option>`).join('');
+        document.getElementById('modal-title').textContent = 'Add Bazar Item';
+        document.getElementById('modal-body').innerHTML = `
+            <label class="am-label">Item name</label><input class="am-input" id="bz-name" placeholder="e.g. Rice, Oil">
+            <label class="am-label">Cost (৳)</label><input class="am-input" id="bz-cost" type="number" placeholder="0">
+            <label class="am-label">Money from</label><select class="am-input" id="bz-member"><option value="">-- select --</option>${opts}</select>`;
+        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.saveBazarItem()">Save</button>`;
+        this.openModal();
+    },
+
+    async saveBazarItem() {
+        const name = document.getElementById('bz-name')?.value?.trim();
+        const cost = parseFloat(document.getElementById('bz-cost')?.value) || 0;
+        const memberName = document.getElementById('bz-member')?.value;
+        if (!name || !cost || !memberName) { this.toast('Fill all fields', 'error'); return; }
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        let memberId = '';
+        Object.entries(members).forEach(([, v]) => { if (v.name === memberName) memberId = v.name; });
+        const now = new Date();
+        await db.ref(`messes/${this.messId}/bazarItems`).push({ name, cost, memberId: memberName, date: this.mk(now) + '-' + String(now.getDate()).padStart(2,'0'), createdAt: Date.now() });
+        this.closeModal(); this.loadBazarList(); this.toast('Bazar item added!', 'success');
+    },
+
+    async showAddDeposit() {
+        if (!this.messId) return;
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const opts = Object.entries(members).map(([, v]) => `<option value="${this.esc(v.name)}">${this.esc(v.name)}</option>`).join('');
+        document.getElementById('modal-title').textContent = 'Add Deposit';
+        document.getElementById('modal-body').innerHTML = `
+            <label class="am-label">Deposited by</label><select class="am-input" id="dep-member"><option value="">-- select --</option>${opts}</select>
+            <label class="am-label">Amount (৳)</label><input class="am-input" id="dep-amount" type="number" placeholder="0">`;
+        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.saveDeposit()">Save</button>`;
+        this.openModal();
+    },
+
+    async saveDeposit() {
+        const memberName = document.getElementById('dep-member')?.value;
+        const amount = parseFloat(document.getElementById('dep-amount')?.value) || 0;
+        if (!memberName || !amount) { this.toast('Fill all fields', 'error'); return; }
+        const now = new Date();
+        await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this.mk(now) + '-' + String(now.getDate()).padStart(2,'0'), createdAt: Date.now() });
+        this.closeModal(); this.loadManagerMoney(); this.toast('Deposit added!', 'success');
+    },
+
+    async loadProfile() {
+        if (!this.currentUser) return;
+        const u = this.currentUser;
+        document.getElementById('prof-avatar').textContent = (u.displayName || 'U').charAt(0).toUpperCase();
+        document.getElementById('prof-name').textContent = u.displayName || 'User';
+        document.getElementById('prof-email').textContent = u.email || '-';
+        document.getElementById('prof-uid-text').textContent = u.uid ? u.uid.slice(0, 12) + '...' : '-';
+    },
+
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
+    copyUid() { if (this.currentUser) navigator.clipboard.writeText(this.currentUser.uid).then(() => this.toast('UID copied!', 'info')); },
+    shareMessCode() { if (this.messCode) navigator.share?.({ title: 'Mess Manager', text: `Join my mess: ${this.messCode}` }).catch(() => {}); },
+    sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
     signOut() { auth.signOut(); },
     openModal() { document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },

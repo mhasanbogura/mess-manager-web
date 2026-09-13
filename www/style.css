@@ -1574,6 +1574,116 @@ select.input-sm { cursor: pointer; }
     .adash-table-wrap { margin: 0 10px; border-radius: 0 0 12px 12px; }
 }
 
+/* ==================== BAZAR LIST & MANAGER MONEY ==================== */
+.abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 8px; }
+.abazar-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.abazar-actions { display: flex; gap: 4px; }
+.abazar-action {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: none; border: none; cursor: pointer; padding: 4px 6px;
+    font-family: inherit; color: #333;
+}
+.abazar-action .material-icons-round { font-size: 22px; color: #222; }
+.abazar-action small { font-size: 10px; color: #555; }
+.abazar-month-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 16px; border-bottom: 1px solid #e0ddd5;
+}
+.abazar-month-row span { font-size: 14px; color: #555; }
+.abazar-month-row strong { font-size: 16px; color: #E53935; font-weight: 700; }
+.abazar-filters { display: flex; align-items: center; gap: 8px; padding: 10px 12px; flex-wrap: wrap; }
+.abazar-filter-btn {
+    display: flex; align-items: center; gap: 4px; background: #fff;
+    border: 1px solid #ccc; border-radius: 20px; padding: 6px 12px;
+    font-size: 13px; color: #555; cursor: pointer; font-family: inherit;
+}
+.abazar-filter-btn .material-icons-round { font-size: 16px; }
+.abazar-view-btn {
+    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #ccc;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #555;
+}
+.abazar-view-btn.active { background: #FFC107; border-color: #FFC107; color: #222; }
+.abazar-view-btn .material-icons-round { font-size: 20px; }
+
+.abazar-day-card {
+    background: #fff; border: 1px solid #E7E2D5; border-radius: 14px;
+    margin: 0 12px 10px; overflow: hidden;
+}
+.abazar-day-head {
+    display: flex; align-items: center; padding: 14px; cursor: pointer;
+}
+.abazar-day-info { flex: 1; min-width: 0; }
+.abazar-day-info h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; }
+.abazar-day-info p { font-size: 13px; color: #777; margin-top: 2px; }
+.abazar-day-total { font-size: 16px; font-weight: 700; color: #E53935; margin-right: 8px; }
+.abazar-day-edit { color: #FFC107; font-size: 13px; font-weight: 600; margin-right: 8px; }
+.abazar-day-head .material-icons-round { color: #999; font-size: 24px; transition: transform .2s; }
+.abazar-day-head.expanded .material-icons-round { transform: rotate(180deg); }
+
+.abazar-day-items { border-top: 1px solid #f0ede5; }
+.abazar-day-items-head {
+    display: grid; grid-template-columns: 1fr 1fr auto;
+    padding: 8px 14px; font-size: 11px; color: #999; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .5px;
+}
+.abazar-item-row {
+    display: grid; grid-template-columns: 1fr 1fr auto;
+    padding: 10px 14px; align-items: center; border-top: 1px solid #f0ede5;
+    cursor: pointer;
+}
+.abazar-item-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.abazar-item-buyer { font-size: 14px; color: #555; }
+.abazar-item-cost { font-size: 15px; font-weight: 600; color: #E53935; display: flex; align-items: center; gap: 4px; }
+.abazar-item-cost .material-icons-round { font-size: 18px; color: #ccc; }
+
+.abazar-fab {
+    position: fixed; bottom: 80px; right: 16px;
+    background: #E53935; color: #fff; border: none; border-radius: 16px;
+    padding: 14px 22px; font-size: 16px; font-weight: 700;
+    display: flex; align-items: center; gap: 6px; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(229,57,53,.4); font-family: inherit; z-index: 20;
+}
+.abazar-fab .material-icons-round { font-size: 22px; }
+
+/* ==================== PROFILE & SETTINGS ==================== */
+.aprof-head { padding: 14px 16px 10px; }
+.aprof-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.aprof-card {
+    background: #fff; border: 1px solid #E7E2D5; border-radius: 14px;
+    margin: 0 12px 4px; overflow: hidden;
+}
+.aprof-card:first-of-type {
+    display: flex; align-items: center; gap: 14px; padding: 16px; margin-top: 8px;
+}
+.aprof-avatar {
+    width: 56px; height: 56px; border-radius: 50%; background: #3a3a3a; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 700; flex-shrink: 0;
+    font-family: 'Inter', sans-serif;
+}
+.aprof-info { flex: 1; min-width: 0; }
+.aprof-info h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; }
+.aprof-info p { font-size: 13px; color: #777; }
+.aprof-uid { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.aprof-section { margin-top: 14px; }
+.aprof-section-title { font-size: 12px; font-weight: 600; color: #999; padding: 0 16px; margin-bottom: 6px; letter-spacing: .5px; }
+.aprof-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px; border-top: 1px solid #f0ede5; cursor: pointer;
+}
+.aprof-row:first-child { border-top: none; }
+.aprof-row .material-icons-round:first-child { font-size: 22px; color: #555; flex-shrink: 0; }
+.aprof-label { flex: 1; font-size: 15px; color: #1a1a1a; }
+.aprof-value { font-size: 14px; color: #777; display: flex; align-items: center; gap: 2px; }
+.aprof-row .material-icons-round:last-child { font-size: 20px; color: #ccc; }
+.aprof-desc { font-size: 13px; color: #777; padding: 14px 14px 0; line-height: 1.5; }
+.aprof-row.danger .aprof-label { color: #E53935; }
+.aprof-row.danger .material-icons-round:first-child { color: #E53935; }
+
+#app-screen.on-bazaar .topbar, #app-screen.on-balance .topbar, #app-screen.on-profile .topbar { display: none; }
+#app-screen.on-bazaar .main-content, #app-screen.on-balance .main-content, #app-screen.on-profile .main-content { margin-top: 0; padding: 0 0 72px; }
+
 /* ==================== ANDROID NOTICE BOARD ==================== */
 #app-screen.on-notices .topbar { display: none; }
 #app-screen.on-notices .main-content { margin-top: 0; padding: 0 0 72px; }
