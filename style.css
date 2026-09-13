@@ -1707,3 +1707,52 @@ select.input-sm { cursor: pointer; }
     .aduty-chip { font-size: 15px; padding: 7px 13px; }
     .aduty-member-top strong { font-size: 18px; }
 }
+
+/* ==================== MOBILE VIEW SUPPORT (all pages) ==================== */
+html, body { overflow-x: hidden; }
+button { touch-action: manipulation; }
+img, canvas { max-width: 100%; }
+
+@media (max-width: 480px) {
+    /* prevent iOS auto-zoom on input focus */
+    .form-group input, .form-group select, .form-group textarea,
+    .input-group input, .flat-add-row input { font-size: 16px; }
+    .auth-container { padding: 24px 16px; }
+    /* dashboard */
+    .adash-head { padding: 12px 12px 14px; }
+    .adash-mess-card { margin: 10px 10px 0; padding: 16px 14px; border-radius: 20px; }
+    .adash-notice, .adash-today, .adash-finance { margin-left: 10px; margin-right: 10px; }
+    .adash-today-top { flex-wrap: wrap; gap: 6px; }
+    .adash-table-wrap { margin: 0 10px; }
+    .adash-stats-head { padding-left: 12px; padding-right: 12px; }
+    /* notices */
+    .anotice-head { padding: 14px 12px 16px; gap: 14px; }
+    .anotice-board { padding: 16px 12px; }
+    .anotice-empty { padding: 70px 20px 30px; }
+    .anotice-fab { bottom: 86px; right: 12px; padding: 14px 20px; font-size: 18px; }
+    /* duty */
+    .aduty-head { padding: 14px 12px 16px; gap: 14px; }
+    .aduty-banner, .aduty-card, .aduty-member { margin-left: 10px; margin-right: 10px; }
+    /* bottom nav fits narrow screens */
+    .bottom-nav-items { width: 100%; }
+    .bottom-nav-item { min-width: 0; flex: 1; font-size: 9px; padding: 4px 2px; }
+    .bottom-nav-item .material-icons-round { font-size: 20px; }
+}
+
+@media (max-width: 360px) {
+    .adash-head { gap: 4px; padding: 12px 10px 14px; }
+    .adash-user { gap: 8px; }
+    .adash-user h2 { font-size: 17px; }
+    .adash-user p { font-size: 13px; }
+    .adash-head-actions .material-icons-round { font-size: 22px; }
+    .adash-mess-top { flex-wrap: wrap; gap: 6px; }
+    .adash-duo { grid-template-columns: 1fr; }
+    .adash-today-top > strong { font-size: 13px; }
+    .adash-fin-box strong { font-size: 15px; }
+    .anotice-head h2, .aduty-head h2 { font-size: 21px; }
+    .anotice-empty h3 { font-size: 22px; }
+    .anotice-empty p { font-size: 16px; }
+    .anotice-fab { font-size: 16px; padding: 12px 18px; }
+    .bottom-nav-item { font-size: 8px; }
+    .bottom-nav-item .material-icons-round { font-size: 18px; }
+}
