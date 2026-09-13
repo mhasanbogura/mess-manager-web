@@ -1764,3 +1764,91 @@ img, canvas { max-width: 100%; }
 #app-screen { flex-direction: column; }
 #app-screen > .main-content { min-width: 0; width: 100%; }
 .adash-table-wrap, .dash-table-wrap { min-width: 0; }
+
+/* ==================== ANDROID COMPACT MATCH ==================== */
+/* Brand header */
+.adash-head { padding: 10px 12px; gap: 6px; }
+.adash-brand { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+.adash-logo {
+    width: 42px; height: 42px; flex-shrink: 0; margin: 4px;
+    background: #fff; border: 2px solid #1a7f37; border-radius: 12px;
+    transform: rotate(45deg); display: flex; align-items: center; justify-content: center;
+}
+.adash-logo .material-icons-round { transform: rotate(-45deg); font-size: 22px; color: #1a1a1a; }
+.adash-brand h2 { font-size: 15px; font-weight: 800; color: #111; font-family: 'Inter', sans-serif; letter-spacing: .2px; white-space: nowrap; }
+.adash-brand p { font-size: 10px; color: #5a4a1a; letter-spacing: 2px; font-family: 'Inter', sans-serif; white-space: nowrap; }
+.adash-head-actions .material-icons-round { font-size: 26px; }
+/* Mess card: no wrapping */
+.adash-mess-box { min-width: 0; }
+.adash-mess-box-top small { white-space: nowrap; }
+.adash-mess-box strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; }
+.adash-edit { width: 34px; height: 34px; }
+/* Ad banner */
+.adash-ads {
+    margin: 14px -18px -20px; padding: 12px;
+    background: #6353DC; border-radius: 0 0 22px 22px;
+    display: flex; gap: 10px; align-items: stretch;
+}
+.adash-adfree { flex: 1; display: flex; gap: 8px; align-items: center; color: #fff; min-width: 0; }
+.adash-adfree .material-icons-round { font-size: 24px; flex-shrink: 0; }
+.adash-adfree strong { font-size: 16px; display: block; white-space: nowrap; }
+.adash-adfree p { font-size: 13px; opacity: .85; white-space: nowrap; }
+.adash-premium {
+    flex: 1.2; display: flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg, #FFC93C, #FFA800);
+    border: none; border-radius: 14px; padding: 8px 10px;
+    font-family: inherit; cursor: pointer; text-align: left; color: #3d2c00; min-width: 0;
+}
+.adash-premium strong { font-size: 15px; display: block; white-space: nowrap; }
+.adash-premium p { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adash-premium .material-icons-round { font-size: 22px; flex-shrink: 0; }
+/* Notice: single line */
+.adash-notice strong { font-size: 17px; }
+.adash-notice p { font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Today row: single line */
+.adash-today-top { flex-wrap: nowrap; gap: 6px; }
+.adash-today-top > strong { font-family: Georgia, 'Times New Roman', serif; font-size: 14px; white-space: nowrap; }
+.adash-online { font-size: 12px; gap: 4px; white-space: nowrap; flex-shrink: 0; }
+.adash-mini-avatar { width: 22px; height: 22px; font-size: 11px; }
+.adash-online .material-icons-round { font-size: 15px; }
+/* Meals: always 3 columns */
+.adash-meals { grid-template-columns: 1fr 1fr 1fr; }
+.adash-meal { min-width: 0; }
+/* Duty duo: always 2 columns */
+.adash-duo { grid-template-columns: 1fr 1fr; }
+.adash-duo-box { padding: 8px 10px; gap: 8px; min-width: 0; }
+.adash-duo-box > div { min-width: 0; flex: 1; }
+.adash-duo-box .material-icons-round { font-size: 20px; flex-shrink: 0; }
+.adash-duo-box strong { font-size: 13px; white-space: nowrap; }
+.adash-duo-box p { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Finance: always 4 in a row */
+.adash-finance { grid-template-columns: 1fr 1fr 1fr auto; }
+.adash-fin-box { padding: 6px 4px; min-width: 0; }
+.adash-fin-box small { font-size: 11px; white-space: nowrap; }
+.adash-fin-box strong { font-size: 15px; }
+.adash-analyse { grid-column: auto; font-size: 13px; padding: 6px 10px; white-space: nowrap; }
+.adash-analyse .material-icons-round { font-size: 18px; }
+
+@media (max-width: 480px) {
+    .adash-brand h2 { font-size: 13px; }
+    .adash-brand p { font-size: 9px; letter-spacing: 1.5px; }
+    .adash-logo { width: 38px; height: 38px; }
+    .adash-today-top > strong { font-size: 12.5px; }
+    .adash-online { font-size: 11px; }
+    .adash-fin-box small { font-size: 10px; }
+    .adash-fin-box strong { font-size: 14px; }
+    .adash-analyse { font-size: 12px; padding: 6px 8px; }
+    .adash-mess-box strong { font-size: 14px; }
+    .adash-adfree strong { font-size: 14px; }
+    .adash-premium strong { font-size: 13px; }
+}
+
+@media (max-width: 360px) {
+    .adash-brand h2 { font-size: 12px; letter-spacing: 0; }
+    .adash-finance { padding: 10px 8px; gap: 6px; }
+    .adash-today-top > strong { font-size: 11.5px; }
+}
+
+@media (max-width: 340px) {
+    .adash-today-top { flex-wrap: wrap; }
+}

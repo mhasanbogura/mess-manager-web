@@ -422,13 +422,8 @@ const App = {
             const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
             const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
 
-            const hour = now.getHours();
-            const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
             const userName = this.currentUser?.displayName || 'User';
-            document.getElementById('dash-greeting').textContent = greet;
-            document.getElementById('dash-user-name').textContent = userName;
             const initial = ((userName.trim()[0] || 'U')).toUpperCase();
-            document.getElementById('dash-avatar').textContent = initial;
             document.getElementById('dash-mini-avatar').textContent = initial;
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
