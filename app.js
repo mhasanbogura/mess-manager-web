@@ -14,7 +14,6 @@ const App = {
         this.bindEvents();
         this.bindBackButton();
         auth.onAuthStateChanged(user => {
-            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             if (user) {
                 this.currentUser = user;
                 this.loadMyMesses();
@@ -22,6 +21,7 @@ const App = {
                 this.currentUser = null;
                 this.messId = null;
                 this.showScreen('auth-screen');
+                if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             }
         });
     },
@@ -113,11 +113,13 @@ const App = {
 
     async loadMyMesses() {
         if (!this.currentUser) return;
+        const splash = document.getElementById('splash-screen');
         try {
             const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
             const data = snap.val() || {};
             const ids = Object.keys(data);
             if (ids.length === 1) { this.enterMess(ids[0]); return; }
+            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             if (ids.length > 1) {
                 this.showScreen('mess-select-screen');
                 const div = document.getElementById('my-messes-list');
@@ -212,6 +214,8 @@ const App = {
 
     showApp() {
         this.showScreen('app-screen');
+        const splash = document.getElementById('splash-screen');
+        if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
         try { history.pushState({ app: true }, ''); } catch (e) { /* ignore */ }
         this.navigate('dashboard');
     },
