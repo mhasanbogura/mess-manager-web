@@ -197,9 +197,69 @@ const App = {
         const bni = document.querySelector(`.bottom-nav-item[data-page="${page}"]`);
         if (bni) bni.classList.add('active');
         document.getElementById('app-screen').classList.toggle('on-dashboard', page === 'dashboard');
+        document.getElementById('app-screen').classList.toggle('on-notices', page === 'notices');
         const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         if (page === 'dashboard') this.loadDashboard();
+        if (page === 'notices') this.loadNotices();
+    },
+
+    async loadNotices() {
+        if (!this.messId) return;
+        const div = document.getElementById('notices-list');
+        try {
+            const snap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(50).once('value');
+            if (!snap.exists()) {
+                div.innerHTML = `<div class="anotice-empty">
+                    <span class="material-icons-round">push_pin</span>
+                    <h3>The board is empty</h3>
+                    <p>Pin a notice and everyone in the house gets a notification.</p>
+                </div>`;
+                return;
+            }
+            const arr = [];
+            snap.forEach(s => { arr.unshift({ key: s.key, ...s.val() }); });
+            div.innerHTML = arr.map(n => {
+                const when = n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+                return `<div class="anotice-card">
+                    <p>${this.esc(n.body || '')}</p>
+                    <div class="anotice-meta">
+                        <span>${this.esc(n.author || '')}${when ? ' · ' + when : ''}</span>
+                        <button class="anotice-del" onclick="App.deleteNotice('${n.key}')"><span class="material-icons-round">delete</span></button>
+                    </div>
+                </div>`;
+            }).join('');
+        } catch (e) { console.error('loadNotices error:', e); }
+    },
+
+    showNoticeModal() {
+        document.getElementById('modal-title').textContent = 'Pin a notice';
+        document.getElementById('modal-body').innerHTML = `
+            <div class="form-group"><label style="color:#888">Notice for the whole house</label>
+            <textarea id="notice-body" rows="4" placeholder="Write the notice here..."></textarea></div>`;
+        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button><button class="btn-modal-add" onclick="App.saveNotice()">Pin</button>`;
+        this.openModal();
+    },
+
+    async saveNotice() {
+        const body = document.getElementById('notice-body').value.trim();
+        if (!body) { this.toast('Write something first', 'error'); return; }
+        try {
+            await db.ref(`messes/${this.messId}/notices`).push({
+                body,
+                author: this.currentUser?.displayName || 'Manager',
+                createdAt: Date.now()
+            });
+            this.closeModal(); this.loadNotices(); this.toast('Notice pinned!', 'success');
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async deleteNotice(key) {
+        if (!confirm('Remove this notice?')) return;
+        try {
+            await db.ref(`messes/${this.messId}/notices/${key}`).remove();
+            this.loadNotices(); this.toast('Notice removed', 'success');
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
     dk(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
@@ -343,6 +403,7 @@ const App = {
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
     signOut() { auth.signOut(); },
+    openModal() { document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
 
     esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; },

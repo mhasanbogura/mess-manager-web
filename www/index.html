@@ -220,7 +220,20 @@
             <div class="page" id="page-meals"></div>
             <div class="page" id="page-bazaar"></div>
             <div class="page" id="page-balance"></div>
-            <div class="page" id="page-notices"></div>
+            <div class="page" id="page-notices">
+                <div class="anotice-head">
+                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Notice Board</h2>
+                </div>
+                <div class="anotice-board" id="notices-list">
+                    <div class="anotice-empty">
+                        <span class="material-icons-round">push_pin</span>
+                        <h3>The board is empty</h3>
+                        <p>Pin a notice and everyone in the house gets a notification.</p>
+                    </div>
+                </div>
+                <button class="anotice-fab" onclick="App.showNoticeModal()"><span class="material-icons-round">push_pin</span> Pin a notice</button>
+            </div>
             <div class="page" id="page-monthly"></div>
             <div class="page" id="page-profile"></div>
         </main>
