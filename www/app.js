@@ -617,7 +617,6 @@ const App = {
             document.getElementById('dash-mini-avatar').textContent = initial;
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
-            document.getElementById('dash-mess-name-right').textContent = this.messName || 'My Mess';
 
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
