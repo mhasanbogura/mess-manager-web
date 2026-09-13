@@ -1681,9 +1681,6 @@ select.input-sm { cursor: pointer; }
 .aprof-row.danger .aprof-label { color: #E53935; }
 .aprof-row.danger .material-icons-round:first-child { color: #E53935; }
 
-#app-screen.on-bazaar .topbar, #app-screen.on-balance .topbar, #app-screen.on-profile .topbar { display: none; }
-#app-screen.on-bazaar .main-content, #app-screen.on-balance .main-content, #app-screen.on-profile .main-content { margin-top: 0; padding: 0 0 72px; }
-
 /* ==================== ANDROID NOTICE BOARD ==================== */
 #app-screen.on-notices .topbar { display: none; }
 #app-screen.on-notices .main-content { margin-top: 0; padding: 0 0 72px; }
