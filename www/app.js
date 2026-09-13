@@ -664,45 +664,41 @@ const App = {
             } catch (e) { /* duty may not exist */ }
             document.getElementById('dash-duty-name').textContent = dutyName;
 
-            const bzSnap = await db.ref(`messes/${this.messId}/bazaar`).orderByChild('dateKey').startAt(month + '-01').endAt(monthEnd).once('value');
-            let bazTotal = 0, utilTotal = 0;
+            const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
+            let bazTotal = 0;
             const paidBy = {};
-            bzSnap.forEach(s => {
-                const b = s.val() || {}; const amt = b.amount || 0;
-                if ((b.category || 'Shopping') === 'Utility') utilTotal += amt;
-                else { bazTotal += amt; const n = (b.buyer || '').trim(); if (n) paidBy[n] = (paidBy[n] || 0) + amt; }
+            Object.values(bzSnap.val() || {}).forEach(b => {
+                const amt = parseFloat(b.cost) || 0;
+                bazTotal += amt;
+                const n = (b.memberId || '').trim();
+                if (n) paidBy[n] = (paidBy[n] || 0) + amt;
             });
 
             const mlMSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(monthEnd).once('value');
-            const memberMeals = {}, memberSpecial = {};
+            const memberMeals = {};
             let totalMeals = 0;
             mlMSnap.forEach(d => {
-                Object.entries(d.val() || {}).forEach(([mid, m]) => {
+                Object.entries(d.val() || {}).forEach(([memberName, m]) => {
                     const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
-                    const sp = (m.special || 0);
-                    memberMeals[mid] = (memberMeals[mid] || 0) + base;
-                    memberSpecial[mid] = (memberSpecial[mid] || 0) + sp;
-                    totalMeals += base + sp;
+                    memberMeals[memberName] = (memberMeals[memberName] || 0) + base;
+                    totalMeals += base;
                 });
             });
             const rate = totalMeals > 0 ? bazTotal / totalMeals : 0;
-            const utilShare = mids.length ? utilTotal / mids.length : 0;
 
             const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
             const depAll = depSnap.val() || {};
-            const depByMid = {}; let totalDep = 0;
-            Object.entries(depAll).forEach(([mid, v]) => {
+            const depByName = {}; let totalDep = 0;
+            Object.values(depAll).forEach(v => {
                 if (!v || typeof v !== 'object') return;
-                if (typeof v.amount === 'number') { depByMid[mid] = (depByMid[mid] || 0) + v.amount; totalDep += v.amount; return; }
-                Object.values(v).forEach(e => {
-                    if (e && typeof e.amount === 'number' && (!e.dateKey || String(e.dateKey).startsWith(month))) {
-                        depByMid[mid] = (depByMid[mid] || 0) + e.amount; totalDep += e.amount;
-                    }
-                });
+                if (typeof v.amount === 'number' && v.memberId) {
+                    depByName[v.memberId] = (depByName[v.memberId] || 0) + v.amount;
+                    totalDep += v.amount;
+                }
             });
 
             document.getElementById('dash-deposit').textContent = '৳ ' + this.fmtNum(totalDep);
-            const finBal = totalDep - utilTotal;
+            const finBal = totalDep - bazTotal;
             const balEl = document.getElementById('dash-balance');
             balEl.textContent = '৳ ' + this.fmtNum(finBal);
             balEl.className = finBal < 0 ? 'neg' : 'pos';
@@ -714,20 +710,16 @@ const App = {
             mids.forEach(mid => {
                 const m = members[mid] || {};
                 const name = m.name || 'Unknown';
-                const base = memberMeals[mid] || 0;
-                const sp = memberSpecial[mid] || 0;
-                const mealCost = base * rate, spCost = sp * rate;
-                const cost = mealCost + spCost + utilShare;
-                const paid = paidBy[name] || 0;
-                const dep = depByMid[mid] || 0;
-                const depTot = paid + dep;
-                const bal = depTot - cost;
+                const total = memberMeals[name] || 0;
+                const cost = total * rate;
+                const dep = depByName[name] || 0;
+                const bal = dep - cost;
                 html += `<tr>
                     <td class="c-name">${this.esc(name)}</td>
-                    <td><strong>${this.fmtNum(base + sp)}</strong></td>
-                    <td><strong>${this.fmtNum(cost)}</strong></td>
-                    <td><strong>${this.fmtNum(depTot)}</strong></td>
-                    <td class="${bal < 0 ? 'neg' : 'pos'}"><strong>${this.fmtNum(bal)}</strong></td>
+                    <td><strong>${this.fmtNum(total)}</strong></td>
+                    <td><strong>৳${this.fmtNum(cost)}</strong></td>
+                    <td><strong>৳${this.fmtNum(dep)}</strong></td>
+                    <td class="${bal < 0 ? 'neg' : 'pos'}"><strong>৳${this.fmtNum(bal)}</strong></td>
                 </tr>`;
             });
             rowsEl.innerHTML = html;
@@ -772,7 +764,7 @@ const App = {
                 });
             });
             const today = now.getDate();
-            let html = '<thead><tr><th class="am-col-view"><span class="ameal-row-label" style="justify-content:center"><span class="material-icons-round" style="font-size:16px">tune</span> View</span></th>';
+            let html = '<thead><tr><th class="am-col-view" colspan="2"><span class="ameal-row-label" style="justify-content:center"><span class="material-icons-round" style="font-size:16px">tune</span> View</span></th>';
             for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#FFD54F"':''}>${d}</th>`;
             html += '</tr></thead><tbody>';
             const colors = ['#43A047','#2E7D32','#1B5E20','#388E3C','#4CAF50','#66BB6A'];
