@@ -1751,6 +1751,28 @@ select.input-sm { cursor: pointer; }
 .ameal-table .ameal-row-count.zero { color: #aaa; }
 .ameal-table .ame-day-today { background: #FFF9C4 !important; }
 
+/* ==================== DEPOSIT MODAL ==================== */
+.dep-date { display: flex; align-items: center; gap: 8px; font-size: 16px; color: #333; padding: 8px 0 14px; border-bottom: 1px solid #e0ddd5; font-weight: 500; }
+.dep-date .material-icons-round { font-size: 22px; color: #555; }
+.dep-label { font-size: 15px; color: #555; margin: 16px 0 10px; }
+.dep-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.dep-chip {
+    padding: 8px 18px; border-radius: 20px; border: 1.5px solid #ccc;
+    background: #fff; font-size: 14px; font-family: inherit; color: #333;
+    cursor: pointer; transition: all .15s;
+}
+.dep-chip.active { border-color: #FFC107; background: #FFF8E1; color: #333; font-weight: 600; }
+.dep-input-wrap { display: flex; align-items: center; gap: 6px; margin-top: 18px; border-bottom: 2px solid #e0ddd5; padding: 8px 0; }
+.dep-taka { font-size: 20px; font-weight: 700; color: #333; }
+.dep-input { flex: 1; border: none; outline: none; font-size: 16px; font-family: inherit; color: #333; background: transparent; }
+.dep-input::placeholder { color: #999; }
+.dep-footer-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.dep-footer-hint { font-size: 14px; color: #888; }
+.dep-footer-total { font-size: 18px; font-weight: 700; color: #E53935; }
+.dep-footer-btns { display: flex; gap: 12px; }
+.dep-footer-btns .btn-modal-add { flex: 1; }
+.dep-footer-btns .btn-modal-cancel { flex: 1; }
+
 /* ==================== BAZAR LIST & MANAGER MONEY ==================== */
 .abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 8px; }
 .abazar-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }

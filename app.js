@@ -1103,19 +1103,49 @@ const App = {
         if (!this.messId) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const opts = Object.entries(members).map(([, v]) => `<option value="${this.esc(v.name)}">${this.esc(v.name)}</option>`).join('');
+        const mids = Object.keys(members);
+        const names = mids.map(id => members[id]?.name || 'Unknown');
+        const now = new Date();
+        const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
         document.getElementById('modal-title').textContent = 'Add Deposit';
         document.getElementById('modal-body').innerHTML = `
-            <label class="am-label">Deposited by</label><select class="am-input" id="dep-member"><option value="">-- select --</option>${opts}</select>
-            <label class="am-label">Amount (৳)</label><input class="am-input" id="dep-amount" type="number" placeholder="0">`;
-        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.saveDeposit()">Save</button>`;
+            <div class="dep-date"><span class="material-icons-round">calendar_month</span> ${dateStr}</div>
+            <div class="dep-label">Money of:</div>
+            <div class="dep-chips" id="dep-chips">
+                ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
+            </div>
+            <div class="dep-input-wrap"><span class="dep-taka">৳</span><input class="dep-input" id="dep-amount" type="number" placeholder="Enter Amount" oninput="App.depUpdateFooter()"></div>`;
+        document.getElementById('modal-footer').innerHTML = `
+            <div class="dep-footer-row">
+                <span class="dep-footer-hint">Pick whose money it is</span>
+                <span class="dep-footer-total" id="dep-footer-total">৳ 0</span>
+            </div>
+            <div class="dep-footer-btns">
+                <button class="btn-modal-add" onclick="App.saveDeposit()">Add</button>
+                <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
+            </div>`;
+        this._depSelected = null;
         this.openModal();
     },
 
+    depPick(el) {
+        document.querySelectorAll('.dep-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        this._depSelected = el.dataset.name;
+        this.depUpdateFooter();
+    },
+
+    depUpdateFooter() {
+        const amt = parseFloat(document.getElementById('dep-amount')?.value) || 0;
+        const el = document.getElementById('dep-footer-total');
+        if (el) el.textContent = '৳ ' + this.fmtNum(amt);
+    },
+
     async saveDeposit() {
-        const memberName = document.getElementById('dep-member')?.value;
+        const memberName = this._depSelected;
         const amount = parseFloat(document.getElementById('dep-amount')?.value) || 0;
-        if (!memberName || !amount) { this.toast('Fill all fields', 'error'); return; }
+        if (!memberName) { this.toast('Pick whose money it is', 'error'); return; }
+        if (!amount) { this.toast('Enter an amount', 'error'); return; }
         const now = new Date();
         await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this.mk(now) + '-' + String(now.getDate()).padStart(2,'0'), createdAt: Date.now() });
         this.closeModal(); this.loadManagerMoney(); this.toast('Deposit added!', 'success');
