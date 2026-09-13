@@ -1710,9 +1710,7 @@ select.input-sm { cursor: pointer; }
 .anotice-head .material-icons-round { font-size: 32px; }
 .anotice-head h2 { font-size: 28px; font-weight: 500; color: #111; }
 .anotice-board {
-    background:
-        repeating-linear-gradient(180deg, rgba(0,0,0,.09) 0 2px, transparent 2px 64px),
-        linear-gradient(180deg, #5d4232 0%, #4a3428 40%, #423026 100%);
+    background: #fff;
     min-height: calc(100vh - 260px);
     padding: 20px 16px;
 }
@@ -1720,9 +1718,9 @@ select.input-sm { cursor: pointer; }
     text-align: center; padding: 90px 30px 40px;
     display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
-.anotice-empty .material-icons-round { font-size: 84px; color: rgba(255,255,255,.35); margin-bottom: 14px; }
-.anotice-empty h3 { font-size: 26px; font-weight: 500; color: #f3ede2; }
-.anotice-empty p { font-size: 19px; color: #e8e0d2; line-height: 1.5; margin-top: 8px; }
+.anotice-empty .material-icons-round { font-size: 84px; color: rgba(0,0,0,.15); margin-bottom: 14px; }
+.anotice-empty h3 { font-size: 26px; font-weight: 500; color: #222; }
+.anotice-empty p { font-size: 19px; color: #666; line-height: 1.5; margin-top: 8px; }
 .anotice-card {
     background: #FFF8E7; border-radius: 6px;
     padding: 16px 16px 12px; margin-bottom: 14px;
