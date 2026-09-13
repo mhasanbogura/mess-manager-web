@@ -302,7 +302,7 @@
                         <button class="ameal-action" onclick="App.toast('Edit History coming soon','info')"><span class="material-icons-round">edit</span><small>Edit History</small></button>
                     </div>
                 </div>
-                <div class="ameal-month-row"><span>Current Month:</span><strong id="ameal-month">-</strong></div>
+                <div class="ameal-month-row" onclick="App.mealPickMonth()" style="cursor:pointer"><span>Current Month:</span><strong id="ameal-month">-</strong><span class="material-icons-round" style="font-size:18px;color:#888">expand_more</span></div>
                 <div class="ameal-grid-wrap">
                     <div class="ameal-loader" id="ameal-loader"><div class="ameal-spinner"></div></div>
                     <div class="ameal-grid-scroll" id="ameal-grid-scroll" style="display:none">
@@ -315,10 +315,6 @@
                 <div class="aam-head">
                     <button class="icon-btn" onclick="App.navigate('meals')"><span class="material-icons-round">arrow_back</span></button>
                     <h2>Add Meal</h2>
-                </div>
-                <div class="aam-tabs">
-                    <button class="aam-tab active" id="aam-tab-add">Add Meal</button>
-                    <button class="aam-tab" id="aam-tab-req" onclick="App.toast('Meal Request coming soon','info')">Meal Request</button>
                 </div>
                 <div class="aam-body">
                     <label class="aam-label">Select meal date</label>

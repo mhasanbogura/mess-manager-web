@@ -728,10 +728,29 @@ const App = {
         } catch (e) { console.error('loadDashboard error:', e); }
     },
 
+    mealPickMonth() {
+        const input = document.createElement('input');
+        input.type = 'month';
+        const now = new Date();
+        input.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+        input.addEventListener('change', () => {
+            const v = input.value;
+            if (v) {
+                const [y, m] = v.split('-').map(Number);
+                this._mealYear = y;
+                this._mealMonth = m - 1;
+                this.loadMeals();
+            }
+        });
+        input.click();
+    },
+
     async loadMeals() {
         if (!this.messId) return;
         const now = new Date();
-        const month = this.mk(now);
+        const year = this._mealYear || now.getFullYear();
+        const mon = this._mealMonth != null ? this._mealMonth : now.getMonth();
+        const month = `${year}-${String(mon + 1).padStart(2, '0')}`;
         const year = now.getFullYear();
         const mon = now.getMonth();
         const daysInMonth = new Date(year, mon + 1, 0).getDate();
