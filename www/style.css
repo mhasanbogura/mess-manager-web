@@ -1823,9 +1823,7 @@ select.input-sm { cursor: pointer; }
     width: 40px; text-align: center; font-size: 16px; font-weight: 600; color: #333;
 }
 .aam-footer {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    padding: 12px 16px; background: #fff; border-top: 1px solid #eee;
-    z-index: 20;
+    padding: 12px 16px;
 }
 #app-screen.on-addmeal .topbar { display: none; }
 #app-screen.on-addmeal .main-content { margin-top: 0; padding: 0 0 72px; }
