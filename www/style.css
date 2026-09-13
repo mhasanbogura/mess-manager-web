@@ -1756,3 +1756,11 @@ img, canvas { max-width: 100%; }
     .bottom-nav-item { font-size: 8px; }
     .bottom-nav-item .material-icons-round { font-size: 18px; }
 }
+
+/* ==================== FLEX OVERFLOW FIX ==================== */
+/* #app-screen is flex; without min-width:0 the wide stats table
+   forces .main-content (a flex item) wider than the viewport,
+   clipping every card on the right edge. */
+#app-screen { flex-direction: column; }
+#app-screen > .main-content { min-width: 0; width: 100%; }
+.adash-table-wrap, .dash-table-wrap { min-width: 0; }
