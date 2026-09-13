@@ -11,6 +11,7 @@ const App = {
             return;
         }
         try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { /* ignore */ }
+        this.handleRedirectResult();
         this.bindEvents();
         this.bindBackButton();
         auth.onAuthStateChanged(user => {
@@ -46,24 +47,25 @@ const App = {
     showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
 
     bindBackButton() {
-        // Browser back button (GitHub Pages / mobile web)
         window.addEventListener('popstate', () => {
-            if (this.messId && this.currentPage && this.currentPage !== 'dashboard') this.navigate('dashboard');
+            if (!document.getElementById('app-screen')?.classList.contains('active')) return;
+            if (this.currentPage && this.currentPage !== 'dashboard') this.navigate('dashboard');
         });
-        // Android hardware back button (Capacitor APK + Cordova)
-        const hwBack = (e) => {
+        const hwBack = () => {
             const appActive = document.getElementById('app-screen')?.classList.contains('active');
             if (appActive && this.currentPage && this.currentPage !== 'dashboard') {
-                if (e && e.preventDefault) e.preventDefault();
                 this.navigate('dashboard');
-            } else if (appActive && this.currentPage === 'dashboard' && window.Capacitor?.Plugins?.App?.exitApp) {
-                try { window.Capacitor.Plugins.App.exitApp(); } catch (err) { /* ignore */ }
+            } else if (appActive && this.currentPage === 'dashboard') {
+                this.signOut();
             }
         };
         document.addEventListener('backbutton', hwBack, false);
         try {
-            if (window.Capacitor?.Plugins?.App?.addListener) {
-                window.Capacitor.Plugins.App.addListener('backButton', () => hwBack(null));
+            if (window.Capacitor?.Plugins?.App) {
+                window.Capacitor.Plugins.App.addListener('backButton', hwBack);
+                window.Capacitor.Plugins.App.addListener('backButton', ({ url }) => {
+                    if (url && url.startsWith('https://mhasanbogura.github.io')) return;
+                });
             }
         } catch (e) { /* not running in Capacitor */ }
     },
@@ -95,13 +97,34 @@ const App = {
         const btn = document.getElementById('google-login'); const orig = btn.innerHTML;
         btn.innerHTML = '<span class="material-icons-round" style="animation:spin 1s linear infinite">refresh</span> Connecting...'; btn.disabled = true;
         try {
-            const p = new firebase.auth.GoogleAuthProvider();
-            const c = await auth.signInWithPopup(p);
-            const s = await db.ref(`users/${c.user.uid}`).once('value');
-            if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() });
+            if (window.Capacitor?.Plugins?.GoogleAuth) {
+                const result = await window.Capacitor.Plugins.GoogleAuth.signIn();
+                const credential = firebase.auth.GoogleAuthProvider.credential(result.authentication.idToken);
+                const c = await auth.signInWithCredential(credential);
+                const s = await db.ref(`users/${c.user.uid}`).once('value');
+                if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName || result.displayName, email: c.user.email || result.email, createdAt: Date.now() });
+            } else if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
+                const p = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithRedirect(p);
+            } else {
+                const p = new firebase.auth.GoogleAuthProvider();
+                const c = await auth.signInWithPopup(p);
+                const s = await db.ref(`users/${c.user.uid}`).once('value');
+                if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() });
+            }
         }
         catch (e) { let m = e.message; if (e.code === 'auth/popup-closed-by-user') m = 'Cancelled'; this.toast(m, 'error'); }
         finally { btn.innerHTML = orig; btn.disabled = false; }
+    },
+
+    async handleRedirectResult() {
+        try {
+            const result = await auth.getRedirectResult();
+            if (result && result.user) {
+                const s = await db.ref(`users/${result.user.uid}`).once('value');
+                if (!s.exists()) await db.ref(`users/${result.user.uid}`).set({ name: result.user.displayName, email: result.user.email, createdAt: Date.now() });
+            }
+        } catch (e) { /* ignore */ }
     },
 
     async sendResetEmail() {
@@ -389,7 +412,7 @@ const App = {
         }
         document.getElementById('modal-title').textContent = `Assign dates — ${name}`;
         document.getElementById('modal-body').innerHTML = `
-            <div class="aduty-legend"><span><i style="background:#43A047"></i>yours</span><span><i style="background:transparent;border:1px dashed #888"></i>taken (tap to take over)</span></div>
+            <div class="aduty-legend"><span><i style="background:#0b3d91"></i>yours</span><span><i style="background:transparent;border:1px dashed #888"></i>taken (tap to take over)</span></div>
             <div class="aduty-pick-grid">${chips}</div>`;
         document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.closeModal();App.loadDuty()">Done</button>`;
     },
@@ -786,21 +809,21 @@ const App = {
             });
             const today = now.getDate();
             let html = '<thead><tr><th class="am-col-view" colspan="2"><span class="ameal-row-label" style="justify-content:center"><span class="material-icons-round" style="font-size:16px">tune</span> View</span></th>';
-            for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#FFD54F"':''}>${d}</th>`;
+                    for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#c8ddf0"':''}>${d}</th>`;
             html += '</tr></thead><tbody>';
-            const colors = ['#43A047','#2E7D32','#1B5E20','#388E3C','#4CAF50','#66BB6A'];
+            const colors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2'];
             mids.forEach((mid, idx) => {
                 const md = memberData[mid];
                 const bg = colors[idx % colors.length];
                 html += `<tr><td rowspan="2" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${md.noonTotal + md.nightTotal})</div></td>`;
-                html += `<td class="am-col-type" style="background:#E8F5E9"><div class="ameal-row-label"><span style="font-size:14px">🍜</span><span class="ameal-row-count${md.noonTotal===0?' zero':''}">${md.noonTotal}</span><span style="color:#888;font-size:11px">Noon</span></div></td>`;
+                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍜</span><span class="ameal-row-count${md.noonTotal===0?' zero':''}">${md.noonTotal}</span><span style="color:#888;font-size:11px">Noon</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.noon[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
-                html += `<td class="am-col-type" style="background:#E3F2FD"><div class="ameal-row-label"><span style="font-size:14px">🍽</span><span class="ameal-row-count dinner${md.nightTotal===0?' zero':''}">${md.nightTotal}</span><span style="color:#888;font-size:11px">Night</span></div></td>`;
+                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍽</span><span class="ameal-row-count dinner${md.nightTotal===0?' zero':''}">${md.nightTotal}</span><span style="color:#888;font-size:11px">Night</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.night[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';

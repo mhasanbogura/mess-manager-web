@@ -405,9 +405,30 @@
                 <div class="aprof-section">
                     <div class="aprof-section-title">APPEARANCE</div>
                     <div class="aprof-card">
-                        <div class="aprof-row"><span class="material-icons-round">brightness_6</span><span class="aprof-label">Theme</span><span class="aprof-value">Light <span class="material-icons-round" style="font-size:18px">expand_more</span></span></div>
-                        <div class="aprof-row"><span class="material-icons-round">language</span><span class="aprof-label">Language</span><span class="aprof-value">English <span class="material-icons-round" style="font-size:18px">expand_more</span></span></div>
-                        <div class="aprof-row"><span class="material-icons-round">attach_money</span><span class="aprof-label">Currency symbol</span><span class="aprof-value">Taka ৳ <span class="material-icons-round" style="font-size:18px">expand_more</span></span></div>
+                        <div class="aprof-row">
+                            <span class="material-icons-round">brightness_6</span>
+                            <div class="aprof-text">
+                                <span class="aprof-label">Device Theme</span>
+                                <p class="aprof-desc-inline">Automatically switch theme based on system</p>
+                            </div>
+                            <label class="aprof-toggle"><input type="checkbox" id="prof-device-theme" onchange="App.toggleDeviceTheme(this.checked)"><span class="aprof-toggle-slider"></span></label>
+                        </div>
+                        <div class="aprof-row">
+                            <span class="material-icons-round">phone_android</span>
+                            <div class="aprof-text">
+                                <span class="aprof-label">OLED Theme</span>
+                                <p class="aprof-desc-inline">Use OLED black backdrop for eye comfort</p>
+                            </div>
+                            <label class="aprof-toggle"><input type="checkbox" id="prof-oled-theme" onchange="App.toggleOledTheme(this.checked)"><span class="aprof-toggle-slider"></span></label>
+                        </div>
+                        <div class="aprof-row">
+                            <span class="material-icons-round">language</span>
+                            <div class="aprof-text">
+                                <span class="aprof-label">Language</span>
+                                <p class="aprof-desc-inline">Choose your preferred language</p>
+                            </div>
+                            <span class="aprof-value">English <span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+                        </div>
                     </div>
                 </div>
                 <div class="aprof-section">
