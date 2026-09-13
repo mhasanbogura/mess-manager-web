@@ -41,7 +41,7 @@ html { -webkit-text-size-adjust: 100%; }
     transition: opacity 0.3s ease;
 }
 .splash-screen.hidden { opacity: 0; pointer-events: none; }
-.splash-icon { width: 120px; height: 120px; border-radius: 24px; object-fit: contain; }
+.splash-icon { width: 80px; height: 80px; border-radius: 18px; object-fit: contain; }
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
