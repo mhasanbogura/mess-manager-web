@@ -1692,7 +1692,7 @@ select.input-sm { cursor: pointer; }
 
 /* ==================== ANDROID NOTICE BOARD ==================== */
 #app-screen.on-notices .topbar { display: none; }
-#app-screen.on-notices .main-content { margin-top: 0; padding: 0 0 72px; }
+#app-screen.on-notices .main-content { margin-top: 0; padding: 0 0 72px; background: #fff; }
 #page-notices {
     font-family: Georgia, 'Times New Roman', serif;
     background: #4a3428;
