@@ -240,11 +240,13 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
         document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
         document.getElementById('app-screen').classList.toggle('on-profile', page === 'profile');
+        document.getElementById('app-screen').classList.toggle('on-addmeal', page === 'addmeal');
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
         if (page === 'members') this.loadFlat();
         if (page === 'meals') this.loadMeals();
+        if (page === 'addmeal') this.loadAddMeal();
         if (page === 'bazaar') this.loadBazarList();
         if (page === 'balance') this.loadManagerMoney();
         if (page === 'profile') this.loadProfile();
@@ -795,34 +797,103 @@ const App = {
     },
 
     async showAddMeal() {
-        if (!this.messId) return;
-        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
-        const members = snap.val() || {};
-        const opts = Object.entries(members).map(([, v]) => `<option value="${this.esc(v.name)}">${this.esc(v.name)}</option>`).join('');
-        const now = new Date();
-        const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-        let dayOpts = '';
-        for (let d = 1; d <= daysInMonth; d++) dayOpts += `<option value="${d}" ${d===now.getDate()?'selected':''}>${d}</option>`;
-        document.getElementById('modal-title').textContent = 'Add Meal';
-        document.getElementById('modal-body').innerHTML = `
-            <label class="am-label">Member</label><select class="am-input" id="meal-member"><option value="">-- select --</option>${opts}</select>
-            <label class="am-label">Day</label><select class="am-input" id="meal-day">${dayOpts}</select>
-            <label class="am-label">Lunch (Noon)</label><input class="am-input" id="meal-lunch" type="number" min="0" max="3" value="1" placeholder="0">
-            <label class="am-label">Dinner (Night)</label><input class="am-input" id="meal-dinner" type="number" min="0" max="3" value="1" placeholder="0">`;
-        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.saveMeal()">Save</button>`;
-        this.openModal();
+        this.navigate('addmeal');
     },
 
-    async saveMeal() {
-        const memberName = document.getElementById('meal-member')?.value;
-        const day = parseInt(document.getElementById('meal-day')?.value) || 1;
-        const lunch = parseInt(document.getElementById('meal-lunch')?.value) || 0;
-        const dinner = parseInt(document.getElementById('meal-dinner')?.value) || 0;
-        if (!memberName) { this.toast('Select a member', 'error'); return; }
+    async loadAddMeal() {
+        if (!this.messId) return;
         const now = new Date();
-        const dateKey = this.mk(now) + '-' + String(day).padStart(2, '0');
-        await db.ref(`messes/${this.messId}/meals/${dateKey}/${memberName}`).set({ lunch, dinner, breakfast: 0 });
-        this.closeModal(); this.loadMeals(); this.toast('Meal saved!', 'success');
+        this._aamDate = this.mk(now) + '-' + String(now.getDate()).padStart(2, '0');
+        document.getElementById('aam-date-text').textContent = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'short'})} ${now.getFullYear()}`;
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+        const colors = ['#E53935','#FF9800','#4CAF50','#2196F3','#9C27B0','#00BCD4'];
+        const div = document.getElementById('aam-member-cards');
+        this._aamData = {};
+        let html = '';
+        mids.forEach((mid, idx) => {
+            const m = members[mid] || {};
+            const name = m.name || 'Unknown';
+            const bg = colors[idx % colors.length];
+            this._aamData[name] = { breakfast: 0, lunch: 0, dinner: 0 };
+            html += `<div class="aam-card">
+                <div class="aam-card-top">
+                    <div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:20px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div>
+                    <span class="aam-name">${this.esc(name)}</span>
+                    <span class="aam-total" id="aam-total-${idx}">Total: 0</span>
+                </div>
+                <div class="aam-meals-row">
+                    <div class="aam-meal-col">
+                        <label>Breakfast</label>
+                        <div class="aam-counter">
+                            <button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button>
+                            <span class="aam-val" id="aam-bf-${idx}">0</span>
+                            <button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button>
+                        </div>
+                    </div>
+                    <div class="aam-meal-col">
+                        <label>Lunch</label>
+                        <div class="aam-counter">
+                            <button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button>
+                            <span class="aam-val" id="aam-ln-${idx}">0</span>
+                            <button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button>
+                        </div>
+                    </div>
+                    <div class="aam-meal-col">
+                        <label>Dinner</label>
+                        <div class="aam-counter">
+                            <button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button>
+                            <span class="aam-val" id="aam-dn-${idx}">0</span>
+                            <button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+        div.innerHTML = html || '<p class="empty-state">No members</p>';
+    },
+
+    aamAdjust(idx, name, field, delta) {
+        if (!this._aamData[name]) return;
+        const v = Math.max(0, (this._aamData[name][field] || 0) + delta);
+        this._aamData[name][field] = v;
+        const map = { breakfast: 'bf', lunch: 'ln', dinner: 'dn' };
+        const el = document.getElementById(`aam-${map[field]}-${idx}`);
+        if (el) el.textContent = v;
+        const total = this._aamData[name].breakfast + this._aamData[name].lunch + this._aamData[name].dinner;
+        const tel = document.getElementById(`aam-total-${idx}`);
+        if (tel) tel.textContent = `Total: ${total}`;
+    },
+
+    aamPickDate() {
+        const input = document.createElement('input');
+        input.type = 'date';
+        const d = new Date();
+        input.value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        input.addEventListener('change', () => {
+            const v = input.value;
+            if (v) {
+                this._aamDate = v;
+                const dd = new Date(v + 'T00:00:00');
+                document.getElementById('aam-date-text').textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'short'})} ${dd.getFullYear()}`;
+            }
+        });
+        input.click();
+    },
+
+    async aamSave() {
+        if (!this.messId || !this._aamData) return;
+        const dateKey = this._aamDate;
+        let saved = 0;
+        for (const [name, m] of Object.entries(this._aamData)) {
+            if (m.breakfast || m.lunch || m.dinner) {
+                await db.ref(`messes/${this.messId}/meals/${dateKey}/${name}`).set({ lunch: m.lunch, dinner: m.dinner, breakfast: m.breakfast });
+                saved++;
+            }
+        }
+        if (saved) { this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
+        else this.toast('Set at least one meal', 'error');
     },
 
     async loadBazarList() {
@@ -931,10 +1002,7 @@ const App = {
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members);
-        const names = mids.map(id => members[id]?.name || 'Unknown').sort((a, b) => a.localeCompare(b));
-        let managerName = 'Manager';
-        const adminFound = mids.find(id => members[id] && members[id].role === 'admin');
-        if (adminFound && members[adminFound].name) managerName = members[adminFound].name;
+        const names = [...new Set(mids.map(id => members[id]?.name || 'Unknown'))].sort((a, b) => a.localeCompare(b));
         const now = new Date();
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
 
@@ -961,7 +1029,7 @@ const App = {
                 <div id="bz-bazar-section">
                     <div class="bz-label">Money from:</div>
                     <div class="bz-chips" id="bz-money-chips">
-                        <button class="bz-chip" data-name="${managerName}" onclick="App.bzPickMoney(this)">${managerName}</button>
+                        <button class="bz-chip" data-name="Manager" onclick="App.bzPickMoney(this)">Manager</button>
                         ${names.map(n => `<button class="bz-chip" data-name="${n}" onclick="App.bzPickMoney(this)">${n}</button>`).join('')}
                     </div>
                     <div class="bz-label">Done by:</div>
@@ -980,7 +1048,8 @@ const App = {
                 <div id="bz-utility-section" style="display:none">
                     <div class="bz-label">Type:</div>
                     <div class="bz-chips" id="bz-type-chips">
-                        ${['Rent','Utility','Wifi','Cook'].map(t => `<button class="bz-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
+                        ${['Rent','Wi-Fi'].map(t => `<button class="bz-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
+                        <button class="bz-chip bz-chip-add" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Add suggestion</button>
                     </div>
                     <div class="bz-input-wrap" style="margin:12px 0"><span class="material-icons-round" style="color:#E53935">attach_money</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App.bzUtilAmount=this.value;App.bzRenderFooter()"></div>
                     <div class="bz-util-members">
@@ -1047,9 +1116,11 @@ const App = {
     },
 
     bzToggleAll() {
-        const cb = document.getElementById('bz-selectall-cb');
-        cb.checked = !cb.checked;
-        this.bzToggleAllCb();
+        const all = document.querySelectorAll('#bz-utility-section .bz-util-member input');
+        const allChecked = [...all].every(c => c.checked);
+        all.forEach(c => c.checked = !allChecked);
+        document.getElementById('bz-selectall-cb').checked = !allChecked;
+        this.bzUpdateUtilCount();
     },
 
     bzToggleAllCb() {
