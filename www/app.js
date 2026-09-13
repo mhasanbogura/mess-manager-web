@@ -2,13 +2,13 @@ const App = {
     currentUser: null, messId: null, messCode: null, messName: null,
     currentPage: 'dashboard', userRole: 'member',
 
-    init() {
+    async init() {
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
             return;
         }
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { /* ignore */ }
         this.bindEvents();
         this.bindBackButton();
         auth.onAuthStateChanged(user => {
