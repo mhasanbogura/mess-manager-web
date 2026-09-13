@@ -224,12 +224,14 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-dashboard', page === 'dashboard');
         document.getElementById('app-screen').classList.toggle('on-notices', page === 'notices');
         document.getElementById('app-screen').classList.toggle('on-duty', page === 'duty');
+        document.getElementById('app-screen').classList.toggle('on-members', page === 'members');
         const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Bazar Today' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
+        if (page === 'members') this.loadFlat();
     },
 
     async loadNotices() {
@@ -401,6 +403,178 @@ const App = {
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
+    // ==================== FLAT PAGE ====================
+    switchFlatTab(tab) {
+        document.querySelectorAll('.aflat-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.getElementById('flat-tab-members').style.display = tab === 'members' ? '' : 'none';
+        document.getElementById('flat-tab-peoples').style.display = tab === 'peoples' ? '' : 'none';
+        document.getElementById('flat-tab-permissions').style.display = tab === 'permissions' ? '' : 'none';
+    },
+
+    async loadFlat() {
+        if (!this.messId) return;
+        try {
+            const sSnap = await db.ref(`messes/${this.messId}/settings`).once('value');
+            const s = sSnap.val() || {};
+            document.getElementById('flat-mess-name').textContent = s.messName || 'My Mess';
+            document.getElementById('flat-mess-code').textContent = s.messCode || '------';
+
+            const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const members = mSnap.val() || {};
+            const mids = Object.keys(members);
+            let adminName = '-';
+            const admin = mids.find(id => members[id] && members[id].role === 'admin');
+            if (admin) adminName = members[admin].name || '-';
+            document.getElementById('flat-manager-name').textContent = adminName;
+
+            document.getElementById('flat-member-count').textContent = mids.length;
+            const list = document.getElementById('flat-member-list');
+            if (!mids.length) { list.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No members yet</p>'; }
+            else {
+                list.innerHTML = mids.map(id => {
+                    const m = members[id] || {};
+                    return `<div class="aflat-member-item">
+                        <span class="name">${this.esc(m.name || 'Unknown')}</span>
+                        <button class="aflat-remove" onclick="App.removeFlatMember('${id}')"><span class="material-icons-round">close</span></button>
+                    </div>`;
+                }).join('');
+            }
+
+            document.getElementById('flat-add-member-input').value = '';
+            document.getElementById('flat-name-count').textContent = '0/20';
+            document.getElementById('flat-add-member-input').oninput = function() {
+                document.getElementById('flat-name-count').textContent = this.value.length + '/20';
+            };
+
+            this.loadFlatPeoples(members);
+            this.loadFlatPermissions(members);
+        } catch (e) { console.error('loadFlat error:', e); }
+    },
+
+    async addFlatMember() {
+        const inp = document.getElementById('flat-add-member-input');
+        const name = inp.value.trim();
+        if (!name) { this.toast('Enter a name', 'error'); return; }
+        if (!/^[a-zA-Z0-9 ]+$/.test(name)) { this.toast('Letters, numbers & spaces only', 'error'); return; }
+        try {
+            const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const members = mSnap.val() || {};
+            const exists = Object.values(members).some(m => m && m.name && m.name.toLowerCase() === name.toLowerCase());
+            if (exists) { this.toast('Name already exists', 'error'); return; }
+            const tempId = 'member_' + Date.now();
+            await db.ref(`messes/${this.messId}/members/${tempId}`).set({ name, addedBy: this.currentUser.uid, addedAt: Date.now() });
+            this.toast('Member added!', 'success');
+            this.loadFlat();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async removeFlatMember(id) {
+        if (!confirm('Remove this member?')) return;
+        try {
+            await db.ref(`messes/${this.messId}/members/${id}`).remove();
+            this.toast('Member removed', 'success');
+            this.loadFlat();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async loadFlatPeoples(members) {
+        if (!this.messId) return;
+        const div = document.getElementById('flat-peoples-list');
+        try {
+            const mids = Object.keys(members);
+            const appUsers = mids.filter(id => id.startsWith('member_') === false);
+            document.getElementById('flat-peoples-count').textContent = appUsers.length;
+            if (!appUsers.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples have joined yet</p>'; return; }
+            const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
+            div.innerHTML = await Promise.all(appUsers.map(async (id, i) => {
+                const m = members[id] || {};
+                const uSnap = await db.ref(`users/${id}`).once('value');
+                const u = uSnap.val() || {};
+                const initial = ((m.name || u.name || '?')[0] || '?').toUpperCase();
+                const isAdmin = m.role === 'admin';
+                const color = colors[i % colors.length];
+                const lastSeen = u.lastSeen ? new Date(u.lastSeen) : null;
+                const isOnline = lastSeen && (Date.now() - lastSeen.getTime() < 5 * 60 * 1000);
+                const statusHtml = isOnline
+                    ? `<div class="status"><span class="dot"></span> Online now</div>`
+                    : `<div class="status offline">Last seen: ${lastSeen ? this.timeAgo(lastSeen) : 'Unknown'}</div>`;
+                return `<div class="aflat-people-item">
+                    <div class="aflat-people-avatar" style="background:${color}">${initial}</div>
+                    <div class="aflat-people-info">
+                        <h4>${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager, You)' + (id === this.currentUser.uid ? '' : '') + '</span>' : ''}</h4>
+                        ${statusHtml}
+                        <div class="email">${this.esc(u.email || '')}</div>
+                    </div>
+                    <span class="material-icons-round chevron">chevron_right</span>
+                </div>`;
+            })).join('');
+        } catch (e) { console.error('loadFlatPeoples error:', e); }
+    },
+
+    async loadFlatPermissions(members) {
+        if (!this.messId) return;
+        const div = document.getElementById('flat-permissions-list');
+        try {
+            const mids = Object.keys(members).filter(id => !id.startsWith('member_'));
+            if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
+            const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
+            const perms = pSnap.val() || {};
+            const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'specialMeal', 'togglePerms'];
+            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Bazar Entry', 'Special Meal Management', 'Turn on/off Permissions'];
+            const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
+            div.innerHTML = mids.map((id, i) => {
+                const m = members[id] || {};
+                const isAdmin = m.role === 'admin';
+                const initial = ((m.name || '?')[0] || '?').toUpperCase();
+                const color = colors[i % colors.length];
+                const userPerms = perms[id] || {};
+                const checks = permKeys.map((k, j) => {
+                    const checked = isAdmin || userPerms[k];
+                    return `<div class="aflat-perm-row">
+                        <div class="aflat-perm-check ${checked ? 'checked' : ''}" onclick="App.togglePerm('${id}','${k}',this)" ${isAdmin ? 'style="pointer-events:none;opacity:.5"' : ''}>
+                            <span class="material-icons-round">check</span>
+                        </div>
+                        <span class="aflat-perm-label">${permLabels[j]}</span>
+                    </div>`;
+                }).join('');
+                return `<div class="aflat-perm-card">
+                    <div class="aflat-perm-top">
+                        <div class="aflat-perm-avatar" style="background:${color}">${initial}</div>
+                        <div class="aflat-perm-name">${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager, You)</span>' : ''}</div>
+                    </div>
+                    <div class="aflat-perm-list">${checks}</div>
+                </div>`;
+            }).join('');
+        } catch (e) { console.error('loadFlatPermissions error:', e); }
+    },
+
+    async togglePerm(uid, key, el) {
+        if (!this.messId) return;
+        try {
+            const isChecked = el.classList.toggle('checked');
+            await db.ref(`messes/${this.messId}/permissions/${uid}/${key}`).set(isChecked);
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    timeAgo(d) {
+        const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+        if (diff < 60) return 'just now';
+        if (diff < 3600) return Math.floor(diff / 60) + ' min ago';
+        if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+        return Math.floor(diff / 86400) + ' days ago';
+    },
+
+    async editMessName() {
+        const name = prompt('Enter new mess name:', this.messName || '');
+        if (!name || !name.trim()) return;
+        try {
+            await db.ref(`messes/${this.messId}/settings/messName`).set(name.trim());
+            this.messName = name.trim();
+            document.getElementById('flat-mess-name').textContent = name.trim();
+            this.toast('Mess name updated', 'success');
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
     dk(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
     mk(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); },
     fmtMonth(d) { return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); },
@@ -425,18 +599,18 @@ const App = {
             const userName = this.currentUser?.displayName || 'User';
             const initial = ((userName.trim()[0] || 'U')).toUpperCase();
             document.getElementById('dash-mini-avatar').textContent = initial;
-            document.getElementById('dash-avatar').textContent = initial;
 
-            const hour = now.getHours();
-            let greet = 'Good morning';
-            if (hour >= 12 && hour < 17) greet = 'Good afternoon';
-            else if (hour >= 17) greet = 'Good evening';
-            document.getElementById('dash-greeting').textContent = greet;
-            document.getElementById('dash-user-name').textContent = userName;
+            document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
 
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
             const mids = Object.keys(members);
+            let managerName = '-';
+            const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
+            if (adminFound) managerName = adminFound[1].name || '-';
+            else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
+            document.getElementById('dash-manager').textContent = managerName;
+            document.getElementById('dash-month').textContent = this.fmtMonth(now);
             document.getElementById('dash-online-count').textContent = mids.length;
 
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];

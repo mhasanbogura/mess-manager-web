@@ -93,15 +93,48 @@
         <main class="main-content">
             <div class="page active" id="page-dashboard">
                 <div class="adash-head">
-                    <div class="adash-user">
-                        <div class="adash-avatar" id="dash-avatar">M</div>
+                    <div class="adash-brand">
+                        <div class="adash-logo"><span class="material-icons-round">restaurant_menu</span></div>
                         <div>
-                            <h2 id="dash-greeting">Good morning</h2>
-                            <p id="dash-user-name">User</p>
+                            <h2>BACHELORS' MEAL MANAGER</h2>
+                            <p>SPLIT THE MESS BILL, FAIRLY</p>
                         </div>
                     </div>
                     <div class="adash-head-actions">
                         <button class="icon-btn" onclick="App.toast('PDF export coming soon', 'info')"><span class="material-icons-round">picture_as_pdf</span></button>
+                        <button class="icon-btn" onclick="App.toast('Calculator coming soon', 'info')"><span class="material-icons-round">calculate</span></button>
+                        <button class="icon-btn" onclick="App.shareMessCode()"><span class="material-icons-round">share</span></button>
+                    </div>
+                </div>
+
+                <div class="adash-mess-card">
+                    <div class="adash-mess-top">
+                        <h2 id="dash-mess-name">My Mess</h2>
+                        <span class="adash-talk"><span class="material-icons-round">headset_mic</span> Talk to us</span>
+                    </div>
+                    <button class="adash-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Flat ID</button>
+                    <p class="adash-flat-type">Flat Type: <span>Calculated meal rate</span></p>
+                    <div class="adash-mess-grid">
+                        <div class="adash-mess-box">
+                            <div class="adash-mess-box-top">
+                                <span class="material-icons-round">person</span>
+                                <small>Manager</small>
+                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
+                            </div>
+                            <strong id="dash-manager">-</strong>
+                        </div>
+                        <div class="adash-mess-box">
+                            <div class="adash-mess-box-top">
+                                <span class="material-icons-round">calendar_month</span>
+                                <small>Current month</small>
+                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
+                            </div>
+                            <strong id="dash-month">-</strong>
+                        </div>
+                    </div>
+                    <div class="adash-ads">
+                        <div class="adash-adfree"><span class="material-icons-round">bolt</span><div><strong>24h Ad-free</strong><p>Watch 2 ads</p></div></div>
+                        <button class="adash-premium" onclick="App.toast('Premium coming soon', 'info')"><span class="material-icons-round">workspace_premium</span><div><strong>Buy Premium</strong><p>From ৳200 · no ads ever</p></div><span class="material-icons-round">chevron_right</span></button>
                     </div>
                 </div>
 
@@ -199,7 +232,76 @@
                 </div>
                 <div id="duty-members"></div>
             </div>
-            <div class="page" id="page-members"></div>
+            <div class="page" id="page-members">
+                <div class="aflat-head">
+                    <h2>Flat</h2>
+                    <button class="aflat-leave" onclick="App.leaveMess()"><span class="material-icons-round">logout</span> Leave</button>
+                </div>
+                <div class="aflat-card">
+                    <div class="aflat-card-top">
+                        <div class="aflat-home-icon"><span class="material-icons-round">home</span></div>
+                        <div class="aflat-card-info">
+                            <h3 id="flat-mess-name">My Mess</h3>
+                            <span class="aflat-badge"><span class="material-icons-round">calculate</span> Calculated meal rate</span>
+                        </div>
+                        <div class="aflat-card-actions">
+                            <button class="aflat-icon-btn" onclick="App.toast('Theme coming soon','info')"><span class="material-icons-round">palette</span></button>
+                            <button class="aflat-icon-btn" onclick="App.editMessName()"><span class="material-icons-round">edit</span></button>
+                        </div>
+                    </div>
+                    <div class="aflat-card-row">
+                        <div class="aflat-card-box">
+                            <div class="aflat-card-box-head"><span class="material-icons-round">vpn_key</span> Flat ID <button class="aflat-share-inline" onclick="App.shareMessCode()"><span class="material-icons-round">share</span></button></div>
+                            <strong id="flat-mess-code">------</strong>
+                        </div>
+                        <div class="aflat-card-box">
+                            <div class="aflat-card-box-head"><span class="material-icons-round">person</span> Manager <span class="material-icons-round" style="font-size:18px">chevron_right</span></div>
+                            <strong id="flat-manager-name">-</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="aflat-tabs">
+                    <button class="aflat-tab active" data-tab="members" onclick="App.switchFlatTab('members')">Members</button>
+                    <button class="aflat-tab" data-tab="peoples" onclick="App.switchFlatTab('peoples')">Peoples</button>
+                    <button class="aflat-tab" data-tab="permissions" onclick="App.switchFlatTab('permissions')">Permissions</button>
+                </div>
+                <div class="aflat-tab-content" id="flat-tab-members">
+                    <div class="aflat-info-box green">
+                        <span class="material-icons-round">restaurant</span>
+                        <p>Members are the names your meals, bazar and balances are counted against. Add everyone who eats in this flat — they do not need the app.</p>
+                    </div>
+                    <div class="aflat-add-row">
+                        <div class="aflat-input-wrap">
+                            <input type="text" id="flat-add-member-input" placeholder="Add Member" maxlength="20">
+                            <button class="aflat-clear-btn" onclick="document.getElementById('flat-add-member-input').value=''"><span class="material-icons-round">close</span></button>
+                        </div>
+                        <button class="aflat-add-btn" onclick="App.addFlatMember()">ADD</button>
+                    </div>
+                    <p class="aflat-hint">Unique name; letters, numbers & spaces only (e.g. Ziad1, Ziad2) <span id="flat-name-count">0/20</span></p>
+                    <div class="aflat-divider"></div>
+                    <p class="aflat-total">Total Flat Members: <strong id="flat-member-count">0</strong></p>
+                    <div id="flat-member-list"></div>
+                </div>
+                <div class="aflat-tab-content" id="flat-tab-peoples" style="display:none">
+                    <div class="aflat-info-box blue">
+                        <span class="material-icons-round">smartphone</span>
+                        <p>Peoples have the app and have joined this flat. Joining does not put anyone on the meal list — add them under Members for that.</p>
+                    </div>
+                    <div class="aflat-peoples-head">
+                        <p class="aflat-total">Flat Peoples <strong id="flat-peoples-count">0</strong></p>
+                        <button class="aflat-activity-btn" onclick="App.toast('Activity filter coming soon','info')"><span class="material-icons-round">bolt</span> Activity <span class="material-icons-round">expand_more</span></button>
+                    </div>
+                    <div id="flat-peoples-list"></div>
+                </div>
+                <div class="aflat-tab-content" id="flat-tab-permissions" style="display:none">
+                    <div class="aflat-info-box orange">
+                        <span class="material-icons-round">lock</span>
+                        <p>What each People is allowed to do — add meals, add bazar, manage the lists. Only Peoples appear here: a Member who has never opened the app has nothing to grant.</p>
+                    </div>
+                    <div id="flat-permissions-list"></div>
+                    <p class="aflat-perm-note"><span class="material-icons-round">info</span> The manager always has every permission, whether these are checked or not.</p>
+                </div>
+            </div>
             <div class="page" id="page-meals"></div>
             <div class="page" id="page-bazaar"></div>
             <div class="page" id="page-balance"></div>
