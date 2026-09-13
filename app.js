@@ -774,10 +774,9 @@ const App = {
         const year = this._mealYear || now.getFullYear();
         const mon = this._mealMonth != null ? this._mealMonth : now.getMonth();
         const month = `${year}-${String(mon + 1).padStart(2, '0')}`;
-        const year = now.getFullYear();
-        const mon = now.getMonth();
         const daysInMonth = new Date(year, mon + 1, 0).getDate();
-        document.getElementById('ameal-month').textContent = this.fmtMonth(now);
+        const monthLabel = `${now.toLocaleString('en-US',{month:'long'})} ${year}`;
+        document.getElementById('ameal-month').textContent = monthLabel;
         const loader = document.getElementById('ameal-loader');
         const scroll = document.getElementById('ameal-grid-scroll');
         loader.style.display = 'flex';
