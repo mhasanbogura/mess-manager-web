@@ -771,24 +771,27 @@ const App = {
                     memberData[mid].nightTotal += dinner;
                 });
             });
-            let html = '<thead><tr><th><span class="ameal-row-label"><span class="material-icons-round" style="font-size:16px">tune</span> View</span></th>';
-            for (let d = 1; d <= daysInMonth; d++) html += `<th>${d}</th>`;
+            const today = now.getDate();
+            let html = '<thead><tr><th class="am-col-view"><span class="ameal-row-label" style="justify-content:center"><span class="material-icons-round" style="font-size:16px">tune</span> View</span></th>';
+            for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#FFD54F"':''}>${d}</th>`;
             html += '</tr></thead><tbody>';
-            mids.forEach(mid => {
+            const colors = ['#43A047','#2E7D32','#1B5E20','#388E3C','#4CAF50','#66BB6A'];
+            mids.forEach((mid, idx) => {
                 const md = memberData[mid];
-                const colors = ['#43A047','#2E7D32','#1B5E20','#388E3C','#4CAF50','#66BB6A'];
-                const bg = colors[mids.indexOf(mid) % colors.length];
-                html += `<tr><td rowspan="2" style="background:${bg};vertical-align:middle;padding:8px 10px"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${md.noonTotal + md.nightTotal})</div></td>`;
-                html += `<td style="background:#E8F5E9;text-align:left;padding:4px 8px"><div class="ameal-row-label"><span style="font-size:16px">🍜</span><span class="ameal-row-count${md.noonTotal===0?' zero':''}">${md.noonTotal}</span><span style="color:#888;font-size:12px">Noon</span></div></td>`;
+                const bg = colors[idx % colors.length];
+                html += `<tr><td rowspan="2" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${md.noonTotal + md.nightTotal})</div></td>`;
+                html += `<td class="am-col-type" style="background:#E8F5E9"><div class="ameal-row-label"><span style="font-size:14px">🍜</span><span class="ameal-row-count${md.noonTotal===0?' zero':''}">${md.noonTotal}</span><span style="color:#888;font-size:11px">Noon</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.noon[d];
-                    html += `<td style="${v?'color:#333;font-weight:600':'color:#ccc'}">${v || ''}</td>`;
+                    const cls = d + 1 === today ? ' class="ame-day-today"' : '';
+                    html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
-                html += `<td style="background:#E3F2FD;text-align:left;padding:4px 8px"><div class="ameal-row-label"><span style="font-size:16px">🍽</span><span class="ameal-row-count dinner${md.nightTotal===0?' zero':''}">${md.nightTotal}</span><span style="color:#888;font-size:12px">Night</span></div></td>`;
+                html += `<td class="am-col-type" style="background:#E3F2FD"><div class="ameal-row-label"><span style="font-size:14px">🍽</span><span class="ameal-row-count dinner${md.nightTotal===0?' zero':''}">${md.nightTotal}</span><span style="color:#888;font-size:11px">Night</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.night[d];
-                    html += `<td style="${v?'color:#333;font-weight:600':'color:#ccc'}">${v || ''}</td>`;
+                    const cls = d + 1 === today ? ' class="ame-day-today"' : '';
+                    html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
                 }
                 html += '</tr>';
             });
