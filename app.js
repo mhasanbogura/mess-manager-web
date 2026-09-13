@@ -10,6 +10,7 @@ const App = {
         }
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         this.bindEvents();
+        this.bindBackButton();
         auth.onAuthStateChanged(user => {
             if (user) {
                 this.currentUser = user;
@@ -40,6 +41,29 @@ const App = {
     },
 
     showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
+
+    bindBackButton() {
+        // Browser back button (GitHub Pages / mobile web)
+        window.addEventListener('popstate', () => {
+            if (this.messId && this.currentPage && this.currentPage !== 'dashboard') this.navigate('dashboard');
+        });
+        // Android hardware back button (Capacitor APK + Cordova)
+        const hwBack = (e) => {
+            const appActive = document.getElementById('app-screen')?.classList.contains('active');
+            if (appActive && this.currentPage && this.currentPage !== 'dashboard') {
+                if (e && e.preventDefault) e.preventDefault();
+                this.navigate('dashboard');
+            } else if (appActive && this.currentPage === 'dashboard' && window.Capacitor?.Plugins?.App?.exitApp) {
+                try { window.Capacitor.Plugins.App.exitApp(); } catch (err) { /* ignore */ }
+            }
+        };
+        document.addEventListener('backbutton', hwBack, false);
+        try {
+            if (window.Capacitor?.Plugins?.App?.addListener) {
+                window.Capacitor.Plugins.App.addListener('backButton', () => hwBack(null));
+            }
+        } catch (e) { /* not running in Capacitor */ }
+    },
 
     async emailLogin() {
         const email = document.getElementById('login-email').value.trim(), pass = document.getElementById('login-password').value;
@@ -185,6 +209,7 @@ const App = {
 
     showApp() {
         this.showScreen('app-screen');
+        try { history.pushState({ app: true }, ''); } catch (e) { /* ignore */ }
         this.navigate('dashboard');
     },
 
@@ -201,6 +226,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-duty', page === 'duty');
         const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Bazar Today' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
+        if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
