@@ -308,7 +308,7 @@ const App = {
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label style="color:#888">Notice for the whole house</label>
             <textarea id="notice-body" rows="4" placeholder="Write the notice here..."></textarea></div>`;
-        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button><button class="btn-modal-add" onclick="App.saveNotice()">Pin</button>`;
+        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.saveNotice()">Pin</button>`;
         this.openModal();
     },
 
@@ -1109,7 +1109,6 @@ const App = {
             </div>
             <div class="bz-actions">
                 <button class="bz-btn-add" onclick="App.bzSave()">Add</button>
-                <button class="bz-btn-cancel" onclick="App.bzClose()">Cancel</button>
             </div>
         </div>`;
         document.body.appendChild(overlay);
@@ -1250,7 +1249,6 @@ const App = {
             </div>
             <div class="dep-footer-btns">
                 <button class="btn-modal-add" onclick="App.saveDeposit()">Add</button>
-                <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
             </div>`;
         this._depSelected = null;
         this.openModal();
