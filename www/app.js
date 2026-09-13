@@ -930,29 +930,174 @@ const App = {
         if (!this.messId) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const opts = Object.entries(members).map(([, v]) => `<option value="${this.esc(v.name)}">${this.esc(v.name)}</option>`).join('');
-        document.getElementById('modal-title').textContent = 'Add Bazar Item';
-        document.getElementById('modal-body').innerHTML = `
-            <label class="am-label">Item name</label><input class="am-input" id="bz-name" placeholder="e.g. Rice, Oil">
-            <label class="am-label">Cost (৳)</label><input class="am-input" id="bz-cost" type="number" placeholder="0">
-            <label class="am-label">Money from</label><select class="am-input" id="bz-member"><option value="">-- select --</option>${opts}</select>`;
-        document.getElementById('modal-footer').innerHTML = `<button class="btn-modal-add" onclick="App.saveBazarItem()">Save</button>`;
-        this.openModal();
+        const mids = Object.keys(members);
+        const names = mids.map(id => members[id]?.name || 'Unknown');
+        const now = new Date();
+        const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
+
+        this._bzMembers = names;
+        this._bzItems = [{ name: '', cost: '' }];
+        this._bzMoneyBy = '';
+        this._bzTab = 'bazar';
+        this._bzUtilType = '';
+        this._bzUtilAmount = '';
+        this._bzUtilSelected = names.slice();
+
+        const overlay = document.createElement('div');
+        overlay.id = 'bz-overlay';
+        overlay.className = 'bz-overlay';
+        overlay.innerHTML = `
+        <div class="bz-page">
+            <div class="bz-tabs">
+                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Bazar</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility</button>
+            </div>
+            <div class="bz-body">
+                <div class="bz-date"><span class="material-icons-round">calendar_month</span> ${dateStr}</div>
+                <div id="bz-bazar-section">
+                    <div class="bz-label">Money:</div>
+                    <div class="bz-chips" id="bz-money-chips">
+                        ${names.map(n => `<button class="bz-chip" data-name="${n}" onclick="App.bzPickMoney(this)">${n}</button>`).join('')}
+                    </div>
+                    <div id="bz-item-rows">
+                        <div class="bz-item-row">
+                            <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
+                            <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
+                        </div>
+                    </div>
+                    <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                    <p class="bz-hint">💡 Add each item on its own line. The Analysis page can then show which items cost you the most.</p>
+                </div>
+                <div id="bz-utility-section" style="display:none">
+                    <div class="bz-label">Type:</div>
+                    <div class="bz-chips" id="bz-type-chips">
+                        ${['Rent','Utility','Wifi','Cook'].map(t => `<button class="bz-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
+                    </div>
+                    <div class="bz-input-wrap" style="margin:12px 0"><span class="material-icons-round" style="color:#E53935">attach_money</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App.bzUtilAmount=this.value;App.bzRenderFooter()"></div>
+                    <div class="bz-util-members">
+                        <div class="bz-util-selectall" onclick="App.bzToggleAll()">
+                            <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
+                            <span>Select all</span>
+                            <span class="bz-util-count" id="bz-util-count">${names.length}/${names.length} selected</span>
+                        </div>
+                        ${names.map(n => `<label class="bz-util-member"><input type="checkbox" checked data-member="${n}" onchange="App.bzUpdateUtilCount()"><span>${n}</span></label>`).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="bz-footer">
+                <span id="bz-footer-left">0 items &nbsp; Pick whose money it is</span>
+                <span class="bz-footer-total" id="bz-footer-total">৳ 0</span>
+            </div>
+            <div class="bz-actions">
+                <button class="bz-btn-add" onclick="App.bzSave()">Add</button>
+                <button class="bz-btn-cancel" onclick="App.bzClose()">Cancel</button>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
     },
 
-    async saveBazarItem() {
-        const name = document.getElementById('bz-name')?.value?.trim();
-        const cost = parseFloat(document.getElementById('bz-cost')?.value) || 0;
-        const memberName = document.getElementById('bz-member')?.value;
-        if (!name || !cost || !memberName) { this.toast('Fill all fields', 'error'); return; }
-        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
-        const members = snap.val() || {};
-        let memberId = '';
-        Object.entries(members).forEach(([, v]) => { if (v.name === memberName) memberId = v.name; });
-        const now = new Date();
-        await db.ref(`messes/${this.messId}/bazarItems`).push({ name, cost, memberId: memberName, date: this.mk(now) + '-' + String(now.getDate()).padStart(2,'0'), createdAt: Date.now() });
-        this.closeModal(); this.loadBazarList(); this.toast('Bazar item added!', 'success');
+    bzSwitchTab(tab) {
+        this._bzTab = tab;
+        document.querySelectorAll('.bz-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.getElementById('bz-bazar-section').style.display = tab === 'bazar' ? '' : 'none';
+        document.getElementById('bz-utility-section').style.display = tab === 'utility' ? '' : 'none';
+        this.bzRenderFooter();
     },
+
+    bzPickMoney(el) {
+        document.querySelectorAll('#bz-money-chips .bz-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        this._bzMoneyBy = el.dataset.name;
+        this.bzRenderFooter();
+    },
+
+    bzPickType(el) {
+        document.querySelectorAll('#bz-type-chips .bz-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        this._bzUtilType = el.dataset.type;
+    },
+
+    bzUpdateItem(idx, field, val) { this._bzItems[idx][field] = val; this.bzRenderFooter(); },
+
+    bzAddItemRow() {
+        this._bzItems.push({ name: '', cost: '' });
+        const div = document.getElementById('bz-item-rows');
+        const idx = this._bzItems.length - 1;
+        const row = document.createElement('div');
+        row.className = 'bz-item-row';
+        row.innerHTML = `<div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(${idx},'name',this.value)"></div>
+            <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(${idx},'cost',this.value)"></div>`;
+        div.appendChild(row);
+    },
+
+    bzToggleAll() {
+        const cb = document.getElementById('bz-selectall-cb');
+        cb.checked = !cb.checked;
+        this.bzToggleAllCb();
+    },
+
+    bzToggleAllCb() {
+        const checked = document.getElementById('bz-selectall-cb').checked;
+        document.querySelectorAll('#bz-utility-section .bz-util-member input').forEach(c => c.checked = checked);
+        this.bzUpdateUtilCount();
+    },
+
+    bzUpdateUtilCount() {
+        const all = document.querySelectorAll('#bz-utility-section .bz-util-member input');
+        const checked = [...all].filter(c => c.checked).length;
+        document.getElementById('bz-util-count').textContent = `${checked}/${all.length} selected`;
+        this._bzUtilSelected = [...all].filter(c => c.checked).map(c => c.dataset.member);
+        this.bzRenderFooter();
+    },
+
+    bzRenderFooter() {
+        const left = document.getElementById('bz-footer-left');
+        const total = document.getElementById('bz-footer-total');
+        if (!left || !total) return;
+        if (this._bzTab === 'bazar') {
+            const items = this._bzItems.filter(i => i.name || i.cost);
+            const sum = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
+            left.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}  ${this._bzMoneyBy || 'Pick whose money it is'}`;
+            total.textContent = '৳ ' + this.fmtNum(sum);
+        } else {
+            const amt = parseFloat(this._bzUtilAmount) || 0;
+            const count = this._bzUtilSelected?.length || 0;
+            left.textContent = `Split among: ${count} Member${count !== 1 ? 's' : ''}`;
+            total.textContent = '৳ ' + this.fmtNum(amt);
+        }
+    },
+
+    async bzSave() {
+        const now = new Date();
+        const dateKey = this.mk(now) + '-' + String(now.getDate()).padStart(2, '0');
+        if (this._bzTab === 'bazar') {
+            const items = this._bzItems.filter(i => i.name && i.cost);
+            if (!items.length) { this.toast('Add at least one item', 'error'); return; }
+            if (!this._bzMoneyBy) { this.toast('Pick whose money it is', 'error'); return; }
+            for (const item of items) {
+                await db.ref(`messes/${this.messId}/bazarItems`).push({
+                    name: item.name, cost: parseFloat(item.cost) || 0,
+                    memberId: this._bzMoneyBy, date: dateKey, category: 'bazar', createdAt: Date.now()
+                });
+            }
+        } else {
+            const amt = parseFloat(this._bzUtilAmount) || 0;
+            if (!amt) { this.toast('Enter bill amount', 'error'); return; }
+            if (!this._bzUtilType) { this.toast('Pick a type', 'error'); return; }
+            const share = this._bzUtilSelected.length ? amt / this._bzUtilSelected.length : 0;
+            for (const name of this._bzUtilSelected) {
+                await db.ref(`messes/${this.messId}/bazarItems`).push({
+                    name: this._bzUtilType, cost: Math.round(share * 100) / 100,
+                    memberId: name, date: dateKey, category: 'utility', createdAt: Date.now()
+                });
+            }
+        }
+        this.bzClose();
+        this.loadBazarList();
+        this.toast('Added!', 'success');
+    },
+
+    bzClose() { const o = document.getElementById('bz-overlay'); if (o) o.remove(); },
 
     async showAddDeposit() {
         if (!this.messId) return;
