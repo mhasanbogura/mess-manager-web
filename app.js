@@ -1204,7 +1204,7 @@ const App = {
                 </div>
                 <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
                 <div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;padding:8px 12px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
-                <div class="dep-label" style="margin-top:12px">Split among:</div>
+                <div class="dep-label" style="margin-top:12px">Cost from:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
                         <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
@@ -1300,7 +1300,7 @@ const App = {
         } else {
             const amt = parseFloat(this._bzUtilAmount) || 0;
             const count = this._bzUtilSelected?.length || 0;
-            left.textContent = `Split among: ${count} Member${count !== 1 ? 's' : ''}  ৳${this.fmtNum(amt > 0 ? amt / Math.max(count, 1) : 0)} each`;
+            left.textContent = `Cost from: ${count} Member${count !== 1 ? 's' : ''}  ৳${this.fmtNum(amt > 0 ? amt / Math.max(count, 1) : 0)} each`;
             total.textContent = '৳ ' + this.fmtNum(amt);
         }
     },
