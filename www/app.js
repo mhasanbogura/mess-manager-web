@@ -746,12 +746,19 @@ const App = {
 
             const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
             const depAll = depSnap.val() || {};
-            const depByName = {}; let totalDep = 0;
+            const mealDepByName = {}; const utilDepByName = {}; let totalDep = 0; let totalMealDep = 0; let totalUtilDep = 0;
             Object.values(depAll).forEach(v => {
                 if (!v || typeof v !== 'object') return;
                 if (typeof v.amount === 'number' && v.memberId) {
-                    depByName[v.memberId] = (depByName[v.memberId] || 0) + v.amount;
                     totalDep += v.amount;
+                    const cat = v.category || 'meal';
+                    if (cat === 'utility') {
+                        utilDepByName[v.memberId] = (utilDepByName[v.memberId] || 0) + v.amount;
+                        totalUtilDep += v.amount;
+                    } else {
+                        mealDepByName[v.memberId] = (mealDepByName[v.memberId] || 0) + v.amount;
+                        totalMealDep += v.amount;
+                    }
                 }
             });
 
@@ -770,7 +777,7 @@ const App = {
                 const name = m.name || 'Unknown';
                 const total = memberMeals[name] || 0;
                 const cost = total * rate;
-                const dep = depByName[name] || 0;
+                const dep = mealDepByName[name] || 0;
                 const bal = dep - cost;
                 html += `<tr>
                     <td class="c-name">${this.esc(name)}</td>
@@ -803,7 +810,7 @@ const App = {
                 const name = m.name || 'Unknown';
                 const rent = rentByName[name] || 0;
                 const util = utilByName[name] || 0;
-                const dep = depByName[name] || 0;
+                const dep = utilDepByName[name] || 0;
                 const bal = dep - rent - util;
                 utilHtml += `<tr>
                     <td class="c-name">${this.esc(name)}</td>
@@ -1315,8 +1322,13 @@ const App = {
         const now = new Date();
         this._depDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
+        this._depCategory = 'meal';
         document.getElementById('modal-title').textContent = 'Add Deposit';
         document.getElementById('modal-body').innerHTML = `
+            <div class="bz-tabs" style="padding:0 0 12px">
+                <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+            </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span></div>
             <div class="dep-label">Money of:</div>
             <div class="dep-chips" id="dep-chips">
@@ -1333,6 +1345,11 @@ const App = {
             </div>`;
         this._depSelected = null;
         this.openModal();
+    },
+
+    depSwitchTab(tab) {
+        this._depCategory = tab;
+        document.querySelectorAll('.bz-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
     },
 
     depPick(el) {
@@ -1368,7 +1385,8 @@ const App = {
         const amount = parseFloat(document.getElementById('dep-amount')?.value) || 0;
         if (!memberName) { this.toast('Pick whose money it is', 'error'); return; }
         if (!amount) { this.toast('Enter an amount', 'error'); return; }
-        await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, createdAt: Date.now() });
+        const category = this._depCategory || 'meal';
+        await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, createdAt: Date.now() });
         this.closeModal(); this.loadManagerMoney(); this.toast('Deposit added!', 'success');
     },
 
@@ -1623,8 +1641,10 @@ const App = {
             let totalDep = 0;
             Object.values(depAll).forEach(v => {
                 if (v && typeof v.amount === 'number' && v.memberId) {
-                    depByName[v.memberId] = (depByName[v.memberId] || 0) + v.amount;
                     totalDep += v.amount;
+                    if ((v.category || 'meal') === 'meal') {
+                        depByName[v.memberId] = (depByName[v.memberId] || 0) + v.amount;
+                    }
                 }
             });
 

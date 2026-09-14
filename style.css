@@ -1288,8 +1288,8 @@ select.input-sm { cursor: pointer; }
     .page-header h3 { font-size: 17px; }
     .page-header { margin-bottom: 10px; }
 
-    .modal { max-width: 100%; margin: 0 8px; border-radius: 20px 20px 0 0; max-height: 80vh; }
-    .modal-overlay { padding: 0; }
+    .modal { max-width: 100%; margin: 0 8px; border-radius: 20px 20px 0 0; max-height: calc(80vh - env(safe-area-inset-top, 0px)); }
+    .modal-overlay { padding: 0; padding-top: env(safe-area-inset-top, 0px); }
     .modal-overlay.active { align-items: flex-end; }
     .modal-header { padding: 14px 16px; }
     .modal-body { padding: 14px 16px; }
