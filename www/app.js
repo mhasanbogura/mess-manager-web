@@ -1018,7 +1018,10 @@ const App = {
         if (!this.messId) return;
         const now = new Date();
         const month = this.mk(now);
-        document.getElementById('abazar-month').textContent = month;
+        document.getElementById('abazar-month').textContent = this.fmtMonth(now);
+        this._bazarFilter = 'all';
+        const filterBtns = document.querySelectorAll('#abazar-filters .abazar-filter-btn');
+        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
         const div = document.getElementById('abazar-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
@@ -1027,39 +1030,53 @@ const App = {
                 db.ref(`messes/${this.messId}/members`).once('value')
             ]);
             const members = membersSnap.val() || {};
-            const allItems = bazarSnap.val() || {};
-            const filtered = Object.entries(allItems)
+            this._allBazar = Object.entries(bazarSnap.val() || {})
                 .filter(([, v]) => v.date && v.date.startsWith(month))
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
-            if (!filtered.length) { div.innerHTML = '<p class="empty-state">No cost items this month</p>'; return; }
-            const grouped = {};
-            filtered.forEach(([k, v]) => {
-                const day = v.date.slice(0, 10);
-                (grouped[day] = grouped[day] || []).push({ key: k, ...v });
-            });
-            let html = '';
-            Object.entries(grouped).forEach(([day, items]) => {
-                const d = new Date(day + 'T00:00:00');
-                const dayTotal = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
-                const expanded = day === Object.keys(grouped)[0];
-                html += `<div class="abazar-day-card">
-                    <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
-                        <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${items.length} item${items.length>1?'s':''}</p></div>
-                        <span class="abazar-day-total">৳${this.fmtNum(dayTotal)}</span>
-                        <span class="material-icons-round">expand_more</span>
-                    </div>
-                    <div class="abazar-day-items" style="${expanded?'':'display:none'}">
-                        <div class="abazar-day-items-head"><span>ITEM</span><span>MONEY FROM</span><span>COST</span></div>
-                        ${items.map(i => `<div class="abazar-item-row">
-                            <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
-                            <span class="abazar-item-buyer">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
-                            <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)}</span>
-                        </div>`).join('')}
-                    </div>
-                </div>`;
-            });
-            div.innerHTML = html;
+            this._bazarMembers = members;
+            this.renderBazarList();
         } catch (e) { console.error('loadBazarList error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
+    },
+
+    filterBazar(filter) {
+        this._bazarFilter = filter;
+        document.querySelectorAll('#abazar-filters .abazar-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+        this.renderBazarList();
+    },
+
+    renderBazarList() {
+        const filter = this._bazarFilter || 'all';
+        const items = filter === 'all' ? (this._allBazar || []) : (this._allBazar || []).filter(([, v]) => (v.category || 'bazar') === filter);
+        const members = this._bazarMembers || {};
+        const div = document.getElementById('abazar-list');
+        if (!items.length) { div.innerHTML = '<p class="empty-state">No cost items this month</p>'; return; }
+        const grouped = {};
+        items.forEach(([k, v]) => {
+            const day = v.date.slice(0, 10);
+            (grouped[day] = grouped[day] || []).push({ key: k, ...v });
+        });
+        let html = '';
+        Object.entries(grouped).forEach(([day, dayItems]) => {
+            const d = new Date(day + 'T00:00:00');
+            const dayTotal = dayItems.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
+            const expanded = day === Object.keys(grouped)[0];
+            html += `<div class="abazar-day-card">
+                <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
+                    <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayItems.length} item${dayItems.length>1?'s':''}</p></div>
+                    <span class="abazar-day-total">৳${this.fmtNum(dayTotal)}</span>
+                    <span class="material-icons-round">expand_more</span>
+                </div>
+                <div class="abazar-day-items" style="${expanded?'':'display:none'}">
+                    <div class="abazar-day-items-head"><span>ITEM</span><span>MONEY FROM</span><span>COST</span></div>
+                    ${dayItems.map(i => `<div class="abazar-item-row">
+                        <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
+                        <span class="abazar-item-buyer">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
+                        <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)}</span>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+        });
+        div.innerHTML = html;
     },
 
     async loadManagerMoney() {
@@ -1342,6 +1359,10 @@ const App = {
         this._depCategory = 'meal';
         document.getElementById('modal-title').textContent = 'Add Deposit';
         document.getElementById('modal-body').innerHTML = `
+            <div class="bz-tabs" style="padding:0 0 12px">
+                <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+            </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span></div>
             <div class="dep-label">Money of:</div>
             <div class="dep-chips" id="dep-chips">
@@ -1358,6 +1379,11 @@ const App = {
             </div>`;
         this._depSelected = null;
         this.openModal();
+    },
+
+    depSwitchTab(tab) {
+        this._depCategory = tab;
+        document.querySelectorAll('#modal-body .bz-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
     },
 
     depPick(el) {
