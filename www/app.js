@@ -269,7 +269,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-bazarnote', page === 'bazarnote');
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
-        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Edits', costtrash: 'Cost Trash', deptrash: 'Manager Trash' };
+        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal Entry', bazaar: 'Cost List', balance: 'Manager Money', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile & Settings', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Edits', costtrash: 'Cost Trash', deptrash: 'Manager Trash' };
         const hideTopbar = [];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         document.querySelector('.topbar').style.display = '';
@@ -278,6 +278,8 @@ const App = {
         if (page === 'meals') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'mealhistory\')"><span class="material-icons-round">edit</span></button>';
         if (page === 'bazaar') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'costtrash\')"><span class="material-icons-round">delete</span></button>';
         if (page === 'balance') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'deptrash\')"><span class="material-icons-round">delete</span></button>';
+        if (page === 'costtrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'bazaar\')"><span class="material-icons-round">arrow_back</span></button>';
+        if (page === 'deptrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'balance\')"><span class="material-icons-round">arrow_back</span></button>';
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
         document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
@@ -296,6 +298,8 @@ const App = {
         if (page === 'menu') this.loadMenu();
         if (page === 'monthly') this.loadMonthly();
         if (page === 'mealhistory') this.loadMealHistory();
+        if (page === 'costtrash') this.loadCostTrash();
+        if (page === 'deptrash') this.loadDepTrash();
     },
 
     async loadNotices() {
@@ -928,15 +932,19 @@ const App = {
             const mealsSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-' + String(daysInMonth).padStart(2,'0')).once('value');
             const allMeals = mealsSnap.val() || {};
             const memberData = {};
+            const nameToMid = {};
             mids.forEach(mid => {
                 const m = members[mid] || {};
-                memberData[mid] = { name: m.name || 'Unknown', breakfast: new Array(daysInMonth).fill(0), lunch: new Array(daysInMonth).fill(0), dinner: new Array(daysInMonth).fill(0), breakfastTotal: 0, lunchTotal: 0, dinnerTotal: 0 };
+                const name = m.name || 'Unknown';
+                memberData[mid] = { name, breakfast: new Array(daysInMonth).fill(0), lunch: new Array(daysInMonth).fill(0), dinner: new Array(daysInMonth).fill(0), breakfastTotal: 0, lunchTotal: 0, dinnerTotal: 0 };
+                nameToMid[name] = mid;
             });
             Object.entries(allMeals).forEach(([dateKey, dayMeals]) => {
                 const day = parseInt(dateKey.slice(8, 10), 10) - 1;
                 if (day < 0 || day >= daysInMonth) return;
-                Object.entries(dayMeals || {}).forEach(([mid, m]) => {
-                    if (!memberData[mid]) return;
+                Object.entries(dayMeals || {}).forEach(([memberName, m]) => {
+                    const mid = nameToMid[memberName];
+                    if (!mid || !memberData[mid]) return;
                     const bf = m.breakfast || 0;
                     const lunch = m.lunch || 0;
                     const dinner = m.dinner || 0;
@@ -1003,11 +1011,11 @@ const App = {
             const name = m.name || 'Unknown';
             const bg = colors[idx % colors.length];
             this._aamData[name] = { breakfast: preType === 'breakfast' ? 1 : 0, lunch: preType === 'lunch' ? 1 : 0, dinner: preType === 'dinner' ? 1 : 0 };
-            cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:20px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: ${preType ? 1 : 0}</span></div><div class="aam-meals-row"><div class="aam-meal-col"><label>Breakfast</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button><span class="aam-val" id="aam-bf-${idx}">${preType === 'breakfast' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button></div></div><div class="aam-meal-col"><label>Lunch</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button><span class="aam-val" id="aam-ln-${idx}">${preType === 'lunch' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button></div></div><div class="aam-meal-col"><label>Dinner</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button><span class="aam-val" id="aam-dn-${idx}">${preType === 'dinner' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button></div></div></div></div>`;
+            cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:18px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: ${preType ? 1 : 0}</span></div><div class="aam-meals-row"><div class="aam-meal-col"><label>Breakfast</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button><span class="aam-val" id="aam-bf-${idx}">${preType === 'breakfast' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button></div></div><div class="aam-meal-col"><label>Lunch</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button><span class="aam-val" id="aam-ln-${idx}">${preType === 'lunch' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button></div></div><div class="aam-meal-col"><label>Dinner</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button><span class="aam-val" id="aam-dn-${idx}">${preType === 'dinner' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button></div></div></div></div>`;
         });
         document.getElementById('modal-title').textContent = 'Add Meal';
         document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="cursor:pointer" onclick="App.aamPickDate()"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
-        document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.aamSave()">Add</button></div>`;
+        document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.aamSave()" style="width:100%;padding:12px;border-radius:10px">Add</button></div>`;
         this.openModal();
     },
 
@@ -1109,6 +1117,108 @@ const App = {
             });
             div.innerHTML = html;
         } catch (e) { console.error('loadMealHistory error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
+    },
+
+    async loadCostTrash() {
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        const el = document.getElementById('costtrash-month');
+        if (el) el.textContent = this.fmtMonth(now);
+        const div = document.getElementById('costtrash-list');
+        div.innerHTML = '<p class="empty-state">Loading...</p>';
+        try {
+            const snap = await db.ref(`messes/${this.messId}/costTrash`).orderByChild('deletedAt').once('value');
+            const entries = Object.entries(snap.val() || {})
+                .filter(([, v]) => v.deletedAt && new Date(v.deletedAt).toISOString().startsWith(month))
+                .sort((a, b) => (b[1].deletedAt || 0) - (a[1].deletedAt || 0));
+            if (!entries.length) { div.innerHTML = '<p class="empty-state">No deleted costs this month</p>'; return; }
+            let html = '';
+            entries.forEach(([k, v]) => {
+                const d = new Date(v.deletedAt || 0);
+                const dateStr = d.toLocaleString('en', { day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = d.toLocaleString('en', { hour: 'numeric', minute: '2-digit', hour12: true });
+                const catLabel = v.category === 'utility' ? 'Utility & Others' : 'Meal';
+                const catColor = v.category === 'utility' ? '#7B1FA2' : '#0b3d91';
+                html += `<div class="amealhist-card" onclick="this.classList.toggle('expanded')">
+                    <div class="amealhist-row">
+                        <div class="amealhist-left">
+                            <span class="amealhist-name">${this.esc(v.name || '?')}</span>
+                            <span class="amealhist-dot" style="background:#D32F2F"></span>
+                            <span class="amealhist-type" style="color:#D32F2F">৳${Number(v.cost || 0).toLocaleString()}</span>
+                            <span class="amealhist-count">${catLabel}</span>
+                        </div>
+                        <div class="amealhist-right">
+                            <span class="amealhist-user">Deleted by: ${this.esc(v.deletedBy || '?')}</span>
+                            <span class="amealhist-date">${dateStr} ${timeStr}</span>
+                        </div>
+                        <span class="material-icons-round ameatlhist-chevron">expand_more</span>
+                    </div>
+                    <div class="amealhist-detail">
+                        <div class="amealhist-detail-row">
+                            <span class="amealhist-dot red"></span>
+                            <span>Deleted by: <strong>${this.esc(v.deletedBy || '?')}</strong></span>
+                            <span> · ${dateStr} ${timeStr}</span>
+                        </div>
+                        <div class="amealhist-detail-info">Cost: ৳${Number(v.cost || 0).toLocaleString()} — ${catLabel}</div>
+                        ${v.addedBy ? `<div class="amealhist-detail-info">Originally added by: ${this.esc(v.addedBy)}</div>` : ''}
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        } catch (e) { console.error('loadCostTrash error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
+    },
+
+    async loadDepTrash() {
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        const el = document.getElementById('deptrash-month');
+        if (el) el.textContent = this.fmtMonth(now);
+        const div = document.getElementById('deptrash-list');
+        div.innerHTML = '<p class="empty-state">Loading...</p>';
+        try {
+            const snap = await db.ref(`messes/${this.messId}/depTrash`).orderByChild('deletedAt').once('value');
+            const entries = Object.entries(snap.val() || {})
+                .filter(([, v]) => v.deletedAt && new Date(v.deletedAt).toISOString().startsWith(month))
+                .sort((a, b) => (b[1].deletedAt || 0) - (a[1].deletedAt || 0));
+            if (!entries.length) { div.innerHTML = '<p class="empty-state">No deleted deposits this month</p>'; return; }
+            let html = '';
+            entries.forEach(([k, v]) => {
+                const d = new Date(v.deletedAt || 0);
+                const dateStr = d.toLocaleString('en', { day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = d.toLocaleString('en', { hour: 'numeric', minute: '2-digit', hour12: true });
+                const members = this._depMembers || {};
+                const memberName = (members[v.memberId] || {}).name || v.memberId || '?';
+                const catLabel = v.category === 'utility' ? 'Utility & Others' : 'Meal';
+                const catColor = v.category === 'utility' ? '#7B1FA2' : '#0b3d91';
+                html += `<div class="amealhist-card" onclick="this.classList.toggle('expanded')">
+                    <div class="amealhist-row">
+                        <div class="amealhist-left">
+                            <span class="amealhist-name">${this.esc(memberName)}</span>
+                            <span class="amealhist-dot" style="background:#D32F2F"></span>
+                            <span class="amealhist-type" style="color:#D32F2F">৳${Number(v.amount || 0).toLocaleString()}</span>
+                            <span class="amealhist-count">${catLabel}</span>
+                        </div>
+                        <div class="amealhist-right">
+                            <span class="amealhist-user">Deleted by: ${this.esc(v.deletedBy || '?')}</span>
+                            <span class="amealhist-date">${dateStr} ${timeStr}</span>
+                        </div>
+                        <span class="material-icons-round ameatlhist-chevron">expand_more</span>
+                    </div>
+                    <div class="amealhist-detail">
+                        <div class="amealhist-detail-row">
+                            <span class="amealhist-dot red"></span>
+                            <span>Deleted by: <strong>${this.esc(v.deletedBy || '?')}</strong></span>
+                            <span> · ${dateStr} ${timeStr}</span>
+                        </div>
+                        <div class="amealhist-detail-info">Deposit: ৳${Number(v.amount || 0).toLocaleString()} — ${catLabel}</div>
+                        ${v.addedBy ? `<div class="amealhist-detail-info">Originally added by: ${this.esc(v.addedBy)}</div>` : ''}
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        } catch (e) { console.error('loadDepTrash error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
     async loadBazarList() {

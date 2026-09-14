@@ -1711,7 +1711,7 @@ select.input-sm { cursor: pointer; }
 }
 
 /* ==================== MEAL ENTRY ==================== */
-.ameal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 8px; }
+.ameal-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 4px; }
 .ameal-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
 .ameal-actions { display: flex; gap: 4px; }
 .ameal-action {
@@ -1745,7 +1745,7 @@ select.input-sm { cursor: pointer; }
 .amealhist-detail-info { font-size: 13px; color: #333; margin-top: 4px; }
 .ameal-month-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 16px; border-bottom: 1px solid #e0ddd5;
+    padding: 6px 16px; border-bottom: 1px solid #e0ddd5;
 }
 .ameal-month-row span { font-size: 14px; color: #555; }
 .ameal-month-row strong { font-size: 16px; color: #d32f2f; font-weight: 700; }
@@ -1799,9 +1799,9 @@ select.input-sm { cursor: pointer; }
 .ameal-table .ame-day-today { background: #e8f0fe !important; }
 
 /* ==================== DEPOSIT MODAL ==================== */
-.dep-date { display: flex; align-items: center; gap: 8px; font-size: 16px; color: #333; padding: 8px 0 14px; border-bottom: 1px solid #e0ddd5; font-weight: 500; }
-.dep-date .material-icons-round { font-size: 22px; color: #555; }
-.dep-label { font-size: 15px; color: #555; margin: 16px 0 10px; }
+.dep-date { display: flex; align-items: center; gap: 8px; font-size: 15px; color: #333; padding: 6px 0 10px; border-bottom: 1px solid #e0ddd5; font-weight: 500; }
+.dep-date .material-icons-round { font-size: 20px; color: #555; }
+.dep-label { font-size: 14px; color: #555; margin: 12px 0 8px; }
 .dep-chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .dep-chip {
     padding: 8px 18px; border-radius: 20px; border: 1.5px solid #ccc;
@@ -1821,62 +1821,62 @@ select.input-sm { cursor: pointer; }
 .dep-footer-btns .btn-modal-cancel { flex: 1; }
 
 /* ==================== ADD MEAL PAGE ==================== */
-.aam-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; }
-.aam-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.aam-head { display: flex; align-items: center; gap: 10px; padding: 8px 16px 4px; }
+.aam-head h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; }
 .aam-head .icon-btn { color: #333; }
-.aam-tabs { display: flex; gap: 0; padding: 0 16px 12px; }
+.aam-tabs { display: flex; gap: 0; padding: 0 16px 8px; }
 .aam-tab {
-    padding: 10px 22px; border-radius: 24px; border: 1.5px solid #ddd;
-    background: #fff; font-size: 15px; font-weight: 600; font-family: inherit;
+    padding: 8px 18px; border-radius: 20px; border: 1.5px solid #ddd;
+    background: #fff; font-size: 14px; font-weight: 600; font-family: inherit;
     color: #888; cursor: pointer; transition: all .15s;
 }
 .aam-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.aam-body { padding: 0 16px; padding-bottom: 100px; overflow-y: auto; }
-.aam-label { display: block; font-size: 13px; color: #888; margin: 14px 0 6px; font-style: italic; }
+.aam-body { padding: 0 16px; padding-bottom: 80px; overflow-y: auto; }
+.aam-label { display: block; font-size: 12px; color: #888; margin: 10px 0 4px; font-style: italic; }
 .aam-select {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 16px; border: 1px solid #e0ddd5; border-radius: 12px;
-    background: #fff; font-size: 16px; color: #333; cursor: pointer;
+    padding: 12px 14px; border: 1px solid #e0ddd5; border-radius: 12px;
+    background: #fff; font-size: 15px; color: #333; cursor: pointer;
 }
 .aam-select .material-icons-round { color: #999; font-size: 22px; }
 .aam-date-icon .material-icons-round { color: #d32f2f; font-size: 20px; margin-right: 8px; }
-.aam-section-head { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+.aam-section-head { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
 .aam-card {
-    background: #fff; border: 1px solid #dfe4ec; border-radius: 14px;
-    padding: 16px; margin: 10px 0;
+    background: #fff; border: 1px solid #dfe4ec; border-radius: 12px;
+    padding: 12px; margin: 8px 0;
 }
-.aam-card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.aam-card-top { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .aam-avatar {
-    width: 44px; height: 44px; border-radius: 50%; background: #f0f0f0;
+    width: 40px; height: 40px; border-radius: 50%; background: #f0f0f0;
     display: flex; align-items: center; justify-content: center;
     font-size: 20px; flex-shrink: 0; overflow: hidden;
 }
 .aam-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.aam-card-top .aam-name { flex: 1; font-size: 16px; font-weight: 600; color: #1a1a1a; }
-.aam-card-top .aam-req { font-size: 12px; color: #d32f2f; border: 1px solid #d32f2f; border-radius: 10px; padding: 2px 8px; }
-.aam-card-top .aam-total { font-size: 14px; color: #555; font-weight: 500; }
-.aam-meals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.aam-card-top .aam-name { flex: 1; font-size: 15px; font-weight: 600; color: #1a1a1a; }
+.aam-card-top .aam-req { font-size: 11px; color: #d32f2f; border: 1px solid #d32f2f; border-radius: 10px; padding: 2px 8px; }
+.aam-card-top .aam-total { font-size: 13px; color: #555; font-weight: 500; }
+.aam-meals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
 .aam-meal-col { text-align: center; }
-.aam-meal-col label { display: block; font-size: 12px; color: #888; margin-bottom: 6px; }
+.aam-meal-col label { display: block; font-size: 11px; color: #888; margin-bottom: 4px; }
 .aam-counter { display: flex; align-items: center; gap: 0; justify-content: center; }
 .aam-counter button {
-    width: 34px; height: 34px; border-radius: 50%; border: 1px solid #ddd;
-    background: #f5f5f5; color: #555; font-size: 18px; font-weight: 600;
+    width: 32px; height: 32px; border-radius: 50%; border: 1px solid #ddd;
+    background: #f5f5f5; color: #555; font-size: 16px; font-weight: 600;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     font-family: inherit; transition: all .15s;
 }
 .aam-counter button:active { background: #e0e0e0; }
 .aam-counter .aam-val {
-    width: 40px; text-align: center; font-size: 16px; font-weight: 600; color: #333;
+    width: 36px; text-align: center; font-size: 15px; font-weight: 600; color: #333;
 }
 .aam-footer {
-    padding: 12px 16px;
+    padding: 10px 16px;
 }
 #app-screen.on-addmeal .topbar { display: none; }
 #app-screen.on-addmeal .main-content { margin-top: 0; padding: 0 0 72px; }
 .aam-save-btn {
-    width: 100%; padding: 14px; border-radius: 12px; border: none;
-    background: var(--primary); color: #fff; font-size: 17px; font-weight: 700;
+    width: 100%; padding: 12px; border-radius: 12px; border: none;
+    background: var(--primary); color: #fff; font-size: 16px; font-weight: 700;
     cursor: pointer; font-family: inherit;
 }
 
