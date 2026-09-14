@@ -1073,16 +1073,19 @@ const App = {
                     <span class="material-icons-round">expand_more</span>
                 </div>
                 <div class="abazar-day-items" style="${expanded?'':'display:none'}">
-                    <div class="abazar-day-items-head"><span>ITEM</span><span>MONEY FROM</span><span>COST</span></div>
-                    ${dayItems.map(i => `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
+                    <div class="abazar-day-items-head"><span>ITEM</span><span>${this._bazarFilter === 'utility' ? 'COST FROM' : 'MONEY FROM'}</span><span>COST</span></div>
+                    ${dayItems.map(i => {
+                        const isUtil = (i.category || 'bazar') === 'utility';
+                        const buyerName = isUtil ? (i.splitWith || i.memberId || '-') : (members[i.memberId]||{}).name || i.memberId || '-';
+                        return `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
                         <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
-                        <span class="abazar-item-buyer">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
+                        <span class="abazar-item-buyer">${this.esc(buyerName)}</span>
                         <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                     </div>
                     <div class="abazar-item-detail" style="display:none">
                         <div class="abazar-item-detail-info">
                             <span class="abazar-detail-dot"></span>
-                            <span>Added by: <strong>${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</strong></span>
+                            <span>Added by: <strong>Manager</strong></span>
                             ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                         </div>
                         <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
@@ -1090,7 +1093,8 @@ const App = {
                             <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
                             <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
                         </div>
-                    </div>`).join('')}
+                    </div>`;
+                    }).join('')}
                 </div>
             </div>`;
         });
