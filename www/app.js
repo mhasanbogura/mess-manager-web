@@ -810,13 +810,13 @@ const App = {
                 if (day < 0 || day >= daysInMonth) return;
                 Object.entries(dayMeals || {}).forEach(([mid, m]) => {
                     if (!memberData[mid]) return;
-                    const breakfast = m.breakfast || 0;
+                    const bf = m.breakfast || 0;
                     const lunch = m.lunch || 0;
                     const dinner = m.dinner || 0;
-                    memberData[mid].breakfast[day] += breakfast;
+                    memberData[mid].breakfast[day] += bf;
                     memberData[mid].lunch[day] += lunch;
                     memberData[mid].dinner[day] += dinner;
-                    memberData[mid].breakfastTotal += breakfast;
+                    memberData[mid].breakfastTotal += bf;
                     memberData[mid].lunchTotal += lunch;
                     memberData[mid].dinnerTotal += dinner;
                 });

@@ -91,7 +91,6 @@
         <header class="topbar">
             <div class="topbar-title" id="topbar-mess-name">
                 <h2 id="page-title">Dashboard</h2>
-                <small id="topbar-mess-label" style="color:var(--text-secondary);font-size:11px">My Mess</small>
             </div>
         </header>
 
@@ -293,7 +292,14 @@
                 </div>
             </div>
             <div class="page" id="page-meals">
-
+                <div class="ameal-head">
+                    <h2>Meal Entry</h2>
+                    <div class="ameal-actions">
+                        <button class="ameal-action" onclick="App.toast('Special Meals coming soon','info')"><span class="material-icons-round">star</span><small>Special Meals</small></button>
+                        <button class="ameal-action" onclick="App.toast('Month History coming soon','info')"><span class="material-icons-round">history</span><small>Month History</small></button>
+                        <button class="ameal-action" onclick="App.toast('Edit History coming soon','info')"><span class="material-icons-round">edit</span><small>Edit History</small></button>
+                    </div>
+                </div>
                 <div class="ameal-month-row" onclick="App.mealPickMonth()" style="cursor:pointer"><span>Current Month:</span><strong id="ameal-month">-</strong><span class="material-icons-round" style="font-size:18px;color:#888">expand_more</span></div>
                 <div class="ameal-grid-wrap">
                     <div class="ameal-loader" id="ameal-loader"><div class="ameal-spinner"></div></div>
@@ -325,7 +331,15 @@
                 </div>
             </div>
             <div class="page" id="page-bazaar">
-
+                <div class="abazar-head">
+                    <h2>Bazar List</h2>
+                    <div class="abazar-actions">
+                        <button class="abazar-action" onclick="App.toast('Receipts coming soon','info')"><span class="material-icons-round">receipt</span><small>Receipts</small></button>
+                        <button class="abazar-action" onclick="App.toast('Bazar Note coming soon','info')"><span class="material-icons-round">note</span><small>Bazar Note</small></button>
+                        <button class="abazar-action" onclick="App.toast('History coming soon','info')"><span class="material-icons-round">history</span><small>Month History</small></button>
+                        <button class="abazar-action" onclick="App.toast('Trash coming soon','info')"><span class="material-icons-round">delete</span><small>Trash</small></button>
+                    </div>
+                </div>
                 <div class="abazar-month-row"><span>Current Month:</span><strong id="abazar-month">-</strong></div>
                 <div class="abazar-filters">
                     <div class="abazar-filter-btn"><span class="material-icons-round">filter_list</span> No Filter <span class="material-icons-round">expand_more</span></div>
@@ -337,7 +351,13 @@
                 <button class="abazar-fab" onclick="App.showAddBazar()"><span class="material-icons-round">add</span> Add</button>
             </div>
             <div class="page" id="page-balance">
-
+                <div class="abazar-head">
+                    <h2>Manager Money</h2>
+                    <div class="abazar-actions">
+                        <button class="abazar-action" onclick="App.toast('History coming soon','info')"><span class="material-icons-round">history</span><small>Month History</small></button>
+                        <button class="abazar-action" onclick="App.toast('Trash coming soon','info')"><span class="material-icons-round">delete</span><small>Trash</small></button>
+                    </div>
+                </div>
                 <div class="abazar-month-row"><span>Current Month:</span><strong id="abalance-month">-</strong></div>
                 <div class="abazar-filters">
                     <div class="abazar-filter-btn"><span class="material-icons-round">filter_list</span> No Filter <span class="material-icons-round">expand_more</span></div>
@@ -364,7 +384,7 @@
             </div>
             <div class="page" id="page-monthly"></div>
             <div class="page" id="page-profile">
-
+                <div class="aprof-head"><h2>Profile & Settings</h2></div>
                 <div class="aprof-card">
                     <div class="aprof-avatar" id="prof-avatar">M</div>
                     <div class="aprof-info">
