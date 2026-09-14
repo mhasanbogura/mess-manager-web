@@ -1907,12 +1907,30 @@ select.input-sm { cursor: pointer; }
 .abazar-item-row {
     display: grid; grid-template-columns: 1fr 1fr auto;
     padding: 10px 14px; align-items: center; border-top: 1px solid #eef1f6;
-    cursor: pointer;
+    cursor: pointer; transition: background .15s;
 }
+.abazar-item-row:hover { background: #f8f9fb; }
+.abazar-item-row.expanded { background: #f0f4fa; border-radius: 8px 8px 0 0; }
 .abazar-item-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
 .abazar-item-buyer { font-size: 14px; color: #555; }
 .abazar-item-cost { font-size: 15px; font-weight: 600; color: #d32f2f; display: flex; align-items: center; gap: 4px; }
-.abazar-item-cost .material-icons-round { font-size: 18px; color: #ccc; }
+.abazar-item-cost .material-icons-round { font-size: 18px; color: #ccc; transition: transform .2s; }
+.abazar-item-row.expanded .abazar-item-cost .material-icons-round { transform: rotate(180deg); }
+.abazar-item-detail { padding: 12px 14px; background: #f7f8fa; border-top: 1px solid #eef1f6; border-radius: 0 0 8px 8px; }
+.abazar-item-detail-info { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #2E9E44; margin-bottom: 6px; flex-wrap: wrap; }
+.abazar-detail-dot { width: 8px; height: 8px; border-radius: 50%; background: #2E9E44; flex-shrink: 0; }
+.abazar-item-detail-row { font-size: 14px; color: #333; margin-bottom: 10px; }
+.abazar-item-detail-btns { display: flex; gap: 10px; }
+.abazar-btn-edit {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: inherit; cursor: pointer; background: #FFC107; color: #333;
+}
+.abazar-btn-delete {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: inherit; cursor: pointer; background: #D32F2F; color: #fff;
+}
 
 .abazar-fab {
     position: fixed; bottom: 80px; right: 16px;

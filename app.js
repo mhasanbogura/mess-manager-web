@@ -1025,9 +1025,9 @@ const App = {
         const now = new Date();
         const month = this.mk(now);
         document.getElementById('abazar-month').textContent = this.fmtMonth(now);
-        this._bazarFilter = 'all';
+        this._bazarFilter = 'bazar';
         const filterBtns = document.querySelectorAll('#abazar-filters .abazar-filter-btn');
-        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
+        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'bazar'));
         const div = document.getElementById('abazar-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
@@ -1074,10 +1074,22 @@ const App = {
                 </div>
                 <div class="abazar-day-items" style="${expanded?'':'display:none'}">
                     <div class="abazar-day-items-head"><span>ITEM</span><span>MONEY FROM</span><span>COST</span></div>
-                    ${dayItems.map(i => `<div class="abazar-item-row">
+                    ${dayItems.map(i => `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
                         <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
                         <span class="abazar-item-buyer">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
-                        <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)}</span>
+                        <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
+                    </div>
+                    <div class="abazar-item-detail" style="display:none">
+                        <div class="abazar-item-detail-info">
+                            <span class="abazar-detail-dot"></span>
+                            <span>Added by: <strong>${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</strong></span>
+                            ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+                        </div>
+                        <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
+                        <div class="abazar-item-detail-btns">
+                            <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
+                            <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                        </div>
                     </div>`).join('')}
                 </div>
             </div>`;
@@ -1085,14 +1097,57 @@ const App = {
         div.innerHTML = html;
     },
 
+    toggleBazarItem(el) {
+        const detail = el.nextElementSibling;
+        if (detail && detail.classList.contains('abazar-item-detail')) {
+            const isOpen = detail.style.display !== 'none';
+            detail.style.display = isOpen ? 'none' : 'block';
+            el.classList.toggle('expanded', !isOpen);
+        }
+    },
+
+    async deleteBazarItem(key) {
+        if (!this.messId) return;
+        if (!confirm('Delete this cost item?')) return;
+        await db.ref(`messes/${this.messId}/bazarItems/${key}`).remove();
+        this.loadBazarList();
+        this.toast('Deleted!', 'success');
+    },
+
+    editBazarItem(key, name, cost, memberId, date, category) {
+        this._editBzKey = key;
+        this._editBzCategory = category;
+        document.getElementById('modal-title').textContent = 'Edit Cost';
+        document.getElementById('modal-body').innerHTML = `
+            <div class="form-group"><label>Item name</label><input type="text" id="edit-bz-name" value="${this.esc(name)}"></div>
+            <div class="form-group"><label>Cost (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>`;
+        document.getElementById('modal-footer').innerHTML = `
+            <div class="dep-footer-btns">
+                <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
+                <button class="btn-modal-add" onclick="App.saveBazarEdit('${key}','${category}')">Save</button>
+            </div>`;
+        this.openModal();
+    },
+
+    async saveBazarEdit(key, category) {
+        const name = document.getElementById('edit-bz-name').value.trim();
+        const cost = parseFloat(document.getElementById('edit-bz-cost').value) || 0;
+        if (!name) { this.toast('Enter name', 'error'); return; }
+        if (cost <= 0) { this.toast('Enter cost', 'error'); return; }
+        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost });
+        this.closeModal();
+        this.loadBazarList();
+        this.toast('Updated!', 'success');
+    },
+
     async loadManagerMoney() {
         if (!this.messId) return;
         const now = new Date();
         const month = this.mk(now);
         document.getElementById('abalance-month').textContent = this.fmtMonth(now);
-        this._depFilter = 'all';
+        this._depFilter = 'meal';
         const filterBtns = document.querySelectorAll('#abalance-filters .abazar-filter-btn');
-        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
+        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'meal'));
         const div = document.getElementById('abalance-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
