@@ -666,8 +666,6 @@ const App = {
             const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
 
             const userName = this.currentUser?.displayName || 'User';
-            const initial = ((userName.trim()[0] || 'U')).toUpperCase();
-            document.getElementById('dash-mini-avatar').textContent = initial;
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
 
