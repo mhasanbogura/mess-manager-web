@@ -43,7 +43,7 @@ html { -webkit-text-size-adjust: 100%; }
 .splash-icon { width: 80px; height: 80px; border-radius: 18px; object-fit: contain; }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Times New Roman', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     background-image: var(--bg-gradient);
     color: var(--text);
@@ -1402,7 +1402,7 @@ select.input-sm { cursor: pointer; }
     background: #3a3a3a; color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-size: 24px; font-weight: 700; flex-shrink: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Times New Roman', sans-serif;
 }
 .adash-user h2 { font-size: 22px; font-weight: 800; color: #fff; line-height: 1.2; }
 .adash-user p { font-size: 17px; color: rgba(255,255,255,.8); }
@@ -1463,8 +1463,8 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
 .adash-today-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
-.adash-today-top > strong { font-size: 15px; font-weight: 800; color: #111; font-family: 'Inter', sans-serif; letter-spacing: -.2px; }
-.adash-online { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #1e8e3e; font-family: 'Inter', sans-serif; }
+.adash-today-top > strong { font-size: 15px; font-weight: 800; color: #111; font-family: 'Times New Roman', sans-serif; letter-spacing: -.2px; }
+.adash-online { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #1e8e3e; font-family: 'Times New Roman', sans-serif; }
 .adash-mini-avatar {
     width: 22px; height: 22px; border-radius: 50%; background: #3a3a3a; color: #fff;
     display: inline-flex; align-items: center; justify-content: center;
@@ -1521,6 +1521,11 @@ select.input-sm { cursor: pointer; }
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
 .adash-fin-box.meal-fin small, .adash-fin-box.util-fin small { color: rgba(255,255,255,.8); font-weight: 600; }
+.adash-fin-label {
+    display: flex; align-items: center; gap: 4px; padding: 6px 4px;
+    font-size: 14px; font-weight: 700; color: var(--primary); cursor: pointer;
+}
+.adash-fin-label strong { font-size: 13px; }
 .adash-analyse {
     background: var(--primary); border: none; border-radius: 12px;
     padding: 6px 10px; font-family: inherit; font-size: 14px; color: #fff;
@@ -1533,7 +1538,7 @@ select.input-sm { cursor: pointer; }
 .adash-stats-head { display: flex; align-items: center; gap: 6px; padding: 4px 12px 8px; }
 .adash-stats-head .material-icons-round { font-size: 20px; color: #222; }
 .adash-stats-head strong { font-size: 16px; font-weight: 600; color: #222; flex: 1; }
-.adash-custom { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #222; cursor: pointer; font-family: 'Inter', sans-serif; }
+.adash-custom { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #222; cursor: pointer; font-family: 'Times New Roman', sans-serif; }
 .adash-custom .material-icons-round { font-size: 18px; }
 .adash-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 12px; border-radius: 0 0 14px 14px; }
 .adash-table { width: 100%; border-collapse: collapse; background: #fff; font-size: 13px; }
@@ -1542,7 +1547,7 @@ select.input-sm { cursor: pointer; }
     color: #fff; font-weight: 600; padding: 8px 4px; text-align: center;
     font-size: 11px; line-height: 1.3;
 }
-.adash-table thead th small { display: block; font-size: 9px; font-weight: 400; opacity: .85; font-family: 'Inter', sans-serif; }
+.adash-table thead th small { display: block; font-size: 9px; font-weight: 400; opacity: .85; font-family: 'Times New Roman', sans-serif; }
 .adash-table thead th:first-child { border-radius: 12px 0 0 0; text-align: left; padding-left: 10px; font-size: 13px; }
 .adash-table thead th:last-child { border-radius: 0 12px 0 0; }
 .adash-table td {
@@ -1550,7 +1555,7 @@ select.input-sm { cursor: pointer; }
     border-bottom: 1px solid #dfe4ec; vertical-align: middle; background: #fff;
 }
 .adash-table td.c-name { text-align: left; padding-left: 8px; font-size: 14px; }
-.adash-table td small { display: block; font-size: 9px; color: #999; font-family: 'Inter', sans-serif; }
+.adash-table td small { display: block; font-size: 9px; color: #999; font-family: 'Times New Roman', sans-serif; }
 .adash-table td strong { font-size: 14px; font-weight: 500; }
 .adash-table td.pos { background: #e8f0fe; }
 .adash-table td.pos strong { color: #0b3d91; }
@@ -1724,7 +1729,7 @@ select.input-sm { cursor: pointer; }
 .ameal-grid-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .ameal-table {
     border-collapse: collapse; border-spacing: 0;
-    font-family: 'Inter', sans-serif; font-size: 14px;
+    font-family: 'Times New Roman', sans-serif; font-size: 14px;
 }
 .ameal-table thead th {
     position: sticky; top: 0; z-index: 3;
@@ -1932,7 +1937,7 @@ select.input-sm { cursor: pointer; }
     width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: #fff;
     display: flex; align-items: center; justify-content: center;
     font-size: 24px; font-weight: 700; flex-shrink: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Times New Roman', sans-serif;
 }
 .aprof-info { flex: 1; min-width: 0; }
 .aprof-info h3 { font-size: 17px; font-weight: 700; color: #1a1a1a; }
@@ -2012,7 +2017,7 @@ select.input-sm { cursor: pointer; }
 .anotice-card p { font-size: 18px; line-height: 1.55; }
 .anotice-meta {
     display: flex; align-items: center; justify-content: space-between;
-    margin-top: 10px; font-size: 13px; color: #999; font-family: 'Inter', sans-serif;
+    margin-top: 10px; font-size: 13px; color: #999; font-family: 'Times New Roman', sans-serif;
 }
 .anotice-del {
     background: none; border: none; color: #bbb; cursor: pointer;
@@ -2063,7 +2068,7 @@ select.input-sm { cursor: pointer; }
     padding: 16px 14px; border: 1px solid #dfe4ec;
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
-.aduty-card h3 { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 12px; font-family: 'Inter', sans-serif; letter-spacing: -.2px; }
+.aduty-card h3 { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 12px; font-family: 'Times New Roman', sans-serif; letter-spacing: -.2px; }
 .aduty-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .aduty-chip {
     background: #e8f0fe; border: 1.5px solid var(--primary); border-radius: 14px;
@@ -2081,7 +2086,7 @@ select.input-sm { cursor: pointer; }
 .aduty-member-top { display: flex; align-items: center; gap: 8px; }
 .aduty-member-top .person { font-size: 28px; color: #d32f2f; }
 .aduty-member-top strong { font-size: 21px; font-weight: 500; color: #222; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.aduty-days { font-size: 16px; color: #999; font-family: 'Inter', sans-serif; white-space: nowrap; }
+.aduty-days { font-size: 16px; color: #999; font-family: 'Times New Roman', sans-serif; white-space: nowrap; }
 .aduty-member-top .icon-btn { min-width: 40px; min-height: 40px; }
 .aduty-member-top .icon-btn.red { color: #d32f2f; }
 .aduty-member-top .icon-btn.red:hover { background: rgba(229,57,53,.08); }
@@ -2090,13 +2095,13 @@ select.input-sm { cursor: pointer; }
 .aduty-member-top .material-icons-round { font-size: 30px; }
 .aduty-member .aduty-chips { margin-top: 10px; }
 /* duty day picker (inside dark modal) */
-.aduty-legend { display: flex; gap: 14px; font-size: 12px; color: #888; margin-bottom: 10px; font-family: 'Inter', sans-serif; }
+.aduty-legend { display: flex; gap: 14px; font-size: 12px; color: #888; margin-bottom: 10px; font-family: 'Times New Roman', sans-serif; }
 .aduty-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 4px; vertical-align: baseline; }
 .aduty-pick-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .aduty-pick {
     width: 44px; height: 44px; border-radius: 12px;
     background: rgba(42,42,62,.8); border: 1px solid rgba(255,255,255,.1);
-    color: #ccc; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif;
+    color: #ccc; font-size: 15px; font-weight: 600; font-family: 'Times New Roman', sans-serif;
     cursor: pointer; transition: all .15s;
 }
 .aduty-pick.mine { background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; border-color: transparent; }
@@ -2167,7 +2172,7 @@ img, canvas { max-width: 100%; }
 .adash-table-wrap, .dash-table-wrap { min-width: 0; }
 
 /* ==================== FLAT PAGE ==================== */
-#page-members { font-family: 'Inter', sans-serif; }
+#page-members { font-family: 'Times New Roman', sans-serif; }
 .aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; }
 .aflat-head h2 { font-size: 24px; font-weight: 700; color: #fff; }
 .aflat-leave { display: flex; align-items: center; gap: 4px; background: none; border: none; color: #d32f2f; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
@@ -2345,8 +2350,8 @@ img, canvas { max-width: 100%; }
     transform: rotate(45deg); display: flex; align-items: center; justify-content: center;
 }
 .adash-logo .material-icons-round { transform: rotate(-45deg); font-size: 22px; color: #1a1a1a; }
-.adash-brand h2 { font-size: 15px; font-weight: 800; color: #fff; font-family: 'Inter', sans-serif; letter-spacing: .2px; white-space: nowrap; }
-.adash-brand p { font-size: 10px; color: #5b6472; letter-spacing: 2px; font-family: 'Inter', sans-serif; white-space: nowrap; }
+.adash-brand h2 { font-size: 15px; font-weight: 800; color: #fff; font-family: 'Times New Roman', sans-serif; letter-spacing: .2px; white-space: nowrap; }
+.adash-brand p { font-size: 10px; color: #5b6472; letter-spacing: 2px; font-family: 'Times New Roman', sans-serif; white-space: nowrap; }
 .adash-head-actions .material-icons-round { font-size: 26px; }
 /* Mess card: no wrapping */
 .adash-mess-box { min-width: 0; }

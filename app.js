@@ -681,13 +681,6 @@ const App = {
             document.getElementById('dash-manager').textContent = managerName;
             document.getElementById('dash-month').textContent = this.fmtMonth(now);
 
-            let onlineCount = 0;
-            try {
-                const onlineSnap = await db.ref(`messes/${this.messId}/online`).once('value');
-                onlineCount = onlineSnap.numChildren();
-            } catch (e) { /* ignore */ }
-            document.getElementById('dash-online-count').textContent = onlineCount;
-
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             document.getElementById('dash-date').textContent = `Today is ${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()} (${weekdays[now.getDay()]})`;
