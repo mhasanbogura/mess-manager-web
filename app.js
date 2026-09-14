@@ -1051,9 +1051,12 @@ const App = {
     },
 
     renderBazarList() {
-        const filter = this._bazarFilter || 'all';
+        const filter = this._bazarFilter || 'bazar';
         const items = filter === 'all' ? (this._allBazar || []) : (this._allBazar || []).filter(([, v]) => (v.category || 'bazar') === filter);
         const members = this._bazarMembers || {};
+        const total = items.reduce((s, [, v]) => s + (parseFloat(v.cost) || 0), 0);
+        const totalEl = document.getElementById('abazar-filter-total');
+        if (totalEl) totalEl.textContent = items.length ? '৳ ' + this.fmtNum(total) : '';
         const div = document.getElementById('abazar-list');
         if (!items.length) { div.innerHTML = '<p class="empty-state">No cost items this month</p>'; return; }
         const grouped = {};
@@ -1175,9 +1178,12 @@ const App = {
     },
 
     renderDeposits() {
-        const filter = this._depFilter || 'all';
+        const filter = this._depFilter || 'meal';
         const deps = filter === 'all' ? (this._allDeps || []) : (this._allDeps || []).filter(([, v]) => (v.category || 'meal') === filter);
         const members = this._depMembers || {};
+        const total = deps.reduce((s, [, v]) => s + (parseFloat(v.amount) || 0), 0);
+        const totalEl = document.getElementById('abalance-filter-total');
+        if (totalEl) totalEl.textContent = deps.length ? '৳ ' + this.fmtNum(total) : '';
         const div = document.getElementById('abalance-list');
         if (!deps.length) { div.innerHTML = '<p class="empty-state">No deposits this month</p>'; return; }
         const grouped = {};
