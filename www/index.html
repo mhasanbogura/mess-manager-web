@@ -92,6 +92,7 @@
             <div class="topbar-title" id="topbar-mess-name">
                 <h2 id="page-title">Dashboard</h2>
             </div>
+            <div class="topbar-actions" id="topbar-actions"></div>
         </header>
 
         <main class="main-content">
@@ -328,11 +329,8 @@
             <div class="page" id="page-meals">
                     <div class="ameal-head">
                     <h2>Meal Entry</h2>
-                    <div class="ameal-actions">
-                        <button class="ameal-action" onclick="App.navigate('mealhistory')"><span class="material-icons-round">edit</span><small>Edit History</small></button>
-                    </div>
                 </div>
-                <div class="ameal-month-row" onclick="App.mealPickMonth()" style="cursor:pointer"><span>Current Month:</span><strong id="ameal-month">-</strong><span class="material-icons-round" style="font-size:18px;color:#888">expand_more</span></div>
+                <div class="ameal-month-row" onclick="App.mealPickMonth()" style="cursor:pointer"><span>Current Month:</span><strong id="ameal-month">-</strong></div>
                 <div class="ameal-grid-wrap">
                     <div class="ameal-loader" id="ameal-loader"><div class="ameal-spinner"></div></div>
                     <div class="ameal-grid-scroll" id="ameal-grid-scroll" style="display:none">
@@ -395,6 +393,20 @@
                 </div>
                 <div id="abalance-list"></div>
                 <button class="abazar-fab" onclick="App.showAddDeposit()"><span class="material-icons-round">add</span> Add</button>
+            </div>
+            <div class="page" id="page-costtrash">
+                <div class="abazar-head">
+                    <h2>Cost Trash</h2>
+                </div>
+                <div class="abazar-month-row"><span>Current Month:</span><strong id="costtrash-month">-</strong></div>
+                <div id="costtrash-list" style="padding:0 12px"></div>
+            </div>
+            <div class="page" id="page-deptrash">
+                <div class="abazar-head">
+                    <h2>Manager Money Trash</h2>
+                </div>
+                <div class="abazar-month-row"><span>Current Month:</span><strong id="deptrash-month">-</strong></div>
+                <div id="deptrash-list" style="padding:0 12px"></div>
             </div>
             <div class="page" id="page-notices">
                 <div class="anotice-head">

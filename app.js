@@ -269,10 +269,15 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-bazarnote', page === 'bazarnote');
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
-        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Edits' };
-        const hideTopbar = ['bazaar', 'meals', 'balance', 'profile', 'mealhistory'];
+        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Edits', costtrash: 'Cost Trash', deptrash: 'Manager Trash' };
+        const hideTopbar = [];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
-        document.querySelector('.topbar').style.display = hideTopbar.includes(page) ? 'none' : '';
+        document.querySelector('.topbar').style.display = '';
+        const topbarActions = document.getElementById('topbar-actions');
+        topbarActions.innerHTML = '';
+        if (page === 'meals') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'mealhistory\')"><span class="material-icons-round">edit</span></button>';
+        if (page === 'bazaar') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'costtrash\')"><span class="material-icons-round">delete</span></button>';
+        if (page === 'balance') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'deptrash\')"><span class="material-icons-round">delete</span></button>';
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
         document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
@@ -1210,6 +1215,12 @@ const App = {
     async deleteBazarItem(key) {
         if (!this.messId) return;
         if (!confirm('Delete this cost item?')) return;
+        const snap = await db.ref(`messes/${this.messId}/bazarItems/${key}`).once('value');
+        const item = snap.val();
+        if (item) {
+            const userName = this.currentUser?.displayName || 'Unknown';
+            await db.ref(`messes/${this.messId}/costTrash`).push({ ...item, deletedBy: userName, deletedAt: Date.now() });
+        }
         await db.ref(`messes/${this.messId}/bazarItems/${key}`).remove();
         this.loadBazarList();
         this.toast('Deleted!', 'success');
@@ -1335,6 +1346,12 @@ const App = {
     async deleteDeposit(key) {
         if (!this.messId) return;
         if (!confirm('Delete this deposit?')) return;
+        const snap = await db.ref(`messes/${this.messId}/deposits/${key}`).once('value');
+        const item = snap.val();
+        if (item) {
+            const userName = this.currentUser?.displayName || 'Unknown';
+            await db.ref(`messes/${this.messId}/depTrash`).push({ ...item, deletedBy: userName, deletedAt: Date.now() });
+        }
         await db.ref(`messes/${this.messId}/deposits/${key}`).remove();
         this.loadManagerMoney();
         this.toast('Deleted!', 'success');
