@@ -371,7 +371,7 @@ const App = {
             const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const mids = Object.keys(members);
+            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
             const dutySnap = await db.ref(`messes/${this.messId}/bazarDuty`).once('value');
             const dutyAll = dutySnap.val() || {};
             const duty = {};
@@ -489,7 +489,7 @@ const App = {
 
             const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = mSnap.val() || {};
-            const mids = Object.keys(members);
+            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
             let adminName = '-';
             const admin = mids.find(id => members[id] && members[id].role === 'admin');
             if (admin) adminName = members[admin].name || '-';
@@ -707,8 +707,7 @@ const App = {
 
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const mids = Object.keys(members);
-            let managerName = '-';
+            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
             if (adminFound) managerName = adminFound[1].name || '-';
             else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
@@ -927,7 +926,7 @@ const App = {
         try {
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const mids = Object.keys(members);
+            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
             if (!mids.length) { loader.innerHTML = '<p class="empty-state">No members</p>'; return; }
             const mealsSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-' + String(daysInMonth).padStart(2,'0')).once('value');
             const allMeals = mealsSnap.val() || {};
@@ -1500,7 +1499,7 @@ const App = {
         if (!this.messId) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members);
+        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
         const names = [...new Set(mids.map(id => members[id]?.name || 'Unknown'))].sort((a, b) => a.localeCompare(b));
         const now = new Date();
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
@@ -1701,7 +1700,7 @@ const App = {
         if (!this.messId) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members);
+        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
         const names = mids.map(id => members[id]?.name || 'Unknown');
         const now = new Date();
         this._depDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
@@ -1978,7 +1977,7 @@ const App = {
         try {
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const mids = Object.keys(members);
+            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
 
             const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
             const allBz = bzSnap.val() || {};
