@@ -1343,7 +1343,14 @@ select.input-sm { cursor: pointer; }
 }
 
 @media (min-width: 768px) {
-    .main-content { padding: 16px 24px; max-width: 600px; margin: 0 auto; }
+    .main-content { padding: 16px 24px; max-width: 700px; margin: var(--topbar-height) auto 0; padding-bottom: 24px; }
+    #app-screen.on-dashboard .main-content { margin-top: 0; }
+    #app-screen.on-members .main-content { margin-top: 0; }
+    .ameal-grid-scroll { overflow-x: visible; }
+    .ameal-table { width: 100%; }
+    .abazar-day-card { margin: 0 auto 10px; max-width: 700px; }
+    .aprof-card { margin: 0 auto 4px; max-width: 700px; }
+    .abazar-fab { right: calc(50% - 350px + 16px); }
 }
 
 @media (max-width: 360px) {
