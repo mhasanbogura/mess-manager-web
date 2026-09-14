@@ -1086,15 +1086,23 @@ const App = {
                         <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                     </div>
                     <div class="abazar-item-detail" style="display:none">
+                        ${i.splitWith ? `<div class="abazar-detail-price">৳${this.fmtNum(parseFloat(i.cost)||0)} each</div>
+                        <div class="abazar-detail-split">${this.esc(i.splitWith)}</div>` : ''}
                         <div class="abazar-item-detail-info">
-                            <span class="abazar-detail-dot"></span>
-                            <span>Added by: <strong>Manager</strong></span>
+                            <span class="abazar-detail-dot green"></span>
+                            <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
                             ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                         </div>
                         <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
+                        ${i.editedBy ? `<div class="abazar-item-detail-info">
+                            <span class="abazar-detail-dot orange"></span>
+                            <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
+                            ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+                        </div>
+                        <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
                         <div class="abazar-item-detail-btns">
-                            <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
                             <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                            <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
                         </div>
                     </div>`;
                     }).join('')}
@@ -1141,7 +1149,8 @@ const App = {
         const cost = parseFloat(document.getElementById('edit-bz-cost').value) || 0;
         if (!name) { this.toast('Enter name', 'error'); return; }
         if (cost <= 0) { this.toast('Enter cost', 'error'); return; }
-        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost });
+        const userName = this.currentUser?.displayName || 'Unknown';
+        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
         this.loadBazarList();
         this.toast('Updated!', 'success');
@@ -1203,10 +1212,27 @@ const App = {
                 </div>
                 <div class="abazar-day-items" style="${expanded?'':'display:none'}">
                     <div class="abazar-day-items-head"><span>MONEY OF</span><span>CATEGORY</span><span>AMOUNT</span></div>
-                    ${dayDeps.map(i => `<div class="abazar-item-row">
+                    ${dayDeps.map(i => `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
                         <span class="abazar-item-name">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
                         <span class="abazar-item-buyer">${i.category === 'utility' ? '<span class=\"material-icons-round\" style=\"font-size:14px;vertical-align:middle;color:#E65100\">lightbulb</span> Utility' : '<span class=\"material-icons-round\" style=\"font-size:14px;vertical-align:middle;color:#0b3d91\">restaurant</span> Meal'}</span>
-                        <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)}</span>
+                        <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)} <span class="material-icons-round">expand_more</span></span>
+                    </div>
+                    <div class="abazar-item-detail" style="display:none">
+                        <div class="abazar-item-detail-info">
+                            <span class="abazar-detail-dot green"></span>
+                            <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
+                            ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+                        </div>
+                        <div class="abazar-item-detail-row">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')} — ৳${this.fmtNum(parseFloat(i.amount)||0)}</div>
+                        ${i.editedBy ? `<div class="abazar-item-detail-info">
+                            <span class="abazar-detail-dot orange"></span>
+                            <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
+                            ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+                        </div>` : ''}
+                        <div class="abazar-item-detail-btns">
+                            <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteDeposit('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                            <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editDeposit('${i.key}','${i.memberId||''}',${parseFloat(i.amount)||0},'${i.category||'meal'}','${i.date||''}')"><span class="material-icons-round">edit</span> Edit</button>
+                        </div>
                     </div>`).join('')}
                 </div>
             </div>`;
@@ -1218,6 +1244,43 @@ const App = {
         head.classList.toggle('expanded');
         const items = head.nextElementSibling;
         if (items) items.style.display = items.style.display === 'none' ? '' : 'none';
+    },
+
+    async deleteDeposit(key) {
+        if (!this.messId) return;
+        if (!confirm('Delete this deposit?')) return;
+        await db.ref(`messes/${this.messId}/deposits/${key}`).remove();
+        this.loadManagerMoney();
+        this.toast('Deleted!', 'success');
+    },
+
+    editDeposit(key, memberId, amount, category, date) {
+        const members = this._depMembers || {};
+        const currentName = (members[memberId] || {}).name || '';
+        const names = Object.values(members).map(m => m.name || 'Unknown');
+        document.getElementById('modal-title').textContent = 'Edit Deposit';
+        document.getElementById('modal-body').innerHTML = `
+            <div class="form-group"><label>Member</label><select id="edit-dep-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Amount (৳)</label><input type="number" id="edit-dep-amount" value="${amount}"></div>
+            <div class="form-group"><label>Category</label><select id="edit-dep-cat"><option value="meal" ${category==='meal'?'selected':''}>Meal</option><option value="utility" ${category==='utility'?'selected':''}>Utility</option></select></div>`;
+        document.getElementById('modal-footer').innerHTML = `
+            <div class="dep-footer-btns">
+                <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
+                <button class="btn-modal-add" onclick="App.saveDepositEdit('${key}')">Save</button>
+            </div>`;
+        this.openModal();
+    },
+
+    async saveDepositEdit(key) {
+        const memberId = document.getElementById('edit-dep-member').value;
+        const amount = parseFloat(document.getElementById('edit-dep-amount').value) || 0;
+        const category = document.getElementById('edit-dep-cat').value;
+        if (amount <= 0) { this.toast('Enter amount', 'error'); return; }
+        const userName = this.currentUser?.displayName || 'Unknown';
+        await db.ref(`messes/${this.messId}/deposits/${key}`).update({ memberId, amount, category, editedBy: userName, editedAt: Date.now() });
+        this.closeModal();
+        this.loadManagerMoney();
+        this.toast('Updated!', 'success');
     },
 
     async showAddBazar() {
@@ -1376,6 +1439,7 @@ const App = {
 
     async bzSave() {
         const dateKey = this._bzDate;
+        const userName = this.currentUser?.displayName || 'Unknown';
         if (this._bzTab === 'bazar') {
             const items = this._bzItems.filter(i => i.name && i.cost);
             if (!items.length) { this.toast('Add at least one item', 'error'); return; }
@@ -1383,7 +1447,7 @@ const App = {
             for (const item of items) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
                     name: item.name, cost: parseFloat(item.cost) || 0,
-                    memberId: this._bzMoneyBy, doneBy: this._bzDoneBy || '', date: dateKey, category: 'bazar', createdAt: Date.now()
+                    memberId: this._bzMoneyBy, doneBy: this._bzDoneBy || '', date: dateKey, category: 'bazar', addedBy: userName, createdAt: Date.now()
                 });
             }
         } else {
@@ -1394,7 +1458,7 @@ const App = {
             for (const name of this._bzUtilSelected) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
                     name: this._bzUtilType, cost: Math.round(share * 100) / 100,
-                    memberId: 'Manager', splitWith: name, date: dateKey, category: 'utility', createdAt: Date.now()
+                    memberId: 'Manager', splitWith: name, date: dateKey, category: 'utility', addedBy: userName, createdAt: Date.now()
                 });
             }
         }

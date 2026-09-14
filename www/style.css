@@ -1919,7 +1919,11 @@ select.input-sm { cursor: pointer; }
 .abazar-item-row.expanded .abazar-item-cost .material-icons-round { transform: rotate(180deg); }
 .abazar-item-detail { padding: 12px 14px; background: #f7f8fa; border-top: 1px solid #eef1f6; border-radius: 0 0 8px 8px; }
 .abazar-item-detail-info { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #2E9E44; margin-bottom: 6px; flex-wrap: wrap; }
-.abazar-detail-dot { width: 8px; height: 8px; border-radius: 50%; background: #2E9E44; flex-shrink: 0; }
+.abazar-detail-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.abazar-detail-dot.green { background: #2E9E44; }
+.abazar-detail-dot.orange { background: #E65100; }
+.abazar-detail-price { font-size: 13px; font-weight: 600; color: #7B1FA2; margin-bottom: 2px; }
+.abazar-detail-split { font-size: 13px; color: #333; margin-bottom: 8px; }
 .abazar-item-detail-row { font-size: 14px; color: #333; margin-bottom: 10px; }
 .abazar-item-detail-btns { display: flex; gap: 10px; }
 .abazar-btn-edit {
