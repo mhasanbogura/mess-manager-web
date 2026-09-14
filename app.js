@@ -1200,7 +1200,7 @@ const App = {
                     ${['Rent','Wi-Fi'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Add suggestion</button>
                 </div>
-                <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App.bzUtilAmount=this.value;App.bzRenderFooter()"></div>
+                <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
                         <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
@@ -1230,21 +1230,21 @@ const App = {
     },
 
     bzPickMoney(el) {
-        document.querySelectorAll('#bz-money-chips .bz-chip').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('#bz-money-chips .dep-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         this._bzMoneyBy = el.dataset.name;
         this.bzRenderFooter();
     },
 
     bzPickDone(el) {
-        document.querySelectorAll('#bz-done-chips .bz-chip').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('#bz-done-chips .dep-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         this._bzDoneBy = el.dataset.name;
         this.bzRenderFooter();
     },
 
     bzPickType(el) {
-        document.querySelectorAll('#bz-type-chips .bz-chip').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('#bz-type-chips .dep-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
         this._bzUtilType = el.dataset.type;
     },
@@ -1296,7 +1296,7 @@ const App = {
         } else {
             const amt = parseFloat(this._bzUtilAmount) || 0;
             const count = this._bzUtilSelected?.length || 0;
-            left.textContent = `Split among: ${count} Member${count !== 1 ? 's' : ''}`;
+            left.textContent = `Split among: ${count} Member${count !== 1 ? 's' : ''}  ৳${this.fmtNum(amt > 0 ? amt / Math.max(count, 1) : 0)} each`;
             total.textContent = '৳ ' + this.fmtNum(amt);
         }
     },
