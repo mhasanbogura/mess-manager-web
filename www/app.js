@@ -491,8 +491,8 @@ const App = {
                     const m = members[id] || {};
                     return `<div class="aflat-member-item">
                         <span class="name">${this.esc(m.name || 'Unknown')}</span>
-                        <button class="aflat-remove" onclick="App.editFlatMember('${id}','${this.esc(m.name || '')}')"><span class="material-icons-round">edit</span></button>
                         <button class="aflat-remove" onclick="App.removeFlatMember('${id}')"><span class="material-icons-round">close</span></button>
+                        <button class="aflat-remove" onclick="App.editFlatMember('${id}','${this.esc(m.name || '')}')"><span class="material-icons-round">edit</span></button>
                     </div>`;
                 }).join('');
             }
