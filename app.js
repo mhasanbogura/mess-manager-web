@@ -257,7 +257,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-notices', page === 'notices');
         document.getElementById('app-screen').classList.toggle('on-duty', page === 'duty');
         document.getElementById('app-screen').classList.toggle('on-members', page === 'members');
-        const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Bazar', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Bazar Today' };
+        const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
@@ -354,7 +354,7 @@ const App = {
             const tMid = duty[todayKey];
             const tName = (tMid && members[tMid] && members[tMid].name) || null;
             document.getElementById('duty-banner').innerHTML =
-                `<span class="material-icons-round">event</span><p><strong>Bazar today (${now.getDate()} ${shortMon}):</strong> ` +
+                `<span class="material-icons-round">event</span><p><strong>Cost today (${now.getDate()} ${shortMon}):</strong> ` +
                 (tName ? this.esc(tName) : '<span class="unassigned">Nobody assigned</span>') + `</p>`;
 
             const assignedDays = new Set(Object.keys(duty).map(dk => parseInt(dk.slice(8, 10), 10)));
@@ -432,7 +432,7 @@ const App = {
     },
 
     async clearDuty(mid) {
-        if (!confirm('Remove all bazar dates for this member?')) return;
+        if (!confirm('Remove all cost dates for this member?')) return;
         try {
             const now = new Date();
             const month = this.mk(now);
@@ -574,7 +574,7 @@ const App = {
             const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = pSnap.val() || {};
             const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'specialMeal', 'togglePerms'];
-            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Bazar Entry', 'Special Meal Management', 'Turn on/off Permissions'];
+            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Cost Entry', 'Special Meal Management', 'Turn on/off Permissions'];
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
             div.innerHTML = mids.map((id, i) => {
                 const m = members[id] || {};
@@ -760,6 +760,39 @@ const App = {
                 </tr>`;
             });
             rowsEl.innerHTML = html;
+
+            const utilRows = document.getElementById('dash-utility-rows');
+            const utilByName = {};
+            const rentByName = {};
+            Object.values(bzSnap.val() || {}).forEach(b => {
+                const amt = parseFloat(b.cost) || 0;
+                const n = (b.memberId || '').trim();
+                if (!n) return;
+                if (b.category === 'utility') {
+                    if ((b.name || '').toLowerCase() === 'rent') {
+                        rentByName[n] = (rentByName[n] || 0) + amt;
+                    } else {
+                        utilByName[n] = (utilByName[n] || 0) + amt;
+                    }
+                }
+            });
+            let utilHtml = '';
+            mids.forEach(mid => {
+                const m = members[mid] || {};
+                const name = m.name || 'Unknown';
+                const rent = rentByName[name] || 0;
+                const util = utilByName[name] || 0;
+                const dep = depByName[name] || 0;
+                const bal = dep - rent - util;
+                utilHtml += `<tr>
+                    <td class="c-name">${this.esc(name)}</td>
+                    <td><strong>৳${this.fmtNum(rent)}</strong></td>
+                    <td><strong>৳${this.fmtNum(util)}</strong></td>
+                    <td><strong>৳${this.fmtNum(dep)}</strong></td>
+                    <td class="${bal < 0 ? 'neg' : 'pos'}"><strong>৳${this.fmtNum(bal)}</strong></td>
+                </tr>`;
+            });
+            utilRows.innerHTML = utilHtml || '<tr><td colspan="5" class="empty-state">No data</td></tr>';
         } catch (e) { console.error('loadDashboard error:', e); }
     },
 
@@ -942,7 +975,7 @@ const App = {
             const filtered = Object.entries(allItems)
                 .filter(([, v]) => v.date && v.date.startsWith(month))
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
-            if (!filtered.length) { div.innerHTML = '<p class="empty-state">No bazar items this month</p>'; return; }
+            if (!filtered.length) { div.innerHTML = '<p class="empty-state">No cost items this month</p>'; return; }
             const grouped = {};
             filtered.forEach(([k, v]) => {
                 const day = v.date.slice(0, 10);
@@ -1045,11 +1078,11 @@ const App = {
         this._bzUtilAmount = '';
         this._bzUtilSelected = names.slice();
 
-        document.getElementById('modal-title').textContent = 'Add Bazar';
+        document.getElementById('modal-title').textContent = 'Add Cost';
         document.getElementById('modal-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 12px">
-                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Bazar</button>
-                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility</button>
+                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Cost</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span></div>
             <div id="bz-bazar-section">

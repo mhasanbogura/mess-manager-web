@@ -167,11 +167,11 @@
                     <div class="adash-duo">
                         <div class="adash-duo-box" onclick="App.navigate('duty')">
                             <span class="material-icons-round">event_available</span>
-                            <div><strong id="dash-duty-name">Not assigned</strong><p>Bazar duty today</p></div>
+                            <div><strong id="dash-duty-name">Not assigned</strong><p>Cost duty today</p></div>
                         </div>
                         <div class="adash-duo-box" onclick="App.navigate('bazaar')">
                             <span class="material-icons-round">receipt_long</span>
-                            <div><strong>Bazar note</strong><p id="dash-live-count">Nothing on the list</p></div>
+                            <div><strong>Cost note</strong><p id="dash-live-count">Nothing on the list</p></div>
                         </div>
                     </div>
                     <div class="adash-dinner-row">
@@ -192,7 +192,7 @@
                 <div class="adash-stats">
                     <div class="adash-stats-head">
                         <span class="material-icons-round">groups</span>
-                        <strong>Member Stats :</strong>
+                        <strong>Meal Summary :</strong>
                         <span class="adash-custom" onclick="App.navigate('monthly')">Customise table <span class="material-icons-round">tune</span></span>
                     </div>
                     <div class="adash-table-wrap">
@@ -212,11 +212,34 @@
                         </table>
                     </div>
                 </div>
+
+                <div class="adash-stats">
+                    <div class="adash-stats-head">
+                        <span class="material-icons-round">receipt_long</span>
+                        <strong>Utility & Others :</strong>
+                    </div>
+                    <div class="adash-table-wrap">
+                        <table class="adash-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Rent(৳)</th>
+                                    <th>Utility & Others(৳)</th>
+                                    <th>Deposit(৳)</th>
+                                    <th>Balance(৳)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-utility-rows">
+                                <tr><td colspan="5" class="empty-state">No data</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <div class="page" id="page-duty">
                 <div class="aduty-head">
                     <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
-                    <h2>Bazar Today</h2>
+                    <h2>Cost Today</h2>
                 </div>
                 <div class="aduty-banner" id="duty-banner"></div>
                 <div class="aduty-card">
@@ -260,7 +283,7 @@
                 <div class="aflat-tab-content" id="flat-tab-members">
                     <div class="aflat-info-box green">
                         <span class="material-icons-round">restaurant</span>
-                        <p>Members are the names your meals, bazar and balances are counted against. Add everyone who eats in this flat — they do not need the app.</p>
+                        <p>Members are the names your meals, cost and balances are counted against. Add everyone who eats in this flat — they do not need the app.</p>
                     </div>
                     <div class="aflat-add-row">
                         <div class="aflat-input-wrap">
@@ -285,7 +308,7 @@
                 <div class="aflat-tab-content" id="flat-tab-permissions" style="display:none">
                     <div class="aflat-info-box orange">
                         <span class="material-icons-round">lock</span>
-                        <p>What each People is allowed to do — add meals, add bazar, manage the lists. Only Peoples appear here: a Member who has never opened the app has nothing to grant.</p>
+                        <p>What each People is allowed to do — add meals, add cost, manage the lists. Only Peoples appear here: a Member who has never opened the app has nothing to grant.</p>
                     </div>
                     <div id="flat-permissions-list"></div>
                     <p class="aflat-perm-note"><span class="material-icons-round">info</span> The manager always has every permission, whether these are checked or not.</p>
@@ -332,10 +355,10 @@
             </div>
             <div class="page" id="page-bazaar">
                 <div class="abazar-head">
-                    <h2>Bazar List</h2>
+                    <h2>Cost List</h2>
                     <div class="abazar-actions">
                         <button class="abazar-action" onclick="App.toast('Receipts coming soon','info')"><span class="material-icons-round">receipt</span><small>Receipts</small></button>
-                        <button class="abazar-action" onclick="App.toast('Bazar Note coming soon','info')"><span class="material-icons-round">note</span><small>Bazar Note</small></button>
+                        <button class="abazar-action" onclick="App.toast('Cost Note coming soon','info')"><span class="material-icons-round">note</span><small>Cost Note</small></button>
                         <button class="abazar-action" onclick="App.toast('History coming soon','info')"><span class="material-icons-round">history</span><small>Month History</small></button>
                         <button class="abazar-action" onclick="App.toast('Trash coming soon','info')"><span class="material-icons-round">delete</span><small>Trash</small></button>
                     </div>
@@ -471,7 +494,7 @@
         <div class="bottom-nav-items">
             <button class="bottom-nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')"><span class="material-icons-round">dashboard</span>Dashboard</button>
             <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">home</span>Flat</button>
-            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Bazar</button>
+            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Cost</button>
             <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant</span>Meal</button>
             <button class="bottom-nav-item" data-page="balance" onclick="App.navigate('balance')"><span class="material-icons-round">account_balance_wallet</span>Manager</button>
             <button class="bottom-nav-item" data-page="profile" onclick="App.navigate('profile')"><span class="material-icons-round">person</span>Profile</button>
