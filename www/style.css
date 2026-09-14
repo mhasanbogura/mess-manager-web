@@ -2235,7 +2235,7 @@ img, canvas { max-width: 100%; }
 .aflat-card {
     background: linear-gradient(135deg, #0b3d91, #08306b);
     border-radius: 20px; padding: 18px 16px 16px; color: #fff;
-    margin: 0 12px; position: relative;
+    margin: 12px 12px 0; position: relative;
 }
 .aflat-card-top { display: flex; align-items: flex-start; gap: 12px; }
 .aflat-home-icon {
