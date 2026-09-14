@@ -956,7 +956,7 @@ const App = {
                 });
             });
             const today = now.getDate();
-            let html = '<thead><tr><th class="am-col-view" colspan="2"><span class="ameal-row-label" style="justify-content:center"><span class="material-icons-round" style="font-size:16px">tune</span> View</span></th>';
+            let html = '<thead><tr><th class="am-col-view" colspan="2"><span class="ameal-row-label" style="justify-content:center"><span class="material-icons-round" style="font-size:14px">tune</span> View</span></th>';
                     for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#c8ddf0"':''}>${d}</th>`;
             html += '</tr></thead><tbody>';
             const colors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2'];
@@ -965,21 +965,21 @@ const App = {
                 const bg = colors[idx % colors.length];
                 const total = md.breakfastTotal + md.lunchTotal + md.dinnerTotal;
                 html += `<tr><td rowspan="3" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
-                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🌅</span><span class="ameal-row-count${md.breakfastTotal===0?' zero':''}">${md.breakfastTotal}</span><span style="color:#888;font-size:11px">Breakfast</span></div></td>`;
+                html += `<td class="am-col-type" style="background:#fff8e1"><div class="ameal-row-label"><span style="font-size:12px">☕</span><span class="ameal-row-count" style="color:#e65100${md.breakfastTotal===0?';color:#ccc':''}">${md.breakfastTotal}</span><span style="color:#e65100;font-size:10px">Breakfast</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.breakfast[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
-                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍜</span><span class="ameal-row-count${md.lunchTotal===0?' zero':''}">${md.lunchTotal}</span><span style="color:#888;font-size:11px">Lunch</span></div></td>`;
+                html += `<td class="am-col-type" style="background:#e8f5e9"><div class="ameal-row-label"><span style="font-size:12px">🍔</span><span class="ameal-row-count" style="color:#2E7D32${md.lunchTotal===0?';color:#ccc':''}">${md.lunchTotal}</span><span style="color:#2E7D32;font-size:10px">Lunch</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.lunch[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
-                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍽</span><span class="ameal-row-count dinner${md.dinnerTotal===0?' zero':''}">${md.dinnerTotal}</span><span style="color:#888;font-size:11px">Dinner</span></div></td>`;
+                html += `<td class="am-col-type" style="background:#e3f2fd"><div class="ameal-row-label"><span style="font-size:12px">🍽</span><span class="ameal-row-count" style="color:#1565C0${md.dinnerTotal===0?';color:#ccc':''}">${md.dinnerTotal}</span><span style="color:#1565C0;font-size:10px">Dinner</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.dinner[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';

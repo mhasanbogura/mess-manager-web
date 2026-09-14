@@ -1747,9 +1747,9 @@ select.input-sm { cursor: pointer; }
     display: flex; align-items: center; justify-content: space-between;
     padding: 6px 16px; border-bottom: 1px solid #e0ddd5;
 }
-.ameal-month-row span { font-size: 14px; color: #555; }
-.ameal-month-row strong { font-size: 16px; color: #d32f2f; font-weight: 700; }
-.ameal-grid-wrap { padding: 0 0 80px; }
+.ameal-month-row span { font-size: 13px; color: #555; }
+.ameal-month-row strong { font-size: 15px; color: #d32f2f; font-weight: 700; }
+.ameal-grid-wrap { padding: 0 0 70px; }
 .ameal-loader { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
 .ameal-spinner {
     width: 40px; height: 40px; border: 4px solid #e0e0e0;
@@ -1760,40 +1760,40 @@ select.input-sm { cursor: pointer; }
 .ameal-grid-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .ameal-table {
     border-collapse: collapse; border-spacing: 0;
-    font-family: 'Times New Roman', sans-serif; font-size: 14px;
+    font-family: 'Times New Roman', sans-serif; font-size: 13px;
 }
 .ameal-table thead th {
     position: sticky; top: 0; z-index: 3;
     background: var(--primary); color: #fff; font-weight: 600;
-    text-align: center; padding: 10px 4px; font-size: 13px;
+    text-align: center; padding: 7px 3px; font-size: 12px;
     border: 1px solid #08306b;
 }
 .ameal-table thead th.am-col-view {
     position: sticky; left: 0; z-index: 4;
     text-align: center; background: var(--primary);
-    min-width: 230px; width: 230px;
+    min-width: 160px; width: 160px;
 }
 .ameal-table tbody td {
     text-align: center; border: 1px solid #ddd;
-    font-size: 14px; color: #333; background: #fff;
-    width: 42px; min-width: 42px; max-width: 42px; height: 42px;
-    padding: 4px 2px;
+    font-size: 13px; color: #333; background: #fff;
+    width: 32px; min-width: 32px; max-width: 32px; height: 32px;
+    padding: 2px 1px;
 }
 .ameal-table tbody td.am-col-name {
     position: sticky; left: 0; z-index: 2;
-    width: 120px; min-width: 120px; max-width: 120px; height: auto;
-    font-weight: 700; font-size: 14px; color: #fff; padding: 8px 6px;
+    width: 80px; min-width: 80px; max-width: 80px; height: auto;
+    font-weight: 700; font-size: 13px; color: #fff; padding: 6px 4px;
     vertical-align: middle; text-align: center;
 }
 .ameal-table tbody td.am-col-type {
-    position: sticky; left: 120px; z-index: 2;
-    width: 110px; min-width: 110px; max-width: 110px; height: auto;
-    text-align: left; padding: 4px 6px; vertical-align: middle;
+    position: sticky; left: 80px; z-index: 2;
+    width: 90px; min-width: 90px; max-width: 90px; height: auto;
+    text-align: left; padding: 3px 4px; vertical-align: middle;
 }
-.ameal-table .ameal-mname { font-weight: 700; font-size: 14px; color: #fff; line-height: 1.2; }
-.ameal-table .ameal-mtotal { font-size: 11px; color: rgba(255,255,255,.8); }
-.ameal-table .ameal-row-label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #555; white-space: nowrap; }
-.ameal-table .ameal-row-count { font-weight: 700; font-size: 14px; color: #0b3d91; }
+.ameal-table .ameal-mname { font-weight: 700; font-size: 13px; color: #fff; line-height: 1.2; }
+.ameal-table .ameal-mtotal { font-size: 10px; color: rgba(255,255,255,.8); }
+.ameal-table .ameal-row-label { display: flex; align-items: center; gap: 3px; font-size: 11px; color: #555; white-space: nowrap; }
+.ameal-table .ameal-row-count { font-weight: 700; font-size: 13px; color: #0b3d91; }
 .ameal-table .ameal-row-count.dinner { color: #0b3d91; }
 .ameal-table .ameal-row-count.zero { color: #aaa; }
 .ameal-table .ame-day-today { background: #e8f0fe !important; }
