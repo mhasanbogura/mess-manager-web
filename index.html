@@ -169,12 +169,12 @@
                             <span class="material-icons-round">event_available</span>
                             <div><strong id="dash-duty-name">Not assigned</strong><p>Cost duty today</p></div>
                         </div>
-                        <div class="adash-duo-box" onclick="App.navigate('bazaar')">
+                        <div class="adash-duo-box" onclick="App.navigate('bazarnote')">
                             <span class="material-icons-round">receipt_long</span>
                             <div><strong>Cost note</strong><p id="dash-live-count">Nothing on the list</p></div>
                         </div>
                     </div>
-                    <div class="adash-dinner-row">
+                    <div class="adash-dinner-row" onclick="App.navigate('menu')">
                         <span class="material-icons-round">restaurant</span>
                         <div class="adash-dinner-text"><strong>Dinner</strong><span>after 8:00pm</span></div>
                         <span class="adash-edit sm"><span class="material-icons-round">edit</span></span>
@@ -406,6 +406,55 @@
                 <button class="anotice-fab" onclick="App.showNoticeModal()"><span class="material-icons-round">push_pin</span> Pin a notice</button>
             </div>
             <div class="page" id="page-monthly"></div>
+
+            <!-- BAZAR NOTE PAGE -->
+            <div class="page" id="page-bazarnote">
+                <div class="abn-head">
+                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Bazar Note <span class="abn-count" id="abn-count">0</span></h2>
+                </div>
+                <div class="abn-body">
+                    <div class="abn-info-card">
+                        <p>Anyone can add to the <span class="material-icons-round" style="font-size:16px;vertical-align:middle">note</span> Bazar note</p>
+                        <p>Anyone can go to the bazar with <span class="material-icons-round" style="font-size:16px;vertical-align:middle">storefront</span> Bazar Mode — even without Bazar Entry permission</p>
+                        <p>Note down whatever the house needs, ready for the next time somebody goes shopping. It is a DRAFT — add and remove freely, because nothing here is counted or charged to anybody yet.</p>
+                        <p>When somebody starts <span class="material-icons-round" style="font-size:16px;vertical-align:middle">storefront</span> Bazar Mode, this list goes with them. They fill in the prices as they buy — that works with no internet — and only at the end does any of it become real, on the <span class="material-icons-round" style="font-size:16px;vertical-align:middle">shopping_cart</span> Bazar list.</p>
+                    </div>
+                    <div id="abn-items"></div>
+                </div>
+                <div class="abn-bottom">
+                    <div class="abn-input-row">
+                        <input type="text" id="abn-input" placeholder="What do we need?" maxlength="60">
+                        <button class="abn-add-btn" onclick="App.addBazarNote()"><span class="material-icons-round">add</span></button>
+                    </div>
+                    <button class="abn-go-bazar" onclick="App.navigate('bazaar')"><span class="material-icons-round">storefront</span> Go to bazar</button>
+                </div>
+            </div>
+
+            <!-- MENU TODAY PAGE -->
+            <div class="page" id="page-menu">
+                <div class="amenu-head">
+                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Menu Today</h2>
+                    <button class="icon-btn" onclick="App.toast('Menu history coming soon','info')"><span class="material-icons-round">schedule</span></button>
+                </div>
+                <div class="amenu-body">
+                    <div class="amenu-current">
+                        <span class="material-icons-round">restaurant</span>
+                        <div>
+                            <strong>Dinner now</strong> <small>after 8:00pm</small>
+                            <p id="amenu-dinner-status">Nothing set for now</p>
+                        </div>
+                    </div>
+                    <div class="amenu-tabs">
+                        <button class="amenu-tab active" data-tab="upcoming" onclick="App.switchMenuTab('upcoming')"><span class="material-icons-round">view_agenda</span> Upcoming menus</button>
+                        <button class="amenu-tab" data-tab="items" onclick="App.switchMenuTab('items')"><span class="material-icons-round">list</span> Items</button>
+                        <button class="amenu-tab" data-tab="special" onclick="App.switchMenuTab('special')"><span class="material-icons-round">star</span> Special days</button>
+                    </div>
+                    <div id="amenu-tab-content"></div>
+                </div>
+                <button class="amenu-fab" onclick="App.showAddMenu()"><span class="material-icons-round">add</span> Add</button>
+            </div>
             <div class="page" id="page-profile">
                 <div class="aprof-head"><h2>Profile & Settings</h2></div>
                 <div class="aprof-card">

@@ -266,7 +266,10 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-notices', page === 'notices');
         document.getElementById('app-screen').classList.toggle('on-duty', page === 'duty');
         document.getElementById('app-screen').classList.toggle('on-members', page === 'members');
-        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today' };
+        document.getElementById('app-screen').classList.toggle('on-bazarnote', page === 'bazarnote');
+        document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
+        document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
+        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
@@ -282,6 +285,9 @@ const App = {
         if (page === 'bazaar') this.loadBazarList();
         if (page === 'balance') this.loadManagerMoney();
         if (page === 'profile') this.loadProfile();
+        if (page === 'bazarnote') this.loadBazarNote();
+        if (page === 'menu') this.loadMenu();
+        if (page === 'monthly') this.loadMonthly();
     },
 
     async loadNotices() {
@@ -1376,6 +1382,523 @@ const App = {
     },
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
+
+    // ==================== BAZAR NOTE PAGE ====================
+    async loadBazarNote() {
+        if (!this.messId) return;
+        try {
+            const snap = await db.ref(`messes/${this.messId}/bazarNote`).once('value');
+            const items = snap.val() || {};
+            const keys = Object.keys(items);
+            document.getElementById('abn-count').textContent = keys.length;
+            const div = document.getElementById('abn-items');
+            if (!keys.length) { div.innerHTML = '<p class="abn-empty">Nothing on the list. Add whatever the house has run out of — anyone can.</p>'; return; }
+            div.innerHTML = keys.map(k => {
+                const item = items[k];
+                return `<div class="abn-item"><span class="abn-item-text">${this.esc(item.name || item)}</span><button class="abn-item-del" onclick="App.removeBazarNote('${k}')"><span class="material-icons-round">close</span></button></div>`;
+            }).join('');
+        } catch (e) { console.error('loadBazarNote error:', e); }
+    },
+
+    async addBazarNote() {
+        const inp = document.getElementById('abn-input');
+        const name = inp.value.trim();
+        if (!name) return;
+        try {
+            await db.ref(`messes/${this.messId}/bazarNote`).push({ name, addedBy: this.currentUser?.displayName || 'User', createdAt: Date.now() });
+            inp.value = '';
+            this.loadBazarNote();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async removeBazarNote(key) {
+        try {
+            await db.ref(`messes/${this.messId}/bazarNote/${key}`).remove();
+            this.loadBazarNote();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    // ==================== MENU TODAY PAGE ====================
+    async loadMenu() {
+        if (!this.messId) return;
+        const now = new Date();
+        const todayKey = this.dk(now);
+        const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        try {
+            const menuSnap = await db.ref(`messes/${this.messId}/menus/${todayKey}`).once('value');
+            const todayMenu = menuSnap.val();
+            const dinnerEl = document.getElementById('amenu-dinner-status');
+            if (todayMenu && todayMenu.dinner) {
+                dinnerEl.textContent = todayMenu.dinner;
+                dinnerEl.style.color = '#1a1a1a';
+            } else {
+                dinnerEl.textContent = 'Nothing set for now';
+                dinnerEl.style.color = '#999';
+            }
+            const div = document.getElementById('amenu-tab-content');
+            this._menuTab = 'upcoming';
+            this.renderMenuUpcoming(div, now, weekdays, months);
+        } catch (e) { console.error('loadMenu error:', e); }
+    },
+
+    renderMenuUpcoming(div, now, weekdays, months) {
+        let html = '';
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(now);
+            d.setDate(now.getDate() + i);
+            const dk = this.dk(d);
+            const isToday = i === 0;
+            html += `<div class="amenu-day-card${isToday ? ' today' : ''}">
+                <div class="amenu-day-top"><strong>${weekdays[d.getDay()]}</strong><span>${d.getDate()} ${months[d.getMonth()]}</span>${isToday ? '<span class="amenu-badge">Today</span>' : ''}</div>
+                <p class="amenu-day-menu" id="amenu-day-${dk}">Nothing set</p>
+            </div>`;
+        }
+        div.innerHTML = html;
+        this.loadMenuDays(now, 7);
+    },
+
+    async loadMenuDays(now, count) {
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        try {
+            const menusSnap = await db.ref(`messes/${this.messId}/menus`).once('value');
+            const allMenus = menusSnap.val() || {};
+            for (let i = 0; i < count; i++) {
+                const d = new Date(now);
+                d.setDate(now.getDate() + i);
+                const dk = this.dk(d);
+                const menu = allMenus[dk];
+                if (menu) {
+                    const el = document.getElementById(`amenu-day-${dk}`);
+                    if (el) {
+                        const parts = [];
+                        if (menu.breakfast) parts.push('🌅 ' + menu.breakfast);
+                        if (menu.lunch) parts.push('🍜 ' + menu.lunch);
+                        if (menu.dinner) parts.push('🍽 ' + menu.dinner);
+                        el.textContent = parts.join(' · ') || 'Nothing set';
+                        el.style.color = parts.length ? '#333' : '#999';
+                    }
+                }
+            }
+        } catch (e) { /* ignore */ }
+    },
+
+    switchMenuTab(tab) {
+        this._menuTab = tab;
+        document.querySelectorAll('.amenu-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        const div = document.getElementById('amenu-tab-content');
+        const now = new Date();
+        const weekdays = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        if (tab === 'upcoming') {
+            this.renderMenuUpcoming(div, now, weekdays, months);
+        } else if (tab === 'items') {
+            div.innerHTML = '<div class="amenu-section"><p class="amenu-hint">Items shared across all menus</p><div id="amenu-items-list"></div></div>';
+            this.loadMenuItems();
+        } else if (tab === 'special') {
+            div.innerHTML = '<div class="amenu-section"><p class="amenu-hint">Special menus for specific dates</p><div id="amenu-special-list"></div><button class="amenu-add-special" onclick="App.toast(\'Add special day coming soon\',\'info\')"><span class="material-icons-round">add</span> Add special day</button></div>';
+        }
+    },
+
+    async loadMenuItems() {
+        try {
+            const snap = await db.ref(`messes/${this.messId}/menuItems`).once('value');
+            const items = snap.val() || {};
+            const keys = Object.keys(items);
+            const div = document.getElementById('amenu-items-list');
+            if (!div) return;
+            if (!keys.length) { div.innerHTML = '<p class="amenu-empty">No items yet</p>'; return; }
+            div.innerHTML = keys.map(k => `<div class="amenu-item-row"><span>${this.esc(items[k].name || items[k])}</span></div>`).join('');
+        } catch (e) { /* ignore */ }
+    },
+
+    async showAddMenu() {
+        const now = new Date();
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.value = this.dk(now);
+        input.addEventListener('change', () => {
+            if (input.value) this.openMenuEditor(input.value);
+        });
+        input.click();
+    },
+
+    async openMenuEditor(dateKey) {
+        if (!this.messId) return;
+        const dd = new Date(dateKey + 'T00:00:00');
+        const weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const label = `${weekdays[dd.getDay()]}, ${dd.getDate()} ${months[dd.getMonth()]}`;
+        let existing = {};
+        try {
+            const snap = await db.ref(`messes/${this.messId}/menus/${dateKey}`).once('value');
+            existing = snap.val() || {};
+        } catch (e) { /* ignore */ }
+        document.getElementById('modal-title').textContent = `Menu — ${label}`;
+        document.getElementById('modal-body').innerHTML = `
+            <div class="amenu-form-row"><label>🌅 Breakfast</label><input type="text" id="menu-bf" placeholder="What's for breakfast?" value="${this.esc(existing.breakfast || '')}"></div>
+            <div class="amenu-form-row"><label>🍜 Lunch</label><input type="text" id="menu-ln" placeholder="What's for lunch?" value="${this.esc(existing.lunch || '')}"></div>
+            <div class="amenu-form-row"><label>🍽 Dinner</label><input type="text" id="menu-dn" placeholder="What's for dinner?" value="${this.esc(existing.dinner || '')}"></div>`;
+        document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.saveMenu('${dateKey}')">Save</button></div>`;
+        this.openModal();
+    },
+
+    async saveMenu(dateKey) {
+        const bf = document.getElementById('menu-bf')?.value.trim() || '';
+        const ln = document.getElementById('menu-ln')?.value.trim() || '';
+        const dn = document.getElementById('menu-dn')?.value.trim() || '';
+        const data = {};
+        if (bf) data.breakfast = bf;
+        if (ln) data.lunch = ln;
+        if (dn) data.dinner = dn;
+        try {
+            if (Object.keys(data).length) {
+                await db.ref(`messes/${this.messId}/menus/${dateKey}`).set(data);
+            } else {
+                await db.ref(`messes/${this.messId}/menus/${dateKey}`).remove();
+            }
+            this.closeModal();
+            this.loadMenu();
+            this.toast('Menu saved!', 'success');
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    // ==================== ANALYSIS PAGE ====================
+    async loadMonthly() {
+        if (!this.messId) return;
+        const now = new Date();
+        const year = this._analysisYear || now.getFullYear();
+        const mon = this._analysisMonth != null ? this._analysisMonth : now.getMonth();
+        const month = `${year}-${String(mon + 1).padStart(2, '0')}`;
+        const daysInMonth = new Date(year, mon + 1, 0).getDate();
+        const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
+        const monthLabel = `${new Date(year, mon).toLocaleString('en-US', { month: 'long' })} ${year}`;
+        try {
+            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const members = membersSnap.val() || {};
+            const mids = Object.keys(members);
+
+            const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
+            const allBz = bzSnap.val() || {};
+            let totalBazar = 0;
+            const bzByName = {};
+            const bzByDay = {};
+            const itemFreq = {};
+            Object.values(allBz).forEach(b => {
+                const amt = parseFloat(b.cost) || 0;
+                if (b.date && b.date.startsWith(month)) {
+                    totalBazar += amt;
+                    const n = (b.memberId || '').trim();
+                    if (n) bzByName[n] = (bzByName[n] || 0) + amt;
+                    const day = parseInt(b.date.slice(8, 10), 10);
+                    if (day) bzByDay[day] = (bzByDay[day] || 0) + amt;
+                    if (b.name) {
+                        const iname = b.name.trim().toLowerCase();
+                        if (!itemFreq[iname]) itemFreq[iname] = { name: b.name.trim(), count: 0, total: 0 };
+                        itemFreq[iname].count++;
+                        itemFreq[iname].total += amt;
+                    }
+                }
+            });
+
+            const mlSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(monthEnd).once('value');
+            const memberMeals = {};
+            let totalMeals = 0;
+            const mealsByDay = {};
+            mlSnap.forEach(d => {
+                const day = parseInt(d.key.slice(8, 10), 10);
+                Object.entries(d.val() || {}).forEach(([name, m]) => {
+                    const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
+                    memberMeals[name] = (memberMeals[name] || 0) + base;
+                    totalMeals += base;
+                    if (day) mealsByDay[day] = (mealsByDay[day] || 0) + base;
+                });
+            });
+
+            const rate = totalMeals > 0 ? totalBazar / totalMeals : 0;
+
+            const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
+            const depAll = depSnap.val() || {};
+            const depByName = {};
+            let totalDep = 0;
+            Object.values(depAll).forEach(v => {
+                if (v && typeof v.amount === 'number' && v.memberId) {
+                    depByName[v.memberId] = (depByName[v.memberId] || 0) + v.amount;
+                    totalDep += v.amount;
+                }
+            });
+
+            const utilSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
+            let totalUtility = 0, totalRent = 0;
+            Object.values(utilSnap.val() || {}).forEach(b => {
+                if (b.date && b.date.startsWith(month) && b.category === 'utility') {
+                    const amt = parseFloat(b.cost) || 0;
+                    if ((b.name || '').toLowerCase() === 'rent') totalRent += amt;
+                    else totalUtility += amt;
+                }
+            });
+
+            const paidIn = totalDep + totalBazar;
+            const charged = totalMeals * rate + totalUtility + totalRent;
+
+            const topItems = Object.values(itemFreq).sort((a, b) => b.total - a.total).slice(0, 8);
+
+            const memberBalances = mids.map(mid => {
+                const name = members[mid]?.name || 'Unknown';
+                const dep = depByName[name] || 0;
+                const mealCost = (memberMeals[name] || 0) * rate;
+                return { name, balance: dep - mealCost };
+            }).sort((a, b) => b.balance - a.balance);
+
+            let monthPrev = new Date(year, mon - 1, 1);
+            const prevMonth = `${monthPrev.getFullYear()}-${String(monthPrev.getMonth() + 1).padStart(2, '0')}`;
+            const prevDays = new Date(year, mon, 0).getDate();
+            const prevEnd = prevMonth + '-' + String(prevDays).padStart(2, '0');
+            const prevBzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
+            let prevBzTotal = 0;
+            Object.values(prevBzSnap.val() || {}).forEach(b => {
+                if (b.date && b.date >= prevMonth + '-01' && b.date <= prevEnd) prevBzTotal += parseFloat(b.cost) || 0;
+            });
+            const prevMlSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(prevMonth + '-01').endAt(prevEnd).once('value');
+            let prevMeals = 0;
+            prevMlSnap.forEach(d => { Object.values(d.val() || {}).forEach(m => { prevMeals += (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0); }); });
+            const prevRate = prevMeals > 0 ? prevBzTotal / prevMeals : 0;
+            const rateDiff = prevRate > 0 ? ((rate - prevRate) / prevRate * 100).toFixed(0) : 0;
+
+            const mealShare = mids.map(mid => {
+                const name = members[mid]?.name || 'Unknown';
+                return { name, meals: memberMeals[name] || 0 };
+            }).filter(m => m.meals > 0).sort((a, b) => b.meals - a.meals);
+
+            const page = document.getElementById('page-monthly');
+            page.innerHTML = `
+                <div class="am-head">
+                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Analysis</h2>
+                </div>
+                <div class="am-body">
+                    <div class="am-month-row"><label>Month</label><select id="am-month-select" onchange="App.changeAnalysisMonth(this.value)">
+                        ${this.buildMonthOptions(year, mon)}
+                    </select></div>
+                    <div class="am-stats-row">
+                        <div class="am-stat-card"><small>Total meals</small><strong>${totalMeals}</strong></div>
+                        <div class="am-stat-card"><small>Total bazar</small><strong>৳ ${this.fmtNum(totalBazar)}</strong><small>${mids.length} Members ৳${this.fmtNum(totalBazar)}</small></div>
+                        <div class="am-stat-card"><small>Cost per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
+                    </div>
+                    <div class="am-card">
+                        <h3>Manager collection – Spending = Balance</h3>
+                        <div class="am-calc-row"><span>৳ ${this.fmtNum(totalDep)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(totalUtility + totalRent)}</span><span class="am-op">=</span><span class="am-pos">৳ ${this.fmtNum(totalDep - totalUtility - totalRent)}</span></div>
+                        <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
+                        <p class="am-sub">Spending breakdown</p>
+                        <p class="am-sub">Utility: ৳ ${this.fmtNum(totalUtility + totalRent)}</p>
+                    </div>
+                    <div class="am-card">
+                        <h3>Members paid in – Charged = Balance</h3>
+                        <p class="am-desc">What the house took in, and what it actually spent</p>
+                        <div class="am-calc-row"><span>৳ ${this.fmtNum(paidIn)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(charged)}</span><span class="am-op">=</span><span class="${paidIn - charged >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(paidIn - charged)}</span></div>
+                        <div class="am-calc-labels"><span>Paid in</span><span>Charged</span><span>Balance</span></div>
+                        <p class="am-sub">Paid in breakdown</p>
+                        <p class="am-sub">To manager: ৳${this.fmtNum(totalDep)} &nbsp; Own bazar: ৳${this.fmtNum(totalBazar)}</p>
+                        <p class="am-sub">Charged breakdown</p>
+                        <p class="am-sub">Meals: ৳${this.fmtNum(totalMeals * rate)} &nbsp; Utility: ৳${this.fmtNum(totalUtility + totalRent)}</p>
+                    </div>
+                    <div class="am-card">
+                        <h3>Cost per meal trend</h3>
+                        <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
+                        <canvas id="am-rate-chart" width="350" height="200"></canvas>
+                    </div>
+                    <div class="am-card">
+                        <h3>Bazar by day</h3>
+                        <p class="am-sub">৳ ${this.fmtNum(totalBazar)} spent across the month</p>
+                        <canvas id="am-bz-chart" width="350" height="200"></canvas>
+                    </div>
+                    <div class="am-card">
+                        <h3>Meals by day</h3>
+                        <p class="am-sub">${totalMeals} meals across the month</p>
+                        <canvas id="am-ml-chart" width="350" height="200"></canvas>
+                    </div>
+                    ${topItems.length ? `<div class="am-card">
+                        <h3>Top items by cost</h3>
+                        <p class="am-sub">${topItems.length} items from ${Object.keys(allBz).length} bazar entries</p>
+                        <div class="am-top-items">${topItems.map((it, i) => {
+                            const pct = it.total / topItems[0].total * 100;
+                            const barColors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2','#42A5F5','#64B5F6'];
+                            return `<div class="am-item-row"><span class="am-item-name">${this.esc(it.name)} ${it.count > 1 ? '×' + it.count : ''}</span><div class="am-item-bar"><div class="am-item-fill" style="width:${pct}%;background:${barColors[i % barColors.length]}"></div></div><span class="am-item-cost">৳${this.fmtNum(it.total)}</span></div>`;
+                        }).join('')}</div>
+                    </div>` : ''}
+                    ${memberBalances.length ? `<div class="am-card">
+                        <h3>Member balances</h3>
+                        <p class="am-sub">Green = in credit · Red = owes (deposit – meal cost)</p>
+                        <div class="am-bal-list">${memberBalances.map(m => {
+                            const maxAbs = Math.max(...memberBalances.map(x => Math.abs(x.balance)), 1);
+                            const pct = Math.abs(m.balance) / maxAbs * 50;
+                            const cls = m.balance >= 0 ? 'am-bal-pos' : 'am-bal-neg';
+                            return `<div class="am-bal-row"><span class="am-bal-name">${this.esc(m.name)}</span><div class="am-bal-bar"><div class="am-bal-fill ${cls}" style="width:${pct}%"></div></div><span class="am-bal-val ${cls}">৳${this.fmtNum(m.balance)}</span></div>`;
+                        }).join('')}</div>
+                    </div>` : ''}
+                    ${mealShare.length ? `<div class="am-card">
+                        <h3>Meal share by member</h3>
+                        <p class="am-sub">Who ate how much of the ${totalMeals} meals</p>
+                        <div class="am-donut-wrap">
+                            <canvas id="am-donut" width="200" height="200"></canvas>
+                            <div class="am-donut-legend">${mealShare.map((m, i) => {
+                            const colors = ['#1565C0','#0d4fb5','#FFB300','#2E7D32'];
+                            return `<div class="am-donut-item"><span class="am-donut-swatch" style="background:${colors[i % colors.length]}"></span><span class="am-donut-name">${this.esc(m.name)}</span><span class="am-donut-val">${m.meals}</span></div>`;
+                        }).join('')}</div>
+                        </div>
+                    </div>` : ''}
+                    <button class="am-export-btn" onclick="App.toast('PDF export coming soon','info')"><span class="material-icons-round">picture_as_pdf</span> Export PDF</button>
+                </div>`;
+
+            setTimeout(() => {
+                this.drawRateChart(bzByDay, mealsByDay, daysInMonth);
+                this.drawBzChart(bzByDay, daysInMonth);
+                this.drawMlChart(mealsByDay, daysInMonth);
+                if (mealShare.length) this.drawDonut(mealShare);
+            }, 100);
+        } catch (e) { console.error('loadMonthly error:', e); }
+    },
+
+    buildMonthOptions(currentYear, currentMon) {
+        let html = '';
+        const now = new Date();
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const y = d.getFullYear();
+            const m = d.getMonth();
+            const val = `${y}-${String(m + 1).padStart(2, '0')}`;
+            const label = `${d.toLocaleString('en-US', { month: 'long' })} ${y}`;
+            const sel = y === currentYear && m === currentMon ? ' selected' : '';
+            html += `<option value="${val}"${sel}>${label}</option>`;
+        }
+        return html;
+    },
+
+    changeAnalysisMonth(val) {
+        const [y, m] = val.split('-').map(Number);
+        this._analysisYear = y;
+        this._analysisMonth = m - 1;
+        this.loadMonthly();
+    },
+
+    drawRateChart(bzByDay, mealsByDay, days) {
+        const c = document.getElementById('am-rate-chart');
+        if (!c) return;
+        const ctx = c.getContext('2d');
+        const w = c.width, h = c.height;
+        const pad = { t: 20, r: 10, b: 30, l: 40 };
+        ctx.clearRect(0, 0, w, h);
+        const data = [];
+        for (let d = 1; d <= days; d++) {
+            const bz = bzByDay[d] || 0;
+            const ml = mealsByDay[d] || 0;
+            data.push(ml > 0 ? bz / ml : 0);
+        }
+        const maxV = Math.max(...data, 1);
+        const xStep = (w - pad.l - pad.r) / (days - 1 || 1);
+        ctx.strokeStyle = '#0b3d91';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        data.forEach((v, i) => {
+            const x = pad.l + i * xStep;
+            const y = h - pad.b - (v / maxV) * (h - pad.t - pad.b);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+        data.forEach((v, i) => {
+            const x = pad.l + i * xStep;
+            const y = h - pad.b - (v / maxV) * (h - pad.t - pad.b);
+            ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#0b3d91'; ctx.fill();
+        });
+        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
+        for (let d = 1; d <= days; d += Math.ceil(days / 6)) {
+            ctx.fillText(d, pad.l + (d - 1) * xStep - 5, h - 5);
+        }
+    },
+
+    drawBzChart(bzByDay, days) {
+        const c = document.getElementById('am-bz-chart');
+        if (!c) return;
+        const ctx = c.getContext('2d');
+        const w = c.width, h = c.height;
+        const pad = { t: 20, r: 10, b: 30, l: 40 };
+        ctx.clearRect(0, 0, w, h);
+        const data = [];
+        for (let d = 1; d <= days; d++) data.push(bzByDay[d] || 0);
+        const maxV = Math.max(...data, 1);
+        const barW = (w - pad.l - pad.r) / days * 0.7;
+        const gap = (w - pad.l - pad.r) / days;
+        data.forEach((v, i) => {
+            const x = pad.l + i * gap + (gap - barW) / 2;
+            const bh = (v / maxV) * (h - pad.t - pad.b);
+            ctx.fillStyle = '#FFB300';
+            ctx.fillRect(x, h - pad.b - bh, barW, bh);
+            if (v > 0) {
+                ctx.fillStyle = '#333'; ctx.font = '9px sans-serif';
+                ctx.fillText('৳' + this.fmtNum(v), x, h - pad.b - bh - 4);
+            }
+        });
+        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
+        for (let d = 1; d <= days; d += Math.ceil(days / 10)) {
+            ctx.fillText(d, pad.l + (d - 1) * gap + gap / 2 - 5, h - 5);
+        }
+    },
+
+    drawMlChart(mealsByDay, days) {
+        const c = document.getElementById('am-ml-chart');
+        if (!c) return;
+        const ctx = c.getContext('2d');
+        const w = c.width, h = c.height;
+        const pad = { t: 20, r: 10, b: 30, l: 40 };
+        ctx.clearRect(0, 0, w, h);
+        const data = [];
+        for (let d = 1; d <= days; d++) data.push(mealsByDay[d] || 0);
+        const maxV = Math.max(...data, 1);
+        const barW = (w - pad.l - pad.r) / days * 0.7;
+        const gap = (w - pad.l - pad.r) / days;
+        data.forEach((v, i) => {
+            const x = pad.l + i * gap + (gap - barW) / 2;
+            const bh = (v / maxV) * (h - pad.t - pad.b);
+            ctx.fillStyle = '#26A69A';
+            ctx.fillRect(x, h - pad.b - bh, barW, bh);
+            if (v > 0) {
+                ctx.fillStyle = '#333'; ctx.font = '9px sans-serif';
+                ctx.fillText(v, x + barW / 2 - 5, h - pad.b - bh - 4);
+            }
+        });
+        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
+        for (let d = 1; d <= days; d += Math.ceil(days / 10)) {
+            ctx.fillText(d, pad.l + (d - 1) * gap + gap / 2 - 5, h - 5);
+        }
+    },
+
+    drawDonut(share) {
+        const c = document.getElementById('am-donut');
+        if (!c) return;
+        const ctx = c.getContext('2d');
+        const w = c.width, h = c.height;
+        const cx = w / 2, cy = h / 2, r = 70, inner = 40;
+        const total = share.reduce((s, m) => s + m.meals, 0);
+        const colors = ['#1565C0', '#0d4fb5', '#FFB300', '#2E7D32'];
+        let angle = -Math.PI / 2;
+        share.forEach((m, i) => {
+            const slice = (m.meals / total) * Math.PI * 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, angle, angle + slice);
+            ctx.arc(cx, cy, inner, angle + slice, angle, true);
+            ctx.closePath();
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.fill();
+            if (slice > 0.3) {
+                const mid = angle + slice / 2;
+                const pct = Math.round(m.meals / total * 100);
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 11px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(pct + '%', cx + Math.cos(mid) * (r + inner) / 2, cy + Math.sin(mid) * (r + inner) / 2 + 4);
+            }
+            angle += slice;
+        });
+    },
     copyUid() { if (this.currentUser) navigator.clipboard.writeText(this.currentUser.uid).then(() => this.toast('UID copied!', 'info')); },
     shareMessCode() { if (this.messCode) navigator.share?.({ title: 'Mess Manager', text: `Join my mess: ${this.messCode}` }).catch(() => {}); },
     sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
