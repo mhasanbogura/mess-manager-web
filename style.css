@@ -2034,8 +2034,9 @@ select.input-sm { cursor: pointer; }
 }
 .anotice-head {
     background: linear-gradient(135deg, #0b3d91, #08306b);
-    display: flex; align-items: center; gap: 24px;
-    padding: 18px 16px 20px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 16px; margin: 10px 12px 0;
 }
 .anotice-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
 .anotice-head .icon-btn:hover { background: rgba(255,255,255,.15); }
@@ -2097,8 +2098,9 @@ select.input-sm { cursor: pointer; }
 }
 .aduty-head {
     background: linear-gradient(135deg, #0b3d91, #08306b);
-    display: flex; align-items: center; gap: 24px;
-    padding: 18px 16px 20px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-radius: 16px; margin: 10px 12px 0;
 }
 .aduty-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
 .aduty-head .icon-btn:hover { background: rgba(255,255,255,.15); }
@@ -2182,12 +2184,12 @@ img, canvas { max-width: 100%; }
     .adash-table-wrap { margin: 0 10px; }
     .adash-stats-head { padding-left: 12px; padding-right: 12px; }
     /* notices */
-    .anotice-head { padding: 14px 12px 16px; gap: 14px; }
+    .anotice-head { padding: 10px 12px; gap: 12px; }
     .anotice-board { padding: 16px 12px; }
     .anotice-empty { padding: 70px 20px 30px; }
     .anotice-fab { bottom: 86px; right: 12px; padding: 14px 20px; font-size: 18px; }
     /* duty */
-    .aduty-head { padding: 14px 12px 16px; gap: 14px; }
+    .aduty-head { padding: 10px 12px; gap: 12px; }
     .aduty-banner, .aduty-card, .aduty-member { margin-left: 10px; margin-right: 10px; }
     /* bottom nav fits narrow screens */
     .bottom-nav-items { width: 100%; }
@@ -2223,7 +2225,7 @@ img, canvas { max-width: 100%; }
 
 /* ==================== FLAT PAGE ==================== */
 #page-members { font-family: 'Times New Roman', sans-serif; }
-.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; }
+.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; border-radius: 16px; margin: 10px 12px 0; }
 .aflat-head h2 { font-size: 24px; font-weight: 700; color: #fff; }
 .aflat-leave { display: flex; align-items: center; gap: 4px; background: none; border: none; color: #d32f2f; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
 .aflat-leave .material-icons-round { font-size: 20px; }
@@ -2472,7 +2474,7 @@ img, canvas { max-width: 100%; }
 }
 
 /* ==================== BAZAR NOTE PAGE ==================== */
-.abn-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: linear-gradient(135deg, #0b3d91, #08306b); }
+.abn-head { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
 .abn-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
 .abn-head .icon-btn:hover { background: rgba(255,255,255,.15); }
 .abn-head h2 { font-size: 22px; font-weight: 700; color: #fff; flex: 1; }
@@ -2495,7 +2497,7 @@ img, canvas { max-width: 100%; }
 .abn-go-bazar { width: 100%; padding: 14px; border: none; border-radius: 12px; background: #FFB300; color: #1a1a1a; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
 
 /* ==================== MENU TODAY PAGE ==================== */
-.amenu-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: linear-gradient(135deg, #0b3d91, #08306b); }
+.amenu-head { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
 .amenu-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
 .amenu-head .icon-btn:hover { background: rgba(255,255,255,.15); }
 .amenu-head h2 { font-size: 22px; font-weight: 700; color: #fff; flex: 1; }
