@@ -109,14 +109,14 @@
                 <div class="adash-mess-card">
                     <div class="adash-mess-top">
                         <h2 id="dash-mess-name">My Mess</h2>
-                        <button class="adash-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Flat ID</button>
+                        <button class="adash-share" onclick="App.shareMessCode()"><span class="material-icons-round">share</span> Share Mess ID</button>
                     </div>
                     <div class="adash-mess-grid">
                         <div class="adash-mess-box">
                             <div class="adash-mess-box-top">
                                 <span class="material-icons-round">person</span>
                                 <small>Manager</small>
-                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
+                                <span class="adash-edit" onclick="App.goToPeopleTab()"><span class="material-icons-round">edit</span></span>
                             </div>
                             <strong id="dash-manager">-</strong>
                         </div>
@@ -124,7 +124,7 @@
                             <div class="adash-mess-box-top">
                                 <span class="material-icons-round">calendar_month</span>
                                 <small>Current month</small>
-                                <span class="adash-edit"><span class="material-icons-round">edit</span></span>
+                                <span class="adash-edit" onclick="App.changeMonth()"><span class="material-icons-round">edit</span></span>
                             </div>
                             <strong id="dash-month">-</strong>
                         </div>
@@ -151,15 +151,15 @@
                         </span>
                     </div>
                     <div class="adash-meals">
-                        <div class="adash-meal breakfast">
+                        <div class="adash-meal breakfast" onclick="App.goToAddMeal('breakfast')">
                             <small>Breakfast</small>
                             <div><span class="material-icons-round">coffee</span><strong id="dash-breakfast">0</strong></div>
                         </div>
-                        <div class="adash-meal lunch">
+                        <div class="adash-meal lunch" onclick="App.goToAddMeal('lunch')">
                             <small>Lunch</small>
                             <div><span class="material-icons-round">lunch_dining</span><strong id="dash-lunch">0</strong></div>
                         </div>
-                        <div class="adash-meal dinner">
+                        <div class="adash-meal dinner" onclick="App.goToAddMeal('dinner')">
                             <small>Dinner</small>
                             <div><span class="material-icons-round">dinner_dining</span><strong id="dash-dinner">0</strong></div>
                         </div>
@@ -493,7 +493,7 @@
     <nav class="bottom-nav" id="bottom-nav">
         <div class="bottom-nav-items">
             <button class="bottom-nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')"><span class="material-icons-round">dashboard</span>Dashboard</button>
-            <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">home</span>Flat</button>
+            <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">home</span>Mess</button>
             <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Cost</button>
             <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant</span>Meal</button>
             <button class="bottom-nav-item" data-page="balance" onclick="App.navigate('balance')"><span class="material-icons-round">account_balance_wallet</span>Manager</button>

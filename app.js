@@ -179,8 +179,17 @@ const App = {
             this.messName = v.messName;
             const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
             this.userRole = roleSnap.val() || 'member';
+            this.setupPresence();
             this.showApp();
         }).catch(e => { console.error('enterMess error:', e); this.toast('Error loading mess', 'error'); });
+    },
+
+    setupPresence() {
+        if (!this.messId || !this.currentUser) return;
+        const uid = this.currentUser.uid;
+        const presRef = db.ref(`messes/${this.messId}/online/${uid}`);
+        presRef.set(true);
+        presRef.onDisconnect().remove();
     },
 
     async leaveMess() {
@@ -257,7 +266,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-notices', page === 'notices');
         document.getElementById('app-screen').classList.toggle('on-duty', page === 'duty');
         document.getElementById('app-screen').classList.toggle('on-members', page === 'members');
-        const titles = { dashboard: 'Dashboard', members: 'Flat', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today' };
+        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today' };
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
@@ -665,7 +674,13 @@ const App = {
             else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
             document.getElementById('dash-manager').textContent = managerName;
             document.getElementById('dash-month').textContent = this.fmtMonth(now);
-            document.getElementById('dash-online-count').textContent = mids.length;
+
+            let onlineCount = 0;
+            try {
+                const onlineSnap = await db.ref(`messes/${this.messId}/online`).once('value');
+                onlineCount = onlineSnap.numChildren();
+            } catch (e) { /* ignore */ }
+            document.getElementById('dash-online-count').textContent = onlineCount;
 
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -796,11 +811,39 @@ const App = {
         } catch (e) { console.error('loadDashboard error:', e); }
     },
 
-    mealPickMonth() {
+    goToPeopleTab() {
+        this.navigate('members');
+        setTimeout(() => this.switchFlatTab('peoples'), 100);
+    },
+
+    changeMonth() {
         const input = document.createElement('input');
         input.type = 'month';
         const now = new Date();
         input.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+        input.addEventListener('change', () => {
+            const v = input.value;
+            if (v) {
+                const [y, m] = v.split('-').map(Number);
+                this._mealYear = y;
+                this._mealMonth = m - 1;
+                this.navigate('meals');
+            }
+        });
+        input.click();
+    },
+
+    goToAddMeal(type) {
+        this.navigate('meals');
+        setTimeout(() => this.showAddMeal(type), 200);
+    },
+
+    mealPickMonth() {
+        const input = document.createElement('input');
+        input.type = 'month';
+        const year = this._mealYear || new Date().getFullYear();
+        const mon = this._mealMonth != null ? this._mealMonth : new Date().getMonth();
+        input.value = `${year}-${String(mon+1).padStart(2,'0')}`;
         input.addEventListener('change', () => {
             const v = input.value;
             if (v) {
@@ -820,7 +863,7 @@ const App = {
         const mon = this._mealMonth != null ? this._mealMonth : now.getMonth();
         const month = `${year}-${String(mon + 1).padStart(2, '0')}`;
         const daysInMonth = new Date(year, mon + 1, 0).getDate();
-        const monthLabel = `${now.toLocaleString('en-US',{month:'long'})} ${year}`;
+        const monthLabel = `${new Date(year, mon).toLocaleString('en-US',{month:'long'})} ${year}`;
         document.getElementById('ameal-month').textContent = monthLabel;
         const loader = document.getElementById('ameal-loader');
         const scroll = document.getElementById('ameal-grid-scroll');
@@ -893,7 +936,7 @@ const App = {
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
-    async showAddMeal() {
+    async showAddMeal(preType) {
         if (!this.messId) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
@@ -908,8 +951,8 @@ const App = {
             const m = members[mid] || {};
             const name = m.name || 'Unknown';
             const bg = colors[idx % colors.length];
-            this._aamData[name] = { breakfast: 0, lunch: 0, dinner: 0 };
-            cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:20px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: 0</span></div><div class="aam-meals-row"><div class="aam-meal-col"><label>Breakfast</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button><span class="aam-val" id="aam-bf-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button></div></div><div class="aam-meal-col"><label>Lunch</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button><span class="aam-val" id="aam-ln-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button></div></div><div class="aam-meal-col"><label>Dinner</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button><span class="aam-val" id="aam-dn-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button></div></div></div></div>`;
+            this._aamData[name] = { breakfast: preType === 'breakfast' ? 1 : 0, lunch: preType === 'lunch' ? 1 : 0, dinner: preType === 'dinner' ? 1 : 0 };
+            cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:20px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: ${preType ? 1 : 0}</span></div><div class="aam-meals-row"><div class="aam-meal-col"><label>Breakfast</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button><span class="aam-val" id="aam-bf-${idx}">${preType === 'breakfast' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button></div></div><div class="aam-meal-col"><label>Lunch</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button><span class="aam-val" id="aam-ln-${idx}">${preType === 'lunch' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button></div></div><div class="aam-meal-col"><label>Dinner</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button><span class="aam-val" id="aam-dn-${idx}">${preType === 'dinner' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button></div></div></div></div>`;
         });
         document.getElementById('modal-title').textContent = 'Add Meal';
         document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="cursor:pointer" onclick="App.aamPickDate()"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
