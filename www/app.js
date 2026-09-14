@@ -691,7 +691,7 @@ const App = {
                     b1.classList.toggle('active');
                     b2.classList.toggle('active');
                 }
-            }, 2000);
+            }, 5000);
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
 
