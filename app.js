@@ -666,6 +666,30 @@ const App = {
             const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
 
             const userName = this.currentUser?.displayName || 'User';
+            const initial = (userName.trim()[0] || 'U').toUpperCase();
+
+            const avatarEl = document.getElementById('dash-avatar');
+            if (avatarEl) avatarEl.textContent = initial;
+            const usernameEl = document.getElementById('dash-username');
+            if (usernameEl) usernameEl.textContent = userName;
+
+            const hour = now.getHours();
+            const greetEl = document.getElementById('dash-greeting');
+            if (greetEl) {
+                if (hour < 12) greetEl.textContent = 'Good morning';
+                else if (hour < 17) greetEl.textContent = 'Good afternoon';
+                else greetEl.textContent = 'Good evening';
+            }
+
+            if (this._bannerInterval) clearInterval(this._bannerInterval);
+            this._bannerInterval = setInterval(() => {
+                const b1 = document.getElementById('banner-brand');
+                const b2 = document.getElementById('banner-greeting');
+                if (b1 && b2) {
+                    b1.classList.toggle('active');
+                    b2.classList.toggle('active');
+                }
+            }, 2000);
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
 
