@@ -803,19 +803,22 @@ const App = {
             const memberData = {};
             mids.forEach(mid => {
                 const m = members[mid] || {};
-                memberData[mid] = { name: m.name || 'Unknown', noon: new Array(daysInMonth).fill(0), night: new Array(daysInMonth).fill(0), noonTotal: 0, nightTotal: 0 };
+                memberData[mid] = { name: m.name || 'Unknown', breakfast: new Array(daysInMonth).fill(0), lunch: new Array(daysInMonth).fill(0), dinner: new Array(daysInMonth).fill(0), breakfastTotal: 0, lunchTotal: 0, dinnerTotal: 0 };
             });
             Object.entries(allMeals).forEach(([dateKey, dayMeals]) => {
                 const day = parseInt(dateKey.slice(8, 10), 10) - 1;
                 if (day < 0 || day >= daysInMonth) return;
                 Object.entries(dayMeals || {}).forEach(([mid, m]) => {
                     if (!memberData[mid]) return;
+                    const breakfast = m.breakfast || 0;
                     const lunch = m.lunch || 0;
                     const dinner = m.dinner || 0;
-                    memberData[mid].noon[day] += lunch;
-                    memberData[mid].night[day] += dinner;
-                    memberData[mid].noonTotal += lunch;
-                    memberData[mid].nightTotal += dinner;
+                    memberData[mid].breakfast[day] += breakfast;
+                    memberData[mid].lunch[day] += lunch;
+                    memberData[mid].dinner[day] += dinner;
+                    memberData[mid].breakfastTotal += breakfast;
+                    memberData[mid].lunchTotal += lunch;
+                    memberData[mid].dinnerTotal += dinner;
                 });
             });
             const today = now.getDate();
@@ -826,17 +829,25 @@ const App = {
             mids.forEach((mid, idx) => {
                 const md = memberData[mid];
                 const bg = colors[idx % colors.length];
-                html += `<tr><td rowspan="2" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${md.noonTotal + md.nightTotal})</div></td>`;
-                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍜</span><span class="ameal-row-count${md.noonTotal===0?' zero':''}">${md.noonTotal}</span><span style="color:#888;font-size:11px">Noon</span></div></td>`;
+                const total = md.breakfastTotal + md.lunchTotal + md.dinnerTotal;
+                html += `<tr><td rowspan="3" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
+                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🌅</span><span class="ameal-row-count${md.breakfastTotal===0?' zero':''}">${md.breakfastTotal}</span><span style="color:#888;font-size:11px">Breakfast</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
-                    const v = md.noon[d];
+                    const v = md.breakfast[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
-                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍽</span><span class="ameal-row-count dinner${md.nightTotal===0?' zero':''}">${md.nightTotal}</span><span style="color:#888;font-size:11px">Night</span></div></td>`;
+                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍜</span><span class="ameal-row-count${md.lunchTotal===0?' zero':''}">${md.lunchTotal}</span><span style="color:#888;font-size:11px">Lunch</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
-                    const v = md.night[d];
+                    const v = md.lunch[d];
+                    const cls = d + 1 === today ? ' class="ame-day-today"' : '';
+                    html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
+                }
+                html += '</tr><tr>';
+                html += `<td class="am-col-type" style="background:#eef1f6"><div class="ameal-row-label"><span style="font-size:14px">🍽</span><span class="ameal-row-count dinner${md.dinnerTotal===0?' zero':''}">${md.dinnerTotal}</span><span style="color:#888;font-size:11px">Dinner</span></div></td>`;
+                for (let d = 0; d < daysInMonth; d++) {
+                    const v = md.dinner[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
                 }
