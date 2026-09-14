@@ -1344,6 +1344,7 @@ select.input-sm { cursor: pointer; }
 }
 
 @media (min-width: 768px) {
+    .topbar { left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 700px; }
     .main-content { padding: 16px 24px; max-width: 700px; margin: 70px auto 0; padding-bottom: 24px; }
     #app-screen.on-dashboard .main-content { margin-top: 0; }
     #app-screen.on-members .main-content { margin-top: 0; }
