@@ -1031,18 +1031,24 @@ const App = {
     },
 
     aamPickDate() {
+        const el = document.getElementById('aam-date-input');
+        if (el) { el.focus(); el.showPicker?.(); return; }
         const input = document.createElement('input');
         input.type = 'date';
+        input.id = 'aam-date-input';
         input.value = this._aamDate;
-        input.addEventListener('change', () => {
-            const v = input.value;
-            if (v) {
-                this._aamDate = v;
-                const dd = new Date(v + 'T00:00:00');
-                document.getElementById('aam-date-text').textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'short'})} ${dd.getFullYear()}`;
+        input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:none;outline:none;z-index:9999';
+        input.addEventListener('input', () => {
+            if (input.value) {
+                this._aamDate = input.value;
+                const dd = new Date(input.value + 'T00:00:00');
+                const txt = document.getElementById('aam-date-text');
+                if (txt) txt.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'short'})} ${dd.getFullYear()}`;
             }
         });
-        input.click();
+        document.body.appendChild(input);
+        input.focus();
+        input.showPicker?.();
     },
 
     async aamSave() {
@@ -1520,7 +1526,7 @@ const App = {
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Cost</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
-            <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span></div>
+            <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div id="bz-bazar-section">
                 <div class="dep-label">Money from:</div>
                 <div class="dep-chips" id="bz-money-chips">
@@ -1682,10 +1688,14 @@ const App = {
     bzClose() { this.closeModal(); },
 
     bzPickDate() {
+        const el = document.getElementById('bz-date-input');
+        if (el) { el.focus(); el.showPicker?.(); return; }
         const input = document.createElement('input');
         input.type = 'date';
+        input.id = 'bz-date-input';
         input.value = this._bzDate;
-        input.addEventListener('change', () => {
+        input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:none;outline:none;z-index:9999';
+        input.addEventListener('input', () => {
             if (input.value) {
                 this._bzDate = input.value;
                 const dd = new Date(input.value + 'T00:00:00');
@@ -1693,7 +1703,9 @@ const App = {
                 if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
             }
         });
-        input.click();
+        document.body.appendChild(input);
+        input.focus();
+        input.showPicker?.();
     },
 
     async showAddDeposit() {
@@ -1712,7 +1724,7 @@ const App = {
                 <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
-            <div class="dep-date" style="cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span></div>
+            <div class="dep-date" style="cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money of:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
@@ -1749,10 +1761,14 @@ const App = {
     },
 
     depPickDate() {
+        const el = document.getElementById('dep-date-input');
+        if (el) { el.focus(); el.showPicker?.(); return; }
         const input = document.createElement('input');
         input.type = 'date';
+        input.id = 'dep-date-input';
         input.value = this._depDate;
-        input.addEventListener('change', () => {
+        input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:none;outline:none;z-index:9999';
+        input.addEventListener('input', () => {
             if (input.value) {
                 this._depDate = input.value;
                 const dd = new Date(input.value + 'T00:00:00');
@@ -1760,7 +1776,9 @@ const App = {
                 if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
             }
         });
-        input.click();
+        document.body.appendChild(input);
+        input.focus();
+        input.showPicker?.();
     },
 
     async saveDeposit() {
