@@ -1066,7 +1066,10 @@ const App = {
         if (!this.messId) return;
         const now = new Date();
         const month = this.mk(now);
-        document.getElementById('abalance-month').textContent = month;
+        document.getElementById('abalance-month').textContent = this.fmtMonth(now);
+        this._depFilter = 'all';
+        const filterBtns = document.querySelectorAll('#abalance-filters .abazar-filter-btn');
+        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
         const div = document.getElementById('abalance-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
@@ -1075,38 +1078,52 @@ const App = {
                 db.ref(`messes/${this.messId}/members`).once('value')
             ]);
             const members = membersSnap.val() || {};
-            const allDeps = depSnap.val() || {};
-            const filtered = Object.entries(allDeps)
+            this._allDeps = Object.entries(depSnap.val() || {})
                 .filter(([, v]) => v.date && v.date.startsWith(month))
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
-            if (!filtered.length) { div.innerHTML = '<p class="empty-state">No deposits this month</p>'; return; }
-            const grouped = {};
-            filtered.forEach(([k, v]) => {
-                const day = v.date.slice(0, 10);
-                (grouped[day] = grouped[day] || []).push({ key: k, ...v });
-            });
-            let html = '';
-            Object.entries(grouped).forEach(([day, deps]) => {
-                const d = new Date(day + 'T00:00:00');
-                const dayTotal = deps.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
-                const expanded = day === Object.keys(grouped)[0];
-                html += `<div class="abazar-day-card">
-                    <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
-                        <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${deps.length} entr${deps.length>1?'ies':'y'} &middot; Total: ৳${this.fmtNum(dayTotal)}</p></div>
-                        <span class="material-icons-round">expand_more</span>
-                    </div>
-                    <div class="abazar-day-items" style="${expanded?'':'display:none'}">
-                        <div class="abazar-day-items-head"><span>MONEY OF</span><span></span><span>AMOUNT</span></div>
-                        ${deps.map(i => `<div class="abazar-item-row">
-                            <span class="abazar-item-name">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
-                            <span></span>
-                            <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)}</span>
-                        </div>`).join('')}
-                    </div>
-                </div>`;
-            });
-            div.innerHTML = html;
+            this._depMembers = members;
+            this.renderDeposits();
         } catch (e) { console.error('loadManagerMoney error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
+    },
+
+    filterDeposits(filter) {
+        this._depFilter = filter;
+        document.querySelectorAll('#abalance-filters .abazar-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+        this.renderDeposits();
+    },
+
+    renderDeposits() {
+        const filter = this._depFilter || 'all';
+        const deps = filter === 'all' ? (this._allDeps || []) : (this._allDeps || []).filter(([, v]) => (v.category || 'meal') === filter);
+        const members = this._depMembers || {};
+        const div = document.getElementById('abalance-list');
+        if (!deps.length) { div.innerHTML = '<p class="empty-state">No deposits this month</p>'; return; }
+        const grouped = {};
+        deps.forEach(([k, v]) => {
+            const day = v.date.slice(0, 10);
+            (grouped[day] = grouped[day] || []).push({ key: k, ...v });
+        });
+        let html = '';
+        Object.entries(grouped).forEach(([day, dayDeps]) => {
+            const d = new Date(day + 'T00:00:00');
+            const dayTotal = dayDeps.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
+            const expanded = day === Object.keys(grouped)[0];
+            html += `<div class="abazar-day-card">
+                <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
+                    <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayDeps.length} entr${dayDeps.length>1?'ies':'y'} &middot; Total: ৳${this.fmtNum(dayTotal)}</p></div>
+                    <span class="material-icons-round">expand_more</span>
+                </div>
+                <div class="abazar-day-items" style="${expanded?'':'display:none'}">
+                    <div class="abazar-day-items-head"><span>MONEY OF</span><span>CATEGORY</span><span>AMOUNT</span></div>
+                    ${dayDeps.map(i => `<div class="abazar-item-row">
+                        <span class="abazar-item-name">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
+                        <span class="abazar-item-buyer">${i.category === 'utility' ? '<span class=\"material-icons-round\" style=\"font-size:14px;vertical-align:middle;color:#E65100\">lightbulb</span> Utility' : '<span class=\"material-icons-round\" style=\"font-size:14px;vertical-align:middle;color:#0b3d91\">restaurant</span> Meal'}</span>
+                        <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)}</span>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+        });
+        div.innerHTML = html;
     },
 
     toggleDayCard(head) {
@@ -1325,10 +1342,6 @@ const App = {
         this._depCategory = 'meal';
         document.getElementById('modal-title').textContent = 'Add Deposit';
         document.getElementById('modal-body').innerHTML = `
-            <div class="bz-tabs" style="padding:0 0 12px">
-                <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
-                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
-            </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span></div>
             <div class="dep-label">Money of:</div>
             <div class="dep-chips" id="dep-chips">
@@ -1345,11 +1358,6 @@ const App = {
             </div>`;
         this._depSelected = null;
         this.openModal();
-    },
-
-    depSwitchTab(tab) {
-        this._depCategory = tab;
-        document.querySelectorAll('.bz-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
     },
 
     depPick(el) {

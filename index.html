@@ -382,11 +382,10 @@
                     </div>
                 </div>
                 <div class="abazar-month-row"><span>Current Month:</span><strong id="abalance-month">-</strong></div>
-                <div class="abazar-filters">
-                    <div class="abazar-filter-btn"><span class="material-icons-round">filter_list</span> No Filter <span class="material-icons-round">expand_more</span></div>
-                    <div class="abazar-filter-btn"><span class="material-icons-round">arrow_downward</span> Recently ad... <span class="material-icons-round">expand_more</span></div>
-                    <button class="abazar-view-btn active"><span class="material-icons-round">calendar_month</span></button>
-                    <button class="abazar-view-btn"><span class="material-icons-round">view_list</span></button>
+                <div class="abazar-filters" id="abalance-filters">
+                    <button class="abazar-filter-btn active" data-filter="all" onclick="App.filterDeposits('all')"><span class="material-icons-round">filter_list</span> All</button>
+                    <button class="abazar-filter-btn" data-filter="meal" onclick="App.filterDeposits('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
+                    <button class="abazar-filter-btn" data-filter="utility" onclick="App.filterDeposits('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
                 </div>
                 <div id="abalance-list"></div>
                 <button class="abazar-fab" onclick="App.showAddDeposit()"><span class="material-icons-round">add</span> Add</button>
