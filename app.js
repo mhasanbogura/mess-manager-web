@@ -1013,7 +1013,7 @@ const App = {
             cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:18px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: ${preType ? 1 : 0}</span></div><div class="aam-meals-row"><div class="aam-meal-col"><label>Breakfast</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button><span class="aam-val" id="aam-bf-${idx}">${preType === 'breakfast' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button></div></div><div class="aam-meal-col"><label>Lunch</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button><span class="aam-val" id="aam-ln-${idx}">${preType === 'lunch' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button></div></div><div class="aam-meal-col"><label>Dinner</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button><span class="aam-val" id="aam-dn-${idx}">${preType === 'dinner' ? 1 : 0}</span><button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button></div></div></div></div>`;
         });
         document.getElementById('modal-title').textContent = 'Add Meal';
-        document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="cursor:pointer" onclick="App.aamPickDate()"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="position:relative;cursor:pointer"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span><input type="date" id="aam-date-input" value="${this._aamDate}" onchange="App.aamOnDateChange(this.value)" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none"></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
         document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.aamSave()" style="width:100%;padding:12px;border-radius:10px">Add</button></div>`;
         this.openModal();
     },
@@ -1030,25 +1030,12 @@ const App = {
         if (tel) tel.textContent = `Total: ${total}`;
     },
 
-    aamPickDate() {
-        const el = document.getElementById('aam-date-input');
-        if (el) { el.focus(); el.showPicker?.(); return; }
-        const input = document.createElement('input');
-        input.type = 'date';
-        input.id = 'aam-date-input';
-        input.value = this._aamDate;
-        input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:none;outline:none;z-index:9999';
-        input.addEventListener('input', () => {
-            if (input.value) {
-                this._aamDate = input.value;
-                const dd = new Date(input.value + 'T00:00:00');
-                const txt = document.getElementById('aam-date-text');
-                if (txt) txt.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'short'})} ${dd.getFullYear()}`;
-            }
-        });
-        document.body.appendChild(input);
-        input.focus();
-        input.showPicker?.();
+    aamOnDateChange(val) {
+        if (!val) return;
+        this._aamDate = val;
+        const dd = new Date(val + 'T00:00:00');
+        const txt = document.getElementById('aam-date-text');
+        if (txt) txt.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'short'})} ${dd.getFullYear()}`;
     },
 
     async aamSave() {
@@ -1526,7 +1513,7 @@ const App = {
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Cost</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
-            <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
+            <div class="dep-date" style="position:relative;cursor:pointer"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><input type="date" id="bz-date-input" value="${this._bzDate}" onchange="App.bzOnDateChange(this.value)" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none"></div>
             <div id="bz-bazar-section">
                 <div class="dep-label">Money from:</div>
                 <div class="dep-chips" id="bz-money-chips">
@@ -1687,25 +1674,12 @@ const App = {
 
     bzClose() { this.closeModal(); },
 
-    bzPickDate() {
-        const el = document.getElementById('bz-date-input');
-        if (el) { el.focus(); el.showPicker?.(); return; }
-        const input = document.createElement('input');
-        input.type = 'date';
-        input.id = 'bz-date-input';
-        input.value = this._bzDate;
-        input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:none;outline:none;z-index:9999';
-        input.addEventListener('input', () => {
-            if (input.value) {
-                this._bzDate = input.value;
-                const dd = new Date(input.value + 'T00:00:00');
-                const el = document.getElementById('bz-date-text');
-                if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
-            }
-        });
-        document.body.appendChild(input);
-        input.focus();
-        input.showPicker?.();
+    bzOnDateChange(val) {
+        if (!val) return;
+        this._bzDate = val;
+        const dd = new Date(val + 'T00:00:00');
+        const el = document.getElementById('bz-date-text');
+        if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
     },
 
     async showAddDeposit() {
@@ -1724,7 +1698,7 @@ const App = {
                 <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
-            <div class="dep-date" style="cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
+            <div class="dep-date" style="position:relative;cursor:pointer"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><input type="date" id="dep-date-input" value="${this._depDate}" onchange="App.depOnDateChange(this.value)" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none"></div>
             <div class="dep-label">Money of:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
@@ -1760,25 +1734,12 @@ const App = {
         if (el) el.textContent = '৳ ' + this.fmtNum(amt);
     },
 
-    depPickDate() {
-        const el = document.getElementById('dep-date-input');
-        if (el) { el.focus(); el.showPicker?.(); return; }
-        const input = document.createElement('input');
-        input.type = 'date';
-        input.id = 'dep-date-input';
-        input.value = this._depDate;
-        input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;border:none;outline:none;z-index:9999';
-        input.addEventListener('input', () => {
-            if (input.value) {
-                this._depDate = input.value;
-                const dd = new Date(input.value + 'T00:00:00');
-                const el = document.getElementById('dep-date-text');
-                if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
-            }
-        });
-        document.body.appendChild(input);
-        input.focus();
-        input.showPicker?.();
+    depOnDateChange(val) {
+        if (!val) return;
+        this._depDate = val;
+        const dd = new Date(val + 'T00:00:00');
+        const el = document.getElementById('dep-date-text');
+        if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
     },
 
     async saveDeposit() {

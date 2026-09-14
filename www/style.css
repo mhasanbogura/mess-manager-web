@@ -1801,21 +1801,21 @@ select.input-sm { cursor: pointer; }
 /* ==================== DEPOSIT MODAL ==================== */
 .dep-date { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #333; padding: 4px 0 6px; border-bottom: 1px solid #e0ddd5; font-weight: 500; }
 .dep-date .material-icons-round { font-size: 20px; color: #555; }
-.dep-label { font-size: 14px; color: #555; margin: 12px 0 8px; }
-.dep-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.dep-label { font-size: 13px; color: #555; margin: 8px 0 4px; }
+.dep-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .dep-chip {
-    padding: 8px 18px; border-radius: 20px; border: 1.5px solid #ccc;
-    background: #fff; font-size: 14px; font-family: inherit; color: #333;
+    padding: 6px 14px; border-radius: 18px; border: 1.5px solid #ccc;
+    background: #fff; font-size: 13px; font-family: inherit; color: #333;
     cursor: pointer; transition: all .15s;
 }
 .dep-chip.active { border-color: var(--primary); background: #e8f0fe; color: #333; font-weight: 600; }
-.dep-input-wrap { display: flex; align-items: center; gap: 6px; margin-top: 18px; border-bottom: 2px solid #e0ddd5; padding: 8px 0; }
-.dep-taka { font-size: 20px; font-weight: 700; color: #333; }
-.dep-input { flex: 1; border: none; outline: none; font-size: 16px; font-family: inherit; color: #333; background: transparent; }
+.dep-input-wrap { display: flex; align-items: center; gap: 6px; margin-top: 12px; border-bottom: 2px solid #e0ddd5; padding: 6px 0; }
+.dep-taka { font-size: 18px; font-weight: 700; color: #333; }
+.dep-input { flex: 1; border: none; outline: none; font-size: 15px; font-family: inherit; color: #333; background: transparent; }
 .dep-input::placeholder { color: #999; }
-.dep-footer-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.dep-footer-hint { font-size: 14px; color: #888; }
-.dep-footer-total { font-size: 18px; font-weight: 700; color: #d32f2f; }
+.dep-footer-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.dep-footer-hint { font-size: 13px; color: #888; }
+.dep-footer-total { font-size: 16px; font-weight: 700; color: #d32f2f; }
 .dep-footer-btns { display: flex; gap: 12px; }
 .dep-footer-btns .btn-modal-add { flex: 1; }
 .dep-footer-btns .btn-modal-cancel { flex: 1; }
