@@ -47,9 +47,14 @@ const App = {
     showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
 
     bindBackButton() {
-        window.addEventListener('popstate', () => {
+        window.addEventListener('popstate', (e) => {
             if (!document.getElementById('app-screen')?.classList.contains('active')) return;
-            if (this.currentPage && this.currentPage !== 'dashboard') this.navigate('dashboard');
+            if (e.state && e.state.page) {
+                this._fromPopstate = true;
+                this.navigate(e.state.page);
+            } else if (this.currentPage && this.currentPage !== 'dashboard') {
+                this.navigate('dashboard');
+            }
         });
         const hwBack = () => {
             const appActive = document.getElementById('app-screen')?.classList.contains('active');
@@ -250,7 +255,7 @@ const App = {
         this.showScreen('app-screen');
         const splash = document.getElementById('splash-screen');
         if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
-        try { history.pushState({ app: true }, ''); } catch (e) { /* ignore */ }
+        try { history.pushState({ page: 'dashboard' }, ''); } catch (e) { /* ignore */ }
         this.navigate('dashboard');
     },
 
@@ -280,7 +285,8 @@ const App = {
         if (page === 'balance') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'deptrash\')"><span class="material-icons-round">delete</span></button>';
         if (page === 'costtrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'bazaar\')"><span class="material-icons-round">arrow_back</span></button>';
         if (page === 'deptrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'balance\')"><span class="material-icons-round">arrow_back</span></button>';
-        if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
+        if (page !== 'dashboard' && !this._fromPopstate) { try { history.pushState({ page }, ''); } catch (e) { /* ignore */ } }
+        this._fromPopstate = false;
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
         document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
         document.getElementById('app-screen').classList.toggle('on-profile', page === 'profile');

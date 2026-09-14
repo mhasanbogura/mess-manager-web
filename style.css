@@ -2031,7 +2031,7 @@ select.input-sm { cursor: pointer; }
 #app-screen.on-notices .main-content { margin-top: 0; padding: 0 0 72px; background: #fff; }
 #page-notices {
     font-family: Georgia, 'Times New Roman', serif;
-    background: #e8ecf2;
+    background: #fff;
     min-height: calc(100vh - 72px);
     position: relative;
     padding-bottom: 90px;
