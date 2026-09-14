@@ -179,7 +179,7 @@ body {
     border-radius: 16px;
 }
 .topbar-title { flex: 1; cursor: pointer; overflow: hidden; min-width: 0; }
-.topbar h2 { font-size: 16px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -0.3px; }
+.topbar h2 { font-size: 18px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -0.3px; }
 .topbar-actions { display: flex; align-items: center; gap: 4px; }
 .topbar-btn { background: none; border: none; color: #fff; cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background .15s; }
 .topbar-btn:hover { background: rgba(255,255,255,.15); }
@@ -2035,14 +2035,14 @@ select.input-sm { cursor: pointer; }
 }
 .anotice-head {
     background: linear-gradient(135deg, #0b3d91, #08306b);
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: center; gap: 10px;
     padding: 10px 12px;
     border-radius: 16px; margin: 10px 12px 0;
 }
-.anotice-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
+.anotice-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .anotice-head .icon-btn:hover { background: rgba(255,255,255,.15); }
-.anotice-head .material-icons-round { font-size: 32px; }
-.anotice-head h2 { font-size: 28px; font-weight: 500; color: #fff; }
+.anotice-head .material-icons-round { font-size: 24px; }
+.anotice-head h2 { font-size: 18px; font-weight: 700; color: #fff; }
 .anotice-board {
     background: #fff;
     min-height: calc(100vh - 260px);
@@ -2099,14 +2099,14 @@ select.input-sm { cursor: pointer; }
 }
 .aduty-head {
     background: linear-gradient(135deg, #0b3d91, #08306b);
-    display: flex; align-items: center; gap: 12px;
+    display: flex; align-items: center; gap: 10px;
     padding: 10px 12px;
     border-radius: 16px; margin: 10px 12px 0;
 }
-.aduty-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
+.aduty-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .aduty-head .icon-btn:hover { background: rgba(255,255,255,.15); }
-.aduty-head .material-icons-round { font-size: 32px; }
-.aduty-head h2 { font-size: 28px; font-weight: 500; color: #fff; }
+.aduty-head .material-icons-round { font-size: 24px; }
+.aduty-head h2 { font-size: 18px; font-weight: 700; color: #fff; }
 .aduty-banner {
     background: #e8f0fe; border: 1.5px solid var(--primary); border-radius: 18px;
     margin: 12px 12px 0; padding: 14px 16px;
@@ -2227,7 +2227,7 @@ img, canvas { max-width: 100%; }
 /* ==================== FLAT PAGE ==================== */
 #page-members { font-family: 'Times New Roman', sans-serif; }
 .aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; border-radius: 16px; margin: 10px 12px 0; }
-.aflat-head h2 { font-size: 24px; font-weight: 700; color: #fff; }
+.aflat-head h2 { font-size: 18px; font-weight: 700; color: #fff; }
 .aflat-leave { display: flex; align-items: center; gap: 4px; background: none; border: none; color: #d32f2f; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
 .aflat-leave .material-icons-round { font-size: 20px; }
 
@@ -2475,10 +2475,10 @@ img, canvas { max-width: 100%; }
 }
 
 /* ==================== BAZAR NOTE PAGE ==================== */
-.abn-head { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
-.abn-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
+.abn-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
+.abn-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .abn-head .icon-btn:hover { background: rgba(255,255,255,.15); }
-.abn-head h2 { font-size: 22px; font-weight: 700; color: #fff; flex: 1; }
+.abn-head h2 { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
 .abn-count { display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,.25); border-radius: 50%; width: 28px; height: 28px; font-size: 13px; margin-left: 8px; }
 .abn-body { flex: 1; overflow-y: auto; padding: 16px 12px 100px; }
 .abn-info-card { background: #e8ecf2; border: 1px solid #d0d8e4; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
@@ -2498,10 +2498,10 @@ img, canvas { max-width: 100%; }
 .abn-go-bazar { width: 100%; padding: 14px; border: none; border-radius: 12px; background: #FFB300; color: #1a1a1a; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
 
 /* ==================== MENU TODAY PAGE ==================== */
-.amenu-head { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
-.amenu-head .icon-btn { color: #fff; min-width: 40px; min-height: 40px; }
+.amenu-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
+.amenu-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .amenu-head .icon-btn:hover { background: rgba(255,255,255,.15); }
-.amenu-head h2 { font-size: 22px; font-weight: 700; color: #fff; flex: 1; }
+.amenu-head h2 { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
 .amenu-body { flex: 1; overflow-y: auto; padding: 16px 12px 80px; }
 .amenu-current { display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: #fff9e6; border: 1px solid #ffe082; border-radius: 14px; margin-bottom: 14px; }
 .amenu-current .material-icons-round { font-size: 28px; color: #333; margin-top: 2px; }
