@@ -726,6 +726,7 @@ const App = {
             let bazTotal = 0;
             const paidBy = {};
             Object.values(bzSnap.val() || {}).forEach(b => {
+                if ((b.category || 'bazar') === 'utility') return;
                 const amt = parseFloat(b.cost) || 0;
                 bazTotal += amt;
                 const n = (b.memberId || '').trim();
@@ -794,9 +795,10 @@ const App = {
             const rentByName = {};
             Object.values(bzSnap.val() || {}).forEach(b => {
                 const amt = parseFloat(b.cost) || 0;
-                const n = (b.memberId || '').trim();
-                if (!n) return;
+                if (!amt) return;
                 if (b.category === 'utility') {
+                    const n = (b.splitWith || b.memberId || '').trim();
+                    if (!n) return;
                     if ((b.name || '').toLowerCase() === 'rent') {
                         rentByName[n] = (rentByName[n] || 0) + amt;
                     } else {
@@ -1321,7 +1323,7 @@ const App = {
             for (const name of this._bzUtilSelected) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
                     name: this._bzUtilType, cost: Math.round(share * 100) / 100,
-                    memberId: name, date: dateKey, category: 'utility', createdAt: Date.now()
+                    memberId: 'Manager', splitWith: name, date: dateKey, category: 'utility', createdAt: Date.now()
                 });
             }
         }
