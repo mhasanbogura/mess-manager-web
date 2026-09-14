@@ -1516,6 +1516,11 @@ select.input-sm { cursor: pointer; }
 .adash-fin-box strong { font-size: 16px; font-weight: 600; color: #111; white-space: nowrap; }
 .adash-fin-box strong.pos { color: #2E9E44; }
 .adash-fin-box strong.neg { color: #D32F2F; }
+.adash-fin-box.meal-fin, .adash-fin-box.util-fin {
+    background: var(--primary); color: #fff; border-color: var(--primary);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+.adash-fin-box.meal-fin small, .adash-fin-box.util-fin small { color: rgba(255,255,255,.8); font-weight: 600; }
 .adash-analyse {
     background: var(--primary); border: none; border-radius: 12px;
     padding: 6px 10px; font-family: inherit; font-size: 14px; color: #fff;

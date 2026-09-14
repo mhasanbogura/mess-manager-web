@@ -763,12 +763,25 @@ const App = {
                 }
             });
 
-            document.getElementById('dash-deposit').textContent = '৳ ' + this.fmtNum(totalDep);
-            const finBal = totalDep - bazTotal;
+            document.getElementById('dash-deposit').textContent = '৳ ' + this.fmtNum(totalMealDep);
+            const finBal = totalMealDep - bazTotal;
             const balEl = document.getElementById('dash-balance');
             balEl.textContent = '৳ ' + this.fmtNum(finBal);
             balEl.className = finBal < 0 ? 'neg' : 'pos';
             document.getElementById('dash-rate').textContent = '৳ ' + rate.toFixed(2);
+
+            let totalRent = 0, totalUtilCost = 0;
+            Object.values(bzSnap.val() || {}).forEach(b => {
+                if ((b.category || 'bazar') !== 'utility') return;
+                const amt = parseFloat(b.cost) || 0;
+                if ((b.name || '').toLowerCase() === 'rent') totalRent += amt;
+                else totalUtilCost += amt;
+            });
+            document.getElementById('dash-util-deposit').textContent = '৳ ' + this.fmtNum(totalUtilDep);
+            const utilBal = totalUtilDep - totalRent - totalUtilCost;
+            const utilBalEl = document.getElementById('dash-util-balance');
+            utilBalEl.textContent = '৳ ' + this.fmtNum(utilBal);
+            utilBalEl.className = utilBal < 0 ? 'neg' : 'pos';
 
             const rowsEl = document.getElementById('dash-member-rows');
             if (!mids.length) { rowsEl.innerHTML = '<tr><td colspan="5" class="empty-state">No data</td></tr>'; return; }
