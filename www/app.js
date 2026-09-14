@@ -270,7 +270,9 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
         const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today' };
+        const hideTopbar = ['bazaar', 'meals', 'balance', 'profile'];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
+        document.querySelector('.topbar').style.display = hideTopbar.includes(page) ? 'none' : '';
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
         document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
@@ -666,6 +668,30 @@ const App = {
             const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
 
             const userName = this.currentUser?.displayName || 'User';
+            const initial = (userName.trim()[0] || 'U').toUpperCase();
+
+            const avatarEl = document.getElementById('dash-avatar');
+            if (avatarEl) avatarEl.textContent = initial;
+            const usernameEl = document.getElementById('dash-username');
+            if (usernameEl) usernameEl.textContent = userName;
+
+            const hour = now.getHours();
+            const greetEl = document.getElementById('dash-greeting');
+            if (greetEl) {
+                if (hour < 12) greetEl.textContent = 'Good morning';
+                else if (hour < 17) greetEl.textContent = 'Good afternoon';
+                else greetEl.textContent = 'Good evening';
+            }
+
+            if (this._bannerInterval) clearInterval(this._bannerInterval);
+            this._bannerInterval = setInterval(() => {
+                const b1 = document.getElementById('banner-brand');
+                const b2 = document.getElementById('banner-greeting');
+                if (b1 && b2) {
+                    b1.classList.toggle('active');
+                    b2.classList.toggle('active');
+                }
+            }, 2000);
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
 

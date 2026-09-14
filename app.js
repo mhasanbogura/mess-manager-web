@@ -270,7 +270,9 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
         const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today' };
+        const hideTopbar = ['bazaar', 'meals', 'balance', 'profile'];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
+        document.querySelector('.topbar').style.display = hideTopbar.includes(page) ? 'none' : '';
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
         document.getElementById('app-screen').classList.toggle('on-bazaar', page === 'bazaar');
         document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
