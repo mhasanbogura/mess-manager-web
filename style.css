@@ -1717,6 +1717,28 @@ select.input-sm { cursor: pointer; }
 }
 .ameal-action .material-icons-round { font-size: 22px; color: #222; }
 .ameal-action small { font-size: 10px; color: #555; }
+.amealhist-card {
+    background: #fff; border: 1px solid #e8e8e8; border-radius: 12px;
+    margin: 8px 12px; padding: 12px 14px; cursor: pointer; transition: all .2s;
+}
+.amealhist-card:hover { background: #fafafa; }
+.amealhist-row { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.amealhist-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.amealhist-right { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+.amealhist-name { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+.amealhist-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.amealhist-dot.green { background: #2E9E44; }
+.amealhist-dot.red { background: #D32F2F; }
+.amealhist-type { font-size: 14px; font-weight: 600; }
+.amealhist-count { font-size: 13px; color: #777; }
+.amealhist-user { font-size: 11px; color: #666; }
+.amealhist-date { font-size: 11px; color: #999; }
+.ameatlhist-chevron { font-size: 20px; color: #ccc; flex-shrink: 0; transition: transform .2s; }
+.amealhist-card.expanded .ameatlhist-chevron { transform: rotate(180deg); }
+.amealhist-detail { display: none; padding: 10px 0 0; border-top: 1px solid #eef1f6; margin-top: 10px; }
+.amealhist-card.expanded .amealhist-detail { display: block; }
+.amealhist-detail-row { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #2E9E44; flex-wrap: wrap; }
+.amealhist-detail-info { font-size: 13px; color: #333; margin-top: 4px; }
 .ameal-month-row {
     display: flex; align-items: center; justify-content: space-between;
     padding: 8px 16px; border-bottom: 1px solid #e0ddd5;

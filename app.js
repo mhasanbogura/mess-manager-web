@@ -269,8 +269,8 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-bazarnote', page === 'bazarnote');
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
-        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today' };
-        const hideTopbar = ['bazaar', 'meals', 'balance', 'profile'];
+        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal', bazaar: 'Cost', balance: 'Manager', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Edits' };
+        const hideTopbar = ['bazaar', 'meals', 'balance', 'profile', 'mealhistory'];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         document.querySelector('.topbar').style.display = hideTopbar.includes(page) ? 'none' : '';
         if (page !== 'dashboard') { try { history.replaceState({ page }, ''); } catch (e) { /* ignore */ } }
@@ -290,6 +290,7 @@ const App = {
         if (page === 'bazarnote') this.loadBazarNote();
         if (page === 'menu') this.loadMenu();
         if (page === 'monthly') this.loadMonthly();
+        if (page === 'mealhistory') this.loadMealHistory();
     },
 
     async loadNotices() {
@@ -1036,14 +1037,73 @@ const App = {
         if (!this.messId || !this._aamData) return;
         const dateKey = this._aamDate;
         let saved = 0;
+        const userName = this.currentUser?.displayName || 'Unknown';
         for (const [name, m] of Object.entries(this._aamData)) {
             if (m.breakfast || m.lunch || m.dinner) {
                 await db.ref(`messes/${this.messId}/meals/${dateKey}/${name}`).set({ lunch: m.lunch, dinner: m.dinner, breakfast: m.breakfast });
+                const meals = [];
+                if (m.breakfast) meals.push('Breakfast');
+                if (m.lunch) meals.push('Lunch');
+                if (m.dinner) meals.push('Dinner');
+                await db.ref(`messes/${this.messId}/mealHistory`).push({
+                    member: name, date: dateKey, type: meals.join(', '),
+                    count: (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0),
+                    action: 'added', user: userName, createdAt: Date.now()
+                });
                 saved++;
             }
         }
         if (saved) { this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
         else this.toast('Set at least one meal', 'error');
+    },
+
+    async loadMealHistory() {
+        if (!this.messId) return;
+        const now = new Date();
+        const month = this.mk(now);
+        document.getElementById('mealhist-month').textContent = this.fmtMonth(now);
+        const div = document.getElementById('mealhist-list');
+        div.innerHTML = '<p class="empty-state">Loading...</p>';
+        try {
+            const snap = await db.ref(`messes/${this.messId}/mealHistory`).orderByChild('createdAt').once('value');
+            const entries = Object.entries(snap.val() || {})
+                .filter(([, v]) => v.date && v.date.startsWith(month))
+                .sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+            if (!entries.length) { div.innerHTML = '<p class="empty-state">No meal edits this month</p>'; return; }
+            let html = '';
+            entries.forEach(([k, v]) => {
+                const d = new Date(v.createdAt || 0);
+                const dateStr = d.toLocaleString('en', { day: 'numeric', month: 'short', year: 'numeric' });
+                const timeStr = d.toLocaleString('en', { hour: 'numeric', minute: '2-digit', hour12: true });
+                const typeColor = (v.type || '').includes('Lunch') ? '#2E7D32' : (v.type || '').includes('Dinner') ? '#1565C0' : '#E65100';
+                const actionIcon = v.action === 'removed' ? 'remove_circle' : 'check_circle';
+                const actionColor = v.action === 'removed' ? '#D32F2F' : typeColor;
+                html += `<div class="amealhist-card" onclick="this.classList.toggle('expanded')">
+                    <div class="amealhist-row">
+                        <div class="amealhist-left">
+                            <span class="amealhist-name">${this.esc(v.member || '?')}</span>
+                            <span class="amealhist-dot" style="background:${actionColor}"></span>
+                            <span class="amealhist-type" style="color:${typeColor}">${this.esc(v.type || '?')}</span>
+                            <span class="amealhist-count">${v.count || 0} meal${v.count !== 1 ? 's' : ''}</span>
+                        </div>
+                        <div class="amealhist-right">
+                            <span class="amealhist-user">${v.action === 'removed' ? 'Removed by:' : 'Added by:'} ${this.esc(v.user || '?')}</span>
+                            <span class="amealhist-date">${dateStr} ${timeStr}</span>
+                        </div>
+                        <span class="material-icons-round ameatlhist-chevron">expand_more</span>
+                    </div>
+                    <div class="amealhist-detail">
+                        <div class="amealhist-detail-row">
+                            <span class="amealhist-dot ${v.action === 'removed' ? 'red' : 'green'}"></span>
+                            <span>${v.action === 'removed' ? 'Removed' : 'Added'} by: <strong>${this.esc(v.user || '?')}</strong></span>
+                            <span> · ${dateStr} ${timeStr}</span>
+                        </div>
+                        <div class="amealhist-detail-info">${this.esc(v.type || '?')} — ${v.count || 0} meal(s)</div>
+                    </div>
+                </div>`;
+            });
+            div.innerHTML = html;
+        } catch (e) { console.error('loadMealHistory error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
     async loadBazarList() {
