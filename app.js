@@ -733,13 +733,6 @@ const App = {
             } catch (e) { /* notices may not exist */ }
             document.getElementById('dash-notice-preview').textContent = preview;
 
-            let noteTxt = 'Nothing on the list';
-            try {
-                const noteSnap = await db.ref(`messes/${this.messId}/bazarNote`).once('value');
-                if (noteSnap.val()) noteTxt = noteSnap.val();
-            } catch (e) { /* ignore */ }
-            document.getElementById('dash-live-count').textContent = noteTxt;
-
             let dutyName = 'Not assigned';
             try {
                 const dSnap = await db.ref(`messes/${this.messId}/bazarDuty/${todayKey}`).once('value');
