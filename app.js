@@ -1840,10 +1840,22 @@ const App = {
     async loadProfile() {
         if (!this.currentUser) return;
         const u = this.currentUser;
-        document.getElementById('prof-avatar').textContent = (u.displayName || 'U').charAt(0).toUpperCase();
         document.getElementById('prof-name').textContent = u.displayName || 'User';
         document.getElementById('prof-email').textContent = u.email || '-';
         document.getElementById('prof-uid-text').textContent = u.uid ? u.uid.slice(0, 12) + '...' : '-';
+        try {
+            const snap = await window.db.ref(`users/${u.uid}/profilePicture`).once('value');
+            const photo = snap.val();
+            const avatar = document.getElementById('prof-avatar');
+            if (photo) {
+                avatar.style.backgroundImage = `url(${photo})`;
+                avatar.style.backgroundSize = 'cover';
+                avatar.textContent = '';
+                avatar.style.color = 'transparent';
+            } else {
+                avatar.textContent = (u.displayName || 'U').charAt(0).toUpperCase();
+            }
+        } catch (e) {}
     },
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
@@ -2370,6 +2382,58 @@ const App = {
     shareMessCode() { if (this.messCode) navigator.share?.({ title: 'Mess Manager', text: `Join my mess: ${this.messCode}` }).catch(() => {}); },
     sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
     signOut() { auth.signOut(); },
+    changeProfilePicture() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { this.toast('Image must be under 2MB', 'error'); return; }
+            try {
+                const reader = new FileReader();
+                reader.onload = async (ev) => {
+                    const dataUrl = ev.target.result;
+                    const uid = this.currentUser.uid;
+                    const messId = this.messId || 'default';
+                    await window.db.ref(`users/${uid}/profilePicture`).set(dataUrl);
+                    await window.db.ref(`messes/${messId}/members/${this.currentUser.displayName}/photo`).set(dataUrl);
+                    document.getElementById('prof-avatar').style.backgroundImage = `url(${dataUrl})`;
+                    document.getElementById('prof-avatar').style.backgroundSize = 'cover';
+                    document.getElementById('prof-avatar').style.color = 'transparent';
+                    this.toast('Profile picture updated!', 'success');
+                };
+                reader.readAsDataURL(file);
+            } catch (e) { this.toast('Failed to upload: ' + e.message, 'error'); }
+        };
+        input.click();
+    },
+    deleteAccount() {
+        if (!this.currentUser) return;
+        this.showConfirm('Delete Account', 'This will permanently delete your account and all data. Type DELETE to confirm:', async (confirmed) => {
+            if (!confirmed) return;
+            try {
+                const uid = this.currentUser.uid;
+                const messId = this.messId || 'default';
+                await window.db.ref(`users/${uid}`).remove();
+                await window.db.ref(`messes/${messId}/members/${this.currentUser.displayName}`).remove();
+                await this.currentUser.delete();
+                this.toast('Account deleted', 'success');
+            } catch (e) { this.toast(e.message, 'error'); }
+        });
+    },
+    showConfirm(title, msg, cb) {
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `<p style="margin:0 0 16px;font-size:15px;color:#333">${msg}</p>
+            <div style="display:flex;gap:10px;justify-content:flex-end">
+                <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Confirm</button>
+                <button id="confirm-no" style="padding:10px 24px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#333;font-size:14px;cursor:pointer">Cancel</button>
+            </div>`;
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-overlay').classList.add('active');
+        document.getElementById('confirm-yes').onclick = () => { document.getElementById('modal-overlay').classList.remove('active'); cb(true); };
+        document.getElementById('confirm-no').onclick = () => { document.getElementById('modal-overlay').classList.remove('active'); cb(false); };
+    },
     openModal() { document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
 
