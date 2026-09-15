@@ -971,7 +971,7 @@ const App = {
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
                     const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','breakfast',${v})"` : '';
-                    html += `<td${cls}${click} style="${v?'color:#333;font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
+                    html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
                 html += `<td class="am-col-type" style="background:#e8f5e9"><div class="ameal-row-label"><span style="font-size:12px">🍔</span><span class="ameal-row-count" style="color:#2E7D32${md.lunchTotal===0?';color:#ccc':''}">${md.lunchTotal}</span><span style="color:#2E7D32;font-size:10px">Lunch</span></div></td>`;
@@ -980,7 +980,7 @@ const App = {
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
                     const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','lunch',${v})"` : '';
-                    html += `<td${cls}${click} style="${v?'color:#333;font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
+                    html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
                 html += `<td class="am-col-type" style="background:#e3f2fd"><div class="ameal-row-label"><span style="font-size:12px">🍽</span><span class="ameal-row-count" style="color:#1565C0${md.dinnerTotal===0?';color:#ccc':''}">${md.dinnerTotal}</span><span style="color:#1565C0;font-size:10px">Dinner</span></div></td>`;
@@ -989,7 +989,7 @@ const App = {
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                     const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
                     const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','dinner',${v})"` : '';
-                    html += `<td${cls}${click} style="${v?'color:#333;font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
+                    html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
                 html += '</tr>';
             });
@@ -2515,10 +2515,10 @@ const App = {
     },
     showConfirm(title, msg, cb) {
         const body = document.getElementById('modal-body');
-        body.innerHTML = `<p style="margin:0 0 16px;font-size:15px;color:#333">${msg}</p>
+        body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">${msg}</p>
             <div style="display:flex;gap:10px;justify-content:flex-end">
                 <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Confirm</button>
-                <button id="confirm-no" style="padding:10px 24px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#333;font-size:14px;cursor:pointer">Cancel</button>
+                <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
             </div>`;
         document.getElementById('modal-title').textContent = title;
         document.getElementById('modal-overlay').classList.add('active');
