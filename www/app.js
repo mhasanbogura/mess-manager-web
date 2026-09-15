@@ -667,6 +667,7 @@ const App = {
         const div = document.getElementById('flat-permissions-list');
         try {
             const mids = Object.keys(members).filter(id => !id.startsWith('member_'));
+            console.log('loadFlatPermissions mids:', mids, 'all keys:', Object.keys(members));
             mids.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
             const pSnap = await window.db.ref(`messes/${this.messId}/permissions`).once('value');
