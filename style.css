@@ -326,43 +326,37 @@ body {
 }
 
 .dash-mess-card {
-    background: linear-gradient(160deg, #0b3d91, #08306b 60%, #08306b);
-    border-radius: var(--radius); padding: 20px; color: white; margin-bottom: 12px;
+    background: var(--card);
+    border-radius: var(--radius); padding: 20px; color: var(--text); margin-bottom: 12px;
     position: relative; overflow: hidden;
-    box-shadow: 0 4px 20px rgba(11,61,145,0.2);
-    border: 1px solid rgba(11,61,145,0.3);
+    border: 1px solid var(--card-border);
 }
-.dash-mess-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 90% 10%, rgba(255,255,255,0.08) 0%, transparent 50%);
-    pointer-events: none;
-}
+.dash-mess-card::before { content: none; }
 .dash-mess-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; position: relative; z-index: 1; }
-.dash-mess-top h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
-.dash-mess-sub { opacity: 0.7; font-size: 12px; margin-top: 3px; }
+.dash-mess-top h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); }
+.dash-mess-sub { color: #888; font-size: 12px; margin-top: 3px; }
 
 .btn-share {
     display: flex; align-items: center; gap: 6px; padding: 8px 16px;
-    background: rgba(255,255,255,0.12); backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 20px; color: white; font-size: 12px; font-weight: 600;
+    background: var(--bg); backdrop-filter: blur(8px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px; color: var(--primary); font-size: 12px; font-weight: 600;
     cursor: pointer; font-family: inherit; white-space: nowrap; min-height: 40px;
     transition: all var(--transition);
 }
-.btn-share:hover { background: rgba(255,255,255,0.2); transform: scale(1.02); }
+.btn-share:hover { background: #e8f0fe; transform: scale(1.02); }
 .btn-share .material-icons-round { font-size: 16px; }
 
 .dash-mess-info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: relative; z-index: 1; }
 
 .dash-info-box {
     display: flex; align-items: center; gap: 10px;
-    background: rgba(255,255,255,0.08); backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: var(--bg); border: 1px solid var(--card-border);
     border-radius: var(--radius-sm); padding: 12px;
 }
-.dash-info-box .material-icons-round { font-size: 18px; opacity: 0.8; }
-.dash-info-box small { font-size: 11px; opacity: 0.6; display: block; }
-.dash-info-box strong { font-size: 13px; }
+.dash-info-box .material-icons-round { font-size: 18px; color: var(--primary); }
+.dash-info-box small { font-size: 11px; color: #888; display: block; }
+.dash-info-box strong { font-size: 13px; color: var(--text); }
 
 .dash-notice-bar {
     display: flex; align-items: center; gap: 12px;
@@ -850,42 +844,36 @@ select.input-sm { cursor: pointer; }
 .btn-leave-top:hover { background: rgba(244,67,54,0.1); border-color: #F44336; }
 
 .flat-mess-card {
-    background: linear-gradient(160deg, #0b3d91, #08306b 60%, #08306b);
-    border-radius: var(--radius); padding: 18px; color: white; margin-bottom: 12px;
+    background: var(--card);
+    border-radius: var(--radius); padding: 18px; color: var(--text); margin-bottom: 12px;
     position: relative; overflow: hidden;
-    box-shadow: 0 4px 20px rgba(11,61,145,0.2);
-    border: 1px solid rgba(11,61,145,0.3);
+    border: 1px solid var(--card-border);
 }
-.flat-mess-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.06) 0%, transparent 50%);
-    pointer-events: none;
-}
+.flat-mess-card::before { content: none; }
 .flat-mess-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; position: relative; z-index: 1; }
 .flat-mess-icon {
-    width: 52px; height: 52px; background: rgba(255,255,255,0.12);
-    backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.15);
+    width: 52px; height: 52px; background: var(--bg);
+    border: 1px solid var(--card-border);
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
 }
-.flat-mess-icon .material-icons-round { font-size: 26px; }
-.flat-mess-info h2 { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; }
+.flat-mess-icon .material-icons-round { font-size: 26px; color: var(--primary); }
+.flat-mess-info h2 { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; color: var(--text); }
 .flat-rate-badge {
     display: inline-flex; align-items: center; gap: 4px;
-    background: rgba(255,255,255,0.12); backdrop-filter: blur(6px);
+    background: var(--bg); border: 1px solid var(--card-border);
     padding: 4px 10px; border-radius: 12px; font-size: 11px; margin-top: 6px;
-    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
 }
-.flat-rate-badge .material-icons-round { font-size: 14px; }
+.flat-rate-badge .material-icons-round { font-size: 14px; color: var(--primary); }
 
 .flat-mess-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; position: relative; z-index: 1; }
 .flat-id-box, .flat-manager-box {
     display: flex; align-items: center; justify-content: space-between;
-    background: rgba(255,255,255,0.08); backdrop-filter: blur(6px);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: var(--bg); border: 1px solid var(--card-border);
     border-radius: var(--radius-sm); padding: 10px 12px;
 }
-.flat-id-box small, .flat-manager-box small { font-size: 11px; opacity: 0.6; display: block; }
-.flat-id-box strong, .flat-manager-box strong { font-size: 12px; display: block; margin-top: 2px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px; }
+.flat-id-box small, .flat-manager-box small { font-size: 11px; color: #888; display: block; }
+.flat-id-box strong, .flat-manager-box strong { font-size: 12px; display: block; margin-top: 2px; letter-spacing: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px; color: var(--text); }
 
 .flat-tabs {
     display: flex; gap: 0; margin-bottom: 14px;
