@@ -682,7 +682,7 @@ const App = {
                 const userPerms = perms[id] || {};
                 const isMe = id === this.currentUser.uid;
                 const checks = permKeys.map((k, j) => {
-                    const checked = isAdmin || userPerms[k];
+                    const checked = !!userPerms[k];
                     const canClick = iCanToggle && !isAdmin && !isMe;
                     return `<div class="aflat-perm-row">
                         <div class="aflat-perm-check ${checked ? 'checked' : ''}" onclick="App.togglePerm('${id}','${k}',this)" ${!canClick ? 'style="pointer-events:none;opacity:.5"' : ''}>
@@ -705,6 +705,7 @@ const App = {
     async togglePerm(uid, key, el) {
         if (!this.messId) return;
         if (!this.checkPerm('togglePerms')) return;
+        if (uid === this.currentUser.uid) { this.toast("Can't change own permissions", 'error'); return; }
         try {
             const isChecked = el.classList.toggle('checked');
             await window.db.ref(`messes/${this.messId}/permissions/${uid}/${key}`).set(isChecked);
