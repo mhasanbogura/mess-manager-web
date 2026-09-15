@@ -1567,7 +1567,7 @@ const App = {
                 </div>
                 <div class="abazar-day-items abazar-dep-grid" style="${expanded?'':'display:none'}">
                     <div class="abazar-day-items-head abazar-dep-grid"><span>MONEY FROM</span><span>AMOUNT</span></div>
-                    ${dayDeps.map(i => `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
+                    ${dayDeps.map(i => `<div class="abazar-item-row abazar-dep-grid" onclick="App.toggleBazarItem(this)">
                         <span class="abazar-item-name">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
                         <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)} <span class="material-icons-round">expand_more</span></span>
                     </div>

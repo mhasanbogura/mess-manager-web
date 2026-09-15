@@ -1963,19 +1963,19 @@ select.input-sm { cursor: pointer; }
 
 .abazar-day-items { border-top: 1px solid #eef1f6; }
 .abazar-day-items-head {
-    display: grid; grid-template-columns: 1fr 1fr auto;
+    display: grid; grid-template-columns: 1fr 1fr 100px;
     padding: 8px 14px; font-size: 11px; color: #999; font-weight: 600;
     text-transform: uppercase; letter-spacing: .5px; text-align: center;
 }
 .abazar-day-items-head.abazar-util-grid { grid-template-columns: 1fr 1.2fr 0.7fr 0.8fr; gap: 8px; text-align: center; }
-.abazar-day-items-head.abazar-dep-grid { grid-template-columns: 1fr auto; text-align: center; }
+.abazar-day-items-head.abazar-dep-grid { grid-template-columns: 1fr 120px; gap: 0; text-align: center; }
 .abazar-item-row {
-    display: grid; grid-template-columns: 1fr 1fr auto;
+    display: grid; grid-template-columns: 1fr 1fr 100px;
     padding: 10px 14px; align-items: center; border-top: 1px solid #eef1f6;
     cursor: pointer; transition: background .15s; text-align: center;
 }
 .abazar-item-row.abazar-util-grid { grid-template-columns: 1fr 1.2fr 0.7fr 0.8fr; gap: 8px; text-align: center; }
-.abazar-item-row.abazar-dep-grid { grid-template-columns: 1fr auto; text-align: center; }
+.abazar-item-row.abazar-dep-grid { grid-template-columns: 1fr 120px; gap: 0; text-align: center; }
 .abazar-item-row:hover { background: #f8f9fb; }
 .abazar-item-row.expanded { background: #f0f4fa; border-radius: 8px 8px 0 0; }
 .abazar-item-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
