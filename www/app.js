@@ -1623,7 +1623,7 @@ const App = {
         this._bzMembers = names;
         this._bzDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         this._bzItems = [{ name: '', cost: '' }];
-        this._bzMoneyBy = '';
+        this._bzMoneyBy = 'Manager';
         this._bzDoneBy = '';
         this._bzTab = 'bazar';
         this._bzUtilType = '';
@@ -1640,7 +1640,7 @@ const App = {
             <div id="bz-bazar-section">
                 <div class="dep-label">Money from:</div>
                 <div class="dep-chips" id="bz-money-chips">
-                    <button class="dep-chip" data-name="Manager" onclick="App.bzPickMoney(this)">Manager</button>
+                    <button class="dep-chip active" data-name="Manager" onclick="App.bzPickMoney(this)">Manager</button>
                     ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.bzPickMoney(this)">${n}</button>`).join('')}
                 </div>
                 <div class="dep-label">Done by:</div>
@@ -1772,6 +1772,7 @@ const App = {
             const items = this._bzItems.filter(i => i.name && i.cost);
             if (!items.length) { this.toast('Add at least one item', 'error'); return; }
             if (!this._bzMoneyBy) { this.toast('Pick whose money it is', 'error'); return; }
+            if (!this._bzDoneBy) { this.toast('Pick who did the shopping', 'error'); return; }
             for (const item of items) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
                     name: item.name, cost: parseFloat(item.cost) || 0,
