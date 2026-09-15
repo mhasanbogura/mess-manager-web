@@ -1996,9 +1996,7 @@ const App = {
             } else {
                 const initial = (u.displayName || 'U').charAt(0).toUpperCase();
                 const avatar = document.getElementById('prof-avatar');
-                const rowAvatar = document.getElementById('prof-row-avatar');
                 if (avatar) avatar.textContent = initial;
-                if (rowAvatar) rowAvatar.textContent = initial;
             }
         } catch (e) {}
         const saved = localStorage.getItem('mess_theme') || 'light';
@@ -2618,7 +2616,7 @@ const App = {
     sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
     signOut() { auth.signOut(); },
     setProfilePic(dataUrl) {
-        const ids = ['prof-avatar', 'prof-row-avatar', 'dash-avatar'];
+        const ids = ['prof-avatar', 'dash-avatar'];
         ids.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
