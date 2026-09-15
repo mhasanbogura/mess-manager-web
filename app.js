@@ -1072,7 +1072,7 @@ const App = {
             const showDn = !viewHide.dinner;
             const visibleRows = [showBf, showLc, showDn].filter(Boolean).length;
             let html = '<thead><tr><th class="am-col-view" colspan="2"><span class="ameal-row-label" style="justify-content:center;cursor:pointer;color:#fff" onclick="App.showMealViewPopup()"><span class="material-icons-round" style="font-size:14px">tune</span> View</span></th>';
-                    for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#c8ddf0"':''}>${d}</th>`;
+                    for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#c8ddf0;color:#000"':''}>${d}</th>`;
             html += '</tr></thead><tbody>';
             const colors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2'];
             const mealTypes = [];
