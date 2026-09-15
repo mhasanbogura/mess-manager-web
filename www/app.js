@@ -579,7 +579,7 @@ const App = {
                 const id = appUsers[i];
                 const m = members[id] || {};
                 let u = {};
-                try { const uSnap = await db.ref(`users/${id}`).once('value'); u = uSnap.val() || {}; } catch (e) { /* user record may not exist */ }
+                try { const uSnap = await db.ref(`users/${id}`).once('value'); u = uSnap.val() || {}; } catch (e) {}
                 const initial = ((m.name || u.name || '?')[0] || '?').toUpperCase();
                 const isAdmin = m.role === 'admin';
                 const color = colors[i % colors.length];
@@ -588,17 +588,60 @@ const App = {
                 let profilePic = '';
                 try { const picSnap = await window.db.ref(`users/${id}/profilePicture`).once('value'); profilePic = picSnap.val() || ''; } catch (e) {}
                 const avatarStyle = profilePic ? `background-image:url(${profilePic});background-size:cover;background-position:center;color:transparent` : `background:${color}`;
-                html += `<div class="aflat-people-item">
+                let actionsHtml = '';
+                if (isYou && isAdmin) {
+                    actionsHtml = `<div class="fp-actions">
+                        <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.stepDownManager()">Step down as manager</button>
+                        <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
+                    </div>`;
+                } else if (!isYou) {
+                    actionsHtml = `<div class="fp-actions">
+                        ${!isAdmin ? `<button class="fp-btn fp-btn-yellow" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote as manager</button>` : ''}
+                        <button class="fp-btn fp-btn-gray" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>
+                    </div>`;
+                }
+                html += `<div class="aflat-people-item" onclick="this.classList.toggle('expanded')">
                     <div class="aflat-people-avatar" style="${avatarStyle}">${profilePic ? '' : initial}</div>
                     <div class="aflat-people-info">
                         <h4>${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager' + (isYou ? ', You' : '') + ')</span>' : ''}</h4>
                         <div class="email">${this.esc(email)}</div>
+                        ${actionsHtml}
                     </div>
-                    <span class="material-icons-round chevron">chevron_right</span>
+                    <span class="material-icons-round chevron">expand_more</span>
                 </div>`;
             }
             div.innerHTML = html;
         } catch (e) { console.error('loadFlatPeoples error:', e); }
+    },
+
+    stepDownManager() {
+        if (!confirm('Step down as manager?')) return;
+        this.promoteToManager(this.currentUser.uid, this.currentUser.displayName);
+    },
+
+    async promoteToManager(uid, name) {
+        if (!confirm(`Promote ${name} as manager?`)) return;
+        try {
+            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const members = membersSnap.val() || {};
+            const updates = {};
+            for (const [id, m] of Object.entries(members)) {
+                if (m.role === 'admin') updates[`messes/${this.messId}/members/${id}/role`] = 'member';
+            }
+            updates[`messes/${this.messId}/members/${uid}/role`] = 'admin';
+            await window.db.ref().update(updates);
+            this.toast('Manager changed!', 'success');
+            this.loadFlat();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async removePerson(uid, name) {
+        if (!confirm(`Remove ${name} from mess?`)) return;
+        try {
+            await db.ref(`messes/${this.messId}/members/${uid}`).remove();
+            this.toast('Removed!', 'success');
+            this.loadFlat();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
     async loadFlatPermissions(members) {
