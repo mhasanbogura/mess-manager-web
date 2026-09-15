@@ -1967,15 +1967,18 @@ select.input-sm { cursor: pointer; }
     padding: 8px 14px; font-size: 11px; color: #999; font-weight: 600;
     text-transform: uppercase; letter-spacing: .5px;
 }
+.abazar-day-items-head.abazar-util-grid { grid-template-columns: 1fr 1fr auto auto; }
 .abazar-item-row {
     display: grid; grid-template-columns: 1fr 1fr auto;
     padding: 10px 14px; align-items: center; border-top: 1px solid #eef1f6;
     cursor: pointer; transition: background .15s;
 }
+.abazar-item-row.abazar-util-grid { grid-template-columns: 1fr 1fr auto auto; }
 .abazar-item-row:hover { background: #f8f9fb; }
 .abazar-item-row.expanded { background: #f0f4fa; border-radius: 8px 8px 0 0; }
 .abazar-item-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
 .abazar-item-buyer { font-size: 14px; color: #555; }
+.abazar-item-each { font-size: 13px; color: #888; }
 .abazar-item-cost { font-size: 15px; font-weight: 600; color: #d32f2f; display: flex; align-items: center; gap: 4px; }
 .abazar-item-cost .material-icons-round { font-size: 18px; color: #ccc; transition: transform .2s; }
 .abazar-item-row.expanded .abazar-item-cost .material-icons-round { transform: rotate(180deg); }
@@ -2691,6 +2694,8 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-day-info h3 { color: #e8ebf1; }
 [data-theme="oled"] .abazar-day-info p { color: #999; }
 [data-theme="oled"] .abazar-item-name { color: #e8ebf1; }
+[data-theme="oled"] .abazar-item-buyer { color: #999; }
+[data-theme="oled"] .abazar-item-each { color: #999; }
 [data-theme="oled"] .amealhist-name { color: #e8ebf1; }
 [data-theme="oled"] .amealhist-detail { color: #ccc; }
 [data-theme="oled"] .aduty-member-top strong { color: #e8ebf1; }

@@ -1368,34 +1368,67 @@ const App = {
 
     renderBazarList() {
         const filter = this._bazarFilter || 'bazar';
-        const items = filter === 'all' ? (this._allBazar || []) : (this._allBazar || []).filter(([, v]) => (v.category || 'bazar') === filter);
+        let items = filter === 'all' ? (this._allBazar || []) : (this._allBazar || []).filter(([, v]) => (v.category || 'bazar') === filter);
         const members = this._bazarMembers || {};
+        const isUtility = filter === 'utility';
+
+        if (isUtility) {
+            const grouped = {};
+            items.forEach(([k, v]) => {
+                const gKey = `${v.date}_${v.name}`;
+                if (!grouped[gKey]) grouped[gKey] = { name: v.name, date: v.date, total: 0, members: [], key: k, category: v.category, addedBy: v.addedBy, createdAt: v.createdAt };
+                grouped[gKey].total += parseFloat(v.cost) || 0;
+                if (v.splitWith && !grouped[gKey].members.includes(v.splitWith)) grouped[gKey].members.push(v.splitWith);
+            });
+            items = Object.values(grouped).map(g => [g.key, { name: g.name, cost: g.total, splitWith: g.members.join(', '), date: g.date, category: g.category, addedBy: g.addedBy, createdAt: g.createdAt, _count: g.members.length }]);
+        }
+
         const total = items.reduce((s, [, v]) => s + (parseFloat(v.cost) || 0), 0);
         const totalEl = document.getElementById('abazar-filter-total');
         if (totalEl) totalEl.textContent = items.length ? '৳ ' + this.fmtNum(total) : '';
         const div = document.getElementById('abazar-list');
         if (!items.length) { div.innerHTML = '<p class="empty-state">No cost items this month</p>'; return; }
-        const grouped = {};
+        const grouped2 = {};
         items.forEach(([k, v]) => {
             const day = v.date.slice(0, 10);
-            (grouped[day] = grouped[day] || []).push({ key: k, ...v });
+            (grouped2[day] = grouped2[day] || []).push({ key: k, ...v });
         });
         let html = '';
-        Object.entries(grouped).forEach(([day, dayItems]) => {
+        Object.entries(grouped2).forEach(([day, dayItems]) => {
             const d = new Date(day + 'T00:00:00');
             const dayTotal = dayItems.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
-            const expanded = day === Object.keys(grouped)[0];
+            const expanded = day === Object.keys(grouped2)[0];
             html += `<div class="abazar-day-card">
                 <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
                     <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayItems.length} item${dayItems.length>1?'s':''}</p></div>
                     <span class="abazar-day-total">৳${this.fmtNum(dayTotal)}</span>
                     <span class="material-icons-round">expand_more</span>
                 </div>
-                <div class="abazar-day-items" style="${expanded?'':'display:none'}">
-                    <div class="abazar-day-items-head"><span>ITEM</span><span>${this._bazarFilter === 'utility' ? 'COST FROM' : 'MONEY FROM'}</span><span>COST</span></div>
+                <div class="abazar-day-items${isUtility ? ' abazar-util-grid' : ''}" style="${expanded?'':'display:none'}">
+                    <div class="abazar-day-items-head${isUtility ? ' abazar-util-grid' : ''}"><span>ITEM</span>${isUtility ? '<span>DIVIDED TO</span><span>EACH</span>' : '<span>MONEY FROM</span>'}<span>TOTAL</span></div>
                     ${dayItems.map(i => {
                         const isUtil = (i.category || 'bazar') === 'utility';
-                        const buyerName = isUtil ? (i.splitWith || i.memberId || '-') : (members[i.memberId]||{}).name || i.memberId || '-';
+                        if (isUtil) {
+                            const each = i._count ? Math.round((parseFloat(i.cost) || 0) / i._count * 100) / 100 : parseFloat(i.cost) || 0;
+                            return `<div class="abazar-item-row abazar-util-grid" onclick="App.toggleBazarItem(this)">
+                            <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
+                            <span class="abazar-item-buyer">${this.esc(i.splitWith || '-')}</span>
+                            <span class="abazar-item-each">৳${this.fmtNum(each)}</span>
+                            <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
+                        </div>
+                        <div class="abazar-item-detail" style="display:none">
+                            <div class="abazar-item-detail-info">
+                                <span class="abazar-detail-dot green"></span>
+                                <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
+                                ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+                            </div>
+                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (${i._count || 0} members)</div>
+                            <div class="abazar-item-detail-btns">
+                                <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                            </div>
+                        </div>`;
+                        }
+                        const buyerName = (members[i.memberId]||{}).name || i.memberId || '-';
                         return `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
                         <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
                         <span class="abazar-item-buyer">${this.esc(buyerName)}</span>
