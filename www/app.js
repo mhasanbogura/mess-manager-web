@@ -1397,7 +1397,7 @@ const App = {
         Object.entries(grouped2).forEach(([day, dayItems]) => {
             const d = new Date(day + 'T00:00:00');
             const dayTotal = dayItems.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
-            const expanded = true;
+            const expanded = day === Object.keys(grouped2)[0];
             html += `<div class="abazar-day-card">
                 <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
                     <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayItems.length} item${dayItems.length>1?'s':''}</p></div>
