@@ -2709,14 +2709,48 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-detail-price { color: #ce93d8; }
 [data-theme="oled"] .abazar-detail-split { color: #ccc; }
 [data-theme="oled"] .abazar-item-cost { color: #d32f2f; }
-[data-theme="oled"] .abazar-item-cost .material-icons-round { color: #555; }
+[data-theme="oled"] .abazar-item-cost .material-icons-round { color: #999; }
+/* Cost page text */
+[data-theme="oled"] .bz-date { color: #ccc; }
+[data-theme="oled"] .bz-date .material-icons-round { color: #999; }
+[data-theme="oled"] .bz-label { color: #ccc; }
+[data-theme="oled"] .bz-footer { color: #999; }
+/* Meal history text */
 [data-theme="oled"] .amealhist-name { color: #e8ebf1; }
 [data-theme="oled"] .amealhist-detail { color: #ccc; }
+[data-theme="oled"] .amealhist-detail-info { color: #ccc; }
+[data-theme="oled"] .amealhist-count { color: #999; }
+[data-theme="oled"] .amealhist-user { color: #999; }
+[data-theme="oled"] .amealhist-date { color: #999; }
+/* Meal entry text */
+[data-theme="oled"] .ameal-action button { color: #e8ebf1; }
+[data-theme="oled"] .ameal-action small { color: #999; }
+[data-theme="oled"] .ameal-month-row span { color: #ccc; }
+[data-theme="oled"] .ameal-table .ameal-row-label { color: #ccc; }
+/* Dashboard text */
+[data-theme="oled"] .adash-edit.sm .material-icons-round { color: #999; }
+[data-theme="oled"] .adash-notice .material-icons-round { color: #999; }
+[data-theme="oled"] .adash-custom { color: #ccc; }
 [data-theme="oled"] .aduty-member-top strong { color: #e8ebf1; }
+/* Flat/People text */
 [data-theme="oled"] .aflat-total { color: #e8ebf1; }
 [data-theme="oled"] .aflat-people-info h4 { color: #e8ebf1; }
+[data-theme="oled"] .aflat-people-info .email { color: #999; }
 [data-theme="oled"] .aflat-perm-name { color: #e8ebf1; }
 [data-theme="oled"] .aflat-perm-label { color: #ccc; }
+[data-theme="oled"] .flat-hint { color: #999; }
+[data-theme="oled"] .flat-member-remove { color: #999; }
+/* Menu/Donut text */
+[data-theme="oled"] .am-donut-name { color: #e8ebf1; }
+[data-theme="oled"] .am-donut-val { color: #e8ebf1; }
+/* Collapse/History text */
+[data-theme="oled"] .collapse-sub { color: #999; }
+[data-theme="oled"] .collapse-arrow { color: #999; }
+[data-theme="oled"] .collapse-table-header { color: #ccc; }
+[data-theme="oled"] .collapse-row-sub { color: #999; }
+[data-theme="oled"] .edits-only-label { color: #999; }
+/* Notice text */
+[data-theme="oled"] .notice-meta { color: #999; }
 /* Inputs */
 [data-theme="oled"] input, [data-theme="oled"] select, [data-theme="oled"] textarea {
     background: #222; border-color: #333; color: #e8ebf1;
