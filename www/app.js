@@ -956,51 +956,45 @@ const App = {
                 });
             });
             const today = now.getDate();
+            const viewHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
+            const showBf = !viewHide.breakfast;
+            const showLc = !viewHide.lunch;
+            const showDn = !viewHide.dinner;
+            const visibleRows = [showBf, showLc, showDn].filter(Boolean).length;
             let html = '<thead><tr><th class="am-col-view" colspan="2"><span class="ameal-row-label" style="justify-content:center;cursor:pointer;color:#fff" onclick="App.showMealViewPopup()"><span class="material-icons-round" style="font-size:14px">tune</span> View</span></th>';
                     for (let d = 1; d <= daysInMonth; d++) html += `<th${d===today?' style="background:#c8ddf0"':''}>${d}</th>`;
             html += '</tr></thead><tbody>';
             const colors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2'];
+            const mealTypes = [];
+            if (showBf) mealTypes.push('breakfast');
+            if (showLc) mealTypes.push('lunch');
+            if (showDn) mealTypes.push('dinner');
             mids.forEach((mid, idx) => {
                 const md = memberData[mid];
                 const bg = colors[idx % colors.length];
                 const total = md.breakfastTotal + md.lunchTotal + md.dinnerTotal;
-                html += `<tr class="ameal-row-bf"><td rowspan="3" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
-                html += `<td class="am-col-type" style="background:#fff8e1"><div class="ameal-row-label"><span style="font-size:12px">☕</span><span class="ameal-row-count" style="color:#e65100${md.breakfastTotal===0?';color:#ccc':''}">${md.breakfastTotal}</span><span style="color:#e65100;font-size:10px">Breakfast</span></div></td>`;
-                for (let d = 0; d < daysInMonth; d++) {
-                    const v = md.breakfast[d];
-                    const cls = d + 1 === today ? ' class="ame-day-today"' : '';
-                    const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
-                    const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','breakfast',${v})"` : '';
-                    html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
-                }
-                html += '</tr><tr class="ameal-row-lc">';
-                html += `<td class="am-col-type" style="background:#e8f5e9"><div class="ameal-row-label"><span style="font-size:12px">🍔</span><span class="ameal-row-count" style="color:#2E7D32${md.lunchTotal===0?';color:#ccc':''}">${md.lunchTotal}</span><span style="color:#2E7D32;font-size:10px">Lunch</span></div></td>`;
-                for (let d = 0; d < daysInMonth; d++) {
-                    const v = md.lunch[d];
-                    const cls = d + 1 === today ? ' class="ame-day-today"' : '';
-                    const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
-                    const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','lunch',${v})"` : '';
-                    html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
-                }
-                html += '</tr><tr class="ameal-row-dn">';
-                html += `<td class="am-col-type" style="background:#e3f2fd"><div class="ameal-row-label"><span style="font-size:12px">🍽</span><span class="ameal-row-count" style="color:#1565C0${md.dinnerTotal===0?';color:#ccc':''}">${md.dinnerTotal}</span><span style="color:#1565C0;font-size:10px">Dinner</span></div></td>`;
-                for (let d = 0; d < daysInMonth; d++) {
-                    const v = md.dinner[d];
-                    const cls = d + 1 === today ? ' class="ame-day-today"' : '';
-                    const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
-                    const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','dinner',${v})"` : '';
-                    html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
-                }
-                html += '</tr>';
+                const mealColors = { breakfast: { bg: '#fff8e1', color: '#e65100', icon: '☕', label: 'Breakfast' }, lunch: { bg: '#e8f5e9', color: '#2E7D32', icon: '🍔', label: 'Lunch' }, dinner: { bg: '#e3f2fd', color: '#1565C0', icon: '🍽', label: 'Dinner' } };
+                const classes = { breakfast: 'ameal-row-bf', lunch: 'ameal-row-lc', dinner: 'ameal-row-dn' };
+                mealTypes.forEach((type, ri) => {
+                    const mc = mealColors[type];
+                    const isFirst = ri === 0;
+                    html += `<tr class="${classes[type]}">`;
+                    if (isFirst) html += `<td rowspan="${visibleRows}" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
+                    html += `<td class="am-col-type" style="background:${mc.bg}"><div class="ameal-row-label"><span style="font-size:12px">${mc.icon}</span><span class="ameal-row-count" style="color:${mc.color}${md[type+'Total']===0?';color:#ccc':''}">${md[type+'Total']}</span><span style="color:${mc.color};font-size:10px">${mc.label}</span></div></td>`;
+                    for (let d = 0; d < daysInMonth; d++) {
+                        const v = md[type][d];
+                        const cls = d + 1 === today ? ' class="ame-day-today"' : '';
+                        const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
+                        const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','${type}',${v})"` : '';
+                        html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
+                    }
+                    html += '</tr>';
+                });
             });
             html += '</tbody>';
             document.getElementById('ameal-table').innerHTML = html;
             loader.style.display = 'none';
             scroll.style.display = 'block';
-            const savedHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
-            if (savedHide.breakfast) document.querySelectorAll('.ameal-row-bf').forEach(r => r.style.display = 'none');
-            if (savedHide.lunch) document.querySelectorAll('.ameal-row-lc').forEach(r => r.style.display = 'none');
-            if (savedHide.dinner) document.querySelectorAll('.ameal-row-dn').forEach(r => r.style.display = 'none');
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
@@ -1174,17 +1168,11 @@ const App = {
             if (!document.getElementById('view-lc').checked) hide.lunch = true;
             if (!document.getElementById('view-dn').checked) hide.dinner = true;
             localStorage.setItem('meal_view_hide', JSON.stringify(hide));
-            document.querySelectorAll('.ameal-row-bf').forEach(r => r.style.display = hide.breakfast ? 'none' : '');
-            document.querySelectorAll('.ameal-row-lc').forEach(r => r.style.display = hide.lunch ? 'none' : '');
-            document.querySelectorAll('.ameal-row-dn').forEach(r => r.style.display = hide.dinner ? 'none' : '');
+            this.loadMeals();
         };
         document.getElementById('view-bf').onchange = apply;
         document.getElementById('view-lc').onchange = apply;
         document.getElementById('view-dn').onchange = apply;
-        const savedHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
-        document.querySelectorAll('.ameal-row-bf').forEach(r => r.style.display = savedHide.breakfast ? 'none' : '');
-        document.querySelectorAll('.ameal-row-lc').forEach(r => r.style.display = savedHide.lunch ? 'none' : '');
-        document.querySelectorAll('.ameal-row-dn').forEach(r => r.style.display = savedHide.dinner ? 'none' : '');
     },
 
     async loadMealHistory() {
