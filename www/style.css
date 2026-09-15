@@ -2959,6 +2959,10 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .aam-select { background: #222; border-color: #333; color: #e8ebf1; }
 [data-theme="oled"] .aam-section-head { color: #ccc; }
 [data-theme="oled"] .aam-section-head .material-icons-round { color: #999; }
+[data-theme="oled"] .aam-body { background: #111; }
+[data-theme="oled"] .aam-save-btn { background: #0b3d91; color: #fff; }
+[data-theme="oled"] .aam-counter button { background: #2a2a2a; border-color: #444; color: #e8ebf1; }
+[data-theme="oled"] .aam-counter button:active { background: #3a3a3a; }
 [data-theme="oled"] .modal-footer { border-color: #2a2a2a; }
 /* ==================== FULL OLED PAGE BACKGROUNDS ==================== */
 [data-theme="oled"] #app-screen { background: #111; }

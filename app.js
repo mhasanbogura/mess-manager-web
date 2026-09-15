@@ -1108,6 +1108,69 @@ const App = {
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
+    async loadAddMeal() {
+        if (!this.messId) return;
+        const now = new Date();
+        const dateKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        if (!this._aamDate) this._aamDate = dateKey;
+        const dd = new Date(this._aamDate + 'T00:00:00');
+        const dateStr = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})} ${dd.getFullYear()}`;
+        const dateEl = document.getElementById('aam-date-text');
+        if (dateEl) dateEl.textContent = dateStr;
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+        const colors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2'];
+        this._aamData = {};
+        let cardsHtml = '';
+        mids.forEach((mid, idx) => {
+            const m = members[mid] || {};
+            const name = m.name || 'Unknown';
+            const bg = colors[idx % colors.length];
+            this._aamData[name] = { breakfast: 0, lunch: 0, dinner: 0 };
+            cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:18px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: 0</span></div><div class="aam-meals-row"><div class="aam-meal-col"><label>Breakfast</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','breakfast',-1)">-</button><span class="aam-val" id="aam-bf-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','breakfast',1)">+</button></div></div><div class="aam-meal-col"><label>Lunch</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','lunch',-1)">-</button><span class="aam-val" id="aam-ln-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','lunch',1)">+</button></div></div><div class="aam-meal-col"><label>Dinner</label><div class="aam-counter"><button onclick="App.aamAdjust(${idx},'${name}','dinner',-1)">-</button><span class="aam-val" id="aam-dn-${idx}">0</span><button onclick="App.aamAdjust(${idx},'${name}','dinner',1)">+</button></div></div></div></div>`;
+        });
+        document.getElementById('aam-member-cards').innerHTML = cardsHtml || '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No members</p>';
+        try {
+            const mealSnap = await db.ref(`messes/${this.messId}/meals/${this._aamDate}`).once('value');
+            const existing = mealSnap.val() || {};
+            mids.forEach((mid, idx) => {
+                const name = members[mid]?.name || 'Unknown';
+                const em = existing[name] || {};
+                if (em.breakfast || em.lunch || em.dinner) {
+                    if (this._aamData[name]) {
+                        this._aamData[name].breakfast = em.breakfast || 0;
+                        this._aamData[name].lunch = em.lunch || 0;
+                        this._aamData[name].dinner = em.dinner || 0;
+                    }
+                    const bfEl = document.getElementById(`aam-bf-${idx}`);
+                    const lnEl = document.getElementById(`aam-ln-${idx}`);
+                    const dnEl = document.getElementById(`aam-dn-${idx}`);
+                    const totEl = document.getElementById(`aam-total-${idx}`);
+                    if (bfEl) bfEl.textContent = em.breakfast || 0;
+                    if (lnEl) lnEl.textContent = em.lunch || 0;
+                    if (dnEl) dnEl.textContent = em.dinner || 0;
+                    if (totEl) totEl.textContent = `Total: ${(em.breakfast||0)+(em.lunch||0)+(em.dinner||0)}`;
+                }
+            });
+            if (this._aamEditName && this._aamEditType) {
+                const editName = this._aamEditName;
+                const editType = this._aamEditType;
+                const editIdx = mids.findIndex(mid => (members[mid]?.name || 'Unknown') === editName);
+                if (editIdx >= 0 && this._aamData[editName]) {
+                    this._aamData[editName][editType] += 1;
+                    const map = { breakfast: 'bf', lunch: 'ln', dinner: 'dn' };
+                    const el = document.getElementById(`aam-${map[editType]}-${editIdx}`);
+                    if (el) el.textContent = this._aamData[editName][editType];
+                    const totEl = document.getElementById(`aam-total-${editIdx}`);
+                    if (totEl) totEl.textContent = `Total: ${this._aamData[editName].breakfast+this._aamData[editName].lunch+this._aamData[editName].dinner}`;
+                }
+                this._aamEditName = null;
+                this._aamEditType = null;
+            }
+        } catch (e) { console.error('loadAddMeal load existing:', e); }
+    },
+
     async showAddMeal(preType) {
         if (!this.messId) return;
         if (!this.checkPerm('mealEntry')) return;
@@ -1160,6 +1223,7 @@ const App = {
         const dd = new Date(val + 'T00:00:00');
         const txt = document.getElementById('aam-date-text');
         if (txt) txt.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})} ${dd.getFullYear()}`;
+        if (this.currentPage === 'addmeal') this.loadAddMeal();
     },
 
     aamPickDate() {
@@ -1196,7 +1260,7 @@ const App = {
                 saved++;
             }
         }
-        if (saved) { this.closeModal(); this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
+        if (saved) { try { this.closeModal(); } catch(e) {} this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
         else this.toast('Set at least one meal', 'error');
     },
 
@@ -1241,15 +1305,10 @@ const App = {
     mealEditCell(memberName, dateKey, mealType) {
         const popup = document.querySelector('.meal-cell-popup');
         if (popup) popup.remove();
+        this._aamDate = dateKey;
+        this._aamEditName = memberName;
+        this._aamEditType = mealType;
         this.navigate('addmeal');
-        setTimeout(() => {
-            const dateInput = document.getElementById('aam-date');
-            if (dateInput) dateInput.textContent = dateKey;
-            this._aamDate = dateKey;
-            const typeMap = { breakfast: 0, lunch: 1, dinner: 2 };
-            const tabs = document.querySelectorAll('#addmeal-screen .aam-type-tab');
-            if (tabs[typeMap[mealType]]) tabs[typeMap[mealType]].click();
-        }, 200);
     },
 
     showMealViewPopup() {
