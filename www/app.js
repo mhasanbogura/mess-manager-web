@@ -1110,6 +1110,13 @@ const App = {
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
+    openAddMealToday() {
+        this._aamDate = null;
+        this._aamEditName = null;
+        this._aamEditType = null;
+        this.navigate('addmeal');
+    },
+
     async loadAddMeal() {
         if (!this.messId) return;
         const now = new Date();
