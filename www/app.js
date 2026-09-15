@@ -1663,8 +1663,8 @@ const App = {
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Add suggestion</button>
                 </div>
                 <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                <div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;padding:8px 12px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
-                <div class="dep-label" style="margin-top:12px">Cost from:</div>
+                <div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;padding:8px 12px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
+                <div class="dep-label" style="margin-top:12px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
                         <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
@@ -1707,6 +1707,19 @@ const App = {
         this.bzRenderFooter();
     },
 
+    bzAddType() {
+        const name = prompt('Enter new utility type:');
+        if (!name || !name.trim()) return;
+        const chips = document.getElementById('bz-type-chips');
+        const btn = document.createElement('button');
+        btn.className = 'dep-chip';
+        btn.dataset.type = name.trim();
+        btn.onclick = () => this.bzPickType(btn);
+        btn.textContent = name.trim();
+        chips.insertBefore(btn, chips.lastElementChild);
+        this.bzPickType(btn);
+    },
+
     bzPickType(el) {
         document.querySelectorAll('#bz-type-chips .dep-chip').forEach(c => c.classList.remove('active'));
         el.classList.add('active');
@@ -1744,6 +1757,7 @@ const App = {
         const all = document.querySelectorAll('#bz-utility-section .bz-util-member input');
         const checked = [...all].filter(c => c.checked).length;
         document.getElementById('bz-util-count').textContent = `${checked}/${all.length} selected`;
+        document.getElementById('bz-selectall-cb').checked = checked === all.length;
         this._bzUtilSelected = [...all].filter(c => c.checked).map(c => c.dataset.member);
         this.bzRenderFooter();
     },
@@ -1760,7 +1774,7 @@ const App = {
         } else {
             const amt = parseFloat(this._bzUtilAmount) || 0;
             const count = this._bzUtilSelected?.length || 0;
-            left.textContent = `Cost from: ${count} Member${count !== 1 ? 's' : ''}  ৳${this.fmtNum(amt > 0 ? amt / Math.max(count, 1) : 0)} each`;
+            left.textContent = `Divided to ${count} Member${count !== 1 ? 's' : ''}  ৳${this.fmtNum(amt > 0 ? amt / Math.max(count, 1) : 0)} each`;
             total.textContent = '৳ ' + this.fmtNum(amt);
         }
     },
