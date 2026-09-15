@@ -1110,7 +1110,12 @@ const App = {
             loader.style.display = 'none';
             scroll.style.display = 'block';
             const todayTh = scroll.querySelector('th[data-today]');
-            if (todayTh) { setTimeout(() => { scroll.scrollLeft = todayTh.offsetLeft - (scroll.clientWidth / 2) + (todayTh.offsetWidth / 2); }, 200); }
+            if (todayTh) { setTimeout(() => {
+                const thLeft = todayTh.getBoundingClientRect().left;
+                const scrollLeft = scroll.getBoundingClientRect().left;
+                const offset = thLeft - scrollLeft + scroll.scrollLeft;
+                scroll.scrollLeft = offset + (todayTh.offsetWidth / 2) - (scroll.clientWidth / 2);
+            }, 300); }
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
