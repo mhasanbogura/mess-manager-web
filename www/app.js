@@ -456,7 +456,9 @@ const App = {
             const dk = `${month}-${String(d).padStart(2, '0')}`;
             const assigned = duty[dk];
             const cls = assigned === mid ? 'mine' : (assigned ? 'taken' : '');
-            chips += `<button class="aduty-pick ${cls}" onclick="App.toggleDutyDay('${dk}')">${d}</button>`;
+            chips += assigned && assigned !== mid
+                ? `<span class="aduty-pick ${cls}">${d}</span>`
+                : `<button class="aduty-pick ${cls}" onclick="App.toggleDutyDay('${dk}')">${d}</button>`;
         }
         document.getElementById('modal-title').textContent = `Assign dates — ${name}`;
         document.getElementById('modal-body').innerHTML = `

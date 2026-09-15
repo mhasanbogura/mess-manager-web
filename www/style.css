@@ -2196,8 +2196,8 @@ select.input-sm { cursor: pointer; }
 .aduty-head {
     background: var(--card);
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; min-height: 60px;
-    border-radius: 16px; margin: 10px 12px 0;
+    padding: 6px 12px; min-height: 50px;
+    border-radius: 16px; margin: 8px 12px 0;
     border: 1px solid var(--border);
 }
 .aduty-head .icon-btn { color: var(--text); min-width: 36px; min-height: 36px; }
@@ -2205,57 +2205,57 @@ select.input-sm { cursor: pointer; }
 .aduty-head .material-icons-round { font-size: 24px; }
 .aduty-head h2 { font-size: 18px; font-weight: 700; color: var(--text); }
 .aduty-banner {
-    background: #e8f0fe; border: 1.5px solid var(--primary); border-radius: 18px;
-    margin: 12px 12px 0; padding: 14px 16px;
-    display: flex; align-items: center; gap: 12px;
+    background: #e8f0fe; border: 1.5px solid var(--primary); border-radius: 14px;
+    margin: 8px 12px 0; padding: 10px 14px;
+    display: flex; align-items: center; gap: 10px;
 }
-.aduty-banner .material-icons-round { font-size: 28px; color: var(--primary); }
-.aduty-banner p { font-size: 19px; color: #555; }
+.aduty-banner .material-icons-round { font-size: 24px; color: var(--primary); }
+.aduty-banner p { font-size: 16px; color: #555; }
 .aduty-banner strong { color: #111; font-weight: 800; }
 .aduty-banner .unassigned { color: #777; }
 .aduty-card {
-    background: #fff; border-radius: 20px; margin: 12px 12px 0;
-    padding: 16px 14px; border: 1px solid #dfe4ec;
+    background: #fff; border-radius: 16px; margin: 8px 12px 0;
+    padding: 10px 12px; border: 1px solid #dfe4ec;
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
-.aduty-card h3 { font-size: 20px; font-weight: 800; color: #111; margin-bottom: 12px; font-family: 'Times New Roman', sans-serif; letter-spacing: -.2px; }
-.aduty-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.aduty-card h3 { font-size: 18px; font-weight: 800; color: #111; margin-bottom: 8px; font-family: 'Times New Roman', sans-serif; letter-spacing: -.2px; }
+.aduty-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 .aduty-chip {
-    background: #e8f0fe; border: 1.5px solid var(--primary); border-radius: 14px;
-    padding: 8px 16px; font-size: 17px; color: #333;
+    background: #e8f0fe; border: 1.5px solid var(--primary); border-radius: 12px;
+    padding: 5px 12px; font-size: 14px; color: #333;
 }
 .aduty-chip.mine {
     background: #e8f0fe; border-color: var(--primary);
 }
-.aduty-none { font-size: 16px; color: #999; }
+.aduty-none { font-size: 14px; color: #999; }
 .aduty-member {
-    background: #fff; border-radius: 20px; margin: 12px 12px 0;
-    padding: 14px; border: 1px solid #dfe4ec;
+    background: #fff; border-radius: 16px; margin: 8px 12px 0;
+    padding: 10px 12px; border: 1px solid #dfe4ec;
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
 }
-.aduty-member-top { display: flex; align-items: center; gap: 8px; }
-.aduty-member-top .person { font-size: 28px; color: #d32f2f; }
-.aduty-member-top strong { font-size: 21px; font-weight: 500; color: #222; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.aduty-days { font-size: 16px; color: #999; font-family: 'Times New Roman', sans-serif; white-space: nowrap; }
-.aduty-member-top .icon-btn { min-width: 40px; min-height: 40px; }
+.aduty-member-top { display: flex; align-items: center; gap: 6px; }
+.aduty-member-top .person { font-size: 24px; color: #d32f2f; }
+.aduty-member-top strong { font-size: 17px; font-weight: 500; color: #222; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aduty-days { font-size: 14px; color: #999; font-family: 'Times New Roman', sans-serif; white-space: nowrap; }
+.aduty-member-top .icon-btn { min-width: 34px; min-height: 34px; }
 .aduty-member-top .icon-btn.red { color: #d32f2f; }
 .aduty-member-top .icon-btn.red:hover { background: rgba(229,57,53,.08); }
 .aduty-member-top .icon-btn.dark { color: #3d3d3d; }
 .aduty-member-top .icon-btn.dark:hover { background: rgba(0,0,0,.06); }
-.aduty-member-top .material-icons-round { font-size: 30px; }
-.aduty-member .aduty-chips { margin-top: 10px; }
+.aduty-member-top .material-icons-round { font-size: 26px; }
+.aduty-member .aduty-chips { margin-top: 6px; }
 /* duty day picker (inside dark modal) */
-.aduty-legend { display: flex; gap: 14px; font-size: 12px; color: #888; margin-bottom: 10px; font-family: 'Times New Roman', sans-serif; }
-.aduty-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 4px; margin-right: 4px; vertical-align: baseline; }
-.aduty-pick-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.aduty-legend { display: flex; gap: 10px; font-size: 11px; color: #888; margin-bottom: 6px; font-family: 'Times New Roman', sans-serif; }
+.aduty-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 3px; vertical-align: baseline; }
+.aduty-pick-grid { display: flex; flex-wrap: wrap; gap: 6px; }
 .aduty-pick {
-    width: 44px; height: 44px; border-radius: 12px;
+    width: 40px; height: 40px; border-radius: 10px;
     background: rgba(42,42,62,.8); border: 1px solid rgba(255,255,255,.1);
-    color: #ccc; font-size: 15px; font-weight: 600; font-family: 'Times New Roman', sans-serif;
+    color: #ccc; font-size: 14px; font-weight: 600; font-family: 'Times New Roman', sans-serif;
     cursor: pointer; transition: all .15s;
 }
 .aduty-pick.mine { background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; border-color: transparent; }
-.aduty-pick.taken { opacity: .45; border-style: dashed; }
+.aduty-pick.taken { opacity: .45; border-style: dashed; cursor: not-allowed; }
 
 @media (max-width: 480px) {
     .aduty-head h2 { font-size: 24px; }
