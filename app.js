@@ -592,7 +592,7 @@ const App = {
                 const email = u.email || m.email || '';
                 const isYou = id === this.currentUser.uid;
                 let profilePic = '';
-                try { const picSnap = await window.db.ref(`users/${id}/profilePicture`).once('value'); profilePic = picSnap.val() || ''; } catch (e) {}
+                try { const picSnap = await db.ref(`users/${id}/profilePicture`).once('value'); profilePic = picSnap.val() || ''; } catch (e) {}
                 const avatarStyle = profilePic ? `background-image:url(${profilePic});background-size:cover;background-position:center;color:transparent` : `background:${color}`;
                 let actionsHtml = '';
                 if (isYou && isAdmin) {
@@ -633,9 +633,9 @@ const App = {
         if (!this.checkPerm('manage')) return;
         if (!confirm(`Promote ${name} as manager?`)) return;
         try {
-            const membersSnap = await window.db.ref(`messes/${this.messId}/members`).once('value');
+            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const permSnap = await window.db.ref(`messes/${this.messId}/permissions`).once('value');
+            const permSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = permSnap.val() || {};
             const oldAdminId = Object.entries(members).find(([, m]) => m && m.role === 'admin')?.[0];
             const newAdminPerms = perms[uid] || {};
@@ -646,7 +646,7 @@ const App = {
             }
             updates[`messes/${this.messId}/members/${uid}/role`] = 'admin';
             updates[`messes/${this.messId}/permissions/${uid}`] = null;
-            await window.db.ref().update(updates);
+            await db.ref().update(updates);
             this.toast('Manager changed!', 'success');
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
@@ -656,7 +656,7 @@ const App = {
         if (!this.checkPerm('manage')) return;
         if (!confirm(`Remove ${name} from mess?`)) return;
         try {
-            await window.db.ref(`messes/${this.messId}/members/${uid}`).remove();
+            await db.ref(`messes/${this.messId}/members/${uid}`).remove();
             this.toast('Removed!', 'success');
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
@@ -671,7 +671,7 @@ const App = {
             const mids = allKeys.filter(id => !id.startsWith('member_'));
             mids.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
-            const pSnap = await window.db.ref(`messes/${this.messId}/permissions`).once('value');
+            const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = pSnap.val() || {};
             const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'togglePerms'];
             const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Cost Entry', 'Turn on/off Permissions'];
@@ -718,7 +718,7 @@ const App = {
         if (uid === this.currentUser.uid) { this.toast("Can't change own permissions", 'error'); return; }
         try {
             const isChecked = el.classList.toggle('checked');
-            await window.db.ref(`messes/${this.messId}/permissions/${uid}/${key}`).set(isChecked);
+            await db.ref(`messes/${this.messId}/permissions/${uid}/${key}`).set(isChecked);
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
@@ -726,10 +726,10 @@ const App = {
     async loadMyPerms() {
         if (!this.messId || !this.currentUser) return;
         try {
-            const membersSnap = await window.db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
+            const membersSnap = await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
             const m = membersSnap.val() || {};
             if (m.role === 'admin') { this._userPerms = null; return; }
-            const permSnap = await window.db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value');
+            const permSnap = await db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value');
             this._userPerms = permSnap.val() || {};
         } catch (e) { this._userPerms = {}; }
     },
@@ -789,7 +789,7 @@ const App = {
             if (avatarEl) {
                 avatarEl.textContent = initial;
                 try {
-                    const picSnap = await window.db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value');
+                    const picSnap = await db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value');
                     const pic = picSnap.val();
                     if (pic) {
                         avatarEl.style.backgroundImage = `url(${pic})`;
@@ -2087,7 +2087,7 @@ const App = {
         document.getElementById('prof-email').textContent = u.email || '-';
         document.getElementById('prof-uid-text').textContent = u.uid ? u.uid.slice(0, 12) + '...' : '-';
         try {
-            const snap = await window.db.ref(`users/${u.uid}/profilePicture`).once('value');
+            const snap = await db.ref(`users/${u.uid}/profilePicture`).once('value');
             const photo = snap.val();
             if (photo) {
                 this.setProfilePic(photo);
@@ -2743,8 +2743,8 @@ const App = {
                     const dataUrl = ev.target.result;
                     const uid = this.currentUser.uid;
                     const messId = this.messId || 'default';
-                    await window.db.ref(`users/${uid}/profilePicture`).set(dataUrl);
-                    await window.db.ref(`messes/${messId}/members/${this.currentUser.displayName}/photo`).set(dataUrl);
+                    await db.ref(`users/${uid}/profilePicture`).set(dataUrl);
+                    await db.ref(`messes/${messId}/members/${this.currentUser.displayName}/photo`).set(dataUrl);
                     this.setProfilePic(dataUrl);
                     this.toast('Profile picture updated!', 'success');
                 };
@@ -2762,8 +2762,8 @@ const App = {
             try {
                 const uid = this.currentUser.uid;
                 const messId = this.messId || 'default';
-                await window.db.ref(`users/${uid}`).remove();
-                await window.db.ref(`messes/${messId}/members/${this.currentUser.displayName}`).remove();
+                await db.ref(`users/${uid}`).remove();
+                await db.ref(`messes/${messId}/members/${this.currentUser.displayName}`).remove();
                 await this.currentUser.delete();
                 this.toast('Account deleted', 'success');
             } catch (e) { this.toast(e.message, 'error'); }
