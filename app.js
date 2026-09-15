@@ -1991,13 +1991,12 @@ const App = {
         try {
             const snap = await window.db.ref(`users/${u.uid}/profilePicture`).once('value');
             const photo = snap.val();
-            const avatar = document.getElementById('prof-avatar');
-            const rowAvatar = document.getElementById('prof-row-avatar');
             if (photo) {
-                if (avatar) { avatar.style.backgroundImage = `url(${photo})`; avatar.style.backgroundSize = 'cover'; avatar.textContent = ''; avatar.style.color = 'transparent'; }
-                if (rowAvatar) { rowAvatar.style.backgroundImage = `url(${photo})`; rowAvatar.style.backgroundSize = 'cover'; rowAvatar.textContent = ''; rowAvatar.style.color = 'transparent'; }
+                this.setProfilePic(photo);
             } else {
                 const initial = (u.displayName || 'U').charAt(0).toUpperCase();
+                const avatar = document.getElementById('prof-avatar');
+                const rowAvatar = document.getElementById('prof-row-avatar');
                 if (avatar) avatar.textContent = initial;
                 if (rowAvatar) rowAvatar.textContent = initial;
             }
@@ -2618,6 +2617,20 @@ const App = {
     shareMessCode() { if (this.messCode) navigator.share?.({ title: 'Mess Manager', text: `Join my mess: ${this.messCode}` }).catch(() => {}); },
     sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
     signOut() { auth.signOut(); },
+    setProfilePic(dataUrl) {
+        const ids = ['prof-avatar', 'prof-row-avatar', 'dash-avatar'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.style.backgroundImage = `url(${dataUrl})`;
+                el.style.backgroundSize = 'cover';
+                el.style.backgroundPosition = 'center';
+                el.textContent = '';
+                el.style.color = 'transparent';
+            }
+        });
+    },
+
     changeProfilePicture() {
         const input = document.createElement('input');
         input.type = 'file';
@@ -2636,11 +2649,7 @@ const App = {
                     const messId = this.messId || 'default';
                     await window.db.ref(`users/${uid}/profilePicture`).set(dataUrl);
                     await window.db.ref(`messes/${messId}/members/${this.currentUser.displayName}/photo`).set(dataUrl);
-                    document.getElementById('prof-avatar').style.backgroundImage = `url(${dataUrl})`;
-                    document.getElementById('prof-avatar').style.backgroundSize = 'cover';
-                    document.getElementById('prof-avatar').style.color = 'transparent';
-                    const ra = document.getElementById('prof-row-avatar');
-                    if (ra) { ra.style.backgroundImage = `url(${dataUrl})`; ra.style.backgroundSize = 'cover'; ra.textContent = ''; ra.style.color = 'transparent'; }
+                    this.setProfilePic(dataUrl);
                     this.toast('Profile picture updated!', 'success');
                 };
                 reader.readAsDataURL(file);
