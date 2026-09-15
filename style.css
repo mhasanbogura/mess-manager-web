@@ -2710,10 +2710,10 @@ img, canvas { max-width: 100%; }
     background: #222; border-color: #333; color: #e8ebf1;
 }
 [data-theme="oled"] select {
-    background: linear-gradient(135deg, #333, #444); color: #e8ebf1; border-color: #555;
-    -webkit-appearance: none; appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e8ebf1' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+    -webkit-appearance: none !important; appearance: none !important;
+    background: linear-gradient(135deg, #333, #444) !important; color: #e8ebf1 !important; border-color: #555 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e8ebf1' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important; background-position: right 12px center !important; padding-right: 32px !important;
 }
 [data-theme="oled"] select option { background: #222; color: #e8ebf1; }
 /* Modal */
