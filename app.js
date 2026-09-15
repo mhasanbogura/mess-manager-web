@@ -186,6 +186,7 @@ const App = {
             const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
             this.userRole = roleSnap.val() || 'member';
             this.setupPresence();
+            await this.loadMyPerms();
             this.showApp();
         }).catch(e => { console.error('enterMess error:', e); this.toast('Error loading mess', 'error'); });
     },
@@ -528,6 +529,7 @@ const App = {
     },
 
     async addFlatMember() {
+        if (!this.checkPerm('manage')) return;
         const inp = document.getElementById('flat-add-member-input');
         const name = inp.value.trim();
         if (!name) { this.toast('Enter a name', 'error'); return; }
@@ -545,6 +547,7 @@ const App = {
     },
 
     async editFlatMember(id, currentName) {
+        if (!this.checkPerm('manage')) return;
         const name = prompt('Rename member:', currentName);
         if (!name || !name.trim()) return;
         if (name.trim() === currentName) return;
@@ -556,6 +559,7 @@ const App = {
     },
 
     async removeFlatMember(id) {
+        if (!this.checkPerm('manage')) return;
         if (!confirm('Remove this member?')) return;
         try {
             await db.ref(`messes/${this.messId}/members/${id}`).remove();
@@ -624,6 +628,7 @@ const App = {
     },
 
     async promoteToManager(uid, name) {
+        if (!this.checkPerm('manage')) return;
         if (!confirm(`Promote ${name} as manager?`)) return;
         try {
             const membersSnap = await window.db.ref(`messes/${this.messId}/members`).once('value');
@@ -646,6 +651,7 @@ const App = {
     },
 
     async removePerson(uid, name) {
+        if (!this.checkPerm('manage')) return;
         if (!confirm(`Remove ${name} from mess?`)) return;
         try {
             await window.db.ref(`messes/${this.messId}/members/${uid}`).remove();
@@ -694,10 +700,31 @@ const App = {
 
     async togglePerm(uid, key, el) {
         if (!this.messId) return;
+        if (!this.checkPerm('togglePerms')) return;
         try {
             const isChecked = el.classList.toggle('checked');
-            await db.ref(`messes/${this.messId}/permissions/${uid}/${key}`).set(isChecked);
+            await window.db.ref(`messes/${this.messId}/permissions/${uid}/${key}`).set(isChecked);
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    _userPerms: null,
+    async loadMyPerms() {
+        if (!this.messId || !this.currentUser) return;
+        try {
+            const membersSnap = await window.db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
+            const m = membersSnap.val() || {};
+            if (m.role === 'admin') { this._userPerms = null; return; }
+            const permSnap = await window.db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value');
+            this._userPerms = permSnap.val() || {};
+        } catch (e) { this._userPerms = {}; }
+    },
+    canDo(key) {
+        if (!this._userPerms) return true;
+        return !!this._userPerms[key];
+    },
+    checkPerm(key) {
+        if (!this.canDo(key)) { this.toast('No permission for this action', 'error'); return false; }
+        return true;
     },
 
     timeAgo(d) {
@@ -1068,6 +1095,7 @@ const App = {
 
     async showAddMeal(preType) {
         if (!this.messId) return;
+        if (!this.checkPerm('mealEntry')) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
@@ -1728,6 +1756,7 @@ const App = {
 
     async showAddBazar() {
         if (!this.messId) return;
+        if (!this.checkPerm('bazarEntry')) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
@@ -1951,6 +1980,7 @@ const App = {
 
     async showAddDeposit() {
         if (!this.messId) return;
+        if (!this.checkPerm('bazarEntry')) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
