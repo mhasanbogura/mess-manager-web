@@ -1038,6 +1038,7 @@ const App = {
             const updates = {};
             updates[`messes/${this.messId}/members/${uid}/status`] = 'active';
             updates[`users/${uid}/messes/${this.messId}`] = { role: 'member', joinedAt: m.joinedAt || Date.now() };
+            updates[`messes/${this.messId}/permissions/${uid}`] = { manage: false, mealEntry: false, mealEdit: false, bazarEntry: false, togglePerms: false };
             await db.ref().update(updates);
             this.toast(`${m.name || 'Member'} approved!`, 'success');
             this.loadDashboard();
