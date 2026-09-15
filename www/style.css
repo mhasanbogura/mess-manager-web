@@ -277,7 +277,7 @@ body {
 /* ==================== MAIN CONTENT ==================== */
 .main-content {
     margin-top: 70px;
-    padding: 14px;
+    padding: 0 12px;
     min-height: calc(100vh - 70px);
     padding-bottom: 24px;
 }
@@ -1345,13 +1345,14 @@ select.input-sm { cursor: pointer; }
 
 @media (min-width: 768px) {
     .topbar { left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 700px; }
-    .main-content { padding: 16px 24px; max-width: 700px; margin: 70px auto 0; padding-bottom: 24px; }
+    .main-content { padding: 16px 24px 24px; max-width: 700px; margin: 70px auto 0; }
     #app-screen.on-dashboard .main-content { margin-top: 0; }
     #app-screen.on-members .main-content { margin-top: 0; }
     .ameal-grid-scroll { overflow-x: visible; }
     .ameal-table { width: 100%; }
-    .abazar-day-card { margin: 0 auto 10px; max-width: 700px; }
-    .aprof-card { margin: 0 auto 4px; max-width: 700px; }
+    .abazar-day-card { margin: 0 0 10px; }
+    .aprof-card { margin: 0 0 4px; }
+    .amealhist-card { margin: 8px 0; }
     .abazar-fab { right: calc(50% - 350px + 16px); }
 }
 
@@ -1932,7 +1933,7 @@ select.input-sm { cursor: pointer; }
 
 .abazar-day-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 14px;
-    margin: 0 12px 10px; overflow: hidden;
+    margin: 0 0 10px; overflow: hidden;
 }
 .abazar-day-head {
     display: flex; align-items: center; padding: 14px; cursor: pointer;
@@ -1997,7 +1998,7 @@ select.input-sm { cursor: pointer; }
 .aprof-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
 .aprof-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 14px;
-    margin: 0 12px 4px; overflow: hidden;
+    margin: 0 0 4px; overflow: hidden;
 }
 .aprof-card:first-of-type {
     display: flex; align-items: center; gap: 14px; padding: 16px; margin-top: 8px;
