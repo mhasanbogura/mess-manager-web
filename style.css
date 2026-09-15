@@ -2705,6 +2705,9 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-item-detail { background: #1e1e1e; border-color: #2a2a2a; }
 [data-theme="oled"] .abazar-item-detail-info { color: #2E9E44; }
 [data-theme="oled"] .abazar-item-detail span { color: #ccc; }
+[data-theme="oled"] .abazar-item-detail-row { color: #e8ebf1; }
+[data-theme="oled"] .abazar-detail-price { color: #ce93d8; }
+[data-theme="oled"] .abazar-detail-split { color: #ccc; }
 [data-theme="oled"] .abazar-item-cost { color: #d32f2f; }
 [data-theme="oled"] .abazar-item-cost .material-icons-round { color: #555; }
 [data-theme="oled"] .amealhist-name { color: #e8ebf1; }
