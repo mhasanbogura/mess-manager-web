@@ -1386,6 +1386,8 @@ select.input-sm { cursor: pointer; }
 .bottom-nav-item.active .material-icons-round { filter: none; }
 #app-screen.on-dashboard .topbar { display: none; }
 #app-screen.on-dashboard .main-content { margin-top: 0; padding: 0 0 72px; }
+#app-screen.on-bazaar .topbar { display: none; }
+#app-screen.on-balance .topbar { display: none; }
 
 /* ==================== ANDROID DASHBOARD (light) ==================== */
 #page-dashboard {
