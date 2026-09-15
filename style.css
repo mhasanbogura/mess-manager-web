@@ -2742,3 +2742,71 @@ img, canvas { max-width: 100%; }
 /* Meal popup */
 [data-theme="oled"] .meal-cell-popup { background: #2a2a2a; border-color: #333; }
 [data-theme="oled"] .meal-cell-popup button { color: #e8ebf1; }
+/* Dashboard finance boxes */
+[data-theme="oled"] .adash-fin-box { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .adash-finance { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .adash-table { background: #1a1a1a; }
+[data-theme="oled"] .adash-table td { background: #1a1a1a; }
+[data-theme="oled"] .adash-notice { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .adash-today { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .adash-edit { background: #1a1a1a; }
+[data-theme="oled"] .ameal-table tbody td { background: #1a1a1a; }
+[data-theme="oled"] .ame-day-today { background: #2a2a2a !important; }
+[data-theme="oled"] .am-col-type { background: #2a2a2a !important; }
+/* Mess page */
+[data-theme="oled"] .aflat-tabs { background: #222; }
+[data-theme="oled"] .aflat-tab { color: #999; }
+[data-theme="oled"] .aflat-tab.active { color: #fff; }
+[data-theme="oled"] .aflat-member-item { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .aflat-people-item { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .aflat-perm-card { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .aflat-input-wrap { background: #222; border-color: #333; }
+[data-theme="oled"] .aflat-activity-btn { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .aflat-perm-label { color: #ccc; }
+[data-theme="oled"] .aflat-card-box-head { color: #ccc; }
+[data-theme="oled"] .aflat-info { color: #ccc; }
+[data-theme="oled"] .aflat-card-box { background: rgba(255,255,255,.05); border-color: #2a2a2a; }
+/* Cost page */
+[data-theme="oled"] .bz-tab { background: #222; border-color: #333; }
+[data-theme="oled"] .bz-tab.active { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .bz-chip { background: #222; border-color: #333; color: #ccc; }
+[data-theme="oled"] .bz-chip.active { background: #1a3a6b; color: #fff; }
+[data-theme="oled"] .abazar-filter-btn { background: #222; border-color: #333; color: #ccc; }
+[data-theme="oled"] .abazar-filter-btn.active { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .abazar-view-btn { background: #222; border-color: #333; color: #ccc; }
+[data-theme="oled"] .bz-util-members { background: #1a1a1a; border-color: #2a2a2a; }
+/* Meal page */
+[data-theme="oled"] .amealhist-card { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .ameal-table tbody td { color: #e8ebf1; }
+/* Deposit */
+[data-theme="oled"] .dep-chip { background: #222; border-color: #333; }
+[data-theme="oled"] .dep-chip.active { background: #1a3a6b; border-color: #3b7bdd; color: #fff; }
+[data-theme="oled"] .aam-tab { background: #222; border-color: #333; color: #ccc; }
+[data-theme="oled"] .aam-tab.active { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .aam-select { background: #222; border-color: #333; color: #e8ebf1; }
+[data-theme="oled"] .aam-card { background: #1a1a1a; border-color: #2a2a2a; }
+/* Notice */
+[data-theme="oled"] #app-screen.on-notices .main-content { background: #111; }
+[data-theme="oled"] #page-notices { background: #111; }
+[data-theme="oled"] .anotice-board { background: #111; }
+[data-theme="oled"] .anotice-card { background: #1a1a1a; border-color: #2a2a2a; }
+/* Duty */
+[data-theme="oled"] .aduty-card { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .aduty-member { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .aduty-banner { background: #1a1a1a; border-color: #2a2a2a; }
+/* Menu */
+[data-theme="oled"] .amenu-tab { background: #222; border-color: #333; }
+[data-theme="oled"] .amenu-day-card { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .amenu-item-row { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .am-stat-card { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .am-card { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .am-month-row select { background: #222; border-color: #333; color: #e8ebf1; }
+/* Bazar note */
+[data-theme="oled"] .abn-item { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .abn-bottom { background: #1a1a1a; border-color: #2a2a2a; }
+/* Bottom nav */
+[data-theme="oled"] .bottom-nav { background: #1a1a1a; border-color: #2a2a2a; }
+/* Add meal */
+[data-theme="oled"] .aam-card { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .aam-card label { color: #ccc; }
+[data-theme="oled"] .aam-card h4 { color: #e8ebf1; }
