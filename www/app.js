@@ -1191,9 +1191,9 @@ const App = {
             const todayTh = scroll.querySelector('th[data-today]');
             if (todayTh) { requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    const cRect = scroll.getBoundingClientRect();
-                    const tRect = todayTh.getBoundingClientRect();
-                    scroll.scrollLeft += (tRect.left + tRect.width / 2) - (cRect.left + cRect.width / 2);
+                    let el = todayTh, off = 0;
+                    while (el && el !== scroll) { off += el.offsetLeft; el = el.offsetParent; }
+                    scroll.scrollLeft = off - scroll.offsetWidth / 2 + todayTh.offsetWidth / 2;
                 });
             }); }
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
