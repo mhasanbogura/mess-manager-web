@@ -2052,11 +2052,11 @@ select.input-sm { cursor: pointer; }
 .abazar-fab .material-icons-round { font-size: 22px; }
 
 /* ==================== PROFILE & SETTINGS ==================== */
-.aprof-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--card-border); }
+.aprof-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 8px; border: 1px solid var(--card-border); }
 .aprof-head h2 { font-size: 22px; font-weight: 700; color: var(--text); }
 .aprof-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 14px;
-    margin: 0 0 4px; overflow: hidden;
+    margin: 0 12px 4px; overflow: hidden;
 }
 .aprof-card-main {
     display: flex; align-items: center; gap: 16px; padding: 24px 20px;
@@ -2070,7 +2070,7 @@ select.input-sm { cursor: pointer; }
 }
 .aprof-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .aprof-info h3 { font-size: 18px; font-weight: 700; color: var(--text); margin: 0; line-height: 1.3; }
-.aprof-info p { font-size: 14px; color: #777; margin: 0; line-height: 1.3; }
+.aprof-info p { font-size: 11px; color: #777; margin: 0; line-height: 1.3; }
 .aprof-uid { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #888; font-size: 13px; }
 .aprof-uid .material-icons-round { color: #aaa; }
 .aprof-section { margin-top: 14px; }
