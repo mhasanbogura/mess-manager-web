@@ -964,7 +964,7 @@ const App = {
                 const md = memberData[mid];
                 const bg = colors[idx % colors.length];
                 const total = md.breakfastTotal + md.lunchTotal + md.dinnerTotal;
-                html += `<tr><td rowspan="3" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
+                html += `<tr class="ameal-row-bf"><td rowspan="3" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
                 html += `<td class="am-col-type" style="background:#fff8e1"><div class="ameal-row-label"><span style="font-size:12px">☕</span><span class="ameal-row-count" style="color:#e65100${md.breakfastTotal===0?';color:#ccc':''}">${md.breakfastTotal}</span><span style="color:#e65100;font-size:10px">Breakfast</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.breakfast[d];
@@ -973,7 +973,7 @@ const App = {
                     const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','breakfast',${v})"` : '';
                     html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
-                html += '</tr><tr>';
+                html += '</tr><tr class="ameal-row-lc">';
                 html += `<td class="am-col-type" style="background:#e8f5e9"><div class="ameal-row-label"><span style="font-size:12px">🍔</span><span class="ameal-row-count" style="color:#2E7D32${md.lunchTotal===0?';color:#ccc':''}">${md.lunchTotal}</span><span style="color:#2E7D32;font-size:10px">Lunch</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.lunch[d];
@@ -982,7 +982,7 @@ const App = {
                     const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','lunch',${v})"` : '';
                     html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
-                html += '</tr><tr>';
+                html += '</tr><tr class="ameal-row-dn">';
                 html += `<td class="am-col-type" style="background:#e3f2fd"><div class="ameal-row-label"><span style="font-size:12px">🍽</span><span class="ameal-row-count" style="color:#1565C0${md.dinnerTotal===0?';color:#ccc':''}">${md.dinnerTotal}</span><span style="color:#1565C0;font-size:10px">Dinner</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.dinner[d];
@@ -997,6 +997,10 @@ const App = {
             document.getElementById('ameal-table').innerHTML = html;
             loader.style.display = 'none';
             scroll.style.display = 'block';
+            const savedHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
+            if (savedHide.breakfast) document.querySelectorAll('.ameal-row-bf').forEach(r => r.style.display = 'none');
+            if (savedHide.lunch) document.querySelectorAll('.ameal-row-lc').forEach(r => r.style.display = 'none');
+            if (savedHide.dinner) document.querySelectorAll('.ameal-row-dn').forEach(r => r.style.display = 'none');
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
@@ -1132,6 +1136,55 @@ const App = {
             const tabs = document.querySelectorAll('#addmeal-screen .aam-type-tab');
             if (tabs[typeMap[mealType]]) tabs[typeMap[mealType]].click();
         }, 200);
+    },
+
+    showMealViewPopup() {
+        const saved = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
+        const bf = !saved.breakfast;
+        const lc = !saved.lunch;
+        const dn = !saved.dinner;
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `
+            <p style="margin:0 0 16px;font-size:14px;color:#777">Select which meal rows to show in the table:</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border-radius:10px;background:var(--card);border:1px solid var(--border)">
+                    <input type="checkbox" id="view-bf" ${bf?'checked':''} style="width:18px;height:18px;accent-color:#e65100">
+                    <span style="font-size:20px">☕</span>
+                    <span style="flex:1;font-size:15px;font-weight:600">Breakfast</span>
+                    <span style="font-size:13px;color:#e65100">Orange</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border-radius:10px;background:var(--card);border:1px solid var(--border)">
+                    <input type="checkbox" id="view-lc" ${lc?'checked':''} style="width:18px;height:18px;accent-color:#2E7D32">
+                    <span style="font-size:20px">🍔</span>
+                    <span style="flex:1;font-size:15px;font-weight:600">Lunch</span>
+                    <span style="font-size:13px;color:#2E7D32">Green</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border-radius:10px;background:var(--card);border:1px solid var(--border)">
+                    <input type="checkbox" id="view-dn" ${dn?'checked':''} style="width:18px;height:18px;accent-color:#1565C0">
+                    <span style="font-size:20px">🍽</span>
+                    <span style="flex:1;font-size:15px;font-weight:600">Dinner</span>
+                    <span style="font-size:13px;color:#1565C0">Blue</span>
+                </label>
+            </div>`;
+        document.getElementById('modal-title').textContent = 'View Settings';
+        document.getElementById('modal-overlay').classList.add('active');
+        const apply = () => {
+            const hide = {};
+            if (!document.getElementById('view-bf').checked) hide.breakfast = true;
+            if (!document.getElementById('view-lc').checked) hide.lunch = true;
+            if (!document.getElementById('view-dn').checked) hide.dinner = true;
+            localStorage.setItem('meal_view_hide', JSON.stringify(hide));
+            document.querySelectorAll('.ameal-row-bf').forEach(r => r.style.display = hide.breakfast ? 'none' : '');
+            document.querySelectorAll('.ameal-row-lc').forEach(r => r.style.display = hide.lunch ? 'none' : '');
+            document.querySelectorAll('.ameal-row-dn').forEach(r => r.style.display = hide.dinner ? 'none' : '');
+        };
+        document.getElementById('view-bf').onchange = apply;
+        document.getElementById('view-lc').onchange = apply;
+        document.getElementById('view-dn').onchange = apply;
+        const savedHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
+        document.querySelectorAll('.ameal-row-bf').forEach(r => r.style.display = savedHide.breakfast ? 'none' : '');
+        document.querySelectorAll('.ameal-row-lc').forEach(r => r.style.display = savedHide.lunch ? 'none' : '');
+        document.querySelectorAll('.ameal-row-dn').forEach(r => r.style.display = savedHide.dinner ? 'none' : '');
     },
 
     async loadMealHistory() {

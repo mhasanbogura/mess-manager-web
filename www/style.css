@@ -2682,17 +2682,10 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .adash-table th { background: #1a1a1a; color: #ccc; border-color: #2a2a2a; }
 [data-theme="oled"] .adash-table td { background: #1a1a1a; color: #e8ebf1; border-color: #2a2a2a; }
 [data-theme="oled"] .am-col-type { background: #2a2a2a !important; }
-/* Text colors */
-[data-theme="oled"] h1, [data-theme="oled"] h2, [data-theme="oled"] h3,
-[data-theme="oled"] h4, [data-theme="oled"] h5, [data-theme="oled"] h6,
-[data-theme="oled"] strong, [data-theme="oled"] b { color: #e8ebf1; }
-[data-theme="oled"] p, [data-theme="oled"] span, [data-theme="oled"] div,
-[data-theme="oled"] td, [data-theme="oled"] th, [data-theme="oled"] li,
-[data-theme="oled"] label, [data-theme="oled"] a { color: #ccc; }
+/* Text colors - only change black/dark text to white, keep colored text */
 [data-theme="oled"] .adash-notice p, [data-theme="oled"] .adash-notice strong { color: #ccc; }
 [data-theme="oled"] .abazar-day-info h3 { color: #e8ebf1; }
 [data-theme="oled"] .abazar-day-info p { color: #999; }
-[data-theme="oled"] .abazar-day-total { color: #ff6b6b; }
 [data-theme="oled"] .abazar-item-name { color: #e8ebf1; }
 [data-theme="oled"] .amealhist-name { color: #e8ebf1; }
 [data-theme="oled"] .amealhist-detail { color: #ccc; }
