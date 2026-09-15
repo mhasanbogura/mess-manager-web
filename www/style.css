@@ -1862,7 +1862,9 @@ select.input-sm { cursor: pointer; }
     color: #888; cursor: pointer; transition: all .15s;
 }
 .aam-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-.aam-body { padding: 0 16px; padding-bottom: 80px; overflow-y: auto; }
+#page-addcost, #page-adddeposit { overflow-x: hidden; max-width: 100%; box-sizing: border-box; }
+#page-addcost .aam-body, #page-adddeposit .aam-body { overflow-x: hidden; box-sizing: border-box; width: 100%; }
+.aam-body { padding: 0 16px; padding-bottom: 80px; overflow-y: auto; overflow-x: hidden; box-sizing: border-box; width: 100%; }
 .aam-label { display: block; font-size: 12px; color: #888; margin: 10px 0 4px; font-style: italic; }
 .aam-select {
     display: flex; align-items: center; justify-content: space-between;
@@ -1909,6 +1911,8 @@ select.input-sm { cursor: pointer; }
 #app-screen.on-addcost .main-content { margin-top: 0; padding: 0 0 72px; }
 #app-screen.on-adddeposit .topbar { display: none; }
 #app-screen.on-adddeposit .main-content { margin-top: 0; padding: 0 0 72px; }
+#page-addcost, #page-adddeposit { overflow-x: hidden; max-width: 100%; }
+#page-addcost .aam-body, #page-adddeposit .aam-body { overflow-x: hidden; }
 .aam-save-btn {
     width: 100%; padding: 12px; border-radius: 12px; border: none;
     background: var(--primary); color: #fff; font-size: 16px; font-weight: 700;
