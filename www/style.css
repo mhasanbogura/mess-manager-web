@@ -1388,6 +1388,10 @@ select.input-sm { cursor: pointer; }
 #app-screen.on-dashboard .main-content { margin-top: 0; padding: 0 0 72px; }
 #app-screen.on-bazaar .topbar { display: none; }
 #app-screen.on-balance .topbar { display: none; }
+#app-screen.on-profile .topbar { display: none; }
+#app-screen.on-mealhistory .topbar { display: none; }
+#app-screen.on-costtrash .topbar { display: none; }
+#app-screen.on-deptrash .topbar { display: none; }
 
 /* ==================== ANDROID DASHBOARD (light) ==================== */
 #page-dashboard {
@@ -1560,10 +1564,10 @@ select.input-sm { cursor: pointer; }
 .adash-fin-box strong.pos { color: #2e7d32 !important; }
 .adash-fin-box strong.neg { color: #d32f2f !important; }
 .adash-fin-box.meal-fin, .adash-fin-box.util-fin {
-    background: var(--primary); color: #fff; border-color: var(--primary);
+    background: transparent; color: var(--primary); border: 1.5px solid var(--primary);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
 }
-.adash-fin-box.meal-fin small, .adash-fin-box.util-fin small { color: rgba(255,255,255,.8); font-weight: 600; }
+.adash-fin-box.meal-fin small, .adash-fin-box.util-fin small { color: #888; font-weight: 600; }
 .adash-fin-label {
     display: flex; align-items: center; gap: 4px; padding: 6px 4px;
     font-size: 14px; font-weight: 700; color: var(--primary); cursor: pointer;

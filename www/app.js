@@ -304,6 +304,9 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-addmeal', page === 'addmeal');
         document.getElementById('app-screen').classList.toggle('on-addcost', page === 'addcost');
         document.getElementById('app-screen').classList.toggle('on-adddeposit', page === 'adddeposit');
+        document.getElementById('app-screen').classList.toggle('on-mealhistory', page === 'mealhistory');
+        document.getElementById('app-screen').classList.toggle('on-costtrash', page === 'costtrash');
+        document.getElementById('app-screen').classList.toggle('on-deptrash', page === 'deptrash');
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();

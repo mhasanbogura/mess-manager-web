@@ -356,6 +356,7 @@
             </div>
             <div class="page" id="page-mealhistory">
                 <div class="ameal-head">
+                    <button class="icon-btn" onclick="App.navigate('meals')"><span class="material-icons-round">arrow_back</span></button>
                     <h2>Meal Entry Edits</h2>
                 </div>
                 <div class="ameal-month-row"><span>Current Month:</span><strong id="mealhist-month">-</strong></div>
@@ -412,12 +413,16 @@
             </div>
             <div class="page" id="page-costtrash">
                 <div class="abazar-head">
+                    <button class="icon-btn" onclick="App.navigate('bazaar')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Cost Trash</h2>
                 </div>
                 <div class="abazar-month-row"><span>Current Month:</span><strong id="costtrash-month">-</strong></div>
                 <div id="costtrash-list"></div>
             </div>
             <div class="page" id="page-deptrash">
                 <div class="abazar-head">
+                    <button class="icon-btn" onclick="App.navigate('balance')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Manager Trash</h2>
                 </div>
                 <div class="abazar-month-row"><span>Current Month:</span><strong id="deptrash-month">-</strong></div>
                 <div id="deptrash-list"></div>
@@ -487,7 +492,7 @@
                 <button class="amenu-fab" onclick="App.showAddMenu()"><span class="material-icons-round">add</span> Add</button>
             </div>
             <div class="page" id="page-profile">
-                <div class="aprof-head"></div>
+                <div class="aprof-head"><h2>Profile</h2></div>
                 <div class="aprof-card aprof-card-main">
                     <div class="aprof-avatar" id="prof-avatar">M</div>
                     <div class="aprof-info">
