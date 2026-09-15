@@ -2301,42 +2301,45 @@ img, canvas { max-width: 100%; }
 .aflat-leave .material-icons-round { font-size: 20px; }
 
 .aflat-card {
-    background: linear-gradient(135deg, #0b3d91, #08306b);
-    border-radius: 20px; padding: 18px 16px 16px; color: #fff;
+    background: var(--card);
+    border-radius: 20px; padding: 18px 16px 16px; color: var(--text);
     margin: 12px 12px 0; position: relative;
+    border: 1px solid var(--card-border);
 }
 .aflat-card-top { display: flex; align-items: flex-start; gap: 12px; }
 .aflat-home-icon {
-    width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,.2);
+    width: 56px; height: 56px; border-radius: 50%; background: var(--bg);
+    border: 1px solid var(--card-border);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.aflat-home-icon .material-icons-round { font-size: 30px; }
+.aflat-home-icon .material-icons-round { font-size: 30px; color: var(--primary); }
 .aflat-card-info { flex: 1; min-width: 0; }
-.aflat-card-info h3 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+.aflat-card-info h3 { font-size: 24px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
 .aflat-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.4);
-    border-radius: 20px; padding: 4px 12px; font-size: 13px;
+    background: var(--bg); border: 1px solid var(--card-border);
+    border-radius: 20px; padding: 4px 12px; font-size: 13px; color: var(--text);
 }
-.aflat-badge .material-icons-round { font-size: 16px; }
+.aflat-badge .material-icons-round { font-size: 16px; color: var(--primary); }
 .aflat-card-actions { display: flex; gap: 4px; }
 .aflat-icon-btn {
-    width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.15);
-    border: none; color: #fff; display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 50%; background: var(--bg);
+    border: 1px solid var(--card-border); color: var(--primary);
+    display: flex; align-items: center; justify-content: center;
     cursor: pointer;
 }
 .aflat-icon-btn .material-icons-round { font-size: 20px; }
 .aflat-card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
 .aflat-card-box {
-    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.35);
+    background: var(--bg); border: 1px solid var(--card-border);
     border-radius: 14px; padding: 10px 12px;
 }
-.aflat-card-box-head { display: flex; align-items: center; gap: 6px; font-size: 13px; opacity: .9; margin-bottom: 4px; }
-.aflat-card-box-head .material-icons-round { font-size: 16px; }
+.aflat-card-box-head { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #888; margin-bottom: 4px; }
+.aflat-card-box-head .material-icons-round { font-size: 16px; color: var(--primary); }
 .aflat-card-box-head span:last-child { margin-left: auto; }
-.aflat-share-inline { background: none; border: none; color: #fff; padding: 0; cursor: pointer; display: flex; }
-.aflat-share-inline .material-icons-round { font-size: 18px; opacity: .8; }
-.aflat-card-box strong { font-size: 14px; font-weight: 600; word-break: break-all; }
+.aflat-share-inline { background: none; border: none; color: var(--primary); padding: 0; cursor: pointer; display: flex; }
+.aflat-share-inline .material-icons-round { font-size: 18px; color: var(--primary); }
+.aflat-card-box strong { font-size: 14px; font-weight: 600; word-break: break-all; color: var(--text); }
 
 .aflat-tabs {
     display: flex; margin: 14px 12px 0; background: #e0ddd5; border-radius: 12px;
