@@ -1388,6 +1388,7 @@ select.input-sm { cursor: pointer; }
 #app-screen.on-dashboard .main-content { margin-top: 0; padding: 0 0 72px; }
 #app-screen.on-bazaar .topbar { display: none; }
 #app-screen.on-balance .topbar { display: none; }
+#app-screen.on-meals .topbar { display: none; }
 #app-screen.on-profile .topbar { display: none; }
 #app-screen.on-mealhistory .topbar { display: none; }
 #app-screen.on-costtrash .topbar { display: none; }

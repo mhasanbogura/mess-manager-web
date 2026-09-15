@@ -291,7 +291,6 @@ const App = {
         document.querySelector('.topbar').style.display = '';
         const topbarActions = document.getElementById('topbar-actions');
         topbarActions.innerHTML = '';
-        if (page === 'meals') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'mealhistory\')"><span class="material-icons-round">history</span></button>';
         if (page === 'bazaar') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'costtrash\')"><span class="material-icons-round">delete</span></button>';
         if (page === 'balance') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'deptrash\')"><span class="material-icons-round">delete</span></button>';
         if (page === 'costtrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'bazaar\')"><span class="material-icons-round">arrow_back</span></button>';
@@ -307,6 +306,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-mealhistory', page === 'mealhistory');
         document.getElementById('app-screen').classList.toggle('on-costtrash', page === 'costtrash');
         document.getElementById('app-screen').classList.toggle('on-deptrash', page === 'deptrash');
+        document.getElementById('app-screen').classList.toggle('on-meals', page === 'meals');
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
@@ -1221,6 +1221,7 @@ const App = {
 
     async loadAddMeal() {
         if (!this.messId) return;
+        if (!this.checkPerm('mealEntry')) { this.navigate('meals'); return; }
         const now = new Date();
         const dateKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         if (!this._aamDate) this._aamDate = dateKey;
@@ -1930,7 +1931,7 @@ const App = {
 
     async loadAddCost() {
         if (!this.messId) return;
-        if (!this.checkPerm('bazarEntry')) return;
+        if (!this.checkPerm('bazarEntry')) { this.navigate('bazaar'); return; }
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
@@ -2000,10 +2001,10 @@ const App = {
 
     async loadAddDeposit() {
         if (!this.messId) return;
-        if (!this.checkPerm('bazarEntry')) return;
+        if (!this.checkPerm('bazarEntry')) { this.navigate('balance'); return; }
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
         const names = [...new Set(mids.map(id => members[id]?.name || 'Unknown'))].sort((a, b) => a.localeCompare(b));
         const now = new Date();
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
@@ -2224,7 +2225,7 @@ const App = {
 
     async loadAddDeposit() {
         if (!this.messId) return;
-        if (!this.checkPerm('bazarEntry')) return;
+        if (!this.checkPerm('bazarEntry')) { this.navigate('balance'); return; }
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
         const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
