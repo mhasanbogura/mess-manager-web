@@ -1905,6 +1905,10 @@ select.input-sm { cursor: pointer; }
 }
 #app-screen.on-addmeal .topbar { display: none; }
 #app-screen.on-addmeal .main-content { margin-top: 0; padding: 0 0 72px; }
+#app-screen.on-addcost .topbar { display: none; }
+#app-screen.on-addcost .main-content { margin-top: 0; padding: 0 0 72px; }
+#app-screen.on-adddeposit .topbar { display: none; }
+#app-screen.on-adddeposit .main-content { margin-top: 0; padding: 0 0 72px; }
 .aam-save-btn {
     width: 100%; padding: 12px; border-radius: 12px; border: none;
     background: var(--primary); color: #fff; font-size: 16px; font-weight: 700;

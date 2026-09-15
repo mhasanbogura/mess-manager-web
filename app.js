@@ -293,12 +293,16 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-balance', page === 'balance');
         document.getElementById('app-screen').classList.toggle('on-profile', page === 'profile');
         document.getElementById('app-screen').classList.toggle('on-addmeal', page === 'addmeal');
+        document.getElementById('app-screen').classList.toggle('on-addcost', page === 'addcost');
+        document.getElementById('app-screen').classList.toggle('on-adddeposit', page === 'adddeposit');
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
         if (page === 'members') this.loadFlat();
         if (page === 'meals') this.loadMeals();
         if (page === 'addmeal') this.loadAddMeal();
+        if (page === 'addcost') this.loadAddCost();
+        if (page === 'adddeposit') this.loadAddDeposit();
         if (page === 'bazaar') this.loadBazarList();
         if (page === 'balance') this.loadManagerMoney();
         if (page === 'profile') this.loadProfile();
@@ -1117,6 +1121,14 @@ const App = {
         this.navigate('addmeal');
     },
 
+    openAddCostToday() {
+        this.navigate('addcost');
+    },
+
+    openAddDepositToday() {
+        this.navigate('adddeposit');
+    },
+
     async loadAddMeal() {
         if (!this.messId) return;
         const now = new Date();
@@ -1826,7 +1838,76 @@ const App = {
         this.toast('Updated!', 'success');
     },
 
-    async showAddBazar() {
+    async loadAddCost() {
+        if (!this.messId) return;
+        if (!this.checkPerm('bazarEntry')) return;
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+        const names = [...new Set(mids.map(id => members[id]?.name || 'Unknown'))].sort((a, b) => a.localeCompare(b));
+        const now = new Date();
+        const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
+        this._bzMembers = names;
+        this._bzDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        this._bzItems = [{ name: '', cost: '' }];
+        this._bzMoneyBy = 'Manager';
+        this._bzDoneBy = '';
+        this._bzTab = 'bazar';
+        this._bzUtilType = '';
+        this._bzUtilAmount = '';
+        this._bzUtilSelected = names.slice();
+        document.getElementById('addcost-body').innerHTML = `
+            <div class="bz-tabs" style="padding:0 0 12px">
+                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Cost</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+            </div>
+            <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
+            <div id="bz-bazar-section">
+                <div class="dep-label">Money from:</div>
+                <div class="dep-chips" id="bz-money-chips">
+                    <button class="dep-chip active" data-name="Manager" onclick="App.bzPickMoney(this)">Manager</button>
+                    ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.bzPickMoney(this)">${n}</button>`).join('')}
+                </div>
+                <div class="dep-label">Done by:</div>
+                <div class="dep-chips" id="bz-done-chips">
+                    ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.bzPickDone(this)">${n}</button>`).join('')}
+                </div>
+                <div id="bz-item-rows">
+                    <div class="bz-item-row">
+                        <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
+                        <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
+                    </div>
+                </div>
+                <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                <p class="bz-hint">Add each item on its own line. The Analysis page can then show which items cost you the most.</p>
+            </div>
+            <div id="bz-utility-section" style="display:none">
+                <div class="dep-label">Type:</div>
+                <div class="dep-chips" id="bz-type-chips">
+                    ${['Rent','Electricity','Wi-Fi'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
+                    <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
+                </div>
+                <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
+                <div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;padding:8px 12px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
+                <div class="dep-label" style="margin-top:12px">Divided to:</div>
+                <div class="bz-util-members">
+                    <div class="bz-util-selectall" onclick="App.bzToggleAll()">
+                        <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
+                        <span>Select all</span>
+                        <span class="bz-util-count" id="bz-util-count">${names.length}/${names.length} selected</span>
+                    </div>
+                    ${names.map(n => `<label class="bz-util-member"><input type="checkbox" checked data-member="${n}" onchange="App.bzUpdateUtilCount()"><span>${n}</span></label>`).join('')}
+                </div>
+            </div>`;
+    },
+
+    bzSavePage() {
+        this.bzSave();
+        this.loadBazarList();
+        this.navigate('bazaar');
+    },
+
+    async loadAddDeposit() {
         if (!this.messId) return;
         if (!this.checkPerm('bazarEntry')) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
@@ -2050,6 +2131,44 @@ const App = {
         setTimeout(() => { try { input.showPicker(); } catch(e) {} }, 100);
     },
 
+    async loadAddDeposit() {
+        if (!this.messId) return;
+        if (!this.checkPerm('bazarEntry')) return;
+        const snap = await db.ref(`messes/${this.messId}/members`).once('value');
+        const members = snap.val() || {};
+        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+        const names = mids.map(id => members[id]?.name || 'Unknown');
+        const now = new Date();
+        this._depDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        const dd = new Date(this._depDate + 'T00:00:00');
+        const dateStr = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
+        this._depCategory = 'meal';
+        this._depSelected = null;
+        document.getElementById('adddeposit-body').innerHTML = `
+            <div class="bz-tabs" style="padding:0 0 12px">
+                <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+            </div>
+            <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
+            <div class="dep-label">Money from:</div>
+            <div class="dep-chips" id="dep-chips">
+                ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
+            </div>
+            <div class="dep-input-wrap"><span class="dep-taka">৳</span><input class="dep-input" id="dep-amount" type="number" placeholder="Enter Amount" oninput="App.depUpdateFooter()"></div>`;
+    },
+
+    saveDepositPage() {
+        const memberName = this._depSelected;
+        const amount = parseFloat(document.getElementById('dep-amount')?.value) || 0;
+        if (!memberName) { this.toast('Money from: pick a name', 'error'); return; }
+        if (!amount) { this.toast('Enter an amount', 'error'); return; }
+        const category = this._depCategory || 'meal';
+        db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, createdAt: Date.now() });
+        this.loadManagerMoney();
+        this.toast('Deposit added!', 'success');
+        this.navigate('balance');
+    },
+
     async showAddDeposit() {
         if (!this.messId) return;
         if (!this.checkPerm('bazarEntry')) return;
@@ -2087,7 +2206,7 @@ const App = {
 
     depSwitchTab(tab) {
         this._depCategory = tab;
-        document.querySelectorAll('#modal-body .bz-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.querySelectorAll('.bz-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
     },
 
     depPick(el) {

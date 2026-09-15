@@ -368,7 +368,7 @@
                     <span class="abazar-filter-total" id="abazar-filter-total"></span>
                 </div>
                 <div id="abazar-list"></div>
-                <button class="abazar-fab" onclick="App.showAddBazar()"><span class="material-icons-round">add</span> Add</button>
+                <button class="abazar-fab" onclick="App.openAddCostToday()"><span class="material-icons-round">add</span> Add</button>
             </div>
             <div class="page" id="page-balance">
                 <div class="abazar-head">
@@ -380,7 +380,27 @@
                     <span class="abazar-filter-total" id="abalance-filter-total"></span>
                 </div>
                 <div id="abalance-list"></div>
-                <button class="abazar-fab" onclick="App.showAddDeposit()"><span class="material-icons-round">add</span> Add</button>
+                <button class="abazar-fab" onclick="App.openAddDepositToday()"><span class="material-icons-round">add</span> Add</button>
+            </div>
+            <div class="page" id="page-addcost">
+                <div class="aam-head">
+                    <button class="icon-btn" onclick="App.navigate('bazaar')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Add Cost</h2>
+                </div>
+                <div class="aam-body" id="addcost-body"></div>
+                <div class="aam-footer">
+                    <button class="aam-save-btn" onclick="App.bzSavePage()">Add</button>
+                </div>
+            </div>
+            <div class="page" id="page-adddeposit">
+                <div class="aam-head">
+                    <button class="icon-btn" onclick="App.navigate('balance')"><span class="material-icons-round">arrow_back</span></button>
+                    <h2>Add Deposit</h2>
+                </div>
+                <div class="aam-body" id="adddeposit-body"></div>
+                <div class="aam-footer">
+                    <button class="aam-save-btn" onclick="App.saveDepositPage()">Add</button>
+                </div>
             </div>
             <div class="page" id="page-costtrash">
                 <div class="abazar-head">
