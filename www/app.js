@@ -1153,18 +1153,7 @@ const App = {
                     if (totEl) totEl.textContent = `Total: ${(em.breakfast||0)+(em.lunch||0)+(em.dinner||0)}`;
                 }
             });
-            if (this._aamEditName && this._aamEditType) {
-                const editName = this._aamEditName;
-                const editType = this._aamEditType;
-                const editIdx = mids.findIndex(mid => (members[mid]?.name || 'Unknown') === editName);
-                if (editIdx >= 0 && this._aamData[editName]) {
-                    this._aamData[editName][editType] += 1;
-                    const map = { breakfast: 'bf', lunch: 'ln', dinner: 'dn' };
-                    const el = document.getElementById(`aam-${map[editType]}-${editIdx}`);
-                    if (el) el.textContent = this._aamData[editName][editType];
-                    const totEl = document.getElementById(`aam-total-${editIdx}`);
-                    if (totEl) totEl.textContent = `Total: ${this._aamData[editName].breakfast+this._aamData[editName].lunch+this._aamData[editName].dinner}`;
-                }
+            if (this._aamEditName) {
                 this._aamEditName = null;
                 this._aamEditType = null;
             }
