@@ -591,13 +591,17 @@ const App = {
                 let actionsHtml = '';
                 if (isYou && isAdmin) {
                     actionsHtml = `<div class="fp-actions">
+                        <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.stepDownManager()">Step down as manager</button>
+                    </div>`;
+                } else if (isYou && !isAdmin) {
+                    actionsHtml = `<div class="fp-actions">
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
                     </div>`;
                 } else if (!isYou) {
                     actionsHtml = `<div class="fp-actions">
-                        ${!isAdmin ? `<button class="fp-btn fp-btn-yellow" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote as manager</button>` : ''}
                         <button class="fp-btn fp-btn-gray" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>
+                        ${!isAdmin ? `<button class="fp-btn fp-btn-yellow" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote as manager</button>` : ''}
                     </div>`;
                 }
                 html += `<div class="aflat-people-item" onclick="this.classList.toggle('expanded')">
@@ -622,7 +626,7 @@ const App = {
     async promoteToManager(uid, name) {
         if (!confirm(`Promote ${name} as manager?`)) return;
         try {
-            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const membersSnap = await window.db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
             const updates = {};
             for (const [id, m] of Object.entries(members)) {
@@ -638,7 +642,7 @@ const App = {
     async removePerson(uid, name) {
         if (!confirm(`Remove ${name} from mess?`)) return;
         try {
-            await db.ref(`messes/${this.messId}/members/${uid}`).remove();
+            await window.db.ref(`messes/${this.messId}/members/${uid}`).remove();
             this.toast('Removed!', 'success');
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
