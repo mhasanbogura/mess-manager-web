@@ -1058,11 +1058,11 @@ const App = {
         input.type = 'date';
         input.id = 'aam-date-hid';
         input.value = this._aamDate;
-        input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0';
-        input.oninput = () => this.aamOnDateChange(input.value);
+        input.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0.01;z-index:-1';
+        input.addEventListener('change', () => this.aamOnDateChange(input.value));
+        input.addEventListener('input', () => this.aamOnDateChange(input.value));
         document.body.appendChild(input);
-        input.click();
-        setTimeout(() => { try { input.showPicker(); } catch(e) {} }, 100);
+        input.showPicker ? input.showPicker() : input.click();
     },
 
     async aamSave() {
@@ -1085,7 +1085,7 @@ const App = {
                 saved++;
             }
         }
-        if (saved) { this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
+        if (saved) { this.closeModal(); this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
         else this.toast('Set at least one meal', 'error');
     },
 
