@@ -1565,11 +1565,10 @@ const App = {
                     <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayDeps.length} entr${dayDeps.length>1?'ies':'y'} &middot; Total: ৳${this.fmtNum(dayTotal)}</p></div>
                     <span class="material-icons-round">expand_more</span>
                 </div>
-                <div class="abazar-day-items" style="${expanded?'':'display:none'}">
-                    <div class="abazar-day-items-head"><span>MONEY OF</span><span>CATEGORY</span><span>AMOUNT</span></div>
+                <div class="abazar-day-items abazar-dep-grid" style="${expanded?'':'display:none'}">
+                    <div class="abazar-day-items-head abazar-dep-grid"><span>MONEY FROM</span><span>AMOUNT</span></div>
                     ${dayDeps.map(i => `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
                         <span class="abazar-item-name">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
-                        <span class="abazar-item-buyer">${i.category === 'utility' ? '<span class=\"material-icons-round\" style=\"font-size:14px;vertical-align:middle;color:#E65100\">lightbulb</span> Utility' : '<span class=\"material-icons-round\" style=\"font-size:14px;vertical-align:middle;color:#0b3d91\">restaurant</span> Meal'}</span>
                         <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)} <span class="material-icons-round">expand_more</span></span>
                     </div>
                     <div class="abazar-item-detail" style="display:none">
@@ -1709,7 +1708,7 @@ const App = {
             </div>`;
         document.getElementById('modal-footer').innerHTML = `
             <div class="dep-footer-row">
-                <span class="dep-footer-hint" id="bz-footer-left">0 items &nbsp; Pick whose money it is</span>
+                <span class="dep-footer-hint" id="bz-footer-left">Money from: Manager  total</span>
                 <span class="dep-footer-total" id="bz-footer-total">৳ 0</span>
             </div>
             <div class="dep-footer-btns">
@@ -1802,12 +1801,12 @@ const App = {
         if (this._bzTab === 'bazar') {
             const items = this._bzItems.filter(i => i.name || i.cost);
             const sum = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
-            left.textContent = `${items.length} item${items.length !== 1 ? 's' : ''}  ${this._bzMoneyBy || 'Pick whose money it is'}${this._bzDoneBy ? ' / ' + this._bzDoneBy : ''}`;
+            left.textContent = `Money from: ${this._bzMoneyBy || 'none'}  total`;
             total.textContent = '৳ ' + this.fmtNum(sum);
         } else {
             const amt = parseFloat(this._bzUtilAmount) || 0;
             const count = this._bzUtilSelected?.length || 0;
-            left.textContent = `Divided to ${count} Member${count !== 1 ? 's' : ''}  ৳${this.fmtNum(amt > 0 ? amt / Math.max(count, 1) : 0)} each`;
+            left.textContent = `Money from: Manager  total`;
             total.textContent = '৳ ' + this.fmtNum(amt);
         }
     },
@@ -1818,7 +1817,7 @@ const App = {
         if (this._bzTab === 'bazar') {
             const items = this._bzItems.filter(i => i.name && i.cost);
             if (!items.length) { this.toast('Add at least one item', 'error'); return; }
-            if (!this._bzMoneyBy) { this.toast('Pick whose money it is', 'error'); return; }
+            if (!this._bzMoneyBy) { this.toast('Money from: pick a name', 'error'); return; }
             if (!this._bzDoneBy) { this.toast('Pick who did the shopping', 'error'); return; }
             for (const item of items) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
@@ -1884,14 +1883,14 @@ const App = {
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
             <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
-            <div class="dep-label">Money of:</div>
+            <div class="dep-label">Money from:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
             </div>
             <div class="dep-input-wrap"><span class="dep-taka">৳</span><input class="dep-input" id="dep-amount" type="number" placeholder="Enter Amount" oninput="App.depUpdateFooter()"></div>`;
         document.getElementById('modal-footer').innerHTML = `
             <div class="dep-footer-row">
-                <span class="dep-footer-hint">Pick whose money it is</span>
+                <span class="dep-footer-hint" id="dep-footer-left">Money from: none</span>
                 <span class="dep-footer-total" id="dep-footer-total">৳ 0</span>
             </div>
             <div class="dep-footer-btns">
@@ -1915,8 +1914,10 @@ const App = {
 
     depUpdateFooter() {
         const amt = parseFloat(document.getElementById('dep-amount')?.value) || 0;
-        const el = document.getElementById('dep-footer-total');
-        if (el) el.textContent = '৳ ' + this.fmtNum(amt);
+        const total = document.getElementById('dep-footer-total');
+        const left = document.getElementById('dep-footer-left');
+        if (total) total.textContent = '৳ ' + this.fmtNum(amt);
+        if (left) left.textContent = `Money from: ${this._depSelected || 'none'}  total`;
     },
 
     depOnDateChange(val) {
@@ -1944,7 +1945,7 @@ const App = {
     async saveDeposit() {
         const memberName = this._depSelected;
         const amount = parseFloat(document.getElementById('dep-amount')?.value) || 0;
-        if (!memberName) { this.toast('Pick whose money it is', 'error'); return; }
+        if (!memberName) { this.toast('Money from: pick a name', 'error'); return; }
         if (!amount) { this.toast('Enter an amount', 'error'); return; }
         const category = this._depCategory || 'meal';
         await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, createdAt: Date.now() });
