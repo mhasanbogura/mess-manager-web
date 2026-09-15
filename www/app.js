@@ -1872,7 +1872,7 @@ const App = {
         if (checked) {
             this.theme = 'system';
             if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.setAttribute('data-theme', 'dark');
+                document.documentElement.setAttribute('data-theme', 'oled');
             } else {
                 document.documentElement.removeAttribute('data-theme');
             }
@@ -1897,7 +1897,7 @@ const App = {
         this.theme = saved;
         if (saved === 'system') {
             if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.setAttribute('data-theme', 'dark');
+                document.documentElement.setAttribute('data-theme', 'oled');
             } else {
                 document.documentElement.removeAttribute('data-theme');
             }

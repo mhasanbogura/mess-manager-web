@@ -30,12 +30,12 @@
     --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 [data-theme="dark"] {
-    --bg: #0f1218; --card: #1a1f2a; --card-solid: #1a1f2a; --card-border: #2c3547;
-    --text: #e8ebf1; --text-secondary: #9aa4b5; --border: #2c3547;
-    --shadow: 0 1px 3px rgba(0,0,0,.4); --shadow-md: 0 2px 8px rgba(0,0,0,.4); --shadow-lg: 0 8px 30px rgba(0,0,0,.5);
+    --bg: #000000; --card: #000000; --card-solid: #000000; --card-border: #1a1a1a;
+    --text: #e8ebf1; --text-secondary: #9aa4b5; --border: #1a1a1a;
+    --shadow: 0 1px 3px rgba(0,0,0,.6); --shadow-md: 0 2px 8px rgba(0,0,0,.6); --shadow-lg: 0 8px 30px rgba(0,0,0,.7);
 }
 [data-theme="oled"] {
-    --bg: #000000; --card: #0a0a0a; --card-solid: #0a0a0a; --card-border: #1a1a1a;
+    --bg: #000000; --card: #000000; --card-solid: #000000; --card-border: #1a1a1a;
     --text: #e8ebf1; --text-secondary: #9aa4b5; --border: #1a1a1a;
     --shadow: 0 1px 3px rgba(0,0,0,.6); --shadow-md: 0 2px 8px rgba(0,0,0,.6); --shadow-lg: 0 8px 30px rgba(0,0,0,.7);
 }
@@ -2068,7 +2068,7 @@ select.input-sm { cursor: pointer; }
 [data-theme="dark"] .aprof-toggle-slider { background: #374151; }
 [data-theme="dark"] .aprof-version { border-color: #2c3547; }
 [data-theme="dark"] .aprof-version span { color: #6b7280; }
-[data-theme="oled"] .aprof-card { background: #0a0a0a; border-color: #1a1a1a; }
+[data-theme="oled"] .aprof-card { background: #000000; border-color: #1a1a1a; }
 [data-theme="oled"] .aprof-info h3, [data-theme="oled"] .aprof-label { color: #e8ebf1; }
 [data-theme="oled"] .aprof-info p, [data-theme="oled"] .aprof-desc-inline, [data-theme="oled"] .aprof-value { color: #9aa4b5; }
 [data-theme="oled"] .aprof-section-title { color: #6b7280; }
@@ -2634,3 +2634,44 @@ img, canvas { max-width: 100%; }
 .am-donut-val { font-size: 13px; font-weight: 600; color: #333; }
 .am-export-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #FFB300; color: #1a1a1a; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; margin-top: 8px; }
 .am-export-btn .material-icons-round { font-size: 22px; }
+
+/* ==================== OLED FULL BLACK OVERRIDES ==================== */
+[data-theme="oled"] .topbar { background: #000000; }
+[data-theme="oled"] .adash-head, [data-theme="oled"] .aflat-head,
+[data-theme="oled"] .anotice-head, [data-theme="oled"] .aduty-head,
+[data-theme="oled"] .abn-head, [data-theme="oled"] .amenu-head { background: #000000; }
+[data-theme="oled"] .adash-mess-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .adash-notice-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .adash-meal-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .adash-summary-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .adash-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .dash-meal-box { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .dash-cost-box { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .aflat-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .aflat-card-box { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .abazar-day-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .ameal-table { background: #000000; }
+[data-theme="oled"] .ameal-grid-scroll { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .ameal-grid-scroll th { background: #000000; color: #9aa4b5; border-color: #1a1a1a; }
+[data-theme="oled"] .ameal-grid-scroll td { border-color: #1a1a1a; color: #e8ebf1; }
+[data-theme="oled"] .abazar-items { background: #000000; }
+[data-theme="oled"] .abazar-item { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .amealhist-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .acosttrash-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .adeptrash-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .amenu-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .anotice-board { background: #000000; }
+[data-theme="oled"] .aduty-banner { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .aduty-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .am-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .aprof-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .modal { background: #000000; }
+[data-theme="oled"] input, [data-theme="oled"] select, [data-theme="oled"] textarea { background: #0a0a0a; border-color: #1a1a1a; color: #e8ebf1; }
+[data-theme="oled"] .bottom-nav { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .btn { background: #1a1a1a; color: #e8ebf1; }
+[data-theme="oled"] .fab { background: #d32f2f; }
+[data-theme="oled"] .am-add-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .am-day-card { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .meal-cell-popup { background: #1a1a1a; border-color: #333; }
+[data-theme="oled"] .collapse-header { background: #000000; border-color: #1a1a1a; }
+[data-theme="oled"] .collapse-body { background: #000000; border-color: #1a1a1a; }
