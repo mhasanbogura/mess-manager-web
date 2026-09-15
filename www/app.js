@@ -2622,6 +2622,8 @@ const App = {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
+        input.style.position = 'fixed';
+        input.style.left = '-9999px';
         input.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -2643,7 +2645,9 @@ const App = {
                 };
                 reader.readAsDataURL(file);
             } catch (e) { this.toast('Failed to upload: ' + e.message, 'error'); }
+            document.body.removeChild(input);
         };
+        document.body.appendChild(input);
         input.click();
     },
     deleteAccount() {
