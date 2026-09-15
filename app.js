@@ -1196,9 +1196,12 @@ const App = {
             const todayTh = scroll.querySelector('th[data-today]');
             if (todayTh) { requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
-                    let el = todayTh, off = 0;
-                    while (el && el !== scroll) { off += el.offsetLeft; el = el.offsetParent; }
-                    scroll.scrollLeft = off - scroll.offsetWidth / 2 + todayTh.offsetWidth / 2;
+                    const headerW = scroll.querySelector('th.am-col-view')?.offsetWidth || 160;
+                    const typeW = 90;
+                    const stickyTotal = headerW + typeW;
+                    const viewWidth = scroll.clientWidth - stickyTotal;
+                    const cellCenter = todayTh.offsetLeft + todayTh.offsetWidth / 2 - stickyTotal;
+                    scroll.scrollLeft = Math.max(0, cellCenter - viewWidth / 2);
                 });
             }); }
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }

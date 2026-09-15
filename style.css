@@ -1787,7 +1787,7 @@ select.input-sm { cursor: pointer; }
 }
 .ameal-month-row span { font-size: 13px; color: #555; }
 .ameal-month-row strong { font-size: 15px; color: #d32f2f; font-weight: 700; }
-.ameal-grid-wrap { padding: 0 12px 70px; }
+.ameal-grid-wrap { padding: 8px 12px 70px; }
 .ameal-loader { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
 .ameal-spinner {
     width: 40px; height: 40px; border: 4px solid #e0e0e0;
