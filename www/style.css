@@ -1749,7 +1749,7 @@ select.input-sm { cursor: pointer; }
 }
 
 /* ==================== MEAL ENTRY ==================== */
-.ameal-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--card-border); }
+.ameal-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 8px; border: 1px solid var(--card-border); }
 .ameal-head h2 { font-size: 22px; font-weight: 700; color: var(--text); }
 .ameal-actions { display: flex; gap: 4px; }
 .ameal-action {
@@ -1950,7 +1950,7 @@ select.input-sm { cursor: pointer; }
 }
 
 /* ==================== BAZAR LIST & MANAGER MONEY ==================== */
-.abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--card-border); }
+.abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 8px; border: 1px solid var(--card-border); }
 .abazar-head h2 { font-size: 22px; font-weight: 700; color: var(--text); }
 .abazar-actions { display: flex; gap: 4px; }
 .abazar-action {
@@ -2138,9 +2138,9 @@ select.input-sm { cursor: pointer; }
 .anotice-head {
     background: var(--card);
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; min-height: 60px;
-    border-radius: 16px; margin: 10px 12px 0;
-    border: 1px solid var(--border);
+    padding: 12px 14px; min-height: 56px;
+    border-radius: 16px; margin: 10px 12px 8px;
+    border: 1px solid var(--card-border);
 }
 .anotice-head .icon-btn { color: var(--text); min-width: 36px; min-height: 36px; }
 .anotice-head .icon-btn:hover { background: rgba(0,0,0,.08); }
@@ -2203,9 +2203,9 @@ select.input-sm { cursor: pointer; }
 .aduty-head {
     background: var(--card);
     display: flex; align-items: center; gap: 10px;
-    padding: 6px 12px; min-height: 50px;
-    border-radius: 16px; margin: 8px 12px 0;
-    border: 1px solid var(--border);
+    padding: 12px 14px; min-height: 56px;
+    border-radius: 16px; margin: 10px 12px 8px;
+    border: 1px solid var(--card-border);
 }
 .aduty-head .icon-btn { color: var(--text); min-width: 36px; min-height: 36px; }
 .aduty-head .icon-btn:hover { background: rgba(0,0,0,.08); }
@@ -2330,7 +2330,7 @@ img, canvas { max-width: 100%; }
 
 /* ==================== FLAT PAGE ==================== */
 #page-members { font-family: 'Times New Roman', sans-serif; }
-.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; min-height: 60px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--border); }
+.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 8px; border: 1px solid var(--card-border); }
 .aflat-head h2 { font-size: 18px; font-weight: 700; color: var(--text); }
 .aflat-leave { display: flex; align-items: center; gap: 4px; background: none; border: none; color: #d32f2f; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
 .aflat-leave .material-icons-round { font-size: 20px; }
