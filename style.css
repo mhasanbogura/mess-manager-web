@@ -1783,11 +1783,11 @@ select.input-sm { cursor: pointer; }
 .amealhist-detail-info { font-size: 13px; color: #333; margin-top: 4px; }
 .ameal-month-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 6px 16px; border-bottom: 1px solid #e0ddd5;
+    padding: 6px 16px; border-bottom: 1px solid #e0ddd5; margin: 0 12px;
 }
 .ameal-month-row span { font-size: 13px; color: #555; }
 .ameal-month-row strong { font-size: 15px; color: #d32f2f; font-weight: 700; }
-.ameal-grid-wrap { padding: 0 0 70px; }
+.ameal-grid-wrap { padding: 0 12px 70px; }
 .ameal-loader { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
 .ameal-spinner {
     width: 40px; height: 40px; border: 4px solid #e0e0e0;
@@ -1962,11 +1962,11 @@ select.input-sm { cursor: pointer; }
 .abazar-action small { font-size: 10px; color: #555; }
 .abazar-month-row {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 8px 16px; border-bottom: 1px solid #e0ddd5;
+    padding: 8px 16px; border-bottom: 1px solid #e0ddd5; margin: 0 12px;
 }
 .abazar-month-row span { font-size: 14px; color: #555; }
 .abazar-month-row strong { font-size: 16px; color: #d32f2f; font-weight: 700; }
-.abazar-filters { display: flex; align-items: center; gap: 8px; padding: 10px 12px; flex-wrap: wrap; }
+.abazar-filters { display: flex; align-items: center; gap: 8px; padding: 10px 12px; flex-wrap: wrap; margin: 0 12px; }
 .abazar-filter-btn {
     display: flex; align-items: center; gap: 4px; background: #fff;
     border: 1px solid #ccc; border-radius: 20px; padding: 6px 12px;
@@ -2073,8 +2073,8 @@ select.input-sm { cursor: pointer; }
 .aprof-info p { font-size: 11px; color: #777; margin: 0; line-height: 1.3; }
 .aprof-uid { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #888; font-size: 13px; }
 .aprof-uid .material-icons-round { color: #aaa; }
-.aprof-section { margin-top: 14px; }
-.aprof-section-title { font-size: 12px; font-weight: 600; color: #999; padding: 0 16px; margin-bottom: 6px; letter-spacing: .5px; }
+.aprof-section { margin: 14px 12px 0; }
+.aprof-section-title { font-size: 12px; font-weight: 600; color: #999; padding: 0 4px; margin-bottom: 6px; letter-spacing: .5px; }
 .aprof-row {
     display: flex; align-items: center; gap: 12px;
     padding: 14px; border-top: 1px solid #eef1f6; cursor: pointer;
@@ -2149,7 +2149,7 @@ select.input-sm { cursor: pointer; }
 .anotice-board {
     background: #fff;
     min-height: calc(100vh - 260px);
-    padding: 20px 16px;
+    padding: 20px 16px; margin: 0 12px;
 }
 .anotice-empty {
     text-align: center; padding: 90px 30px 40px;
