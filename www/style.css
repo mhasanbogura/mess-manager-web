@@ -1526,19 +1526,19 @@ select.input-sm { cursor: pointer; }
 .adash-dinner-sub { flex-basis: 100%; font-size: 14px; color: #777; margin-top: 2px; }
 
 .adash-finance {
-    background: #fff; border-radius: 16px; margin: 10px 12px 0;
-    padding: 10px 8px; border: 1px solid #dfe4ec;
+    background: linear-gradient(135deg, #3a3a3a, #555); border-radius: 16px; margin: 10px 12px 0;
+    padding: 10px 8px; border: 1px solid #444;
     box-shadow: 0 2px 8px rgba(0,0,0,.04);
     display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; align-items: stretch;
 }
 .adash-fin-box {
-    border: 1.5px solid #dfe4ec; border-radius: 12px; padding: 6px 4px;
-    text-align: center; min-width: 0; background: #fff;
+    border: 1.5px solid #555; border-radius: 12px; padding: 6px 4px;
+    text-align: center; min-width: 0; background: transparent;
 }
-.adash-fin-box small { font-size: 11px; color: #777; display: block; }
-.adash-fin-box strong { font-size: 16px; font-weight: 600; color: #111; white-space: nowrap; }
-.adash-fin-box strong.pos { color: #2E9E44; }
-.adash-fin-box strong.neg { color: #D32F2F; }
+.adash-fin-box small { font-size: 11px; color: rgba(255,255,255,.7); display: block; }
+.adash-fin-box strong { font-size: 16px; font-weight: 600; color: #000; white-space: nowrap; }
+.adash-fin-box strong.pos { color: #2E9E44 !important; }
+.adash-fin-box strong.neg { color: #D32F2F !important; }
 .adash-fin-box.meal-fin, .adash-fin-box.util-fin {
     background: var(--primary); color: #fff; border-color: var(--primary);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
@@ -2747,10 +2747,12 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .meal-cell-popup { background: #2a2a2a; border-color: #333; }
 [data-theme="oled"] .meal-cell-popup button { color: #e8ebf1; }
 /* Dashboard finance boxes */
-[data-theme="oled"] .adash-fin-box { background: #1a1a1a; border-color: #2a2a2a; }
-[data-theme="oled"] .adash-fin-box small { color: #999; }
-[data-theme="oled"] .adash-fin-box strong { color: #e8ebf1; }
-[data-theme="oled"] .adash-finance { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .adash-fin-box { background: transparent; border-color: #555; }
+[data-theme="oled"] .adash-fin-box small { color: rgba(255,255,255,.7); }
+[data-theme="oled"] .adash-fin-box strong { color: #fff; }
+[data-theme="oled"] .adash-fin-box strong.pos { color: #4caf50 !important; }
+[data-theme="oled"] .adash-fin-box strong.neg { color: #ff6b6b !important; }
+[data-theme="oled"] .adash-finance { background: linear-gradient(135deg, #999, #bbb); border-color: #aaa; }
 [data-theme="oled"] .adash-table { background: transparent; }
 [data-theme="oled"] .adash-table thead th { background: linear-gradient(135deg, #999, #bbb); color: #000; }
 [data-theme="oled"] .adash-table td { background: linear-gradient(135deg, #333, #444); color: #fff; border-color: #555; }
