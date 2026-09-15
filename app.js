@@ -1026,13 +1026,9 @@ const App = {
             cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:18px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: ${preType ? 1 : 0}</span></div><div class="aam-meals-row">${mealsHtml}</div></div>`;
         });
         document.getElementById('modal-title').textContent = 'Add Meal';
-        document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="position:relative;cursor:pointer" id="aam-date-wrap"><span class="material-icons-round" style="pointer-events:none">calendar_month</span> <span id="aam-date-text" style="pointer-events:none">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999;pointer-events:none">expand_more</span><input type="date" id="aam-date-hid" value="${dateKey}" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;"></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="position:relative;cursor:pointer" onclick="App.aamPickDate()"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
         document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.aamSave()" style="width:100%;padding:12px;border-radius:10px">Add</button></div>`;
         this.openModal();
-        const dateInput = document.getElementById('aam-date-hid');
-        if (dateInput) {
-            dateInput.addEventListener('change', (e) => this.aamOnDateChange(e.target.value));
-        }
     },
 
     aamAdjust(idx, name, field, delta) {
@@ -1056,10 +1052,17 @@ const App = {
     },
 
     aamPickDate() {
-        const input = document.getElementById('aam-date-hid');
-        if (!input) return;
+        const old = document.getElementById('aam-date-hid');
+        if (old) old.remove();
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.id = 'aam-date-hid';
         input.value = this._aamDate;
+        input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0';
+        input.oninput = () => this.aamOnDateChange(input.value);
+        document.body.appendChild(input);
         input.click();
+        setTimeout(() => { try { input.showPicker(); } catch(e) {} }, 100);
     },
 
     async aamSave() {
@@ -1832,7 +1835,7 @@ const App = {
                 <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
-            <div class="dep-date" style="position:relative;cursor:pointer"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><input type="date" id="dep-date-input" value="${this._depDate}" onchange="App.depOnDateChange(this.value)" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none"></div>
+            <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money of:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
@@ -1874,6 +1877,20 @@ const App = {
         const dd = new Date(val + 'T00:00:00');
         const el = document.getElementById('dep-date-text');
         if (el) el.textContent = `${dd.getDate()} ${dd.toLocaleDateString('en-US',{month:'long'})}, ${dd.getFullYear()}`;
+    },
+
+    depPickDate() {
+        const old = document.getElementById('dep-date-hid');
+        if (old) old.remove();
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.id = 'dep-date-hid';
+        input.value = this._depDate;
+        input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0';
+        input.oninput = () => this.depOnDateChange(input.value);
+        document.body.appendChild(input);
+        input.click();
+        setTimeout(() => { try { input.showPicker(); } catch(e) {} }, 100);
     },
 
     async saveDeposit() {

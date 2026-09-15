@@ -2843,6 +2843,50 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .aam-card { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .aam-card label { color: #ccc; }
 [data-theme="oled"] .aam-card h4 { color: #e8ebf1; }
+[data-theme="oled"] .aam-name { color: #e8ebf1; }
+[data-theme="oled"] .aam-total { color: #999; }
+[data-theme="oled"] .aam-meal-col label { color: #999; }
+[data-theme="oled"] .aam-counter button { background: #2a2a2a; border-color: #444; color: #e8ebf1; }
+[data-theme="oled"] .aam-val { color: #e8ebf1; }
+[data-theme="oled"] .aam-avatar { background: #2a2a2a; }
+[data-theme="oled"] .aam-avatar span { color: #fff; }
+/* Modal title & header */
+[data-theme="oled"] #modal-title { color: #e8ebf1; }
+[data-theme="oled"] .modal-header { border-color: #2a2a2a; }
+[data-theme="oled"] .modal-header .close-btn { color: #999; }
+/* Cost/Bazar modal */
+[data-theme="oled"] .bz-tab { background: #222; border-color: #333; color: #999; }
+[data-theme="oled"] .bz-tab.active { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .bz-input-wrap { background: #222; border-color: #333; }
+[data-theme="oled"] .bz-input-wrap .material-icons-round { color: #999; }
+[data-theme="oled"] .bz-input { color: #e8ebf1; }
+[data-theme="oled"] .bz-input::placeholder { color: #666; }
+[data-theme="oled"] .bz-add-more { color: #999; }
+[data-theme="oled"] .bz-add-more .material-icons-round { color: #999; }
+[data-theme="oled"] .bz-hint { color: #666; }
+[data-theme="oled"] .bz-item-row { border-color: #2a2a2a; }
+[data-theme="oled"] .bz-cost-wrap { border-color: #333; }
+[data-theme="oled"] .bz-util-members { background: #1a1a1a; border-color: #2a2a2a; }
+[data-theme="oled"] .bz-util-members label { color: #ccc; }
+[data-theme="oled"] .bz-util-count { color: #999; }
+/* Deposit modal */
+[data-theme="oled"] .dep-label { color: #999; }
+[data-theme="oled"] .dep-input-wrap { border-color: #333; }
+[data-theme="oled"] .dep-input { color: #e8ebf1; }
+[data-theme="oled"] .dep-input::placeholder { color: #666; }
+[data-theme="oled"] .dep-footer-hint { color: #999; }
+[data-theme="oled"] .dep-footer-total { color: #ff6b6b; }
+[data-theme="oled"] .dep-footer-btns .btn-modal-add { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .dep-footer-btns .btn-modal-cancel { background: #2a2a2a; color: #ccc; }
+[data-theme="oled"] .dep-date .material-icons-round { color: #999; }
+/* Add meal page */
+[data-theme="oled"] .aam-head h2 { color: #e8ebf1; }
+[data-theme="oled"] .aam-head .icon-btn { color: #e8ebf1; }
+[data-theme="oled"] .aam-label { color: #999; }
+[data-theme="oled"] .aam-select { background: #222; border-color: #333; color: #e8ebf1; }
+[data-theme="oled"] .aam-section-head { color: #ccc; }
+[data-theme="oled"] .aam-section-head .material-icons-round { color: #999; }
+[data-theme="oled"] .modal-footer { border-color: #2a2a2a; }
 /* ==================== FULL OLED PAGE BACKGROUNDS ==================== */
 [data-theme="oled"] #app-screen { background: #111; }
 [data-theme="oled"] .main-content { background: #111; }
