@@ -672,16 +672,20 @@ const App = {
             const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'togglePerms'];
             const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Cost Entry', 'Turn on/off Permissions'];
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
+            const iAmAdmin = this.userRole === 'admin';
+            const iCanToggle = iAmAdmin || this.canDo('togglePerms');
             div.innerHTML = mids.map((id, i) => {
                 const m = members[id] || {};
                 const isAdmin = m.role === 'admin';
                 const initial = ((m.name || '?')[0] || '?').toUpperCase();
                 const color = colors[i % colors.length];
                 const userPerms = perms[id] || {};
+                const isMe = id === this.currentUser.uid;
                 const checks = permKeys.map((k, j) => {
                     const checked = isAdmin || userPerms[k];
+                    const canClick = iCanToggle && !isAdmin && !isMe;
                     return `<div class="aflat-perm-row">
-                        <div class="aflat-perm-check ${checked ? 'checked' : ''}" onclick="App.togglePerm('${id}','${k}',this)" ${isAdmin ? 'style="pointer-events:none;opacity:.5"' : ''}>
+                        <div class="aflat-perm-check ${checked ? 'checked' : ''}" onclick="App.togglePerm('${id}','${k}',this)" ${!canClick ? 'style="pointer-events:none;opacity:.5"' : ''}>
                             <span class="material-icons-round">check</span>
                         </div>
                         <span class="aflat-perm-label">${permLabels[j]}</span>
@@ -690,7 +694,7 @@ const App = {
                 return `<div class="aflat-perm-card">
                     <div class="aflat-perm-top">
                         <div class="aflat-perm-avatar" style="background:${color}">${initial}</div>
-                        <div class="aflat-perm-name">${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager, You)</span>' : ''}</div>
+                        <div class="aflat-perm-name">${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager' + (isMe ? ', You' : '') + ')</span>' : ''}</div>
                     </div>
                     <div class="aflat-perm-list">${checks}</div>
                 </div>`;
