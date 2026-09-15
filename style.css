@@ -1580,8 +1580,8 @@ select.input-sm { cursor: pointer; }
 .adash-table td.c-name { text-align: left; padding-left: 8px; font-size: 14px; color: #000; }
 .adash-table td small { display: block; font-size: 9px; color: #555; font-family: 'Times New Roman', sans-serif; }
 .adash-table td strong { font-size: 14px; font-weight: 500; color: #000; }
-.adash-table td.pos strong { color: #2e7d32; }
-.adash-table td.neg strong { color: #d32f2f; }
+.adash-table td.pos strong { color: #2e7d32 !important; }
+.adash-table td.neg strong { color: #d32f2f !important; }
 .adash-table tbody tr:last-child td:first-child { border-radius: 0 0 0 14px; }
 .adash-table tbody tr:last-child td:last-child { border-radius: 0 0 14px 0; }
 .adash-table .empty-state { color: #999; padding: 16px; }
@@ -2754,8 +2754,8 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .adash-table td.c-name { color: #fff; }
 [data-theme="oled"] .adash-table td strong { color: #fff; }
 [data-theme="oled"] .adash-table td small { color: #bbb; }
-[data-theme="oled"] .adash-table td.pos strong { color: #4caf50; }
-[data-theme="oled"] .adash-table td.neg strong { color: #ff6b6b; }
+[data-theme="oled"] .adash-table td.pos strong { color: #4caf50 !important; }
+[data-theme="oled"] .adash-table td.neg strong { color: #ff6b6b !important; }
 [data-theme="oled"] .adash-table thead th small { color: #333; }
 [data-theme="oled"] .adash-stats-head .material-icons-round { color: #999; }
 [data-theme="oled"] .adash-stats-head strong { color: #e8ebf1; }
