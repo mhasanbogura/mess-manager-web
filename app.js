@@ -1105,6 +1105,8 @@ const App = {
             document.getElementById('ameal-table').innerHTML = html;
             loader.style.display = 'none';
             scroll.style.display = 'block';
+            const todayTh = scroll.querySelector('th[style*="c8ddf0"]');
+            if (todayTh) { setTimeout(() => { scroll.scrollLeft = todayTh.offsetLeft - scroll.clientWidth / 3; }, 50); }
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
