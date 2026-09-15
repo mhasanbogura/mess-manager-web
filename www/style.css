@@ -1388,9 +1388,9 @@ select.input-sm { cursor: pointer; }
 /* ==================== LIGHT APP SHELL (Android style) ==================== */
 #app-screen { background: #f2f4f8; }
 .main-content { background: transparent; }
-.topbar h2 { color: #fff; }
-#topbar-mess-label { color: rgba(255,255,255,.6) !important; }
-.menu-btn { color: #fff; }
+.topbar h2 { color: var(--text); }
+#topbar-mess-label { color: var(--text); opacity: .6 !important; }
+.menu-btn { color: var(--text); }
 .bottom-nav { background: #ffffff; border-top: 1px solid #dfe4ec; }
 .bottom-nav-item { color: #5b6472; }
 .bottom-nav-item:hover { color: #14181f; }
@@ -1533,12 +1533,12 @@ select.input-sm { cursor: pointer; }
 .adash-fin-box {
     border: 1.5px solid transparent; border-radius: 12px; padding: 6px 4px;
     text-align: center; min-width: 0;
-    background: linear-gradient(135deg, #3a3a3a, #555);
+    background: linear-gradient(135deg, #999, #bbb);
 }
-.adash-fin-box small { font-size: 11px; color: rgba(255,255,255,.7); display: block; }
-.adash-fin-box strong { font-size: 16px; font-weight: 600; color: #fff; white-space: nowrap; }
-.adash-fin-box strong.pos { color: #4caf50 !important; }
-.adash-fin-box strong.neg { color: #ff5252 !important; }
+.adash-fin-box small { font-size: 11px; color: rgba(0,0,0,.6); display: block; }
+.adash-fin-box strong { font-size: 16px; font-weight: 600; color: #000; white-space: nowrap; }
+.adash-fin-box strong.pos { color: #2e7d32 !important; }
+.adash-fin-box strong.neg { color: #d32f2f !important; }
 .adash-fin-box.meal-fin, .adash-fin-box.util-fin {
     background: var(--primary); color: #fff; border-color: var(--primary);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
