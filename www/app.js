@@ -1110,12 +1110,13 @@ const App = {
             loader.style.display = 'none';
             scroll.style.display = 'block';
             const todayTh = scroll.querySelector('th[data-today]');
-            if (todayTh) { setTimeout(() => {
-                const thLeft = todayTh.getBoundingClientRect().left;
-                const scrollLeft = scroll.getBoundingClientRect().left;
-                const offset = thLeft - scrollLeft + scroll.scrollLeft;
-                scroll.scrollLeft = offset + (todayTh.offsetWidth / 2) - (scroll.clientWidth / 2);
-            }, 300); }
+            if (todayTh) { requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    const cRect = scroll.getBoundingClientRect();
+                    const tRect = todayTh.getBoundingClientRect();
+                    scroll.scrollLeft += (tRect.left + tRect.width / 2) - (cRect.left + cRect.width / 2);
+                });
+            }); }
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
