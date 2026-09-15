@@ -1487,9 +1487,15 @@ const App = {
     editBazarItem(key, name, cost, memberId, date, category) {
         this._editBzKey = key;
         this._editBzCategory = category;
+        const members = this._bazarMembers || {};
+        const currentName = (members[memberId] || {}).name || memberId || 'Manager';
+        const names = ['Manager', ...Object.values(members).map(m => m.name || 'Unknown').filter(n => n !== 'Manager')];
+        const dateVal = date || new Date().toISOString().slice(0,10);
         document.getElementById('modal-title').textContent = 'Edit Cost';
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label>Item name</label><input type="text" id="edit-bz-name" value="${this.esc(name)}"></div>
+            <div class="form-group"><label>Money from</label><select id="edit-bz-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Date</label><input type="date" id="edit-bz-date" value="${dateVal}"></div>
             <div class="form-group"><label>Cost (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>`;
         document.getElementById('modal-footer').innerHTML = `
             <div class="dep-footer-btns">
@@ -1502,10 +1508,14 @@ const App = {
     async saveBazarEdit(key, category) {
         const name = document.getElementById('edit-bz-name').value.trim();
         const cost = parseFloat(document.getElementById('edit-bz-cost').value) || 0;
+        const memberName = document.getElementById('edit-bz-member').value;
+        const date = document.getElementById('edit-bz-date').value;
         if (!name) { this.toast('Enter name', 'error'); return; }
         if (cost <= 0) { this.toast('Enter cost', 'error'); return; }
+        const members = this._bazarMembers || {};
+        const memberId = memberName === 'Manager' ? 'Manager' : Object.entries(members).find(([, m]) => m.name === memberName)?.[0] || memberName;
         const userName = this.currentUser?.displayName || 'Unknown';
-        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost, editedBy: userName, editedAt: Date.now() });
+        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost, memberId, date, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
         this.loadBazarList();
         this.toast('Updated!', 'success');
@@ -1618,9 +1628,11 @@ const App = {
         const members = this._depMembers || {};
         const currentName = (members[memberId] || {}).name || '';
         const names = Object.values(members).map(m => m.name || 'Unknown');
+        const dateVal = date || new Date().toISOString().slice(0,10);
         document.getElementById('modal-title').textContent = 'Edit Deposit';
         document.getElementById('modal-body').innerHTML = `
-            <div class="form-group"><label>Member</label><select id="edit-dep-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Money from</label><select id="edit-dep-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Date</label><input type="date" id="edit-dep-date" value="${dateVal}"></div>
             <div class="form-group"><label>Amount (৳)</label><input type="number" id="edit-dep-amount" value="${amount}"></div>
             <div class="form-group"><label>Category</label><select id="edit-dep-cat"><option value="meal" ${category==='meal'?'selected':''}>Meal</option><option value="utility" ${category==='utility'?'selected':''}>Utility</option></select></div>`;
         document.getElementById('modal-footer').innerHTML = `
@@ -1632,12 +1644,15 @@ const App = {
     },
 
     async saveDepositEdit(key) {
-        const memberId = document.getElementById('edit-dep-member').value;
+        const memberName = document.getElementById('edit-dep-member').value;
         const amount = parseFloat(document.getElementById('edit-dep-amount').value) || 0;
         const category = document.getElementById('edit-dep-cat').value;
+        const date = document.getElementById('edit-dep-date').value;
         if (amount <= 0) { this.toast('Enter amount', 'error'); return; }
+        const members = this._depMembers || {};
+        const memberId = Object.entries(members).find(([, m]) => m.name === memberName)?.[0] || '';
         const userName = this.currentUser?.displayName || 'Unknown';
-        await db.ref(`messes/${this.messId}/deposits/${key}`).update({ memberId, amount, category, editedBy: userName, editedAt: Date.now() });
+        await db.ref(`messes/${this.messId}/deposits/${key}`).update({ memberId, amount, category, date, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
         this.loadManagerMoney();
         this.toast('Updated!', 'success');
