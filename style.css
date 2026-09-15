@@ -2035,6 +2035,11 @@ select.input-sm { cursor: pointer; }
 .aprof-info p { font-size: 14px; color: #777; margin: 0; line-height: 1.3; }
 .aprof-uid { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #888; font-size: 13px; }
 .aprof-uid .material-icons-round { color: #aaa; }
+.aprof-row-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 700; flex-shrink: 0; overflow: hidden;
+}
 .aprof-section { margin-top: 14px; }
 .aprof-section-title { font-size: 12px; font-weight: 600; color: #999; padding: 0 16px; margin-bottom: 6px; letter-spacing: .5px; }
 .aprof-row {

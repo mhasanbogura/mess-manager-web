@@ -1992,13 +1992,14 @@ const App = {
             const snap = await window.db.ref(`users/${u.uid}/profilePicture`).once('value');
             const photo = snap.val();
             const avatar = document.getElementById('prof-avatar');
+            const rowAvatar = document.getElementById('prof-row-avatar');
             if (photo) {
-                avatar.style.backgroundImage = `url(${photo})`;
-                avatar.style.backgroundSize = 'cover';
-                avatar.textContent = '';
-                avatar.style.color = 'transparent';
+                if (avatar) { avatar.style.backgroundImage = `url(${photo})`; avatar.style.backgroundSize = 'cover'; avatar.textContent = ''; avatar.style.color = 'transparent'; }
+                if (rowAvatar) { rowAvatar.style.backgroundImage = `url(${photo})`; rowAvatar.style.backgroundSize = 'cover'; rowAvatar.textContent = ''; rowAvatar.style.color = 'transparent'; }
             } else {
-                avatar.textContent = (u.displayName || 'U').charAt(0).toUpperCase();
+                const initial = (u.displayName || 'U').charAt(0).toUpperCase();
+                if (avatar) avatar.textContent = initial;
+                if (rowAvatar) rowAvatar.textContent = initial;
             }
         } catch (e) {}
         const saved = localStorage.getItem('mess_theme') || 'light';
@@ -2636,6 +2637,8 @@ const App = {
                     document.getElementById('prof-avatar').style.backgroundImage = `url(${dataUrl})`;
                     document.getElementById('prof-avatar').style.backgroundSize = 'cover';
                     document.getElementById('prof-avatar').style.color = 'transparent';
+                    const ra = document.getElementById('prof-row-avatar');
+                    if (ra) { ra.style.backgroundImage = `url(${dataUrl})`; ra.style.backgroundSize = 'cover'; ra.textContent = ''; ra.style.color = 'transparent'; }
                     this.toast('Profile picture updated!', 'success');
                 };
                 reader.readAsDataURL(file);
