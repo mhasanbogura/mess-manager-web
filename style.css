@@ -1795,6 +1795,24 @@ select.input-sm { cursor: pointer; }
 .ameal-table .ameal-row-count.zero { color: #aaa; }
 .ameal-table .ame-day-today { background: #e8f0fe !important; }
 
+.meal-cell-popup {
+    position: fixed; z-index: 9999;
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.2);
+    padding: 6px 0; min-width: 140px;
+    animation: fadeIn 0.15s ease;
+}
+.meal-cell-popup button {
+    display: flex; align-items: center; gap: 8px;
+    width: 100%; padding: 10px 16px; border: none; background: none;
+    font-size: 14px; font-family: inherit; color: #333; cursor: pointer;
+    transition: background .1s;
+}
+.meal-cell-popup button:hover { background: #f0f0f0; }
+.meal-cell-popup button .material-icons-round { font-size: 20px; }
+.meal-cell-popup button:first-child { color: #D32F2F; }
+.meal-cell-popup button:first-child .material-icons-round { color: #D32F2F; }
+
 /* ==================== DEPOSIT MODAL ==================== */
 .dep-date { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #333; padding: 4px 0 6px; border-bottom: 1px solid #e0ddd5; font-weight: 500; }
 .dep-date .material-icons-round { font-size: 20px; color: #555; }

@@ -280,7 +280,7 @@ const App = {
         document.querySelector('.topbar').style.display = '';
         const topbarActions = document.getElementById('topbar-actions');
         topbarActions.innerHTML = '';
-        if (page === 'meals') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'mealhistory\')"><span class="material-icons-round">edit</span></button>';
+        if (page === 'meals') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'mealhistory\')"><span class="material-icons-round">history</span></button>';
         if (page === 'bazaar') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'costtrash\')"><span class="material-icons-round">delete</span></button>';
         if (page === 'balance') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'deptrash\')"><span class="material-icons-round">delete</span></button>';
         if (page === 'costtrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'bazaar\')"><span class="material-icons-round">arrow_back</span></button>';
@@ -968,21 +968,27 @@ const App = {
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.breakfast[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
-                    html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
+                    const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
+                    const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','breakfast',${v})"` : '';
+                    html += `<td${cls}${click} style="${v?'color:#333;font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
                 html += `<td class="am-col-type" style="background:#e8f5e9"><div class="ameal-row-label"><span style="font-size:12px">🍔</span><span class="ameal-row-count" style="color:#2E7D32${md.lunchTotal===0?';color:#ccc':''}">${md.lunchTotal}</span><span style="color:#2E7D32;font-size:10px">Lunch</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.lunch[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
-                    html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
+                    const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
+                    const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','lunch',${v})"` : '';
+                    html += `<td${cls}${click} style="${v?'color:#333;font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
                 html += '</tr><tr>';
                 html += `<td class="am-col-type" style="background:#e3f2fd"><div class="ameal-row-label"><span style="font-size:12px">🍽</span><span class="ameal-row-count" style="color:#1565C0${md.dinnerTotal===0?';color:#ccc':''}">${md.dinnerTotal}</span><span style="color:#1565C0;font-size:10px">Dinner</span></div></td>`;
                 for (let d = 0; d < daysInMonth; d++) {
                     const v = md.dinner[d];
                     const cls = d + 1 === today ? ' class="ame-day-today"' : '';
-                    html += `<td${cls} style="${v?'color:#333;font-weight:600':''}">${v || ''}</td>`;
+                    const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
+                    const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','dinner',${v})"` : '';
+                    html += `<td${cls}${click} style="${v?'color:#333;font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
                 }
                 html += '</tr>';
             });
@@ -1073,6 +1079,58 @@ const App = {
         }
         if (saved) { this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
         else this.toast('Set at least one meal', 'error');
+    },
+
+    mealCellClick(e, memberName, dateKey, mealType, currentVal) {
+        e.stopPropagation();
+        const existing = document.querySelector('.meal-cell-popup');
+        if (existing) existing.remove();
+        const popup = document.createElement('div');
+        popup.className = 'meal-cell-popup';
+        popup.innerHTML = `
+            <button onclick="App.mealDeleteCell('${memberName.replace(/'/g,"\\'")}','${dateKey}','${mealType}',${currentVal})"><span class="material-icons-round">delete</span> Delete</button>
+            <button onclick="App.mealEditCell('${memberName.replace(/'/g,"\\'")}','${dateKey}','${mealType}')"><span class="material-icons-round">edit</span> Edit</button>
+        `;
+        document.body.appendChild(popup);
+        const rect = e.target.getBoundingClientRect();
+        popup.style.top = (rect.bottom + 4) + 'px';
+        popup.style.left = Math.min(rect.left, window.innerWidth - 160) + 'px';
+        setTimeout(() => { document.addEventListener('click', function handler() { popup.remove(); document.removeEventListener('click', handler); }); }, 0);
+    },
+
+    async mealDeleteCell(memberName, dateKey, mealType, currentVal) {
+        const popup = document.querySelector('.meal-cell-popup');
+        if (popup) popup.remove();
+        if (!this.messId) return;
+        const userName = this.currentUser?.displayName || 'Unknown';
+        const typeLabel = mealType.charAt(0).toUpperCase() + mealType.slice(1);
+        try {
+            const snap = await db.ref(`messes/${this.messId}/meals/${dateKey}/${memberName}`).once('value');
+            const data = snap.val() || {};
+            const newVal = { breakfast: data.breakfast || 0, lunch: data.lunch || 0, dinner: data.dinner || 0 };
+            newVal[mealType] = 0;
+            await db.ref(`messes/${this.messId}/meals/${dateKey}/${memberName}`).set(newVal);
+            await db.ref(`messes/${this.messId}/mealHistory`).push({
+                member: memberName, date: dateKey, type: typeLabel,
+                count: currentVal, action: 'removed', user: userName, createdAt: Date.now()
+            });
+            this.toast(`${typeLabel} deleted for ${memberName}`, 'success');
+            this.loadMeals();
+        } catch (err) { console.error(err); this.toast('Delete failed', 'error'); }
+    },
+
+    mealEditCell(memberName, dateKey, mealType) {
+        const popup = document.querySelector('.meal-cell-popup');
+        if (popup) popup.remove();
+        this.navigate('addmeal');
+        setTimeout(() => {
+            const dateInput = document.getElementById('aam-date');
+            if (dateInput) dateInput.textContent = dateKey;
+            this._aamDate = dateKey;
+            const typeMap = { breakfast: 0, lunch: 1, dinner: 2 };
+            const tabs = document.querySelectorAll('#addmeal-screen .aam-type-tab');
+            if (tabs[typeMap[mealType]]) tabs[typeMap[mealType]].click();
+        }, 200);
     },
 
     async loadMealHistory() {
