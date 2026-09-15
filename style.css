@@ -1648,11 +1648,11 @@ select.input-sm { cursor: pointer; }
 }
 .bz-page { display: flex; flex-direction: column; height: 100%; }
 .bz-tabs {
-    display: flex; gap: 8px; padding: 10px 16px 8px; background: transparent;
+    display: flex; gap: 8px; padding: 8px 16px 6px; background: transparent;
 }
 .bz-tab {
     display: flex; align-items: center; gap: 4px;
-    padding: 7px 14px; border-radius: 20px; border: 1px solid #ccc;
+    padding: 6px 12px; border-radius: 20px; border: 1px solid #ccc;
     background: #fff; font-size: 13px; font-weight: 600; color: #333;
     cursor: pointer; font-family: inherit; transition: all 0.15s;
 }
@@ -1683,27 +1683,27 @@ select.input-sm { cursor: pointer; }
 }
 .bz-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
 .bz-item-row {
-    display: flex; gap: 12px; margin-top: 14px;
+    display: flex; gap: 10px; margin-top: 8px;
 }
 .bz-input-wrap {
-    flex: 1; display: flex; align-items: center; gap: 8px;
-    border-bottom: 1px solid #ccc; padding: 8px 0;
+    flex: 1; display: flex; align-items: center; gap: 6px;
+    border-bottom: 1px solid #ccc; padding: 5px 0;
 }
-.bz-input-wrap .material-icons-round { font-size: 22px; color: #777; flex-shrink: 0; }
+.bz-input-wrap .material-icons-round { font-size: 20px; color: #777; flex-shrink: 0; }
 .bz-input {
-    flex: 1; border: none; outline: none; font-size: 16px;
+    flex: 1; border: none; outline: none; font-size: 15px;
     font-family: 'Georgia', serif; color: #333; background: transparent;
 }
 .bz-input::placeholder { color: #aaa; }
 .bz-cost-wrap { flex: 0.7; }
 .bz-add-more {
-    display: flex; align-items: center; gap: 6px;
-    margin-top: 14px; background: none; border: none;
-    font-size: 16px; color: #555; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    margin-top: 8px; background: none; border: none;
+    font-size: 14px; color: #555; cursor: pointer;
     font-family: 'Georgia', serif; padding: 0;
 }
-.bz-add-more .material-icons-round { font-size: 20px; }
-.bz-hint { font-size: 13px; color: #888; margin-top: 14px; line-height: 1.5; }
+.bz-add-more .material-icons-round { font-size: 18px; }
+.bz-hint { font-size: 12px; color: #888; margin-top: 6px; line-height: 1.4; }
 .bz-util-members {
     background: #fff; border: 1px solid #ddd; border-radius: 12px;
     margin-top: 8px; overflow: hidden;
@@ -1848,17 +1848,22 @@ select.input-sm { cursor: pointer; }
 .meal-cell-popup button:first-child .material-icons-round { color: #D32F2F; }
 
 /* ==================== DEPOSIT MODAL ==================== */
-.dep-date { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #333; padding: 4px 0 6px; border-bottom: 1px solid #e0ddd5; font-weight: 500; }
+.dep-date { display: flex; align-items: center; gap: 6px; font-size: 14px; color: #333; padding: 2px 0 4px; border-bottom: 1px solid #e0ddd5; font-weight: 500; }
 .dep-date .material-icons-round { font-size: 20px; color: #555; }
-.dep-label { font-size: 13px; color: #555; margin: 8px 0 4px; }
-.dep-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.dep-label { font-size: 13px; color: #555; margin: 6px 0 3px; }
+.dep-chips { display: flex; gap: 5px; flex-wrap: wrap; }
 .dep-chip {
     padding: 6px 14px; border-radius: 18px; border: 1.5px solid #ccc;
     background: #fff; font-size: 13px; font-family: inherit; color: #333;
     cursor: pointer; transition: all .15s;
 }
+.dep-chip {
+    padding: 5px 12px; border-radius: 18px; border: 1.5px solid #ddd;
+    background: #fff; font-size: 13px; color: #555; cursor: pointer; font-family: inherit;
+    transition: all .15s;
+}
 .dep-chip.active { border-color: var(--primary); background: #e8f0fe; color: #333; font-weight: 600; }
-.dep-input-wrap { display: flex; align-items: center; gap: 6px; margin-top: 12px; border-bottom: 2px solid #e0ddd5; padding: 6px 0; }
+.dep-input-wrap { display: flex; align-items: center; gap: 6px; margin-top: 8px; border-bottom: 2px solid #e0ddd5; padding: 4px 0; }
 .dep-taka { font-size: 18px; font-weight: 700; color: #333; }
 .dep-input { flex: 1; border: none; outline: none; font-size: 15px; font-family: inherit; color: #333; background: transparent; }
 .dep-input::placeholder { color: #999; }
@@ -1870,10 +1875,10 @@ select.input-sm { cursor: pointer; }
 .dep-footer-btns .btn-modal-cancel { flex: 1; }
 
 /* ==================== ADD MEAL PAGE ==================== */
-.aam-head { display: flex; align-items: center; gap: 10px; padding: 8px 16px 4px; }
+.aam-head { display: flex; align-items: center; gap: 10px; padding: 6px 14px 2px; }
 .aam-head h2 { font-size: 20px; font-weight: 700; color: #1a1a1a; }
 .aam-head .icon-btn { color: #333; }
-.aam-tabs { display: flex; gap: 0; padding: 0 16px 8px; }
+.aam-tabs { display: flex; gap: 0; padding: 0 16px 6px; }
 .aam-tab {
     padding: 8px 18px; border-radius: 20px; border: 1.5px solid #ddd;
     background: #fff; font-size: 14px; font-weight: 600; font-family: inherit;
@@ -1882,21 +1887,21 @@ select.input-sm { cursor: pointer; }
 .aam-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 #page-addcost, #page-adddeposit { max-width: 100%; box-sizing: border-box; }
 #page-addcost .aam-body, #page-adddeposit .aam-body { box-sizing: border-box; width: 100%; }
-.aam-body { padding: 0 16px; padding-bottom: 80px; overflow-y: auto; width: 100%; box-sizing: border-box; }
-.aam-label { display: block; font-size: 12px; color: #888; margin: 10px 0 4px; font-style: italic; }
+.aam-body { padding: 0 14px; padding-bottom: 72px; overflow-y: auto; width: 100%; box-sizing: border-box; }
+.aam-label { display: block; font-size: 12px; color: #888; margin: 6px 0 3px; font-style: italic; }
 .aam-select {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 14px; border: 1px solid #e0ddd5; border-radius: 12px;
+    padding: 10px 12px; border: 1px solid #e0ddd5; border-radius: 12px;
     background: #fff; font-size: 15px; color: #333; cursor: pointer;
 }
 .aam-select .material-icons-round { color: #999; font-size: 22px; }
 .aam-date-icon .material-icons-round { color: #d32f2f; font-size: 20px; margin-right: 8px; }
-.aam-section-head { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+.aam-section-head { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
 .aam-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 10px;
-    padding: 8px 10px; margin: 6px 0;
+    padding: 6px 10px; margin: 4px 0;
 }
-.aam-card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.aam-card-top { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
 .aam-avatar {
     width: 32px; height: 32px; border-radius: 50%; background: #f0f0f0;
     display: flex; align-items: center; justify-content: center;
@@ -1906,22 +1911,22 @@ select.input-sm { cursor: pointer; }
 .aam-card-top .aam-name { flex: 1; font-size: 14px; font-weight: 600; color: #1a1a1a; }
 .aam-card-top .aam-req { font-size: 10px; color: #d32f2f; border: 1px solid #d32f2f; border-radius: 8px; padding: 1px 6px; }
 .aam-card-top .aam-total { font-size: 12px; color: #555; font-weight: 500; }
-.aam-meals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+.aam-meals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
 .aam-meal-col { text-align: center; }
 .aam-meal-col label { display: block; font-size: 10px; color: #888; margin-bottom: 2px; }
 .aam-counter { display: flex; align-items: center; gap: 0; justify-content: center; }
 .aam-counter button {
-    width: 28px; height: 28px; border-radius: 50%; border: 1px solid #ddd;
-    background: #f5f5f5; color: #555; font-size: 14px; font-weight: 600;
+    width: 26px; height: 26px; border-radius: 50%; border: 1px solid #ddd;
+    background: #f5f5f5; color: #555; font-size: 13px; font-weight: 600;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     font-family: inherit; transition: all .15s;
 }
 .aam-counter button:active { background: #e0e0e0; }
 .aam-counter .aam-val {
-    width: 28px; text-align: center; font-size: 14px; font-weight: 600; color: #333;
+    width: 24px; text-align: center; font-size: 13px; font-weight: 600; color: #333;
 }
 .aam-footer {
-    padding: 10px 16px;
+    padding: 6px 14px;
 }
 #app-screen.on-addmeal .topbar { display: none; }
 #app-screen.on-addmeal .main-content { margin-top: 0; padding: 0 0 72px; }

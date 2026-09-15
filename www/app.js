@@ -1942,7 +1942,7 @@ const App = {
         this._bzUtilAmount = '';
         this._bzUtilSelected = names.slice();
         document.getElementById('addcost-body').innerHTML = `
-            <div class="bz-tabs" style="padding:0 0 12px">
+            <div class="bz-tabs" style="padding:0 0 8px">
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Cost</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
@@ -1972,9 +1972,9 @@ const App = {
                     ${['Rent','Electricity','Wi-Fi'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
-                <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                <div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;padding:8px 12px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
-                <div class="dep-label" style="margin-top:12px">Divided to:</div>
+                <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
+                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
+                <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
                         <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
@@ -2045,9 +2045,9 @@ const App = {
                     ${['Rent','Electricity','Wi-Fi'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
-                <div class="dep-input-wrap" style="margin:12px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                <div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;padding:8px 12px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
-                <div class="dep-label" style="margin-top:12px">Divided to:</div>
+                <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
+                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
+                <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
                         <input type="checkbox" checked id="bz-selectall-cb" onchange="App.bzToggleAllCb()">
@@ -2231,7 +2231,7 @@ const App = {
         this._depCategory = 'meal';
         this._depSelected = null;
         document.getElementById('adddeposit-body').innerHTML = `
-            <div class="bz-tabs" style="padding:0 0 12px">
+            <div class="bz-tabs" style="padding:0 0 8px">
                 <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
