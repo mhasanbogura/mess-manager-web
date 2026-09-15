@@ -292,8 +292,8 @@ body {
     min-height: calc(100vh - 70px);
     padding-bottom: 24px;
 }
-#app-screen.on-meals .topbar { position: fixed; top: 10px; left: 12px; right: 12px; z-index: 100; min-height: 60px; }
-#app-screen.on-meals .main-content { margin-top: 70px; }
+#app-screen.on-meals .topbar { min-height: 60px; }
+#app-screen.on-meals .main-content { margin-top: 0; }
 
 .page { display: none; }
 .page.active { display: block; animation: fadeIn 0.25s ease-out; }
@@ -1361,8 +1361,8 @@ select.input-sm { cursor: pointer; }
     .main-content { padding: 0 24px 24px; max-width: 700px; margin: 0 auto; }
     #app-screen.on-dashboard .main-content { margin-top: 0; }
     #app-screen.on-members .main-content { margin-top: 0; }
-    #app-screen.on-meals .topbar { left: 50%; transform: translateX(-50%); width: calc(100% - 24px); max-width: 700px; margin: 0; }
-    #app-screen.on-meals .main-content { margin-top: 70px; }
+    #app-screen.on-meals .topbar { left: auto; transform: none; width: 100%; max-width: 700px; margin: 10px auto 0; }
+    #app-screen.on-meals .main-content { margin-top: 0; }
     .ameal-grid-scroll { overflow-x: visible; }
     .ameal-table { width: 100%; }
     .abazar-day-card { margin: 0 0 10px; }
