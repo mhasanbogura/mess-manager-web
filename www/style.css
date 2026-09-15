@@ -1575,10 +1575,10 @@ select.input-sm { cursor: pointer; }
 }
 .adash-fin-label strong { font-size: 13px; }
 .adash-analyse {
-    background: var(--primary); border: none; border-radius: 12px;
-    padding: 6px 10px; font-family: inherit; font-size: 14px; color: #fff;
+    background: linear-gradient(135deg, #e0e0e0, #ccc); border: none; border-radius: 12px;
+    padding: 6px 10px; font-family: inherit; font-size: 14px; color: #111;
     display: flex; align-items: center; gap: 4px; cursor: pointer;
-    box-shadow: 0 3px 8px rgba(11,61,145,.4); white-space: nowrap;
+    box-shadow: 0 2px 6px rgba(0,0,0,.1); white-space: nowrap;
 }
 .adash-analyse .material-icons-round { font-size: 18px; }
 
@@ -1591,7 +1591,7 @@ select.input-sm { cursor: pointer; }
 .adash-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 12px; border-radius: 14px; border: 1px solid #dfe4ec; }
 .adash-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
 .adash-table thead th {
-    background: linear-gradient(135deg, #0b3d91, #08306b);
+    background: linear-gradient(135deg, #555, #333);
     color: #fff; font-weight: 600; padding: 8px 4px; text-align: center;
     font-size: 11px; line-height: 1.3;
 }
@@ -2865,15 +2865,16 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .adash-fin-box strong.neg { color: #d32f2f !important; }
 [data-theme="oled"] .adash-finance-card { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .adash-finance { background: transparent; }
+[data-theme="oled"] .adash-analyse { background: linear-gradient(135deg, #333, #444); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4); }
 [data-theme="oled"] .adash-table { background: transparent; }
-[data-theme="oled"] .adash-table thead th { background: linear-gradient(135deg, #2a2a2a, #333); color: #e8ebf1; }
-[data-theme="oled"] .adash-table td { background: linear-gradient(135deg, #333, #444); color: #fff; border-color: #555; }
+[data-theme="oled"] .adash-table thead th { background: linear-gradient(135deg, #e8e8e8, #d5d5d5); color: #111; }
+[data-theme="oled"] .adash-table td { background: linear-gradient(135deg, #2a2a2a, #333); color: #fff; border-color: #444; }
 [data-theme="oled"] .adash-table td.c-name { color: #fff; }
 [data-theme="oled"] .adash-table td strong { color: #fff; }
 [data-theme="oled"] .adash-table td small { color: #bbb; }
 [data-theme="oled"] .adash-table td.pos strong { color: #4caf50 !important; }
 [data-theme="oled"] .adash-table td.neg strong { color: #ff6b6b !important; }
-[data-theme="oled"] .adash-table thead th small { color: #333; }
+[data-theme="oled"] .adash-table thead th small { color: #555; }
 [data-theme="oled"] .adash-stats-head .material-icons-round { color: #999; }
 [data-theme="oled"] .adash-stats-head strong { color: #e8ebf1; }
 [data-theme="oled"] .adash-notice { background: #1a1a1a; border-color: #2a2a2a; }
