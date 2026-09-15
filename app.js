@@ -585,8 +585,11 @@ const App = {
                 const color = colors[i % colors.length];
                 const email = u.email || m.email || '';
                 const isYou = id === this.currentUser.uid;
+                let profilePic = '';
+                try { const picSnap = await window.db.ref(`users/${id}/profilePicture`).once('value'); profilePic = picSnap.val() || ''; } catch (e) {}
+                const avatarStyle = profilePic ? `background-image:url(${profilePic});background-size:cover;background-position:center;color:transparent` : `background:${color}`;
                 html += `<div class="aflat-people-item">
-                    <div class="aflat-people-avatar" style="background:${color}">${initial}</div>
+                    <div class="aflat-people-avatar" style="${avatarStyle}">${profilePic ? '' : initial}</div>
                     <div class="aflat-people-info">
                         <h4>${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager' + (isYou ? ', You' : '') + ')</span>' : ''}</h4>
                         <div class="email">${this.esc(email)}</div>
@@ -688,7 +691,19 @@ const App = {
             const initial = (userName.trim()[0] || 'U').toUpperCase();
 
             const avatarEl = document.getElementById('dash-avatar');
-            if (avatarEl) avatarEl.textContent = initial;
+            if (avatarEl) {
+                avatarEl.textContent = initial;
+                try {
+                    const picSnap = await window.db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value');
+                    const pic = picSnap.val();
+                    if (pic) {
+                        avatarEl.style.backgroundImage = `url(${pic})`;
+                        avatarEl.style.backgroundSize = 'cover';
+                        avatarEl.style.backgroundPosition = 'center';
+                        avatarEl.textContent = '';
+                    }
+                } catch (e) {}
+            }
             const usernameEl = document.getElementById('dash-username');
             if (usernameEl) usernameEl.textContent = userName;
 
