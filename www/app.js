@@ -628,11 +628,17 @@ const App = {
         try {
             const membersSnap = await window.db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
+            const permSnap = await window.db.ref(`messes/${this.messId}/permissions`).once('value');
+            const perms = permSnap.val() || {};
+            const oldAdminId = Object.entries(members).find(([, m]) => m && m.role === 'admin')?.[0];
+            const newAdminPerms = perms[uid] || {};
             const updates = {};
-            for (const [id, m] of Object.entries(members)) {
-                if (m.role === 'admin') updates[`messes/${this.messId}/members/${id}/role`] = 'member';
+            if (oldAdminId) {
+                updates[`messes/${this.messId}/members/${oldAdminId}/role`] = 'member';
+                updates[`messes/${this.messId}/permissions/${oldAdminId}`] = newAdminPerms;
             }
             updates[`messes/${this.messId}/members/${uid}/role`] = 'admin';
+            updates[`messes/${this.messId}/permissions/${uid}`] = null;
             await window.db.ref().update(updates);
             this.toast('Manager changed!', 'success');
             this.loadFlat();
@@ -655,10 +661,10 @@ const App = {
             const mids = Object.keys(members).filter(id => !id.startsWith('member_'));
             mids.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
-            const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
+            const pSnap = await window.db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = pSnap.val() || {};
-            const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'specialMeal', 'togglePerms'];
-            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Cost Entry', 'Special Meal Management', 'Turn on/off Permissions'];
+            const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'togglePerms'];
+            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Cost Entry', 'Turn on/off Permissions'];
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
             div.innerHTML = mids.map((id, i) => {
                 const m = members[id] || {};
