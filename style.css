@@ -1742,8 +1742,8 @@ select.input-sm { cursor: pointer; }
 }
 
 /* ==================== MEAL ENTRY ==================== */
-.ameal-head { display: flex; align-items: center; justify-content: space-between; padding: 6px 16px 4px; }
-.ameal-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.ameal-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--card-border); }
+.ameal-head h2 { font-size: 22px; font-weight: 700; color: var(--text); }
 .ameal-actions { display: flex; gap: 4px; }
 .ameal-action {
     display: flex; flex-direction: column; align-items: center; gap: 2px;
@@ -1938,8 +1938,8 @@ select.input-sm { cursor: pointer; }
 }
 
 /* ==================== BAZAR LIST & MANAGER MONEY ==================== */
-.abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 8px; }
-.abazar-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--card-border); }
+.abazar-head h2 { font-size: 22px; font-weight: 700; color: var(--text); }
 .abazar-actions { display: flex; gap: 4px; }
 .abazar-action {
     display: flex; flex-direction: column; align-items: center; gap: 2px;
@@ -2040,8 +2040,8 @@ select.input-sm { cursor: pointer; }
 .abazar-fab .material-icons-round { font-size: 22px; }
 
 /* ==================== PROFILE & SETTINGS ==================== */
-.aprof-head { padding: 14px 16px 10px; }
-.aprof-head h2 { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+.aprof-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--card-border); }
+.aprof-head h2 { font-size: 22px; font-weight: 700; color: var(--text); }
 .aprof-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 14px;
     margin: 0 0 4px; overflow: hidden;
@@ -2133,7 +2133,7 @@ select.input-sm { cursor: pointer; }
 .anotice-head .icon-btn { color: var(--text); min-width: 36px; min-height: 36px; }
 .anotice-head .icon-btn:hover { background: rgba(0,0,0,.08); }
 .anotice-head .material-icons-round { font-size: 24px; }
-.anotice-head h2 { font-size: 18px; font-weight: 700; color: #fff; }
+.anotice-head h2 { font-size: 18px; font-weight: 700; color: var(--text); }
 .anotice-board {
     background: #fff;
     min-height: calc(100vh - 260px);
@@ -2198,7 +2198,7 @@ select.input-sm { cursor: pointer; }
 .aduty-head .icon-btn { color: var(--text); min-width: 36px; min-height: 36px; }
 .aduty-head .icon-btn:hover { background: rgba(0,0,0,.08); }
 .aduty-head .material-icons-round { font-size: 24px; }
-.aduty-head h2 { font-size: 18px; font-weight: 700; color: #fff; }
+.aduty-head h2 { font-size: 18px; font-weight: 700; color: var(--text); }
 .aduty-banner {
     background: #e8f0fe; border: 1.5px solid var(--primary); border-radius: 18px;
     margin: 12px 12px 0; padding: 14px 16px;
@@ -3054,9 +3054,17 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .adash-stats-head strong { color: #e8ebf1; }
 /* Notices */
 [data-theme="oled"] .anotice-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
+[data-theme="oled"] .anotice-head h2 { color: #e8ebf1; }
 [data-theme="oled"] .aduty-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
+[data-theme="oled"] .aduty-head h2 { color: #e8ebf1; }
 [data-theme="oled"] .aflat-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
 [data-theme="oled"] .aflat-head h2 { color: #e8ebf1; }
+[data-theme="oled"] .ameal-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
+[data-theme="oled"] .ameal-head h2 { color: #e8ebf1; }
+[data-theme="oled"] .abazar-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
+[data-theme="oled"] .abazar-head h2 { color: #e8ebf1; }
+[data-theme="oled"] .aprof-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
+[data-theme="oled"] .aprof-head h2 { color: #e8ebf1; }
 [data-theme="oled"] .abn-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
 [data-theme="oled"] .amenu-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
 /* Tables */
