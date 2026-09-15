@@ -485,6 +485,7 @@ const App = {
         document.getElementById('flat-tab-members').style.display = tab === 'members' ? '' : 'none';
         document.getElementById('flat-tab-peoples').style.display = tab === 'peoples' ? '' : 'none';
         document.getElementById('flat-tab-permissions').style.display = tab === 'permissions' ? '' : 'none';
+        if (tab === 'permissions' && this._flatMembers) this.loadFlatPermissions(this._flatMembers);
     },
 
     async loadFlat() {
@@ -497,7 +498,8 @@ const App = {
 
             const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = mSnap.val() || {};
-            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+            this._flatMembers = members;
+            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             let adminName = '-';
             const admin = mids.find(id => members[id] && members[id].role === 'admin');
             if (admin) adminName = members[admin].name || '-';
