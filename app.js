@@ -1901,8 +1901,9 @@ const App = {
             </div>`;
     },
 
-    bzSavePage() {
-        this.bzSave();
+    async bzSavePage() {
+        const result = await this.bzSave();
+        if (result === false) return;
         this.loadBazarList();
         this.navigate('bazaar');
     },
@@ -2081,9 +2082,9 @@ const App = {
         const userName = this.currentUser?.displayName || 'Unknown';
         if (this._bzTab === 'bazar') {
             const items = this._bzItems.filter(i => i.name && i.cost);
-            if (!items.length) { this.toast('Add at least one item', 'error'); return; }
-            if (!this._bzMoneyBy) { this.toast('Money from: pick a name', 'error'); return; }
-            if (!this._bzDoneBy) { this.toast('Pick who did the shopping', 'error'); return; }
+            if (!items.length) { this.toast('Add at least one item', 'error'); return false; }
+            if (!this._bzMoneyBy) { this.toast('Money from: pick a name', 'error'); return false; }
+            if (!this._bzDoneBy) { this.toast('Pick who did the shopping', 'error'); return false; }
             for (const item of items) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
                     name: item.name, cost: parseFloat(item.cost) || 0,
@@ -2092,8 +2093,8 @@ const App = {
             }
         } else {
             const amt = parseFloat(this._bzUtilAmount) || 0;
-            if (!amt) { this.toast('Enter bill amount', 'error'); return; }
-            if (!this._bzUtilType) { this.toast('Pick a type', 'error'); return; }
+            if (!amt) { this.toast('Enter bill amount', 'error'); return false; }
+            if (!this._bzUtilType) { this.toast('Pick a type', 'error'); return false; }
             const share = this._bzUtilSelected.length ? amt / this._bzUtilSelected.length : 0;
             for (const name of this._bzUtilSelected) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
