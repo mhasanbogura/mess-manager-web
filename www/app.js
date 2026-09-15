@@ -242,11 +242,20 @@ const App = {
             const snap = await db.ref('messes').orderByChild('settings/messCode').equalTo(code).once('value');
             if (!snap.exists()) { this.toast('Mess not found', 'error'); btn.textContent = 'Join Mess'; btn.disabled = false; return; }
             let mid = null; snap.forEach(s => { mid = s.key; });
-            await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).set({ name: this.currentUser.displayName || 'Member', email: this.currentUser.email, role: 'member', joinedAt: Date.now() });
-            await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).set({ role: 'member', joinedAt: Date.now() });
-            this.toast('Joined!', 'success');
+            const existingSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
+            if (existingSnap.exists()) {
+                const ed = existingSnap.val() || {};
+                if (ed.status === 'pending') { this.toast('Join request already pending', 'info'); btn.textContent = 'Join Mess'; btn.disabled = false; return; }
+                await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).set({ role: 'member', joinedAt: ed.joinedAt || Date.now() });
+                this.toast('Joined!', 'success');
+                document.getElementById('join-mess-code').value = '';
+                this.enterMess(mid);
+                btn.textContent = 'Join Mess'; btn.disabled = false;
+                return;
+            }
+            await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).set({ name: this.currentUser.displayName || 'Member', email: this.currentUser.email, role: 'member', status: 'pending', joinedAt: Date.now() });
+            this.toast('Request sent! Waiting for approval.', 'success');
             document.getElementById('join-mess-code').value = '';
-            this.enterMess(mid);
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
         finally { btn.textContent = 'Join Mess'; btn.disabled = false; }
     },
@@ -510,6 +519,11 @@ const App = {
             document.getElementById('flat-manager-name').textContent = adminName;
 
             document.getElementById('flat-member-count').textContent = mids.length;
+            const canManage = this.userRole === 'admin' || this.canDo('manage');
+            const addRow = document.getElementById('flat-add-row');
+            const addHint = document.getElementById('flat-add-hint');
+            if (addRow) addRow.style.display = canManage ? '' : 'none';
+            if (addHint) addHint.style.display = canManage ? '' : 'none';
             const list = document.getElementById('flat-member-list');
             if (!mids.length) { list.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No members yet</p>'; }
             else {
@@ -517,8 +531,8 @@ const App = {
                     const m = members[id] || {};
                     return `<div class="aflat-member-item">
                         <span class="name">${this.esc(m.name || 'Unknown')}</span>
-                        <button class="aflat-remove" onclick="App.removeFlatMember('${id}')"><span class="material-icons-round">close</span></button>
-                        <button class="aflat-remove" onclick="App.editFlatMember('${id}','${this.esc(m.name || '')}')"><span class="material-icons-round">edit</span></button>
+                        ${canManage ? `<button class="aflat-remove" onclick="App.removeFlatMember('${id}')"><span class="material-icons-round">close</span></button>
+                        <button class="aflat-remove" onclick="App.editFlatMember('${id}','${this.esc(m.name || '')}')"><span class="material-icons-round">edit</span></button>` : ''}
                     </div>`;
                 }).join('');
             }
@@ -579,7 +593,7 @@ const App = {
         const div = document.getElementById('flat-peoples-list');
         try {
             const mids = Object.keys(members);
-            const appUsers = mids.filter(id => !id.startsWith('member_'));
+            const appUsers = mids.filter(id => !id.startsWith('member_') && (members[id] || {}).status !== 'pending');
             appUsers.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             document.getElementById('flat-peoples-count').textContent = appUsers.length;
             if (!appUsers.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples have joined yet</p>'; return; }
@@ -599,6 +613,7 @@ const App = {
                 try { const picSnap = await db.ref(`users/${id}/profilePicture`).once('value'); profilePic = picSnap.val() || ''; } catch (e) {}
                 const avatarStyle = profilePic ? `background-image:url(${profilePic});background-size:cover;background-position:center;color:transparent` : `background:${color}`;
                 let actionsHtml = '';
+                const canManage = this.userRole === 'admin' || this.canDo('manage');
                 if (isYou && isAdmin) {
                     actionsHtml = `<div class="fp-actions">
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
@@ -608,7 +623,7 @@ const App = {
                     actionsHtml = `<div class="fp-actions">
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
                     </div>`;
-                } else if (!isYou) {
+                } else if (!isYou && canManage) {
                     actionsHtml = `<div class="fp-actions">
                         <button class="fp-btn fp-btn-gray" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>
                         ${!isAdmin ? `<button class="fp-btn fp-btn-yellow" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote as manager</button>` : ''}
@@ -672,7 +687,7 @@ const App = {
         if (!div) return;
         try {
             const allKeys = Object.keys(members);
-            const mids = allKeys.filter(id => !id.startsWith('member_'));
+            const mids = allKeys.filter(id => !id.startsWith('member_') && (members[id] || {}).status !== 'pending');
             mids.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
             const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
@@ -828,7 +843,8 @@ const App = {
 
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+            const allMids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+            const mids = allMids.filter(id => (members[id] || {}).status !== 'pending');
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
             if (adminFound) managerName = adminFound[1].name || '-';
             else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
@@ -976,7 +992,69 @@ const App = {
                 </tr>`;
             });
             utilRows.innerHTML = utilHtml || '<tr><td colspan="5" class="empty-state">No data</td></tr>';
+            this.loadJoinRequests(members);
         } catch (e) { console.error('loadDashboard error:', e); }
+    },
+
+    async loadJoinRequests(members) {
+        const div = document.getElementById('dash-join-requests');
+        if (!div) return;
+        const canManage = this.userRole === 'admin' || this.canDo('manage');
+        const pending = Object.entries(members).filter(([, m]) => m && m.status === 'pending');
+        if (!pending.length) { div.innerHTML = ''; return; }
+        if (!canManage) {
+            div.innerHTML = '';
+            return;
+        }
+        const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
+        let html = '';
+        pending.forEach(([id, m], i) => {
+            const initial = ((m.name || '?')[0] || '?').toUpperCase();
+            const color = colors[i % colors.length];
+            const email = m.email || '';
+            html += `<div class="adash-join-card">
+                <div class="adash-join-left">
+                    <div class="adash-join-avatar" style="background:${color}">${initial}</div>
+                    <div class="adash-join-info">
+                        <strong>${this.esc(m.name || 'Unknown')}</strong>
+                        <small>${this.esc(email)}</small>
+                    </div>
+                </div>
+                <div class="adash-join-actions">
+                    <button class="adash-join-btn adash-join-delete" onclick="App.rejectJoin('${id}')"><span class="material-icons-round">close</span></button>
+                    <button class="adash-join-btn adash-join-confirm" onclick="App.confirmJoin('${id}')"><span class="material-icons-round">check</span></button>
+                </div>
+            </div>`;
+        });
+        div.innerHTML = html;
+    },
+
+    async confirmJoin(uid) {
+        if (!this.messId) return;
+        if (!this.checkPerm('manage')) return;
+        try {
+            const mSnap = await db.ref(`messes/${this.messId}/members/${uid}`).once('value');
+            const m = mSnap.val() || {};
+            const updates = {};
+            updates[`messes/${this.messId}/members/${uid}/status`] = 'active';
+            updates[`users/${uid}/messes/${this.messId}`] = { role: 'member', joinedAt: m.joinedAt || Date.now() };
+            await db.ref().update(updates);
+            this.toast(`${m.name || 'Member'} approved!`, 'success');
+            this.loadDashboard();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async rejectJoin(uid) {
+        if (!this.messId) return;
+        if (!this.checkPerm('manage')) return;
+        try {
+            const mSnap = await db.ref(`messes/${this.messId}/members/${uid}`).once('value');
+            const m = mSnap.val() || {};
+            if (!confirm(`Reject ${m.name || 'this member'}?`)) return;
+            await db.ref(`messes/${this.messId}/members/${uid}`).remove();
+            this.toast('Request rejected', 'success');
+            this.loadDashboard();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
     goToPeopleTab() {

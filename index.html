@@ -145,6 +145,8 @@
                     </div>
                 </div>
 
+                <div id="dash-join-requests"></div>
+
                 <div class="adash-notice" onclick="App.navigate('notices')">
                     <span class="material-icons-round">push_pin</span>
                     <div>
@@ -290,14 +292,14 @@
                         <span class="material-icons-round">restaurant</span>
                         <p>Members are the names your meals, cost and balances are counted against. Add everyone who eats in this mess — they do not need the app.</p>
                     </div>
-                    <div class="aflat-add-row">
+                    <div class="aflat-add-row" id="flat-add-row">
                         <div class="aflat-input-wrap">
                             <input type="text" id="flat-add-member-input" placeholder="Add Member" maxlength="20">
                             <button class="aflat-clear-btn" onclick="document.getElementById('flat-add-member-input').value=''"><span class="material-icons-round">close</span></button>
                         </div>
                         <button class="aflat-add-btn" onclick="App.addFlatMember()">ADD</button>
                     </div>
-                    <p class="aflat-hint">Unique name; letters, numbers & spaces only (e.g. Ziad1, Ziad2) <span id="flat-name-count">0/20</span></p>
+                    <p class="aflat-hint" id="flat-add-hint">Unique name; letters, numbers & spaces only (e.g. Ziad1, Ziad2) <span id="flat-name-count">0/20</span></p>
                     <div class="aflat-divider"></div>
                     <p class="aflat-total">Total Mess Members: <strong id="flat-member-count">0</strong></p>
                     <div id="flat-member-list"></div>
