@@ -665,9 +665,10 @@ const App = {
     async loadFlatPermissions(members) {
         if (!this.messId) return;
         const div = document.getElementById('flat-permissions-list');
+        if (!div) return;
         try {
-            const mids = Object.keys(members).filter(id => !id.startsWith('member_'));
-            console.log('loadFlatPermissions mids:', mids, 'all keys:', Object.keys(members));
+            const allKeys = Object.keys(members);
+            const mids = allKeys.filter(id => !id.startsWith('member_'));
             mids.sort((a, b) => ((members[a] || {}).name || '').localeCompare((members[b] || {}).name || ''));
             if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
             const pSnap = await window.db.ref(`messes/${this.messId}/permissions`).once('value');
@@ -677,32 +678,38 @@ const App = {
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
             const iAmAdmin = this.userRole === 'admin';
             const iCanToggle = iAmAdmin || this.canDo('togglePerms');
-            div.innerHTML = mids.map((id, i) => {
+            const uid = this.currentUser ? this.currentUser.uid : '';
+            let html = '';
+            for (let i = 0; i < mids.length; i++) {
+                const id = mids[i];
                 const m = members[id] || {};
                 const isAdmin = m.role === 'admin';
                 const initial = ((m.name || '?')[0] || '?').toUpperCase();
                 const color = colors[i % colors.length];
                 const userPerms = perms[id] || {};
-                const isMe = id === this.currentUser.uid;
-                const checks = permKeys.map((k, j) => {
+                const isMe = id === uid;
+                let checks = '';
+                for (let j = 0; j < permKeys.length; j++) {
+                    const k = permKeys[j];
                     const checked = !!userPerms[k];
                     const canClick = iCanToggle && !isAdmin && !isMe;
-                    return `<div class="aflat-perm-row">
+                    checks += `<div class="aflat-perm-row">
                         <div class="aflat-perm-check ${checked ? 'checked' : ''}" onclick="App.togglePerm('${id}','${k}',this)" ${!canClick ? 'style="pointer-events:none;opacity:.5"' : ''}>
                             <span class="material-icons-round">check</span>
                         </div>
                         <span class="aflat-perm-label">${permLabels[j]}</span>
                     </div>`;
-                }).join('');
-                return `<div class="aflat-perm-card">
+                }
+                html += `<div class="aflat-perm-card">
                     <div class="aflat-perm-top">
                         <div class="aflat-perm-avatar" style="background:${color}">${initial}</div>
                         <div class="aflat-perm-name">${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager' + (isMe ? ', You' : '') + ')</span>' : ''}</div>
                     </div>
                     <div class="aflat-perm-list">${checks}</div>
                 </div>`;
-            }).join('');
-        } catch (e) { console.error('loadFlatPermissions error:', e); }
+            }
+            div.innerHTML = html;
+        } catch (e) { console.error('loadFlatPermissions error:', e); div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:red">Error: ' + e.message + '</p>'; }
     },
 
     async togglePerm(uid, key, el) {
