@@ -2021,19 +2021,19 @@ select.input-sm { cursor: pointer; }
     margin: 0 0 4px; overflow: hidden;
 }
 .aprof-card-main {
-    display: flex; align-items: center; gap: 18px; padding: 20px;
+    display: flex; align-items: center; gap: 16px; padding: 24px 20px;
 }
 .aprof-avatar {
-    width: 80px; height: 80px; border-radius: 50%; background: var(--primary); color: #fff;
+    width: 72px; height: 72px; border-radius: 50%; background: var(--primary); color: #fff;
     display: flex; align-items: center; justify-content: center;
-    font-size: 30px; font-weight: 700; flex-shrink: 0;
+    font-size: 28px; font-weight: 700; flex-shrink: 0;
     font-family: 'Times New Roman', sans-serif;
     overflow: hidden; border: 3px solid #e0e0e0;
 }
-.aprof-info { flex: 1; min-width: 0; }
-.aprof-info h3 { font-size: 22px; font-weight: 700; color: #1a1a1a; margin: 0 0 4px; }
-.aprof-info p { font-size: 14px; color: #666; margin: 0; }
-.aprof-uid { display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; font-size: 13px; }
+.aprof-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.aprof-info h3 { font-size: 18px; font-weight: 700; color: var(--text); margin: 0; line-height: 1.3; }
+.aprof-info p { font-size: 14px; color: #777; margin: 0; line-height: 1.3; }
+.aprof-uid { display: flex; align-items: center; gap: 6px; cursor: pointer; color: #888; font-size: 13px; }
 .aprof-uid .material-icons-round { color: #aaa; }
 .aprof-section { margin-top: 14px; }
 .aprof-section-title { font-size: 12px; font-weight: 600; color: #999; padding: 0 16px; margin-bottom: 6px; letter-spacing: .5px; }
