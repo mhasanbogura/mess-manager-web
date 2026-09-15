@@ -1110,7 +1110,7 @@ const App = {
             loader.style.display = 'none';
             scroll.style.display = 'block';
             const todayTh = scroll.querySelector('th[data-today]');
-            if (todayTh) { setTimeout(() => { scroll.scrollLeft = todayTh.offsetLeft - 200; }, 200); }
+            if (todayTh) { setTimeout(() => { scroll.scrollLeft = todayTh.offsetLeft - (scroll.clientWidth / 2) + (todayTh.offsetWidth / 2); }, 200); }
         } catch (e) { console.error('loadMeals error:', e); loader.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
 
