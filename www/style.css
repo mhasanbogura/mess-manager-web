@@ -175,7 +175,7 @@ body {
     position: relative;
     background: linear-gradient(135deg, #0b3d91, #08306b);
     display: flex; align-items: center;
-    padding: 10px 12px; gap: 8px;
+    padding: 10px 18px; gap: 8px;
     border-radius: 16px; margin: 10px 12px 0;
 }
 .topbar-title { flex: 1; cursor: pointer; overflow: hidden; min-width: 0; }
@@ -2057,7 +2057,7 @@ select.input-sm { cursor: pointer; }
 .anotice-head {
     background: linear-gradient(135deg, #0b3d91, #08306b);
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; min-height: 60px;
+    padding: 10px 18px; min-height: 60px;
     border-radius: 16px; margin: 10px 12px 0;
 }
 .anotice-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
@@ -2121,7 +2121,7 @@ select.input-sm { cursor: pointer; }
 .aduty-head {
     background: linear-gradient(135deg, #0b3d91, #08306b);
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; min-height: 60px;
+    padding: 10px 18px; min-height: 60px;
     border-radius: 16px; margin: 10px 12px 0;
 }
 .aduty-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
@@ -2247,7 +2247,7 @@ img, canvas { max-width: 100%; }
 
 /* ==================== FLAT PAGE ==================== */
 #page-members { font-family: 'Times New Roman', sans-serif; }
-.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; min-height: 60px; background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; border-radius: 16px; margin: 10px 12px 0; }
+.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; min-height: 60px; background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; border-radius: 16px; margin: 10px 12px 0; }
 .aflat-head h2 { font-size: 18px; font-weight: 700; color: #fff; }
 .aflat-leave { display: flex; align-items: center; gap: 4px; background: none; border: none; color: #d32f2f; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
 .aflat-leave .material-icons-round { font-size: 20px; }
@@ -2496,7 +2496,7 @@ img, canvas { max-width: 100%; }
 }
 
 /* ==================== BAZAR NOTE PAGE ==================== */
-.abn-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 60px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
+.abn-head { display: flex; align-items: center; gap: 10px; padding: 10px 18px; min-height: 60px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
 .abn-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .abn-head .icon-btn:hover { background: rgba(255,255,255,.15); }
 .abn-head h2 { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
@@ -2519,7 +2519,7 @@ img, canvas { max-width: 100%; }
 .abn-go-bazar { width: 100%; padding: 14px; border: none; border-radius: 12px; background: #FFB300; color: #1a1a1a; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
 
 /* ==================== MENU TODAY PAGE ==================== */
-.amenu-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 60px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
+.amenu-head { display: flex; align-items: center; gap: 10px; padding: 10px 18px; min-height: 60px; background: linear-gradient(135deg, #0b3d91, #08306b); border-radius: 16px; margin: 10px 12px 0; }
 .amenu-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .amenu-head .icon-btn:hover { background: rgba(255,255,255,.15); }
 .amenu-head h2 { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
