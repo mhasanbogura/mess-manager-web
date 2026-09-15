@@ -469,6 +469,35 @@
                     </div>
                 </div>
                 <div class="aprof-section">
+                    <div class="aprof-section-title">GENERAL SETTINGS</div>
+                    <div class="aprof-card">
+                        <div class="aprof-row">
+                            <span class="material-icons-round">brightness_6</span>
+                            <div class="aprof-text">
+                                <span class="aprof-label">Device Theme</span>
+                                <p class="aprof-desc-inline">Automatically switch theme based on system</p>
+                            </div>
+                            <label class="aprof-toggle"><input type="checkbox" id="prof-device-theme" onchange="App.toggleDeviceTheme(this.checked)"><span class="aprof-toggle-slider"></span></label>
+                        </div>
+                        <div class="aprof-row">
+                            <span class="material-icons-round">phone_android</span>
+                            <div class="aprof-text">
+                                <span class="aprof-label">OLED Theme</span>
+                                <p class="aprof-desc-inline">Use OLED black backdrop for eye comfort</p>
+                            </div>
+                            <label class="aprof-toggle"><input type="checkbox" id="prof-oled-theme" onchange="App.toggleOledTheme(this.checked)"><span class="aprof-toggle-slider"></span></label>
+                        </div>
+                        <div class="aprof-row" onclick="App.toggleLanguage()">
+                            <span class="material-icons-round">language</span>
+                            <div class="aprof-text">
+                                <span class="aprof-label">Language</span>
+                                <p class="aprof-desc-inline">Choose your preferred language</p>
+                            </div>
+                            <span class="aprof-value" id="prof-lang">EN <span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="aprof-section">
                     <div class="aprof-section-title">ACCOUNT</div>
                     <div class="aprof-card">
                         <div class="aprof-row" onclick="App.changeProfilePicture()"><span class="material-icons-round">person</span><span class="aprof-label">Profile picture</span><span class="material-icons-round">chevron_right</span></div>
@@ -476,6 +505,17 @@
                         <div class="aprof-row" onclick="App.signOut()"><span class="material-icons-round">logout</span><span class="aprof-label">Log out</span><span class="material-icons-round">chevron_right</span></div>
                         <div class="aprof-row danger" onclick="App.deleteAccount()"><span class="material-icons-round">delete_forever</span><span class="aprof-label">Delete account</span><span class="material-icons-round">chevron_right</span></div>
                     </div>
+                </div>
+                <div class="aprof-section">
+                    <div class="aprof-section-title">MORE</div>
+                    <div class="aprof-card">
+                        <div class="aprof-row" onclick="App.shareMessCode()"><span class="material-icons-round">share</span><span class="aprof-label">Share</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.toast('About coming soon','info')"><span class="material-icons-round">info</span><span class="aprof-label">About App</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.contactDeveloper()"><span class="material-icons-round">mail</span><span class="aprof-label">Contact Developer</span><span class="material-icons-round">chevron_right</span></div>
+                    </div>
+                </div>
+                <div class="aprof-version">
+                    <span>Version 1.0.0 (build 1)</span>
                 </div>
             </div>
         </main>

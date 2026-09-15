@@ -4,6 +4,7 @@ const App = {
 
     async init() {
         const splash = document.getElementById('splash-screen');
+        this.applyTheme();
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
@@ -1856,9 +1857,99 @@ const App = {
                 avatar.textContent = (u.displayName || 'U').charAt(0).toUpperCase();
             }
         } catch (e) {}
+        const saved = localStorage.getItem('mess_theme') || 'light';
+        const dt = document.getElementById('prof-device-theme');
+        const ot = document.getElementById('prof-oled-theme');
+        const lang = document.getElementById('prof-lang');
+        if (dt) dt.checked = saved === 'system';
+        if (ot) ot.checked = saved === 'oled';
+        if (lang) lang.textContent = (localStorage.getItem('mess_lang') || 'en') === 'en' ? 'EN' : 'BD';
     },
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
+
+    toggleDeviceTheme(checked) {
+        if (checked) {
+            this.theme = 'system';
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        } else {
+            this.theme = 'light';
+            document.documentElement.removeAttribute('data-theme');
+        }
+        localStorage.setItem('mess_theme', this.theme);
+    },
+    toggleOledTheme(checked) {
+        if (checked) {
+            this.theme = 'oled';
+            document.documentElement.setAttribute('data-theme', 'oled');
+        } else {
+            this.theme = 'light';
+            document.documentElement.removeAttribute('data-theme');
+        }
+        localStorage.setItem('mess_theme', this.theme);
+    },
+    applyTheme() {
+        const saved = localStorage.getItem('mess_theme') || 'light';
+        this.theme = saved;
+        if (saved === 'system') {
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        } else if (saved === 'oled') {
+            document.documentElement.setAttribute('data-theme', 'oled');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        const dt = document.getElementById('prof-device-theme');
+        const ot = document.getElementById('prof-oled-theme');
+        if (dt) dt.checked = saved === 'system';
+        if (ot) ot.checked = saved === 'oled';
+    },
+    toggleLanguage() {
+        const lang = localStorage.getItem('mess_lang') || 'en';
+        const newLang = lang === 'en' ? 'bn' : 'en';
+        localStorage.setItem('mess_lang', newLang);
+        document.getElementById('prof-lang').textContent = newLang === 'en' ? 'EN' : 'BD';
+        this.toast(newLang === 'en' ? 'Language: English' : 'Language: বাংলা', 'info');
+    },
+    contactDeveloper() {
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `
+            <div style="text-align:center;margin-bottom:16px">
+                <div style="font-weight:700;font-size:22px;margin-bottom:8px">Mahmudul Hasan</div>
+                <div style="font-size:14px;color:#777;margin-bottom:16px">Developer of Mess Manager</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+                <a href="https://wa.me/8801710632114" target="_blank" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
+                    <span class="material-icons-round" style="color:#25D366">chat</span>
+                    <span class="aprof-label">WhatsApp</span>
+                    <span class="material-icons-round">chevron_right</span>
+                </a>
+                <a href="mailto:mahmudulhasandhk70@gmail.com" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
+                    <span class="material-icons-round" style="color:#d32f2f">mail</span>
+                    <span class="aprof-label">Email</span>
+                    <span class="material-icons-round">chevron_right</span>
+                </a>
+                <a href="https://github.com/mhasanbogura" target="_blank" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
+                    <span class="material-icons-round">code</span>
+                    <span class="aprof-label">GitHub</span>
+                    <span class="material-icons-round">chevron_right</span>
+                </a>
+                <a href="https://facebook.com/mahmudulhasandhk70" target="_blank" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
+                    <span class="material-icons-round" style="color:#1877F2">facebook</span>
+                    <span class="aprof-label">Facebook</span>
+                    <span class="material-icons-round">chevron_right</span>
+                </a>
+            </div>`;
+        document.getElementById('modal-title').textContent = 'Contact Developer';
+        document.getElementById('modal-overlay').classList.add('active');
+    },
 
     // ==================== BAZAR NOTE PAGE ====================
     async loadBazarNote() {
