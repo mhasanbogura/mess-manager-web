@@ -188,14 +188,15 @@ body {
     background: transparent;
     display: flex; align-items: center;
     padding: 10px 12px; min-height: 60px; gap: 8px;
-    border-radius: 0; margin: 0;
+    border-radius: 16px; margin: 10px 12px 0;
     width: calc(100% - 24px); box-sizing: border-box;
+    border: 1px solid var(--border);
 }
 .topbar-title { flex: 1; cursor: pointer; overflow: hidden; min-width: 0; }
 .topbar h2 { font-size: 18px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -0.3px; }
 .topbar-actions { display: flex; align-items: center; gap: 4px; }
 .topbar-btn { background: none; border: none; color: var(--text); cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background .15s; }
-.topbar-btn:hover { background: rgba(255,255,255,.15); }
+.topbar-btn:hover { background: rgba(0,0,0,.08); }
 .topbar-btn .material-icons-round { font-size: 22px; }
 
 .menu-btn {
@@ -2091,10 +2092,11 @@ select.input-sm { cursor: pointer; }
     padding-bottom: 90px;
 }
 .anotice-head {
-    background: transparent;
+    background: var(--card);
     display: flex; align-items: center; gap: 10px;
     padding: 10px 12px; min-height: 60px;
-    border-radius: 0; margin: 0;
+    border-radius: 16px; margin: 10px 12px 0;
+    border: 1px solid var(--border);
 }
 .anotice-head .icon-btn { color: var(--text); min-width: 36px; min-height: 36px; }
 .anotice-head .icon-btn:hover { background: rgba(0,0,0,.08); }
@@ -2155,10 +2157,11 @@ select.input-sm { cursor: pointer; }
     color: #2b2b2b;
 }
 .aduty-head {
-    background: transparent;
+    background: var(--card);
     display: flex; align-items: center; gap: 10px;
     padding: 10px 12px; min-height: 60px;
-    border-radius: 0; margin: 0;
+    border-radius: 16px; margin: 10px 12px 0;
+    border: 1px solid var(--border);
 }
 .aduty-head .icon-btn { color: var(--text); min-width: 36px; min-height: 36px; }
 .aduty-head .icon-btn:hover { background: rgba(0,0,0,.08); }
@@ -2283,7 +2286,7 @@ img, canvas { max-width: 100%; }
 
 /* ==================== FLAT PAGE ==================== */
 #page-members { font-family: 'Times New Roman', sans-serif; }
-.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; min-height: 60px; background: transparent; color: var(--text); border-radius: 0; margin: 0; }
+.aflat-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; min-height: 60px; background: var(--card); color: var(--text); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--border); }
 .aflat-head h2 { font-size: 18px; font-weight: 700; color: var(--text); }
 .aflat-leave { display: flex; align-items: center; gap: 4px; background: none; border: none; color: #d32f2f; font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; }
 .aflat-leave .material-icons-round { font-size: 20px; }
@@ -2532,7 +2535,7 @@ img, canvas { max-width: 100%; }
 }
 
 /* ==================== BAZAR NOTE PAGE ==================== */
-.abn-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 60px; background: transparent; border-radius: 0; margin: 0; }
+.abn-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 60px; background: var(--card); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--border); }
 .abn-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .abn-head .icon-btn:hover { background: rgba(255,255,255,.15); }
 .abn-head h2 { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
@@ -2555,7 +2558,7 @@ img, canvas { max-width: 100%; }
 .abn-go-bazar { width: 100%; padding: 14px; border: none; border-radius: 12px; background: #FFB300; color: #1a1a1a; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
 
 /* ==================== MENU TODAY PAGE ==================== */
-.amenu-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 60px; background: transparent; border-radius: 0; margin: 0; }
+.amenu-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px; min-height: 60px; background: var(--card); border-radius: 16px; margin: 10px 12px 0; border: 1px solid var(--border); }
 .amenu-head .icon-btn { color: #fff; min-width: 36px; min-height: 36px; }
 .amenu-head .icon-btn:hover { background: rgba(255,255,255,.15); }
 .amenu-head h2 { font-size: 18px; font-weight: 700; color: #fff; flex: 1; }
@@ -2639,13 +2642,13 @@ img, canvas { max-width: 100%; }
 /* ==================== OLED DARK GRAY OVERRIDES ==================== */
 [data-theme="oled"] body { background: #111; color: #e8ebf1; }
 [data-theme="oled"] .main-content { background: #111; }
-[data-theme="oled"] .topbar { background: transparent !important; }
+[data-theme="oled"] .topbar { background: var(--card) !important; border-color: var(--border); }
 [data-theme="oled"] .topbar h2 { color: #e8ebf1; }
 [data-theme="oled"] .topbar-btn { color: #e8ebf1; }
 [data-theme="oled"] .topbar-btn:hover { background: rgba(255,255,255,.1); }
 [data-theme="oled"] .adash-head, [data-theme="oled"] .aflat-head,
 [data-theme="oled"] .anotice-head, [data-theme="oled"] .aduty-head,
-[data-theme="oled"] .abn-head, [data-theme="oled"] .amenu-head { background: transparent; color: #e8ebf1; }
+[data-theme="oled"] .abn-head, [data-theme="oled"] .amenu-head { background: var(--card); border-color: var(--border); color: #e8ebf1; }
 [data-theme="oled"] .bottom-nav { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .bottom-nav-item { color: #888; }
 [data-theme="oled"] .bottom-nav-item.active { color: #fff; }
