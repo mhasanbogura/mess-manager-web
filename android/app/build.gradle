@@ -24,14 +24,8 @@ task bumpVersion {
     }
 }
 
-tasks.whenTaskAdded { task ->
-    if (task.name == 'assembleDebug') {
-        task.dependsOn bumpVersion
-    }
-}
-
 task release {
-    dependsOn 'assembleDebug'
+    dependsOn bumpVersion, 'assembleDebug'
     doLast {
         def v = project.ext.newVersion
         def b = project.ext.newBuild
@@ -39,6 +33,7 @@ task release {
         def apkPath = file("${buildDir}/outputs/apk/debug/app-debug.apk")
         def tagName = "v${v}"
         def rootDir = project.projectDir.parentFile
+        def ghBin = new File(System.getProperty("user.home"), ".local/bin/gh").absolutePath
 
         println "Releasing ${tagName} (build ${b})..."
 
@@ -63,13 +58,13 @@ task release {
 
         exec {
             workingDir rootDir
-            commandLine 'gh', 'release', 'delete', tagName, '--yes'
+            commandLine ghBin, 'release', 'delete', tagName, '--yes'
             ignoreExitValue = true
         }
         exec {
             workingDir rootDir
-            commandLine 'gh', 'release', 'create', tagName,
-                apkPath.absolutePath,
+            commandLine ghBin, 'release', 'create', tagName,
+                "${rootDir}/${apkName}",
                 '--title', "Mess Manager v${v} (build ${b})",
                 '--notes', "Mess Manager v${v} build ${b}\nPackage: com.mahmuduls.messmanager",
                 '--latest'
@@ -86,8 +81,8 @@ android {
         applicationId "com.mahmuduls.messmanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 55
-        versionName "1.3.12"
+        versionCode 43
+        versionName "1.3.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
