@@ -29,7 +29,7 @@ task release {
     doLast {
         def v = project.ext.newVersion
         def b = project.ext.newBuild
-        def apkName = "Mess Manager.apk"
+        def apkName = "mess-manager.apk"
         def apkPath = file("${buildDir}/outputs/apk/debug/app-debug.apk")
         def tagName = "v${v}"
         def rootDir = project.projectDir.parentFile
@@ -81,8 +81,8 @@ android {
         applicationId "com.mahmuduls.messmanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 46
-        versionName "1.3.9"
+        versionCode 49
+        versionName "1.3.10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
