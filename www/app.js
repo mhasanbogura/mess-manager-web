@@ -2828,11 +2828,9 @@ const App = {
         this.toast(newLang === 'en' ? 'Language: English' : 'Language: বাংলা', 'info');
     },
     shareApp() {
-        const ver = '1.3.6', build = '37';
-        const apkName = `Mess Manager_com.mahmuduls.messmanager_v${ver}_build_${build}.apk`;
         const shareData = {
             title: 'Mess Manager',
-            text: `Mess Manager v${ver} (build ${build})\n${apkName}\n\nDownload: https://mhasanbogura.github.io/mess-manager-web/`,
+            text: `Check out Mess Manager — A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\nDownload: https://github.com/mhasanbogura/mess-manager-web/releases/latest`,
         };
         if (navigator.share) {
             navigator.share(shareData).catch(() => {
@@ -2896,8 +2894,6 @@ const App = {
         body.style.overflowY = 'auto';
         document.getElementById('modal-title').textContent = 'Contact Developer';
         this.openModal();
-    },
-        document.getElementById('modal-overlay').classList.add('active');
     },
 
     // ==================== BAZAR NOTE PAGE ====================
