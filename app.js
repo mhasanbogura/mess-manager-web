@@ -2729,8 +2729,6 @@ const App = {
             }
         } catch (e) {}
         const saved = localStorage.getItem('mess_theme') || 'light';
-        const dt = document.getElementById('prof-device-theme');
-        const ot = document.getElementById('prof-oled-theme');
         const toggle = document.getElementById('prof-lang-toggle');
         if (dt) dt.checked = saved === 'system';
         if (ot) ot.checked = saved === 'oled';
@@ -2745,21 +2743,6 @@ const App = {
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
 
-    toggleDeviceTheme(checked) {
-        if (checked) {
-            this.theme = 'system';
-            document.getElementById('prof-oled-theme').checked = false;
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.setAttribute('data-theme', 'oled');
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-            }
-        } else {
-            this.theme = 'light';
-            document.documentElement.removeAttribute('data-theme');
-        }
-        localStorage.setItem('mess_theme', this.theme);
-    },
     toggleOledTheme(checked) {
         if (checked) {
             this.theme = 'oled';
@@ -2774,29 +2757,15 @@ const App = {
     applyTheme() {
         const saved = localStorage.getItem('mess_theme') || 'light';
         this.theme = saved;
-        if (saved === 'system') {
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.documentElement.setAttribute('data-theme', 'oled');
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-            }
-        } else if (saved === 'oled') {
+        if (saved === 'oled') {
             document.documentElement.setAttribute('data-theme', 'oled');
         } else {
             document.documentElement.removeAttribute('data-theme');
         }
         const isOled = document.documentElement.getAttribute('data-theme') === 'oled';
         this._setSystemBars(isOled ? '#111111' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
-        const dt = document.getElementById('prof-device-theme');
         const ot = document.getElementById('prof-oled-theme');
-        if (dt) dt.checked = saved === 'system';
         if (ot) ot.checked = saved === 'oled';
-        if (!this._themeListenerAdded) {
-            this._themeListenerAdded = true;
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                if (this.theme === 'system') this.applyTheme();
-            });
-        }
     },
     _setSystemBars(bgColor, fgColor) {
         try {
