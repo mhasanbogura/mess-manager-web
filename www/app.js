@@ -2748,6 +2748,7 @@ const App = {
     toggleDeviceTheme(checked) {
         if (checked) {
             this.theme = 'system';
+            document.getElementById('prof-oled-theme').checked = false;
             if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
                 document.documentElement.setAttribute('data-theme', 'oled');
             } else {
@@ -2762,6 +2763,7 @@ const App = {
     toggleOledTheme(checked) {
         if (checked) {
             this.theme = 'oled';
+            document.getElementById('prof-device-theme').checked = false;
             document.documentElement.setAttribute('data-theme', 'oled');
         } else {
             this.theme = 'light';
@@ -2789,6 +2791,12 @@ const App = {
         const ot = document.getElementById('prof-oled-theme');
         if (dt) dt.checked = saved === 'system';
         if (ot) ot.checked = saved === 'oled';
+        if (!this._themeListenerAdded) {
+            this._themeListenerAdded = true;
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (this.theme === 'system') this.applyTheme();
+            });
+        }
     },
     _setSystemBars(bgColor, fgColor) {
         try {
