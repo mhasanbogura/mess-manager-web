@@ -2784,7 +2784,7 @@ const App = {
             document.documentElement.removeAttribute('data-theme');
         }
         const isOled = document.documentElement.getAttribute('data-theme') === 'oled';
-        this._setSystemBars(isOled ? '#111111' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
+        this._setSystemBars(isOled ? '#000000' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
         const dt = document.getElementById('prof-device-theme');
         const ot = document.getElementById('prof-oled-theme');
         if (dt) dt.checked = saved === 'system';
