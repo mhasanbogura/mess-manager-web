@@ -2830,7 +2830,7 @@ const App = {
     shareApp() {
         const shareData = {
             title: 'Mess Manager',
-            text: `Check out Mess Manager — A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\nDownload: https://github.com/mhasanbogura/mess-manager-web/releases/latest`,
+            text: `Check out Mess Manager — A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\nDownload: https://mahmudulsapps.u.gy/mess-manager`,
         };
         if (navigator.share) {
             navigator.share(shareData).catch(() => {
