@@ -2,9 +2,331 @@ const App = {
     currentUser: null, messId: null, messCode: null, messName: null,
     currentPage: 'dashboard', userRole: 'member',
 
+    // ── i18n ───────────────────────────────────────────────────
+    _translations: {
+        // Nav
+        nav_dashboard:'Dashboard',nav_mess:'Mess',nav_expense:'Expense',nav_meal:'Meal',nav_money:'Money',nav_profile:'Profile',
+        // Dashboard
+        dash_greet_morning:'Good morning',dash_greet_afternoon:'Good afternoon',dash_greet_evening:'Good evening',
+        dash_share:'Share Mess ID',dash_manager:'Manager',dash_current_month:'Current month',dash_notice:'Notice Board',
+        dash_notice_preview:'Pin a notice for the whole house',dash_today:'Today is',dash_breakfast:'Breakfast',dash_lunch:'Lunch',dash_dinner:'Dinner',
+        dash_meal:'Meal',dash_deposit:'Deposit',dash_balance:'Balance',dash_expense_per_meal:'Expense per meal',
+        dash_utility:'Utility',dash_expense_per_utility:'Expense per utility',dash_analyse:'Analyse',
+        dash_meal_summary:'Meal Summary',dash_util_others:'Utility & Others',
+        dash_table_name:'Name',dash_table_total:'Total',dash_table_expense:'Expense(৳)',dash_table_deposit:'Deposit(৳)',dash_table_balance:'Balance(৳)',
+        dash_table_rent:'Rent(৳)',dash_table_util_others:'Utility & Others(৳)',
+        dash_no_data:'No data',
+        // Expense Today
+        dt_title:'Expense Today',dt_banner:'Expense today',dt_nobody:'Nobody assigned',
+        dt_unassigned:'Unassigned dates',dt_all_assigned:'All dates assigned',dt_day:'day(s)',
+        dt_no_dates:'No dates yet — tap edit to assign',dt_no_members:'No members',
+        // Mess Management
+        mm_title:'Mess Management',mm_leave:'Leave',mm_my_mess:'My Mess',mm_mess_id:'Mess ID',
+        mm_tab_members:'Members',mm_tab_peoples:'Peoples',mm_tab_perms:'Permissions',
+        mm_members_info:'Members are the names your meals, cost and balances are counted against. Add everyone who eats in this mess — they do not need the app.',
+        mm_add_member:'Add Member',mm_add:'ADD',mm_add_hint:'Unique name; letters, numbers & spaces only (e.g. Ziad1, Ziad2)',
+        mm_total:'Total Mess Members',mm_no_members:'No members yet',
+        mm_peoples_info:'Peoples have the app and have joined this mess. Joining does not put anyone on the meal list — add them under Members for that.',
+        mm_no_peoples:'No peoples have joined yet',mm_role_manager:'Manager',mm_role_you:'You',
+        mm_perms_info:'What each People is allowed to do — add meals, add cost, manage the lists. Only Peoples appear here: a member who has never opened the app has nothing to grant.',
+        mm_perms_manager_note:'The manager always has every permission, whether these are checked or not.',
+        mm_perm_add_expense:'Add Expense',mm_perm_add_meal:'Add Meal',mm_perm_edit_meal:'Edit Meal',
+        mm_perm_manage_perms:'Manage Permissions',mm_perm_manage_people:'Manage People & Members',
+        mm_no_perms:'No peoples to set permissions for',
+        // Meal Entry
+        me_title:'Meal Entry',me_current_month:'Current Month:',me_view:'View',
+        me_breakfast:'Breakfast',me_lunch:'Lunch',me_dinner:'Dinner',me_add:'Add',
+        me_no_members:'No members',me_error:'Error loading',
+        // Add Meal
+        am_title:'Add Meal',am_select_date:'Select meal date',am_set_counts:'Set member meal counts',
+        am_add_meal:'Add Meal',am_total:'Total:',am_breakfast:'Breakfast',am_lunch:'Lunch',am_dinner:'Dinner',
+        am_no_members:'No members',
+        // Meal Records
+        mr_title:'Meal Records',mr_current_month:'Current Month:',mr_loading:'Loading...',
+        mr_no_edits:'No meal edits this month',mr_removed_by:'Removed by:',mr_added_by:'Added by:',
+        mr_meals:'meal(s)',mr_removed:'Removed',mr_added:'Added',mr_error:'Error loading',
+        // Expense List
+        el_title:'Expense List',el_current_month:'Current Month:',
+        el_tab_meal:'Meal',el_tab_utility:'Utility & Others',el_add:'Add',
+        el_no_items:'No cost items this month',el_item:'ITEM',el_money_from:'MONEY FROM',el_total:'TOTAL',
+        el_divided_to:'DIVIDED TO',el_each:'EACH',el_delete:'Delete',el_edit:'Edit',
+        el_each_label:'each',el_members:'member(s)',
+        // Money Management
+        mm2_title:'Money Management',mm2_current_month:'Current Month:',
+        mm2_tab_meal:'Meal',mm2_tab_utility:'Utility & Others',mm2_add:'Add',
+        mm2_no_deposits:'No deposits this month',mm2_money_from:'MONEY FROM',mm2_amount:'AMOUNT',
+        mm2_delete:'Delete',mm2_edit:'Edit',
+        // Add Expense
+        ae_title:'Add Expense',ae_tab_meal:'Meal',ae_tab_utility:'Utility & Others',
+        ae_money_from:'Money from:',ae_manager:'Manager',ae_done_by:'Done by:',
+        ae_item_name:'Item name',ae_expense:'Expense',ae_add_another:'Add another item',
+        ae_hint:'Add each item on its own line. The Analysis page can then show which items cost you the most.',
+        ae_type:'Type:',ae_rent:'Rent',ae_electricity:'Electricity',ae_wifi:'Wi-Fi',ae_others:'Others',
+        ae_total_bill:'Total bill amount',ae_expense_from:'Expense from:',ae_divided_to:'Divided to:',
+        ae_select_all:'Select all',ae_selected:'selected',ae_footer_hint:'total',
+        // Add Deposit
+        ad_title:'Add Deposit',ad_tab_meal:'Meal',ad_tab_utility:'Utility & Others',
+        ad_money_from:'Money from:',ad_amount:'Enter Amount',
+        // Deleted Expenses
+        de_title:'Deleted Expenses',de_current_month:'Current Month:',de_loading:'Loading...',
+        de_no_items:'No deleted costs this month',de_deleted_by:'Deleted by:',
+        de_utility:'Utility & Others',de_meal:'Meal',
+        de_expense:'Expense:',de_orig_added_by:'Originally added by:',de_error:'Error loading',
+        // Deleted Transactions
+        dt2_title:'Deleted Transactions',dt2_loading:'Loading...',
+        dt2_no_items:'No deleted deposits this month',dt2_deleted_by:'Deleted by:',
+        // Notice Board
+        nb_title:'Notice Board',nb_empty:'The board is empty',nb_empty_desc:'Pin a notice and everyone in the house gets a notification.',
+        nb_pin:'Pin a notice',nb_modal_title:'Pin a notice',nb_notice_label:'Notice for the whole house',
+        nb_placeholder:'Write the notice here...',nb_pin_btn:'Pin',
+        // Bazar Note
+        bn_title:'Bazar Note',bn_anyone_can:'Anyone can add to the Bazar note',
+        bn_anyone_go:'Anyone can go to the bazar with Bazar Mode — even without Bazar Entry permission',
+        bn_draft:'Note down whatever the house needs, ready for the next time somebody goes shopping. It is a DRAFT — add and remove freely, because nothing here is counted or charged to anybody yet.',
+        bn_bazar_mode:'When somebody starts Bazar Mode, this list goes with them. They fill in the prices as they buy — that works with no internet — and only at the end does any of it become real, on the Bazar list.',
+        bn_placeholder:'What do we need?',bn_go_bazar:'Go to bazar',bn_empty_list:'Nothing on the list. Add whatever the house has run out of — anyone can.',
+        // Menu Today
+        mt_title:'Menu Today',mt_dinner_now:'Dinner now',mt_after_8pm:'after 8:00pm',mt_nothing_set:'Nothing set for now',
+        mt_tab_upcoming:'Upcoming menus',mt_tab_items:'Items',mt_tab_special:'Special days',
+        mt_add:'Add',mt_nothing_set_day:'Nothing set',mt_today:'Today',mt_items_shared:'Items shared across all menus',
+        mt_no_items:'No items yet',mt_special_days:'Special menus for specific dates',mt_add_special:'Add special day',
+        mt_coming_soon:'Menu history coming soon',
+        // Analysis
+        an_title:'Analysis',an_month:'Month',an_tab_meal:'Meal',an_tab_utility:'Utility',
+        an_total_meals:'Total meals',an_meal_bazar:'Meal bazar',an_members:'Members',
+        an_expense_per_meal:'Expense per meal',an_bazar:'Bazar',an_meals_label:'Meals',
+        an_member_balances:'Member balances',an_credit_hint:'Green = in credit · Red = owes (deposit − meal cost)',
+        an_expense_trend:'Expense per meal trend',an_vs_last_month:'vs last month',
+        an_costlier:'costlier',an_cheaper:'cheaper',
+        an_meal_share:'Meal share by member',an_who_ate:'Who ate how much of the',an_meals_count:'meals',
+        an_bazar_by_day:'Bazar by day',an_spent_across:'spent across the month',
+        an_meals_by_day:'Meals by day',an_meals_across:'meals across the month',
+        an_top10_bazar:'Top 10 bazar items by cost',an_items:'items',
+        an_total_utility:'Total utility',an_rent:'Rent',an_other_utility:'Other utility',
+        an_util_balance:'Balance',an_collection:'Collection',an_spending:'Spending',
+        an_util_credit_hint:'Green = in credit · Red = owes (utility deposit − cost share)',
+        an_util_expense_trend:'Expense per utility trend',
+        an_util_by_day:'Utility cost by day',an_util_across:'utility cost across the month',
+        an_top10_util:'Top 10 utility items by cost',
+        // Profile
+        prof_title:'Profile & Settings',
+        prof_general:'GENERAL SETTINGS',prof_device_theme:'Device Theme',prof_device_theme_desc:'Automatically switch theme based on system',
+        prof_oled_theme:'OLED Theme',prof_oled_desc:'Use OLED black backdrop for eye comfort',
+        prof_language:'Language',prof_lang_desc:'Choose your preferred language',
+        prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
+        prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
+        prof_version:'Version 1.0.0 (build 1)',
+        // Duty editor
+        de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
+        // Select Month
+        sm_title:'Select Month',sm_ok:'OK',
+        // View Settings
+        vs_title:'View Settings',vs_select_rows:'Select which meal rows to show in the table:',
+        // Edit Expense Modal
+        eem_title:'Edit Expense',eem_item_name:'Item name',eem_money_from:'Money from',
+        eem_date:'Date',eem_expense:'Expense (৳)',eem_cancel:'Cancel',eem_save:'Save',
+        // Edit Deposit Modal
+        edm_title:'Edit Deposit',edm_money_from:'Money from',edm_date:'Date',
+        edm_amount:'Amount (৳)',edm_category:'Category',edm_meal:'Meal',edm_utility:'Utility',
+        edm_cancel:'Cancel',edm_save:'Save',
+        // Auth
+        auth_title:'Mess Manager',auth_subtitle:'Manage your mess easily',
+        auth_email_ph:'Email address',auth_pass_ph:'Password',auth_login:'Login',
+        auth_forgot:'Forgot Password?',auth_create:'Create Account',auth_or:'or',
+        auth_google:'Continue with Google',
+        reg_title:'Create Account',reg_name_ph:'Full name',reg_email_ph:'Email address',
+        reg_phone_ph:'Phone number',reg_pass_ph:'Password (min 6 chars)',reg_btn:'Create Account',
+        reg_back:'Back to Login',
+        fp_title:'Reset Password',fp_desc:'Enter your email to receive a reset link',
+        fp_email_ph:'Your email address',fp_send:'Send Reset Link',fp_back:'Back to Login',
+        // Mess Selector
+        ms_title:'Your Messes',ms_subtitle:'Select a mess or create a new one',ms_no_mess:'No messes yet',
+        ms_create_title:'Create New Mess',ms_name_ph:'Mess Name',ms_addr_ph:'Address (optional)',
+        ms_create_btn:'Create Mess',ms_join_title:'Join Existing Mess',ms_code_ph:'6-digit Code',
+        ms_join_btn:'Join Mess',ms_code_hint:'Ask your mess admin for the code',ms_signout:'Sign Out',
+        // Delete Account
+        da_title:'Delete Account',da_confirm_text:'This will permanently delete your account and all data. Type DELETE to confirm:',
+        da_confirm:'Confirm',da_cancel:'Cancel',
+        // Contact Developer
+        cd_title:'Contact Developer',cd_role:'Developer of Mess Manager',
+        cd_whatsapp:'WhatsApp',cd_email:'Email',cd_github:'GitHub',cd_facebook:'Facebook',
+        // Generic
+        gen_loading:'Loading...',gen_cancel:'Cancel',gen_save:'Save',gen_delete:'Delete',
+    },
+
+    t(key) { return this._translations[key] || key; },
+
+    applyLanguage() {
+        const lang = localStorage.getItem('mess_lang') || 'en';
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.getAttribute('data-lang-key');
+            const text = this._translations[key];
+            if (text) el.textContent = lang === 'bn' ? this._bnText(key) : text;
+        });
+        document.querySelectorAll('[data-lang-ph]').forEach(el => {
+            const key = el.getAttribute('data-lang-ph');
+            const text = this._translations[key];
+            if (text) el.placeholder = lang === 'bn' ? this._bnText(key) : text;
+        });
+    },
+
+    _bnText(key) {
+        const map = {
+            // Nav
+            nav_dashboard:'ড্যাশবোর্ড',nav_mess:'মেস',nav_expense:'খরচ',nav_meal:'খাবার',nav_money:'টাকা',nav_profile:'প্রোফাইল',
+            // Dashboard
+            dash_greet_morning:'সুপ্রভাত',dash_greet_afternoon:'শুভ অপরাহ্ন',dash_greet_evening:'শুভ সন্ধ্যা',
+            dash_share:'মেস আইডি শেয়ার',dash_manager:'ম্যানেজার',dash_current_month:'বর্তমান মাস',dash_notice:'নোটিশ বোর্ড',
+            dash_notice_preview:'পুরো বাড়ির জন্য একটি নোটিশ দিন',dash_today:'আজ',dash_breakfast:'সকালের নাস্তা',dash_lunch:'দুপুরের খাবার',dash_dinner:'রাতের খাবার',
+            dash_meal:'খাবার',dash_deposit:'জমা',dash_balance:'ব্যালেন্স',dash_expense_per_meal:'প্রতি খাবারে খরচ',
+            dash_utility:'ইউটিলিটি',dash_expense_per_utility:'প্রতি ইউটিলিটিতে খরচ',dash_analyse:'বিশ্লেষণ',
+            dash_meal_summary:'খাবার সারসংক্ষেপ',dash_util_others:'ইউটিলিটি ও অন্যান্য',
+            dash_table_name:'নাম',dash_table_total:'মোট',dash_table_expense:'খরচ(৳)',dash_table_deposit:'জমা(৳)',dash_table_balance:'ব্যালেন্স(৳)',
+            dash_table_rent:'ভাড়া(৳)',dash_table_util_others:'ইউটিলিটি ও অন্যান্য(৳)',dash_no_data:'কোনো তথ্য নেই',
+            // Expense Today
+            dt_title:'আজকের খরচ',dt_banner:'আজকের খরচ',dt_nobody:'কেউ নিয়োগ করা হয়নি',
+            dt_unassigned:'নিয়োগবিহীন তারিখ',dt_all_assigned:'সব তারিখ নিয়োগ করা হয়েছে',dt_day:'দিন',
+            dt_no_dates:'এখনো কোনো তারিখ নেই — সম্পাদনায় ক্লিক করে নিয়োগ করুন',dt_no_members:'কোনো সদস্য নেই',
+            // Mess Management
+            mm_title:'মেস ব্যবস্থাপনা',mm_leave:'ছাড়ুন',mm_my_mess:'আমার মেস',mm_mess_id:'মেস আইডি',
+            mm_tab_members:'সদস্যরা',mm_tab_peoples:'পিপলস',mm_tab_perms:'অনুমতি',
+            mm_members_info:'সদস্যরা হলেন যাদের নামে খাবার, খরচ এবং ব্যালেন্স হিসাব হয়। যারা এই মেসে খায় তাদের সবাইকে যোগ করুন — তাদের অ্যাপ লাগবে না।',
+            mm_add_member:'সদস্য যোগ করুন',mm_add:'যোগ',mm_add_hint:'অনন্য নাম; শুধু অক্ষর, সংখ্যা ও স্পেস (যেমন Ziad1, Ziad2)',
+            mm_total:'মোট মেস সদস্য',mm_no_members:'এখনো কোনো সদস্য নেই',
+            mm_peoples_info:'পিপলসরা অ্যাপ ব্যবহার করে এবং এই মেসে যোগ দিয়েছে। যোগ দেওয়া মানে কাউকে খাবার তালিকায় যোগ করা নয় — সেটির জন্য Members এ যোগ করুন।',
+            mm_no_peoples:'এখনো কোনো পিপলস যোগ দেয়নি',mm_role_manager:'ম্যানেজার',mm_role_you:'আপনি',
+            mm_perms_info:'প্রতিটি পিপলসকে কী করতে দেওয়া হবে — খাবার যোগ, খরচ যোগ, তালিকা পরিচালনা। শুধু পিপলসরা এখানে দেখা যায়।',
+            mm_perms_manager_note:'ম্যানেজার সবসময় সব অনুমতি পান।',
+            mm_perm_add_expense:'খরচ যোগ',mm_perm_add_meal:'খাবার যোগ',mm_perm_edit_meal:'খাবার সম্পাদনা',
+            mm_perm_manage_perms:'অনুমতি পরিচালনা',mm_perm_manage_people:'পিপলস ও সদস্য পরিচালনা',
+            mm_no_perms:'অনুমতি দেওয়ার জন্য কোনো পিপলস নেই',
+            // Meal Entry
+            me_title:'খাবার এন্ট্রি',me_current_month:'বর্তমান মাস:',me_view:'দেখুন',
+            me_breakfast:'সকালের নাস্তা',me_lunch:'দুপুরের খাবার',me_dinner:'রাতের খাবার',me_add:'যোগ',
+            me_no_members:'কোনো সদস্য নেই',me_error:'লোড হচ্ছে না',
+            // Add Meal
+            am_title:'খাবার যোগ',am_select_date:'খাবারের তারিখ নির্বাচন করুন',am_set_counts:'সদস্যদের খাবার সংখ্যা নির্ধারণ করুন',
+            am_add_meal:'খাবার যোগ',am_total:'মোট:',am_breakfast:'সকালের নাস্তা',am_lunch:'দুপুরের খাবার',am_dinner:'রাতের খাবার',
+            am_no_members:'কোনো সদস্য নেই',
+            // Meal Records
+            mr_title:'খাবার রেকর্ড',mr_current_month:'বর্তমান মাস:',mr_loading:'লোড হচ্ছে...',
+            mr_no_edits:'এই মাসে কোনো খাবার সম্পাদনা নেই',mr_removed_by:'সরানো হয়েছে:',mr_added_by:'যোগ করেছে:',
+            mr_meals:'খাবার',mr_removed:'সরানো হয়েছে',mr_added:'যোগ হয়েছে',mr_error:'লোড হচ্ছে না',
+            // Expense List
+            el_title:'খরচ তালিকা',el_current_month:'বর্তমান মাস:',
+            el_tab_meal:'খাবার',el_tab_utility:'ইউটিলিটি ও অন্যান্য',el_add:'যোগ',
+            el_no_items:'এই মাসে কোনো খরচ নেই',el_item:'আইটেম',el_money_from:'টাকা দিয়েছে',el_total:'মোট',
+            el_divided_to:'ভাগ করা হয়েছে',el_each:'প্রতি',el_delete:'মুছুন',el_edit:'সম্পাদনা',
+            el_each_label:'প্রতি',el_members:'সদস্য',
+            // Money Management
+            mm2_title:'টাকা ব্যবস্থাপনা',mm2_current_month:'বর্তমান মাস:',
+            mm2_tab_meal:'খাবার',mm2_tab_utility:'ইউটিলিটি ও অন্যান্য',mm2_add:'যোগ',
+            mm2_no_deposits:'এই মাসে কোনো জমা নেই',mm2_money_from:'টাকা দিয়েছে',mm2_amount:'পরিমাণ',
+            mm2_delete:'মুছুন',mm2_edit:'সম্পাদনা',
+            // Add Expense
+            ae_title:'খরচ যোগ',ae_tab_meal:'খাবার',ae_tab_utility:'ইউটিলিটি ও অন্যান্য',
+            ae_money_from:'টাকা দিয়েছে:',ae_manager:'ম্যানেজার',ae_done_by:'করেছে:',
+            ae_item_name:'আইটেমের নাম',ae_expense:'খরচ',ae_add_another:'আরেকটি আইটেম যোগ',
+            ae_hint:'প্রতিটি আইটেম আলাদা লাইনে যোগ করুন। বিশ্লেষণ পৃষ্ঠায় দেখা যাবে কোন আইটেম সবচেয়ে বেশি খরচ হয়েছে।',
+            ae_type:'ধরন:',ae_rent:'ভাড়া',ae_electricity:'বিদ্যুৎ',ae_wifi:'ওয়াইফাই',ae_others:'অন্যান্য',
+            ae_total_bill:'মোট বিল',ae_expense_from:'খরচ থেকে:',ae_divided_to:'ভাগ করা হয়েছে:',
+            ae_select_all:'সব নির্বাচন',ae_selected:'নির্বাচিত',ae_footer_hint:'মোট',
+            // Add Deposit
+            ad_title:'জমা যোগ',ad_tab_meal:'খাবার',ad_tab_utility:'ইউটিলিটি ও অন্যান্য',
+            ad_money_from:'টাকা দিয়েছে:',ad_amount:'পরিমাণ লিখুন',
+            // Deleted Expenses
+            de_title:'মুছে ফেলা খরচ',de_current_month:'বর্তমান মাস:',de_loading:'লোড হচ্ছে...',
+            de_no_items:'এই মাসে কোনো মুছে ফেলা খরচ নেই',de_deleted_by:'মুছে ফেলেছে:',
+            de_utility:'ইউটিলিটি ও অন্যান্য',de_meal:'খাবার',
+            de_expense:'খরচ:',de_orig_added_by:'মূলত যোগ করেছে:',de_error:'লোড হচ্ছে না',
+            // Deleted Transactions
+            dt2_title:'মুছে ফেলা লেনদেন',dt2_loading:'লোড হচ্ছে...',
+            dt2_no_items:'এই মাসে কোনো মুছে ফেলা জমা নেই',dt2_deleted_by:'মুছে ফেলেছে:',
+            // Notice Board
+            nb_title:'নোটিশ বোর্ড',nb_empty:'বোর্ড খালি',nb_empty_desc:'একটি নোটিশ দিন এবং বাড়ির সবাইকে জানানো হবে।',
+            nb_pin:'নোটিশ দিন',nb_modal_title:'নোটিশ দিন',nb_notice_label:'পুরো বাড়ির জন্য নোটিশ',
+            nb_placeholder:'এখানে নোটিশ লিখুন...',nb_pin_btn:'দিন',
+            // Bazar Note
+            bn_title:'বাজার নোট',bn_anyone_can:'যেকোনো বাজার নোটে যোগ করতে পারে',
+            bn_anyone_go:'যেকোনো বাজারে যেতে পারে — বাজার এন্ট্রি ছাড়াও',
+            bn_draft:'বাড়ির যা প্রয়োজন তা লিখে রাখুন। এটি একটি খসড়া — যোগ ও মুছে ফেলুন।',
+            bn_bazar_mode:'বাজার মোডে এই তালিকা যাবে। কেনাকাটার সময় দাম ভরে দিন।',
+            bn_placeholder:'আমাদের কী লাগে?',bn_go_bazar:'বাজারে যান',bn_empty_list:'তালিকায় কিছু নেই। যা শেষ হয়ে গেছে তা যোগ করুন।',
+            // Menu Today
+            mt_title:'আজকের মেনু',mt_dinner_now:'এখন রাতের খাবার',mt_after_8pm:'রাত ৮টার পর',mt_nothing_set:'এখন কিছু নেই',
+            mt_tab_upcoming:'আসন্ন মেনু',mt_tab_items:'আইটেম',mt_tab_special:'বিশেষ দিন',
+            mt_add:'যোগ',mt_nothing_set_day:'কিছু নেই',mt_today:'আজ',mt_items_shared:'সব মেনুতে ব্যবহৃত আইটেম',
+            mt_no_items:'এখনো কোনো আইটেম নেই',mt_special_days:'নির্দিষ্ট তারিখের বিশেষ মেনু',mt_add_special:'বিশেষ দিন যোগ',
+            mt_coming_soon:'মেনু ইতিহাস শীঘ্রই আসছে',
+            // Analysis
+            an_title:'বিশ্লেষণ',an_month:'মাস',an_tab_meal:'খাবার',an_tab_utility:'ইউটিলিটি',
+            an_total_meals:'মোট খাবার',an_meal_bazar:'খাবার বাজার',an_members:'সদস্য',
+            an_expense_per_meal:'প্রতি খাবারে খরচ',an_bazar:'বাজার',an_meals_label:'খাবার',
+            an_member_balances:'সদস্যদের ব্যালেন্স',an_credit_hint:'সবুজ = বাকি আছে · লাল = দেনা (জমা − খরচ)',
+            an_expense_trend:'প্রতি খাবারে খরচের প্রবণতা',an_vs_last_month:'গত মাসের তুলনায়',
+            an_costlier:'বেশি খরচ',an_cheaper:'কম খরচ',
+            an_meal_share:'সদস্য অনুযায়ী খাবার অংশ',an_who_ate:'কারা কত খেয়েছে',an_meals_count:'খাবার',
+            an_bazar_by_day:'দিন অনুযায়ী বাজার',an_spent_across:'পুরো মাসে খরচ',
+            an_meals_by_day:'দিন অনুযায়ী খাবার',an_meals_across:'পুরো মাসে খাবার',
+            an_top10_bazar:'খরচ অনুযায়ী শীর্ষ ১০ বাজার আইটেম',an_items:'আইটেম',
+            an_total_utility:'মোট ইউটিলিটি',an_rent:'ভাড়া',an_other_utility:'অন্যান্য ইউটিলিটি',
+            an_util_balance:'ব্যালেন্স',an_collection:'সংগ্রহ',an_spending:'খরচ',
+            an_util_credit_hint:'সবুজ = বাকি আছে · লাল = দেনা (ইউটিলিটি জমা − খরচ অংশ)',
+            an_util_expense_trend:'প্রতি ইউটিলিটিতে খরচের প্রবণতা',
+            an_util_by_day:'দিন অনুযায়ী ইউটিলিটি খরচ',an_util_across:'পুরো মাসে ইউটিলিটি খরচ',
+            an_top10_util:'খরচ অনুযায়ী শীর্ষ ১০ ইউটিলিটি আইটেম',
+            // Profile
+            prof_title:'প্রোফাইল ও সেটিংস',
+            prof_general:'সাধারণ সেটিংস',prof_device_theme:'ডিভাইস থিম',prof_device_theme_desc:'সিস্টেম অনুযায়ী থিম পরিবর্তন',
+            prof_oled_theme:'OLED থিম',prof_oled_desc:'চোখের সুবিধার জন্য OLED ব্ল্যাক ব্যাকড্রপ',
+            prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
+            prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
+            prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
+            prof_version:'ভার্সন ১.০.০ (বিল্ড ১)',
+            // Duty editor
+            de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
+            // Select Month
+            sm_title:'মাস নির্বাচন',sm_ok:'ঠিক আছে',
+            // View Settings
+            vs_title:'দেখার সেটিংস',vs_select_rows:'টেবিলে কোন খাবার সারি দেখানো হবে তা নির্বাচন করুন:',
+            // Edit Expense Modal
+            eem_title:'খরচ সম্পাদনা',eem_item_name:'আইটেমের নাম',eem_money_from:'টাকা দিয়েছে',
+            eem_date:'তারিখ',eem_expense:'খরচ (৳)',eem_cancel:'বাতিল',eem_save:'সংরক্ষণ',
+            // Edit Deposit Modal
+            edm_title:'জমা সম্পাদনা',edm_money_from:'টাকা দিয়েছে',edm_date:'তারিখ',
+            edm_amount:'পরিমাণ (৳)',edm_category:'ক্যাটাগরি',edm_meal:'খাবার',edm_utility:'ইউটিলিটি',
+            edm_cancel:'বাতিল',edm_save:'সংরক্ষণ',
+            // Auth
+            auth_title:'মেস ম্যানেজার',auth_subtitle:'আপনার মেস সহজে পরিচালনা করুন',
+            auth_email_ph:'ইমেইল',auth_pass_ph:'পাসওয়ার্ড',auth_login:'লগইন',
+            auth_forgot:'পাসওয়ার্ড ভুলে গেছেন?',auth_create:'অ্যাকাউন্ট তৈরি',auth_or:'অথবা',
+            auth_google:'গুগল দিয়ে চালিয়ে যান',
+            reg_title:'অ্যাকাউন্ট তৈরি',reg_name_ph:'পুরো নাম',reg_email_ph:'ইমেইল',
+            reg_phone_ph:'ফোন নম্বর',reg_pass_ph:'পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)',reg_btn:'অ্যাকাউন্ট তৈরি',
+            reg_back:'লগইনে ফিরুন',
+            fp_title:'পাসওয়ার্ড রিসেট',fp_desc:'রিসেট লিঙ্ক পেতে ইমেইল দিন',
+            fp_email_ph:'আপনার ইমেইল',fp_send:'রিসেট লিঙ্ক পাঠান',fp_back:'লগইনে ফিরুন',
+            // Mess Selector
+            ms_title:'আপনার মেস',ms_subtitle:'একটি মেস নির্বাচন করুন বা নতুন তৈরি করুন',ms_no_mess:'এখনো কোনো মেস নেই',
+            ms_create_title:'নতুন মেস তৈরি',ms_name_ph:'মেসের নাম',ms_addr_ph:'ঠিকানা (ঐচ্ছিক)',
+            ms_create_btn:'মেস তৈরি',ms_join_title:'বিদ্যমান মেসে যোগ দিন',ms_code_ph:'৬ ডিজিট কোড',
+            ms_join_btn:'মেসে যোগ দিন',ms_code_hint:'মেস অ্যাডমিনের কাছ থেকে কোড নিন',ms_signout:'সাইন আউট',
+            // Delete Account
+            da_title:'অ্যাকাউন্ট মুছুন',da_confirm_text:'এটি আপনার অ্যাকাউন্ট ও সব তথ্য মুছে দেবে। DELETE টাইপ করে নিশ্চিত করুন:',
+            da_confirm:'নিশ্চিত',da_cancel:'বাতিল',
+            // Contact Developer
+            cd_title:'ডেভেলপারের সাথে যোগাযোগ',cd_role:'মেস ম্যানেজারের ডেভেলপার',
+            cd_whatsapp:'হোয়াটসঅ্যাপ',cd_email:'ইমেইল',cd_github:'গিটহাব',cd_facebook:'ফেসবুক',
+            // Generic
+            gen_loading:'লোড হচ্ছে...',gen_cancel:'বাতিল',gen_save:'সংরক্ষণ',gen_delete:'মুছুন',
+        };
+        return map[key] || this._translations[key] || key;
+    },
+
     async init() {
         const splash = document.getElementById('splash-screen');
         this.applyTheme();
+        this.applyLanguage();
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
@@ -285,7 +607,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-bazarnote', page === 'bazarnote');
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
-        const titles = { dashboard: 'Dashboard', members: 'Mess Management', meals: 'Meal Entry', bazaar: 'Expense List', balance: 'Money Management', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile & Settings', duty: 'Expense Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Records', costtrash: 'Deleted Expenses', deptrash: 'Deleted Transactions' };
+        const titles = { dashboard: this.t('nav_dashboard'), members: this.t('mm_title'), meals: this.t('me_title'), bazaar: this.t('el_title'), balance: this.t('mm2_title'), notices: this.t('nb_title'), monthly: this.t('an_title'), profile: this.t('prof_title'), duty: this.t('dt_title'), bazarnote: this.t('bn_title'), menu: this.t('mt_title'), mealhistory: this.t('mr_title'), costtrash: this.t('de_title'), deptrash: this.t('dt2_title') };
         const hideTopbar = [];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         document.querySelector('.topbar').style.display = '';
@@ -324,6 +646,7 @@ const App = {
         if (page === 'mealhistory') this.loadMealHistory();
         if (page === 'costtrash') this.loadCostTrash();
         if (page === 'deptrash') this.loadDepTrash();
+        this.applyLanguage();
     },
 
     async loadNotices() {
@@ -2449,6 +2772,7 @@ const App = {
             if (labels[0]) labels[0].classList.toggle('active', newLang === 'bn');
             if (labels[1]) labels[1].classList.toggle('active', newLang === 'en');
         }
+        this.applyLanguage();
         this.toast(newLang === 'en' ? 'Language: English' : 'Language: বাংলা', 'info');
     },
     contactDeveloper() {
