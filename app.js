@@ -2381,10 +2381,16 @@ const App = {
         const saved = localStorage.getItem('mess_theme') || 'light';
         const dt = document.getElementById('prof-device-theme');
         const ot = document.getElementById('prof-oled-theme');
-        const lang = document.getElementById('prof-lang');
+        const toggle = document.getElementById('prof-lang-toggle');
         if (dt) dt.checked = saved === 'system';
         if (ot) ot.checked = saved === 'oled';
-        if (lang) lang.textContent = (localStorage.getItem('mess_lang') || 'en') === 'en' ? 'EN' : 'BD';
+        if (toggle) {
+            const lang = localStorage.getItem('mess_lang') || 'en';
+            toggle.dataset.lang = lang;
+            const labels = toggle.querySelectorAll('.lt-label');
+            if (labels[0]) labels[0].classList.toggle('active', lang === 'bn');
+            if (labels[1]) labels[1].classList.toggle('active', lang === 'en');
+        }
     },
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
@@ -2436,7 +2442,13 @@ const App = {
         const lang = localStorage.getItem('mess_lang') || 'en';
         const newLang = lang === 'en' ? 'bn' : 'en';
         localStorage.setItem('mess_lang', newLang);
-        document.getElementById('prof-lang').textContent = newLang === 'en' ? 'EN' : 'BD';
+        const toggle = document.getElementById('prof-lang-toggle');
+        if (toggle) {
+            toggle.dataset.lang = newLang;
+            const labels = toggle.querySelectorAll('.lt-label');
+            if (labels[0]) labels[0].classList.toggle('active', newLang === 'bn');
+            if (labels[1]) labels[1].classList.toggle('active', newLang === 'en');
+        }
         this.toast(newLang === 'en' ? 'Language: English' : 'Language: বাংলা', 'info');
     },
     contactDeveloper() {
