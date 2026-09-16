@@ -1963,7 +1963,7 @@ const App = {
         this._bzUtilSelected = names.slice();
         document.getElementById('addcost-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 8px">
-                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Expense</button>
+                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
@@ -2036,7 +2036,7 @@ const App = {
         document.getElementById('modal-title').textContent = 'Add Expense';
         document.getElementById('modal-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 12px">
-                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Expense</button>
+                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
