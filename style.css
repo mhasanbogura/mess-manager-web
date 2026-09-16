@@ -39,19 +39,8 @@
     --text: #e8ebf1; --text-secondary: #9aa4b5; --border: #2a2a2a;
     --shadow: 0 1px 3px rgba(0,0,0,.4); --shadow-md: 0 2px 8px rgba(0,0,0,.4); --shadow-lg: 0 8px 30px rgba(0,0,0,.5);
 }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-        --bg: #111111; --card: #1a1a1a; --card-solid: #1a1a1a; --card-border: #2a2a2a;
-        --text: #e8ebf1; --text-secondary: #9aa4b5; --border: #2a2a2a;
-        --shadow: 0 1px 3px rgba(0,0,0,.4); --shadow-md: 0 2px 8px rgba(0,0,0,.4); --shadow-lg: 0 8px 30px rgba(0,0,0,.5);
-    }
-}
 [data-theme="dark"] body, [data-theme="oled"] body { background: var(--bg); color: var(--text); }
 [data-theme="dark"] .main-content, [data-theme="oled"] .main-content { background: var(--bg); }
-@media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) body { background: #111111; color: #e8ebf1; }
-    :root:not([data-theme="light"]) .main-content { background: #111111; }
-}
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { -webkit-text-size-adjust: 100%; }
