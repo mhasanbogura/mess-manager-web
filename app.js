@@ -697,8 +697,8 @@ const App = {
             if (!mids.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples to set permissions for</p>'; return; }
             const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = pSnap.val() || {};
-            const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'togglePerms'];
-            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Expense Entry', 'Turn on/off Permissions'];
+            const permKeys = ['bazarEntry', 'mealEntry', 'mealEdit', 'togglePerms', 'manage'];
+            const permLabels = ['Add Expense', 'Add Meal', 'Edit Meal', 'Manage Permissions', 'Manage People & Members'];
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
             const iAmAdmin = this.userRole === 'admin';
             const iCanToggle = iAmAdmin || this.canDo('togglePerms');
@@ -1052,7 +1052,7 @@ const App = {
             const updates = {};
             updates[`messes/${this.messId}/members/${uid}/status`] = 'active';
             updates[`users/${uid}/messes/${this.messId}`] = { role: 'member', joinedAt: m.joinedAt || Date.now() };
-            updates[`messes/${this.messId}/permissions/${uid}`] = { manage: false, mealEntry: false, mealEdit: false, bazarEntry: false, togglePerms: false };
+                updates[`messes/${this.messId}/permissions/${uid}`] = { bazarEntry: false, mealEntry: false, mealEdit: false, togglePerms: false, manage: false };
             await db.ref().update(updates);
             this.toast(`${m.name || 'Member'} approved!`, 'success');
             this.loadDashboard();
@@ -1387,7 +1387,6 @@ const App = {
         popup.className = 'meal-cell-popup';
         popup.innerHTML = `
             <button onclick="App.mealDeleteCell('${memberName.replace(/'/g,"\\'")}','${dateKey}','${mealType}',${currentVal})"><span class="material-icons-round">delete</span> Delete</button>
-            <button onclick="App.mealEditCell('${memberName.replace(/'/g,"\\'")}','${dateKey}','${mealType}')"><span class="material-icons-round">edit</span> Edit</button>
         `;
         document.body.appendChild(popup);
         const rect = e.target.getBoundingClientRect();
