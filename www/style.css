@@ -1666,7 +1666,7 @@ select.input-sm { cursor: pointer; }
     cursor: pointer; font-family: inherit; transition: all 0.15s;
 }
 .bz-tab .material-icons-round { font-size: 16px; color: inherit !important; }
-.bz-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.bz-tab.active { background: linear-gradient(135deg, #555, #333); border-color: #555; color: #fff; }
 .bz-body {
     flex: 1; overflow-y: auto; padding: 0 16px 12px;
 }
@@ -1690,7 +1690,8 @@ select.input-sm { cursor: pointer; }
     font-family: 'Georgia', serif; color: #333; cursor: pointer;
     transition: all 0.15s;
 }
-.bz-chip.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 600; }
+.bz-chip.active { background: linear-gradient(135deg, #555, #333); border-color: #555; color: #fff; font-weight: 600; }
+.bz-chip .material-icons-round { font-size: 16px; color: inherit; }
 .bz-item-row {
     display: flex; gap: 10px; margin-top: 8px;
 }
@@ -1874,7 +1875,7 @@ select.input-sm { cursor: pointer; }
     background: #fff; font-size: 13px; color: #555; cursor: pointer; font-family: inherit;
     transition: all .15s;
 }
-.dep-chip.active { border-color: var(--primary); background: #e8f0fe; color: #333; font-weight: 600; }
+.dep-chip.active { border-color: var(--primary); background: linear-gradient(135deg, #555, #333); color: #fff; font-weight: 600; }
 .dep-input-wrap { display: flex; align-items: center; gap: 6px; margin-top: 8px; border-bottom: 2px solid #e0ddd5; padding: 4px 0; }
 .dep-taka { font-size: 18px; font-weight: 700; color: #333; }
 .dep-input { flex: 1; border: none; outline: none; font-size: 15px; font-family: inherit; color: #333; background: transparent; }
@@ -1920,12 +1921,12 @@ select.input-sm { cursor: pointer; }
     font-size: 14px; flex-shrink: 0; overflow: hidden;
 }
 .aam-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.aam-card-top .aam-name { flex: 1; font-size: 14px; font-weight: 600; color: #1a1a1a; }
-.aam-card-top .aam-req { font-size: 10px; color: #d32f2f; border: 1px solid #d32f2f; border-radius: 8px; padding: 1px 6px; }
-.aam-card-top .aam-total { font-size: 12px; color: #555; font-weight: 500; }
-.aam-meals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
+.aam-card-top .aam-name { flex: 1; font-size: 13px; font-weight: 600; color: #1a1a1a; }
+.aam-card-top .aam-req { font-size: 9px; color: #d32f2f; border: 1px solid #d32f2f; border-radius: 8px; padding: 1px 6px; }
+.aam-card-top .aam-total { font-size: 11px; color: #555; font-weight: 500; }
+.aam-meals-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; }
 .aam-meal-col { text-align: center; }
-.aam-meal-col label { display: block; font-size: 10px; color: #888; margin-bottom: 2px; }
+.aam-meal-col label { display: block; font-size: 9px; color: #888; margin-bottom: 1px; }
 .aam-counter { display: flex; align-items: center; gap: 0; justify-content: center; }
 .aam-counter button {
     width: 26px; height: 26px; border-radius: 50%; border: 1px solid #ddd;
@@ -1939,6 +1940,18 @@ select.input-sm { cursor: pointer; }
 }
 .aam-footer {
     padding: 6px 14px;
+    position: fixed;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: var(--bg);
+}
+.aam-footer .aam-save-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
 }
 #app-screen.on-addmeal .topbar { display: none; }
 #app-screen.on-addmeal .main-content { margin-top: 0; padding: 0 0 72px; }
@@ -2863,7 +2876,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-filter-btn.active .material-icons-round { color: #111 !important; }
 /* Deposit */
 [data-theme="oled"] .dep-chip { background: #222; border-color: #333; color: #ccc; }
-[data-theme="oled"] .dep-chip.active { background: #1a3a6b; border-color: #3b7bdd; color: #fff; }
+[data-theme="oled"] .dep-chip.active { background: linear-gradient(135deg, #444, #333); border-color: #555; color: #fff; }
 [data-theme="oled"] .dep-taka { color: #e8ebf1; }
 [data-theme="oled"] .dep-date { color: #ccc; border-color: #2a2a2a; }
 /* Profile */
@@ -2951,10 +2964,10 @@ img, canvas { max-width: 100%; }
 /* Cost page */
 [data-theme="oled"] .bz-tab { background: #222; border-color: #333; }
 [data-theme="oled"] .bz-tab .material-icons-round { color: inherit; }
-[data-theme="oled"] .bz-tab.active { background: #3b7bdd; color: #fff; }
-[data-theme="oled"] .bz-tab.active .material-icons-round { color: #fff; }
+[data-theme="oled"] .bz-tab.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #111; }
+[data-theme="oled"] .bz-tab.active .material-icons-round { color: #111; }
 [data-theme="oled"] .bz-chip { background: #222; border-color: #333; color: #ccc; }
-[data-theme="oled"] .bz-chip.active { background: #1a3a6b; color: #fff; }
+[data-theme="oled"] .bz-chip.active { background: linear-gradient(135deg, #444, #333); color: #fff; }
 [data-theme="oled"] .abazar-filter-btn { background: #222; border-color: #333; color: #ccc; }
 [data-theme="oled"] .abazar-filter-btn.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #111; }
 [data-theme="oled"] .abazar-filter-btn.active .material-icons-round { color: #111 !important; }
@@ -2964,7 +2977,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .ameal-table tbody td { color: #e8ebf1; }
 /* Deposit */
 [data-theme="oled"] .dep-chip { background: #222; border-color: #333; }
-[data-theme="oled"] .dep-chip.active { background: #1a3a6b; border-color: #3b7bdd; color: #fff; }
+[data-theme="oled"] .dep-chip.active { background: linear-gradient(135deg, #444, #333); border-color: #555; color: #fff; }
 [data-theme="oled"] .aam-tab { background: #222; border-color: #333; color: #ccc; }
 [data-theme="oled"] .aam-tab.active { background: #3b7bdd; color: #fff; }
 [data-theme="oled"] .aam-select { background: #222; border-color: #333; color: #e8ebf1; }
@@ -3010,7 +3023,8 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .modal-header .close-btn { color: #999; }
 /* Cost/Bazar modal */
 [data-theme="oled"] .bz-tab { background: #222; border-color: #333; color: #999; }
-[data-theme="oled"] .bz-tab.active { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .bz-tab.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #111; }
+[data-theme="oled"] .bz-tab.active .material-icons-round { color: #111; }
 [data-theme="oled"] .bz-input-wrap { background: #222; border-color: #333; }
 [data-theme="oled"] .bz-input-wrap .material-icons-round { color: #999; }
 [data-theme="oled"] .bz-input { color: #e8ebf1; }
