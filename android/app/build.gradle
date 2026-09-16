@@ -34,12 +34,23 @@ task release {
         def tagName = "v${v}"
         def rootDir = project.projectDir.parentFile
         def ghBin = new File(System.getProperty("user.home"), ".local/bin/gh").absolutePath
+        def apkStore = "/home/mhasanbogura/Google Drive/mahmudulhasandhk70/Apk Store/Android"
 
         println "Releasing ${tagName} (build ${b})..."
 
         exec {
             workingDir rootDir
             commandLine 'cp', apkPath.absolutePath, "${rootDir}/${apkName}"
+        }
+
+        exec {
+            workingDir rootDir
+            commandLine 'rm', '-f', "${apkStore}/mess-manager.apk"
+            ignoreExitValue = true
+        }
+        exec {
+            workingDir rootDir
+            commandLine 'cp', apkPath.absolutePath, "${apkStore}/mess-manager.apk"
         }
 
         exec {
@@ -81,8 +92,8 @@ android {
         applicationId "com.mahmuduls.messmanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 52
-        versionName "1.3.11"
+        versionCode 55
+        versionName "1.3.12"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
