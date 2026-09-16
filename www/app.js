@@ -793,6 +793,15 @@ const App = {
     fmtMonth(d) { return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }); },
     fmtNum(n) { const r = Math.round((n || 0) * 10) / 10; return Number.isInteger(r) ? String(r) : r.toFixed(1); },
 
+    _selYear: null,
+    _selMonth: null,
+    getSelMonth() {
+        const now = new Date();
+        const y = this._selYear || now.getFullYear();
+        const m = this._selMonth != null ? this._selMonth : now.getMonth();
+        return { year: y, month: m, key: `${y}-${String(m + 1).padStart(2, '0')}`, date: new Date(y, m, 1) };
+    },
+
     async shareMessCode() {
         if (!this.messCode) { this.toast('No mess code', 'error'); return; }
         const text = `Join my mess "${this.messName || ''}" with code: ${this.messCode}`;
@@ -804,9 +813,10 @@ const App = {
         if (!this.messId) return;
         try {
             const now = new Date();
-            const month = this.mk(now);
+            const sm = this.getSelMonth();
+            const month = sm.key;
             const todayKey = this.dk(now);
-            const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            const daysInMonth = new Date(sm.year, sm.month + 1, 0).getDate();
             const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
 
             const userName = this.currentUser?.displayName || 'User';
@@ -857,7 +867,7 @@ const App = {
             if (adminFound) managerName = adminFound[1].name || '-';
             else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
             document.getElementById('dash-manager').textContent = managerName;
-            document.getElementById('dash-month').textContent = this.fmtMonth(now);
+            document.getElementById('dash-month').textContent = this.fmtMonth(this.getSelMonth().date);
 
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -1066,16 +1076,17 @@ const App = {
     changeMonth() {
         const input = document.createElement('input');
         input.type = 'month';
-        const year = this._mealYear || new Date().getFullYear();
-        const mon = this._mealMonth != null ? this._mealMonth : new Date().getMonth();
-        input.value = `${year}-${String(mon+1).padStart(2,'0')}`;
+        const sm = this.getSelMonth();
+        input.value = sm.key;
         input.addEventListener('change', () => {
             const v = input.value;
             if (v) {
                 const [y, m] = v.split('-').map(Number);
-                this._mealYear = y;
-                this._mealMonth = m - 1;
-                this.navigate('meals');
+                this._selYear = y;
+                this._selMonth = m - 1;
+                const page = this.currentPage;
+                if (page === 'dashboard') this.loadDashboard();
+                else this.navigate(page);
             }
         });
         input.click();
@@ -1092,15 +1103,14 @@ const App = {
     mealPickMonth() {
         const input = document.createElement('input');
         input.type = 'month';
-        const year = this._mealYear || new Date().getFullYear();
-        const mon = this._mealMonth != null ? this._mealMonth : new Date().getMonth();
-        input.value = `${year}-${String(mon+1).padStart(2,'0')}`;
+        const sm = this.getSelMonth();
+        input.value = sm.key;
         input.addEventListener('change', () => {
             const v = input.value;
             if (v) {
                 const [y, m] = v.split('-').map(Number);
-                this._mealYear = y;
-                this._mealMonth = m - 1;
+                this._selYear = y;
+                this._selMonth = m - 1;
                 this.loadMeals();
             }
         });
@@ -1109,12 +1119,10 @@ const App = {
 
     async loadMeals() {
         if (!this.messId) return;
-        const now = new Date();
-        const year = this._mealYear || now.getFullYear();
-        const mon = this._mealMonth != null ? this._mealMonth : now.getMonth();
-        const month = `${year}-${String(mon + 1).padStart(2, '0')}`;
-        const daysInMonth = new Date(year, mon + 1, 0).getDate();
-        const monthLabel = `${new Date(year, mon).toLocaleString('en-US',{month:'long'})} ${year}`;
+        const sm = this.getSelMonth();
+        const month = sm.key;
+        const daysInMonth = new Date(sm.year, sm.month + 1, 0).getDate();
+        const monthLabel = `${sm.date.toLocaleString('en-US',{month:'long'})} ${sm.year}`;
         document.getElementById('ameal-month').textContent = monthLabel;
         const loader = document.getElementById('ameal-loader');
         const scroll = document.getElementById('ameal-grid-scroll');
@@ -1460,9 +1468,9 @@ const App = {
 
     async loadMealHistory() {
         if (!this.messId) return;
-        const now = new Date();
-        const month = this.mk(now);
-        document.getElementById('mealhist-month').textContent = this.fmtMonth(now);
+        const sm = this.getSelMonth();
+        const month = sm.key;
+        document.getElementById('mealhist-month').textContent = this.fmtMonth(sm.date);
         const div = document.getElementById('mealhist-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
@@ -1509,10 +1517,10 @@ const App = {
 
     async loadCostTrash() {
         if (!this.messId) return;
-        const now = new Date();
-        const month = this.mk(now);
+        const sm = this.getSelMonth();
+        const month = sm.key;
         const el = document.getElementById('costtrash-month');
-        if (el) el.textContent = this.fmtMonth(now);
+        if (el) el.textContent = this.fmtMonth(sm.date);
         const div = document.getElementById('costtrash-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
@@ -1559,10 +1567,10 @@ const App = {
 
     async loadDepTrash() {
         if (!this.messId) return;
-        const now = new Date();
-        const month = this.mk(now);
+        const sm = this.getSelMonth();
+        const month = sm.key;
         const el = document.getElementById('deptrash-month');
-        if (el) el.textContent = this.fmtMonth(now);
+        if (el) el.textContent = this.fmtMonth(sm.date);
         const div = document.getElementById('deptrash-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
@@ -1611,9 +1619,9 @@ const App = {
 
     async loadBazarList() {
         if (!this.messId) return;
-        const now = new Date();
-        const month = this.mk(now);
-        document.getElementById('abazar-month').textContent = this.fmtMonth(now);
+        const sm = this.getSelMonth();
+        const month = sm.key;
+        document.getElementById('abazar-month').textContent = this.fmtMonth(sm.date);
         this._bazarFilter = 'bazar';
         const filterBtns = document.querySelectorAll('#abazar-filters .abazar-filter-btn');
         filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'bazar'));
@@ -1796,9 +1804,9 @@ const App = {
 
     async loadManagerMoney() {
         if (!this.messId) return;
-        const now = new Date();
-        const month = this.mk(now);
-        document.getElementById('abalance-month').textContent = this.fmtMonth(now);
+        const sm = this.getSelMonth();
+        const month = sm.key;
+        document.getElementById('abalance-month').textContent = this.fmtMonth(sm.date);
         this._depFilter = 'meal';
         const filterBtns = document.querySelectorAll('#abalance-filters .abazar-filter-btn');
         filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'meal'));
@@ -2644,10 +2652,10 @@ const App = {
     // ==================== ANALYSIS PAGE ====================
     async loadMonthly() {
         if (!this.messId) return;
-        const now = new Date();
-        const year = this._analysisYear || now.getFullYear();
-        const mon = this._analysisMonth != null ? this._analysisMonth : now.getMonth();
-        const month = `${year}-${String(mon + 1).padStart(2, '0')}`;
+        const sm = this.getSelMonth();
+        const year = sm.year;
+        const mon = sm.month;
+        const month = sm.key;
         const daysInMonth = new Date(year, mon + 1, 0).getDate();
         const monthEnd = month + '-' + String(daysInMonth).padStart(2, '0');
         const monthLabel = `${new Date(year, mon).toLocaleString('en-US', { month: 'long' })} ${year}`;
@@ -2869,8 +2877,8 @@ const App = {
 
     changeAnalysisMonth(val) {
         const [y, m] = val.split('-').map(Number);
-        this._analysisYear = y;
-        this._analysisMonth = m - 1;
+        this._selYear = y;
+        this._selMonth = m - 1;
         this.loadMonthly();
     },
 
