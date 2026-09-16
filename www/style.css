@@ -1577,10 +1577,10 @@ select.input-sm { cursor: pointer; }
 .adash-fin-label strong { font-size: 13px; }
 .adash-analyse {
     background: linear-gradient(135deg, #e0e0e0, #ccc); border: none; border-radius: 12px;
-    padding: 6px 10px; font-family: inherit; font-size: 14px; color: #111;
+    padding: 8px 6px; font-family: inherit; font-size: 14px; color: #111;
     display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,.1); white-space: nowrap;
-    grid-column: 1 / -1; justify-self: center; margin-top: 2px;
+    border: 1px solid var(--card-border); min-height: 56px;
 }
 .adash-analyse .material-icons-round { font-size: 18px; }
 
@@ -1839,6 +1839,7 @@ select.input-sm { cursor: pointer; }
 .ameal-table .ameal-row-count.dinner { color: #333; }
 .ameal-table .ameal-row-count.zero { color: #aaa; }
 .ameal-table th[data-today] { background: linear-gradient(135deg, #555, #333) !important; color: #fff !important; }
+.ameal-table td.ame-day-today { background: linear-gradient(135deg, #555, #333) !important; color: #fff !important; }
 
 .meal-cell-popup {
     position: fixed; z-index: 9999;
@@ -2912,7 +2913,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .adash-table-wrap { border-color: #2a2a2a; }
 [data-theme="oled"] .adash-edit { background: #1a1a1a; }
 [data-theme="oled"] .ameal-table tbody td { background: #1a1a1a; }
-[data-theme="oled"] .ame-day-today { background: linear-gradient(135deg, #e0e0e0, #ccc) !important; }
+[data-theme="oled"] .ame-day-today { background: linear-gradient(135deg, #e0e0e0, #ccc) !important; color: #111 !important; }
 [data-theme="oled"] .ameal-table tbody td.am-col-type { background: linear-gradient(135deg, #555, #333) !important; }
 [data-theme="oled"] .ameal-table tbody td.am-col-name { background: linear-gradient(135deg, #555, #333) !important; }
 /* Mess page */
