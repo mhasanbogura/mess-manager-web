@@ -2826,36 +2826,27 @@ const App = {
         this.applyLanguage();
         this.toast(newLang === 'en' ? 'Language: English' : 'Language: বাংলা', 'info');
     },
+    shareApp() {
+        const ver = '1.3.4', build = '31';
+        const apkName = `Mess Manager_com.mahmuduls.messmanager_v${ver}_build_${build}.apk`;
+        const shareData = {
+            title: 'Mess Manager',
+            text: `Mess Manager v${ver} (build ${build})\n${apkName}\n\nDownload: https://mhasanbogura.github.io/mess-manager-web/`,
+        };
+        if (navigator.share) {
+            navigator.share(shareData).catch(() => {
+                navigator.clipboard?.writeText(shareData.text).then(() => this.toast('Copied!', 'success'));
+            });
+        } else {
+            navigator.clipboard?.writeText(shareData.text).then(() => this.toast('Copied!', 'success'));
+        }
+    },
+    aboutApp() {
+        window.open('https://drive.google.com/file/d/1s45exjbMZhDk-Yt7oHSYjO6P_FiPs3YY/view?usp=drive_link', '_blank');
+    },
     contactDeveloper() {
-        const body = document.getElementById('modal-body');
-        body.innerHTML = `
-            <div style="text-align:center;margin-bottom:16px">
-                <div style="font-weight:700;font-size:22px;margin-bottom:8px">Mahmudul Hasan</div>
-                <div style="font-size:14px;color:#777;margin-bottom:16px">Developer of Mess Manager</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:10px">
-                <a href="https://wa.me/8801710632114" target="_blank" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
-                    <span class="material-icons-round" style="color:#25D366">chat</span>
-                    <span class="aprof-label">WhatsApp</span>
-                    <span class="material-icons-round">chevron_right</span>
-                </a>
-                <a href="mailto:mahmudulhasandhk70@gmail.com" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
-                    <span class="material-icons-round" style="color:#d32f2f">mail</span>
-                    <span class="aprof-label">Email</span>
-                    <span class="material-icons-round">chevron_right</span>
-                </a>
-                <a href="https://github.com/mhasanbogura" target="_blank" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
-                    <span class="material-icons-round">code</span>
-                    <span class="aprof-label">GitHub</span>
-                    <span class="material-icons-round">chevron_right</span>
-                </a>
-                <a href="https://facebook.com/mahmudulhasandhk70" target="_blank" class="aprof-row" style="text-decoration:none;color:inherit;border-top:1px solid #eef1f6;border-radius:0">
-                    <span class="material-icons-round" style="color:#1877F2">facebook</span>
-                    <span class="aprof-label">Facebook</span>
-                    <span class="material-icons-round">chevron_right</span>
-                </a>
-            </div>`;
-        document.getElementById('modal-title').textContent = 'Contact Developer';
+        window.open('https://drive.google.com/file/d/1VNmXxG33NWMphp1mz2xQGWcm9NdCc3oH/view?usp=drive_link', '_blank');
+    },
         document.getElementById('modal-overlay').classList.add('active');
     },
 
