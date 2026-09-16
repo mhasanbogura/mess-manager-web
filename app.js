@@ -2825,13 +2825,13 @@ const App = {
                         <div class="am-card">
                             <h3>Cost per meal trend</h3>
                             <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
-                            <div class="am-chart-scroll"><canvas id="am-rate-chart" width="600" height="200"></canvas></div>
+                            <canvas id="am-rate-chart" width="350" height="180"></canvas>
                         </div>
                         ${mealShare.length ? `<div class="am-card">
                             <h3>Meal share by member</h3>
                             <p class="am-sub">Who ate how much of the ${totalMeals} meals</p>
                             <div class="am-donut-wrap">
-                                <canvas id="am-donut" width="200" height="200"></canvas>
+                                <canvas id="am-donut" width="160" height="160"></canvas>
                                 <div class="am-donut-legend">${mealShare.map((m, i) => {
                                 const colors = ['#1565C0','#0d4fb5','#FFB300','#2E7D32'];
                                 return `<div class="am-donut-item"><span class="am-donut-swatch" style="background:${colors[i % colors.length]}"></span><span class="am-donut-name">${this.esc(m.name)}</span><span class="am-donut-val">${m.meals}</span></div>`;
@@ -2841,12 +2841,12 @@ const App = {
                         <div class="am-card">
                             <h3>Bazar by day</h3>
                             <p class="am-sub">৳ ${this.fmtNum(totalMealBazar)} spent across the month</p>
-                            <div class="am-chart-scroll"><canvas id="am-bz-chart" width="600" height="200"></canvas></div>
+                            <canvas id="am-bz-chart" width="350" height="180"></canvas>
                         </div>
                         <div class="am-card">
                             <h3>Meals by day</h3>
                             <p class="am-sub">${totalMeals} meals across the month</p>
-                            <div class="am-chart-scroll"><canvas id="am-ml-chart" width="600" height="200"></canvas></div>
+                            <canvas id="am-ml-chart" width="350" height="180"></canvas>
                         </div>
                         ${topMealItems.length ? `<div class="am-card">
                             <h3>Top 10 bazar items by cost</h3>
@@ -2863,6 +2863,11 @@ const App = {
                             <div class="am-stat-card"><small>Total utility</small><strong>৳ ${this.fmtNum(totalUtility + totalRent)}</strong></div>
                             <div class="am-stat-card"><small>Rent</small><strong>৳ ${this.fmtNum(totalRent)}</strong></div>
                             <div class="am-stat-card"><small>Other utility</small><strong>৳ ${this.fmtNum(totalUtility)}</strong></div>
+                        </div>
+                        <div class="am-card">
+                            <h3>Balance</h3>
+                            <div class="am-calc-row"><span>৳ ${this.fmtNum(totalUtilDep)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(totalUtility + totalRent)}</span><span class="am-op">=</span><span class="${totalUtilDep - totalUtility - totalRent >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(totalUtilDep - totalUtility - totalRent)}</span></div>
+                            <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
                         </div>
                         ${(() => {
                             const utilCostPerMember = mids.length > 0 ? (totalUtility + totalRent) / mids.length : 0;
@@ -2885,17 +2890,12 @@ const App = {
                         <div class="am-card">
                             <h3>Cost per utility trend</h3>
                             <p class="am-sub">${utilRateDiff >= 0 ? '▲' : '▼'} ${Math.abs(utilRateDiff)}% vs last month · ${utilRateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
-                            <div class="am-chart-scroll"><canvas id="am-util-rate-chart" width="600" height="200"></canvas></div>
-                        </div>
-                        <div class="am-card">
-                            <h3>Balance</h3>
-                            <div class="am-calc-row"><span>৳ ${this.fmtNum(totalUtilDep)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(totalUtility + totalRent)}</span><span class="am-op">=</span><span class="${totalUtilDep - totalUtility - totalRent >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(totalUtilDep - totalUtility - totalRent)}</span></div>
-                            <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
+                            <canvas id="am-util-rate-chart" width="350" height="180"></canvas>
                         </div>
                         <div class="am-card">
                             <h3>Utility cost by day</h3>
                             <p class="am-sub">৳ ${this.fmtNum(totalUtilBazar)} utility cost across the month</p>
-                            <div class="am-chart-scroll"><canvas id="am-util-bz-chart" width="600" height="200"></canvas></div>
+                            <canvas id="am-util-bz-chart" width="350" height="180"></canvas>
                         </div>
                         ${topUtilItems.length ? `<div class="am-card">
                             <h3>Top 10 utility items by cost</h3>
@@ -2912,7 +2912,7 @@ const App = {
 
             setTimeout(() => {
                 this.drawRateChart(mealBzByDay, mealsByDay, daysInMonth);
-                this.drawBzChart(mealBzByDay, daysInMonth);
+                this.drawBarChart('am-bz-chart', mealBzByDay, daysInMonth, '#FFB300');
                 this.drawMlChart(mealsByDay, daysInMonth);
                 if (mealShare.length) this.drawDonut(mealShare);
                 if (Object.keys(utilBzByDay).length) this.drawUtilBzChart(utilBzByDay, daysInMonth);
@@ -2951,12 +2951,35 @@ const App = {
         document.getElementById(`am-tab-${tab}`)?.classList.add('active');
     },
 
+    _setupHiDPI(canvas) {
+        const dpr = window.devicePixelRatio || 1;
+        const w = canvas.width, h = canvas.height;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        const ctx = canvas.getContext('2d');
+        ctx.scale(dpr, dpr);
+        return { ctx, w, h };
+    },
+
+    _drawRoundBar(ctx, x, y, w, h, r) {
+        r = Math.min(r, w / 2, h / 2);
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x, y + h);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+    },
+
     drawRateChart(bzByDay, mealsByDay, days) {
         const c = document.getElementById('am-rate-chart');
         if (!c) return;
-        const ctx = c.getContext('2d');
-        const w = c.width, h = c.height;
-        const pad = { t: 20, r: 10, b: 30, l: 40 };
+        const { ctx, w, h } = this._setupHiDPI(c);
+        const pad = { t: 20, r: 15, b: 30, l: 40 };
         ctx.clearRect(0, 0, w, h);
         const data = [];
         for (let d = 1; d <= days; d++) {
@@ -2966,126 +2989,114 @@ const App = {
         }
         const maxV = Math.max(...data, 1);
         const xStep = (w - pad.l - pad.r) / (days - 1 || 1);
+        const chartH = h - pad.t - pad.b;
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+        ctx.lineWidth = 1;
+        const gridLines = 5;
+        for (let i = 0; i <= gridLines; i++) {
+            const y = pad.t + (chartH / gridLines) * i;
+            ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+        }
+
+        ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'right';
+        for (let i = 0; i <= gridLines; i++) {
+            const v = maxV - (maxV / gridLines) * i;
+            const y = pad.t + (chartH / gridLines) * i;
+            ctx.fillText(v % 1 === 0 ? v : v.toFixed(1), pad.l - 6, y + 3);
+        }
+        ctx.textAlign = 'left';
+
+        const pts = data.map((v, i) => ({
+            x: pad.l + i * xStep,
+            y: h - pad.b - (v / maxV) * chartH
+        }));
 
         ctx.beginPath();
-        data.forEach((v, i) => {
-            const x = pad.l + i * xStep;
-            const y = h - pad.b - (v / maxV) * (h - pad.t - pad.b);
-            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        });
-        ctx.strokeStyle = '#0b3d91';
-        ctx.lineWidth = 2;
+        pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.strokeStyle = '#1565C0';
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
         ctx.stroke();
 
-        const baseY = h - pad.b;
-        ctx.lineTo(pad.l + (data.length - 1) * xStep, baseY);
-        ctx.lineTo(pad.l, baseY);
+        ctx.lineTo(pts[pts.length - 1].x, h - pad.b);
+        ctx.lineTo(pad.l, h - pad.b);
         ctx.closePath();
-        ctx.fillStyle = 'rgba(11,61,145,0.1)';
+        ctx.fillStyle = 'rgba(21,101,192,0.08)';
         ctx.fill();
 
-        data.forEach((v, i) => {
-            const x = pad.l + i * xStep;
-            const y = h - pad.b - (v / maxV) * (h - pad.t - pad.b);
-            ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#0b3d91'; ctx.fill();
+        pts.forEach(p => {
+            ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#1565C0'; ctx.fill();
+            ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff'; ctx.fill();
         });
-        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
+
+        ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
         for (let d = 1; d <= days; d += Math.ceil(days / 6)) {
-            ctx.fillText(d, pad.l + (d - 1) * xStep - 5, h - 5);
+            const x = pad.l + (d - 1) * xStep;
+            ctx.fillText(d, x, h - 8);
         }
+        ctx.textAlign = 'left';
     },
 
-    drawBzChart(bzByDay, days) {
-        const c = document.getElementById('am-bz-chart');
+    drawBarChart(canvasId, data, days, color) {
+        const c = document.getElementById(canvasId);
         if (!c) return;
-        const ctx = c.getContext('2d');
-        const w = c.width, h = c.height;
-        const pad = { t: 20, r: 10, b: 30, l: 40 };
-        ctx.clearRect(0, 0, w, h);
-        const data = [];
-        for (let d = 1; d <= days; d++) data.push(bzByDay[d] || 0);
-        const maxV = Math.max(...data, 1);
-        const barW = (w - pad.l - pad.r) / days * 0.7;
-        const gap = (w - pad.l - pad.r) / days;
-        data.forEach((v, i) => {
-            const x = pad.l + i * gap + (gap - barW) / 2;
-            const bh = (v / maxV) * (h - pad.t - pad.b);
-            ctx.fillStyle = '#FFB300';
-            ctx.fillRect(x, h - pad.b - bh, barW, bh);
-            if (v > 0) {
-                ctx.fillStyle = '#333'; ctx.font = '9px sans-serif';
-                ctx.fillText('৳' + this.fmtNum(v), x, h - pad.b - bh - 4);
-            }
-        });
-        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
-        for (let d = 1; d <= days; d += Math.ceil(days / 10)) {
-            ctx.fillText(d, pad.l + (d - 1) * gap + gap / 2 - 5, h - 5);
-        }
-    },
-
-    drawUtilBzChart(data, days) {
-        const c = document.getElementById('am-util-bz-chart');
-        if (!c) return;
-        const ctx = c.getContext('2d');
-        const w = c.width, h = c.height;
-        const pad = { t: 20, r: 10, b: 30, l: 40 };
+        const { ctx, w, h } = this._setupHiDPI(c);
+        const pad = { t: 25, r: 15, b: 30, l: 40 };
         ctx.clearRect(0, 0, w, h);
         const vals = [];
         for (let d = 1; d <= days; d++) vals.push(data[d] || 0);
         const maxV = Math.max(...vals, 1);
-        const barW = (w - pad.l - pad.r) / days * 0.7;
-        const gap = (w - pad.l - pad.r) / days;
+        const chartH = h - pad.t - pad.b;
+        const chartW = w - pad.l - pad.r;
+        const gap = chartW / days;
+        const barW = gap * 0.65;
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const y = pad.t + (chartH / 4) * i;
+            ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+        }
+
         vals.forEach((v, i) => {
             const x = pad.l + i * gap + (gap - barW) / 2;
-            const bh = (v / maxV) * (h - pad.t - pad.b);
-            ctx.fillStyle = '#F57C00';
-            ctx.fillRect(x, h - pad.b - bh, barW, bh);
+            const bh = (v / maxV) * chartH;
+            if (bh > 0) {
+                ctx.fillStyle = color;
+                this._drawRoundBar(ctx, x, h - pad.b - bh, barW, bh, 4);
+            }
             if (v > 0) {
-                ctx.fillStyle = '#333'; ctx.font = '9px sans-serif';
-                ctx.fillText('৳' + this.fmtNum(v), x, h - pad.b - bh - 4);
+                ctx.fillStyle = '#555'; ctx.font = 'bold 9px sans-serif'; ctx.textAlign = 'center';
+                ctx.fillText(this.fmtNum(v), x + barW / 2, h - pad.b - bh - 5);
+                ctx.textAlign = 'left';
             }
         });
-        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
-        for (let d = 1; d <= days; d += Math.ceil(days / 10)) {
-            ctx.fillText(d, pad.l + (d - 1) * gap + gap / 2 - 5, h - 5);
+
+        ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
+        const step = days <= 15 ? 1 : days <= 20 ? 2 : Math.ceil(days / 10);
+        for (let d = 1; d <= days; d += step) {
+            ctx.fillText(d, pad.l + (d - 1) * gap + gap / 2, h - 8);
         }
+        ctx.textAlign = 'left';
+    },
+
+    drawUtilBzChart(data, days) {
+        this.drawBarChart('am-util-bz-chart', data, days, '#F57C00');
     },
 
     drawMlChart(mealsByDay, days) {
-        const c = document.getElementById('am-ml-chart');
-        if (!c) return;
-        const ctx = c.getContext('2d');
-        const w = c.width, h = c.height;
-        const pad = { t: 20, r: 10, b: 30, l: 40 };
-        ctx.clearRect(0, 0, w, h);
-        const data = [];
-        for (let d = 1; d <= days; d++) data.push(mealsByDay[d] || 0);
-        const maxV = Math.max(...data, 1);
-        const barW = (w - pad.l - pad.r) / days * 0.7;
-        const gap = (w - pad.l - pad.r) / days;
-        data.forEach((v, i) => {
-            const x = pad.l + i * gap + (gap - barW) / 2;
-            const bh = (v / maxV) * (h - pad.t - pad.b);
-            ctx.fillStyle = '#26A69A';
-            ctx.fillRect(x, h - pad.b - bh, barW, bh);
-            if (v > 0) {
-                ctx.fillStyle = '#333'; ctx.font = '9px sans-serif';
-                ctx.fillText(v, x + barW / 2 - 5, h - pad.b - bh - 4);
-            }
-        });
-        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
-        for (let d = 1; d <= days; d += Math.ceil(days / 10)) {
-            ctx.fillText(d, pad.l + (d - 1) * gap + gap / 2 - 5, h - 5);
-        }
+        this.drawBarChart('am-ml-chart', mealsByDay, days, '#26A69A');
     },
 
     drawUtilRateChart(utilBzByDay, days, memberCount) {
         const c = document.getElementById('am-util-rate-chart');
         if (!c) return;
-        const ctx = c.getContext('2d');
-        const w = c.width, h = c.height;
-        const pad = { t: 20, r: 10, b: 30, l: 40 };
+        const { ctx, w, h } = this._setupHiDPI(c);
+        const pad = { t: 20, r: 15, b: 30, l: 40 };
         ctx.clearRect(0, 0, w, h);
         const data = [];
         for (let d = 1; d <= days; d++) {
@@ -3094,42 +3105,54 @@ const App = {
         }
         const maxV = Math.max(...data, 1);
         const xStep = (w - pad.l - pad.r) / (days - 1 || 1);
+        const chartH = h - pad.t - pad.b;
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const y = pad.t + (chartH / 4) * i;
+            ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w - pad.r, y); ctx.stroke();
+        }
+
+        const pts = data.map((v, i) => ({
+            x: pad.l + i * xStep,
+            y: h - pad.b - (v / maxV) * chartH
+        }));
 
         ctx.beginPath();
-        data.forEach((v, i) => {
-            const x = pad.l + i * xStep;
-            const y = h - pad.b - (v / maxV) * (h - pad.t - pad.b);
-            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        });
+        pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
         ctx.strokeStyle = '#F57C00';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
         ctx.stroke();
 
-        const baseY = h - pad.b;
-        ctx.lineTo(pad.l + (data.length - 1) * xStep, baseY);
-        ctx.lineTo(pad.l, baseY);
+        ctx.lineTo(pts[pts.length - 1].x, h - pad.b);
+        ctx.lineTo(pad.l, h - pad.b);
         ctx.closePath();
-        ctx.fillStyle = 'rgba(245,124,0,0.1)';
+        ctx.fillStyle = 'rgba(245,124,0,0.08)';
         ctx.fill();
 
-        data.forEach((v, i) => {
-            const x = pad.l + i * xStep;
-            const y = h - pad.b - (v / maxV) * (h - pad.t - pad.b);
-            ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2);
+        pts.forEach(p => {
+            ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
             ctx.fillStyle = '#F57C00'; ctx.fill();
+            ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff'; ctx.fill();
         });
-        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
+
+        ctx.fillStyle = '#aaa'; ctx.font = '10px sans-serif'; ctx.textAlign = 'center';
         for (let d = 1; d <= days; d += Math.ceil(days / 6)) {
-            ctx.fillText(d, pad.l + (d - 1) * xStep - 5, h - 5);
+            const x = pad.l + (d - 1) * xStep;
+            ctx.fillText(d, x, h - 8);
         }
+        ctx.textAlign = 'left';
     },
 
     drawDonut(share) {
         const c = document.getElementById('am-donut');
         if (!c) return;
-        const ctx = c.getContext('2d');
-        const w = c.width, h = c.height;
-        const cx = w / 2, cy = h / 2, r = 70, inner = 40;
+        const { ctx, w, h } = this._setupHiDPI(c);
+        const cx = w / 2, cy = h / 2, r = 58, inner = 34;
         const total = share.reduce((s, m) => s + m.meals, 0);
         const colors = ['#1565C0', '#0d4fb5', '#FFB300', '#2E7D32'];
         let angle = -Math.PI / 2;
