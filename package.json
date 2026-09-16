@@ -13,6 +13,9 @@
     "@capacitor/android": "^8.5.2",
     "@capacitor/cli": "^7.6.9",
     "@capacitor/core": "^8.5.2",
+    "@capacitor/share": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
+    "@capgo/capacitor-navigation-bar": "^8.2.9",
     "@codetrix-studio/capacitor-google-auth": "^3.4.0-rc.4"
   }
 }

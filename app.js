@@ -1164,8 +1164,13 @@ const App = {
         if (!this.messCode) { this.toast('No mess code', 'error'); return; }
         const joinUrl = `${window.location.origin}${window.location.pathname}?join=${this.messCode}`;
         const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
-        try { await navigator.share?.({ title: 'Mess Manager', text }); }
-        catch (e) { navigator.clipboard?.writeText(text).then(() => this.toast('Copied!', 'success')); }
+        if (window.Capacitor?.Plugins?.Share) {
+            window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
+        } else if (navigator.share) {
+            await navigator.share({ title: 'Mess Manager', text });
+        } else {
+            navigator.clipboard?.writeText(text).then(() => this.toast('Copied!', 'success'));
+        }
     },
 
     async loadDashboard() {
@@ -2815,16 +2820,13 @@ const App = {
         this.toast(newLang === 'en' ? 'Language: English' : 'Language: বাংলা', 'info');
     },
     shareApp() {
-        const shareData = {
-            title: 'Mess Manager',
-            text: `Check out Mess Manager — A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\nDownload: https://mahmudulsapp.u.gy/mess-manager`,
-        };
-        if (navigator.share) {
-            navigator.share(shareData).catch(() => {
-                navigator.clipboard?.writeText(shareData.text).then(() => this.toast('Copied!', 'success'));
-            });
+        const text = `Check out Mess Manager — A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\nDownload: https://mahmudulsapp.u.gy/mess-manager`;
+        if (window.Capacitor?.Plugins?.Share) {
+            window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text, url: 'https://mahmudulsapp.u.gy/mess-manager' }).catch(() => {});
+        } else if (navigator.share) {
+            navigator.share({ title: 'Mess Manager', text }).catch(() => {});
         } else {
-            navigator.clipboard?.writeText(shareData.text).then(() => this.toast('Copied!', 'success'));
+            navigator.clipboard?.writeText(text).then(() => this.toast('Copied!', 'success'));
         }
     },
     _driveFiles: {
@@ -3594,9 +3596,13 @@ const App = {
         if (!this.messCode) return;
         const joinUrl = `${window.location.origin}${window.location.pathname}?join=${this.messCode}`;
         const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
-        navigator.share?.({ title: 'Mess Manager', text }).catch(() => {
+        if (window.Capacitor?.Plugins?.Share) {
+            window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
+        } else if (navigator.share) {
+            navigator.share({ title: 'Mess Manager', text }).catch(() => {});
+        } else {
             navigator.clipboard?.writeText(text).then(() => this.toast('Copied!', 'success'));
-        });
+        }
     },
     sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
     signOut() { auth.signOut(); },
