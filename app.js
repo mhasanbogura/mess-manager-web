@@ -285,7 +285,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-bazarnote', page === 'bazarnote');
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
-        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal Entry', bazaar: 'Expense List', balance: 'Money Management', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile & Settings', duty: 'Expense Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Records', costtrash: 'Deleted Costs', deptrash: 'Deleted Transactions' };
+        const titles = { dashboard: 'Dashboard', members: 'Mess Management', meals: 'Meal Entry', bazaar: 'Expense List', balance: 'Money Management', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile & Settings', duty: 'Expense Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Records', costtrash: 'Deleted Expenses', deptrash: 'Deleted Transactions' };
         const hideTopbar = [];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         document.querySelector('.topbar').style.display = '';
