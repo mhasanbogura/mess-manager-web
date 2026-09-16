@@ -115,7 +115,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.0.0 (build 1)',
+        prof_version:'Version 1.3.1 (build 22)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
