@@ -2760,73 +2760,86 @@ const App = {
                     <div class="am-month-row"><label>Month</label><select id="am-month-select" onchange="App.changeAnalysisMonth(this.value)">
                         ${this.buildMonthOptions(year, mon)}
                     </select></div>
-                    <div class="am-stats-row">
-                        <div class="am-stat-card"><small>Total meals</small><strong>${totalMeals}</strong></div>
-                        <div class="am-stat-card"><small>Total bazar</small><strong>৳ ${this.fmtNum(totalBazar)}</strong><small>${mids.length} Members ৳${this.fmtNum(totalBazar)}</small></div>
-                        <div class="am-stat-card"><small>Cost per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
+                    <div class="am-tabs">
+                        <button class="am-tab active" onclick="App.switchAnalysisTab('meal')"><span class="material-icons-round" style="font-size:16px;vertical-align:middle">restaurant</span> Meal</button>
+                        <button class="am-tab" onclick="App.switchAnalysisTab('utility')"><span class="material-icons-round" style="font-size:16px;vertical-align:middle">lightbulb</span> Utility</button>
                     </div>
-                    <div class="am-card">
-                        <h3>Manager collection – Spending = Balance</h3>
-                        <div class="am-calc-row"><span>৳ ${this.fmtNum(totalDep)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(totalUtility + totalRent)}</span><span class="am-op">=</span><span class="am-pos">৳ ${this.fmtNum(totalDep - totalUtility - totalRent)}</span></div>
-                        <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
-                        <p class="am-sub">Spending breakdown</p>
-                        <p class="am-sub">Utility: ৳ ${this.fmtNum(totalUtility + totalRent)}</p>
-                    </div>
-                    <div class="am-card">
-                        <h3>Members paid in – Charged = Balance</h3>
-                        <p class="am-desc">What the house took in, and what it actually spent</p>
-                        <div class="am-calc-row"><span>৳ ${this.fmtNum(paidIn)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(charged)}</span><span class="am-op">=</span><span class="${paidIn - charged >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(paidIn - charged)}</span></div>
-                        <div class="am-calc-labels"><span>Paid in</span><span>Charged</span><span>Balance</span></div>
-                        <p class="am-sub">Paid in breakdown</p>
-                        <p class="am-sub">To manager: ৳${this.fmtNum(totalDep)} &nbsp; Own bazar: ৳${this.fmtNum(totalBazar)}</p>
-                        <p class="am-sub">Charged breakdown</p>
-                        <p class="am-sub">Meals: ৳${this.fmtNum(totalMeals * rate)} &nbsp; Utility: ৳${this.fmtNum(totalUtility + totalRent)}</p>
-                    </div>
-                    <div class="am-card">
-                        <h3>Cost per meal trend</h3>
-                        <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
-                        <canvas id="am-rate-chart" width="350" height="200"></canvas>
-                    </div>
-                    <div class="am-card">
-                        <h3>Bazar by day</h3>
-                        <p class="am-sub">৳ ${this.fmtNum(totalBazar)} spent across the month</p>
-                        <canvas id="am-bz-chart" width="350" height="200"></canvas>
-                    </div>
-                    <div class="am-card">
-                        <h3>Meals by day</h3>
-                        <p class="am-sub">${totalMeals} meals across the month</p>
-                        <canvas id="am-ml-chart" width="350" height="200"></canvas>
-                    </div>
-                    ${topItems.length ? `<div class="am-card">
-                        <h3>Top items by cost</h3>
-                        <p class="am-sub">${topItems.length} items from ${Object.keys(allBz).length} bazar entries</p>
-                        <div class="am-top-items">${topItems.map((it, i) => {
-                            const pct = it.total / topItems[0].total * 100;
-                            const barColors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2','#42A5F5','#64B5F6'];
-                            return `<div class="am-item-row"><span class="am-item-name">${this.esc(it.name)} ${it.count > 1 ? '×' + it.count : ''}</span><div class="am-item-bar"><div class="am-item-fill" style="width:${pct}%;background:${barColors[i % barColors.length]}"></div></div><span class="am-item-cost">৳${this.fmtNum(it.total)}</span></div>`;
-                        }).join('')}</div>
-                    </div>` : ''}
-                    ${memberBalances.length ? `<div class="am-card">
-                        <h3>Member balances</h3>
-                        <p class="am-sub">Green = in credit · Red = owes (deposit – meal cost)</p>
-                        <div class="am-bal-list">${memberBalances.map(m => {
-                            const maxAbs = Math.max(...memberBalances.map(x => Math.abs(x.balance)), 1);
-                            const pct = Math.abs(m.balance) / maxAbs * 50;
-                            const cls = m.balance >= 0 ? 'am-bal-pos' : 'am-bal-neg';
-                            return `<div class="am-bal-row"><span class="am-bal-name">${this.esc(m.name)}</span><div class="am-bal-bar"><div class="am-bal-fill ${cls}" style="width:${pct}%"></div></div><span class="am-bal-val ${cls}">৳${this.fmtNum(m.balance)}</span></div>`;
-                        }).join('')}</div>
-                    </div>` : ''}
-                    ${mealShare.length ? `<div class="am-card">
-                        <h3>Meal share by member</h3>
-                        <p class="am-sub">Who ate how much of the ${totalMeals} meals</p>
-                        <div class="am-donut-wrap">
-                            <canvas id="am-donut" width="200" height="200"></canvas>
-                            <div class="am-donut-legend">${mealShare.map((m, i) => {
-                            const colors = ['#1565C0','#0d4fb5','#FFB300','#2E7D32'];
-                            return `<div class="am-donut-item"><span class="am-donut-swatch" style="background:${colors[i % colors.length]}"></span><span class="am-donut-name">${this.esc(m.name)}</span><span class="am-donut-val">${m.meals}</span></div>`;
-                        }).join('')}</div>
+                    <div class="am-tab-content active" id="am-tab-meal">
+                        <div class="am-stats-row">
+                            <div class="am-stat-card"><small>Total meals</small><strong>${totalMeals}</strong></div>
+                            <div class="am-stat-card"><small>Total bazar</small><strong>৳ ${this.fmtNum(totalBazar)}</strong><small>${mids.length} Members ৳${this.fmtNum(totalBazar)}</small></div>
+                            <div class="am-stat-card"><small>Cost per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
                         </div>
-                    </div>` : ''}
+                        <div class="am-card">
+                            <h3>Cost per meal trend</h3>
+                            <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
+                            <canvas id="am-rate-chart" width="350" height="200"></canvas>
+                        </div>
+                        <div class="am-card">
+                            <h3>Meals by day</h3>
+                            <p class="am-sub">${totalMeals} meals across the month</p>
+                            <canvas id="am-ml-chart" width="350" height="200"></canvas>
+                        </div>
+                        ${memberBalances.length ? `<div class="am-card">
+                            <h3>Member balances</h3>
+                            <p class="am-sub">Green = in credit · Red = owes (deposit – meal cost)</p>
+                            <div class="am-bal-list">${memberBalances.map(m => {
+                                const maxAbs = Math.max(...memberBalances.map(x => Math.abs(x.balance)), 1);
+                                const pct = Math.abs(m.balance) / maxAbs * 50;
+                                const cls = m.balance >= 0 ? 'am-bal-pos' : 'am-bal-neg';
+                                return `<div class="am-bal-row"><span class="am-bal-name">${this.esc(m.name)}</span><div class="am-bal-bar"><div class="am-bal-fill ${cls}" style="width:${pct}%"></div></div><span class="am-bal-val ${cls}">৳${this.fmtNum(m.balance)}</span></div>`;
+                            }).join('')}</div>
+                        </div>` : ''}
+                        ${mealShare.length ? `<div class="am-card">
+                            <h3>Meal share by member</h3>
+                            <p class="am-sub">Who ate how much of the ${totalMeals} meals</p>
+                            <div class="am-donut-wrap">
+                                <canvas id="am-donut" width="200" height="200"></canvas>
+                                <div class="am-donut-legend">${mealShare.map((m, i) => {
+                                const colors = ['#1565C0','#0d4fb5','#FFB300','#2E7D32'];
+                                return `<div class="am-donut-item"><span class="am-donut-swatch" style="background:${colors[i % colors.length]}"></span><span class="am-donut-name">${this.esc(m.name)}</span><span class="am-donut-val">${m.meals}</span></div>`;
+                            }).join('')}</div>
+                            </div>
+                        </div>` : ''}
+                    </div>
+                    <div class="am-tab-content" id="am-tab-utility">
+                        <div class="am-stats-row">
+                            <div class="am-stat-card"><small>Total utility</small><strong>৳ ${this.fmtNum(totalUtility + totalRent)}</strong></div>
+                            <div class="am-stat-card"><small>Rent</small><strong>৳ ${this.fmtNum(totalRent)}</strong></div>
+                            <div class="am-stat-card"><small>Other utility</small><strong>৳ ${this.fmtNum(totalUtility)}</strong></div>
+                        </div>
+                        <div class="am-card">
+                            <h3>Manager collection – Spending = Balance</h3>
+                            <div class="am-calc-row"><span>৳ ${this.fmtNum(totalDep)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(totalUtility + totalRent)}</span><span class="am-op">=</span><span class="${totalDep - totalUtility - totalRent >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(totalDep - totalUtility - totalRent)}</span></div>
+                            <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
+                            <p class="am-sub">Spending breakdown</p>
+                            <p class="am-sub">Utility: ৳ ${this.fmtNum(totalUtility + totalRent)}</p>
+                        </div>
+                        <div class="am-card">
+                            <h3>Members paid in – Charged = Balance</h3>
+                            <p class="am-desc">What the house took in, and what it actually spent</p>
+                            <div class="am-calc-row"><span>৳ ${this.fmtNum(paidIn)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(charged)}</span><span class="am-op">=</span><span class="${paidIn - charged >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(paidIn - charged)}</span></div>
+                            <div class="am-calc-labels"><span>Paid in</span><span>Charged</span><span>Balance</span></div>
+                            <p class="am-sub">Paid in breakdown</p>
+                            <p class="am-sub">To manager: ৳${this.fmtNum(totalDep)} &nbsp; Own bazar: ৳${this.fmtNum(totalBazar)}</p>
+                            <p class="am-sub">Charged breakdown</p>
+                            <p class="am-sub">Meals: ৳${this.fmtNum(totalMeals * rate)} &nbsp; Utility: ৳${this.fmtNum(totalUtility + totalRent)}</p>
+                        </div>
+                        <div class="am-card">
+                            <h3>Bazar by day</h3>
+                            <p class="am-sub">৳ ${this.fmtNum(totalBazar)} spent across the month</p>
+                            <canvas id="am-bz-chart" width="350" height="200"></canvas>
+                        </div>
+                        ${topItems.length ? `<div class="am-card">
+                            <h3>Top items by cost</h3>
+                            <p class="am-sub">${topItems.length} items from ${Object.keys(allBz).length} bazar entries</p>
+                            <div class="am-top-items">${topItems.map((it, i) => {
+                                const pct = it.total / topItems[0].total * 100;
+                                const barColors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2','#42A5F5','#64B5F6'];
+                                return `<div class="am-item-row"><span class="am-item-name">${this.esc(it.name)} ${it.count > 1 ? '×' + it.count : ''}</span><div class="am-item-bar"><div class="am-item-fill" style="width:${pct}%;background:${barColors[i % barColors.length]}"></div></div><span class="am-item-cost">৳${this.fmtNum(it.total)}</span></div>`;
+                            }).join('')}</div>
+                        </div>` : ''}
+                    </div>
                     <button class="am-export-btn" onclick="App.toast('PDF export coming soon','info')"><span class="material-icons-round">picture_as_pdf</span> Export PDF</button>
                 </div>`;
 
@@ -2859,6 +2872,14 @@ const App = {
         this._analysisYear = y;
         this._analysisMonth = m - 1;
         this.loadMonthly();
+    },
+
+    switchAnalysisTab(tab) {
+        document.querySelectorAll('.am-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.am-tab-content').forEach(c => c.classList.remove('active'));
+        const idx = tab === 'meal' ? 0 : 1;
+        document.querySelectorAll('.am-tab')[idx]?.classList.add('active');
+        document.getElementById(`am-tab-${tab}`)?.classList.add('active');
     },
 
     drawRateChart(bzByDay, mealsByDay, days) {
