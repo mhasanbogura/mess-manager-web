@@ -2753,8 +2753,8 @@ const App = {
             const utilPaidIn = totalUtilDep;
             const utilCharged = totalUtility + totalRent;
 
-            const topMealItems = Object.values(mealItemFreq).sort((a, b) => b.total - a.total).slice(0, 8);
-            const topUtilItems = Object.values(utilItemFreq).sort((a, b) => b.total - a.total).slice(0, 8);
+            const topMealItems = Object.values(mealItemFreq).sort((a, b) => b.total - a.total).slice(0, 10);
+            const topUtilItems = Object.values(utilItemFreq).sort((a, b) => b.total - a.total).slice(0, 10);
 
             const memberBalances = mids.map(mid => {
                 const name = members[mid]?.name || 'Unknown';
@@ -2809,10 +2809,19 @@ const App = {
                             <canvas id="am-rate-chart" width="350" height="200"></canvas>
                         </div>
                         <div class="am-card">
-                            <h3>Meal bazar by day</h3>
+                            <h3>Bazar by day</h3>
                             <p class="am-sub">৳ ${this.fmtNum(totalMealBazar)} spent across the month</p>
                             <canvas id="am-bz-chart" width="350" height="200"></canvas>
                         </div>
+                        ${topMealItems.length ? `<div class="am-card">
+                            <h3>Top 10 bazar items by cost</h3>
+                            <p class="am-sub">${topMealItems.length} items</p>
+                            <div class="am-top-items">${topMealItems.map((it, i) => {
+                                const pct = it.total / topMealItems[0].total * 100;
+                                const barColors = ['#1565C0','#0d4fb5','#FFB300','#2E7D32','#F57C00','#E65100','#C62828','#AD1457','#6A1B9A','#00838F'];
+                                return `<div class="am-item-row"><span class="am-item-name">${this.esc(it.name)} ${it.count > 1 ? '×' + it.count : ''}</span><div class="am-item-bar"><div class="am-item-fill" style="width:${pct}%;background:${barColors[i % barColors.length]}"></div></div><span class="am-item-cost">৳${this.fmtNum(it.total)}</span></div>`;
+                            }).join('')}</div>
+                        </div>` : ''}
                         <div class="am-card">
                             <h3>Meals by day</h3>
                             <p class="am-sub">${totalMeals} meals across the month</p>
@@ -2864,12 +2873,30 @@ const App = {
                             <p class="am-sub">Rent: ৳${this.fmtNum(totalRent)} &nbsp; Utility: ৳${this.fmtNum(totalUtility)}</p>
                         </div>
                         <div class="am-card">
-                            <h3>Utility bazar by day</h3>
-                            <p class="am-sub">৳ ${this.fmtNum(totalUtilBazar)} utility bazar across the month</p>
+                            <h3>Utility cost by day</h3>
+                            <p class="am-sub">৳ ${this.fmtNum(totalUtilBazar)} utility cost across the month</p>
                             <canvas id="am-util-bz-chart" width="350" height="200"></canvas>
                         </div>
+                        ${(() => {
+                            const utilCostPerMember = mids.length > 0 ? (totalUtility + totalRent) / mids.length : 0;
+                            const utilMemberBalances = mids.map(mid => {
+                                const name = members[mid]?.name || 'Unknown';
+                                const utilDep = Object.values(depAll).filter(v => v && v.memberId === mid && v.category === 'utility' && v.date && v.date.startsWith(month)).reduce((s, v) => s + (v.amount || 0), 0);
+                                return { name, balance: utilDep - utilCostPerMember };
+                            }).sort((a, b) => b.balance - a.balance);
+                            return utilMemberBalances.length ? `<div class="am-card">
+                                <h3>Member balances</h3>
+                                <p class="am-sub">Green = in credit · Red = owes (utility deposit – cost share)</p>
+                                <div class="am-bal-list">${utilMemberBalances.map(m => {
+                                    const maxAbs = Math.max(...utilMemberBalances.map(x => Math.abs(x.balance)), 1);
+                                    const pct = Math.abs(m.balance) / maxAbs * 50;
+                                    const cls = m.balance >= 0 ? 'am-bal-pos' : 'am-bal-neg';
+                                    return `<div class="am-bal-row"><span class="am-bal-name">${this.esc(m.name)}</span><div class="am-bal-bar"><div class="am-bal-fill ${cls}" style="width:${pct}%"></div></div><span class="am-bal-val ${cls}">৳${this.fmtNum(m.balance)}</span></div>`;
+                                }).join('')}</div>
+                            </div>` : '';
+                        })()}
                         ${topUtilItems.length ? `<div class="am-card">
-                            <h3>Top utility items by cost</h3>
+                            <h3>Top 10 utility items by cost</h3>
                             <p class="am-sub">${topUtilItems.length} items</p>
                             <div class="am-top-items">${topUtilItems.map((it, i) => {
                                 const pct = it.total / topUtilItems[0].total * 100;

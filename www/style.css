@@ -2687,7 +2687,7 @@ img, canvas { max-width: 100%; }
 .am-bal-list { display: flex; flex-direction: column; gap: 10px; }
 .am-bal-row { display: flex; align-items: center; gap: 10px; }
 .am-bal-name { width: 80px; font-size: 13px; color: var(--text); flex-shrink: 0; }
-.am-bal-bar { flex: 1; height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; display: flex; justify-content: flex-end; }
+.am-bal-bar { flex: 1; height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; display: flex; justify-content: flex-start; }
 .am-bal-fill.am-bal-pos { background: #2E7D32; }
 .am-bal-fill.am-bal-neg { background: #d32f2f; }
 .am-bal-val { width: 70px; font-size: 13px; font-weight: 600; text-align: right; }
