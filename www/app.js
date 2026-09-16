@@ -2727,7 +2727,7 @@ const App = {
             const depByName = {};
             let totalDep = 0, totalMealDep = 0, totalUtilDep = 0;
             Object.values(depAll).forEach(v => {
-                if (v && typeof v.amount === 'number' && v.memberId) {
+                if (v && typeof v.amount === 'number' && v.memberId && v.date && v.date.startsWith(month)) {
                     totalDep += v.amount;
                     const cat = v.category || 'meal';
                     if (cat === 'utility') {
@@ -2878,7 +2878,7 @@ const App = {
                             }).join('')}</div>
                         </div>` : ''}
                     </div>
-                    <button class="am-export-btn" onclick="App.toast('PDF export coming soon','info')"><span class="material-icons-round">picture_as_pdf</span> Export PDF</button>
+
                 </div>`;
 
             setTimeout(() => {
