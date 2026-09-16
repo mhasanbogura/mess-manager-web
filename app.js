@@ -941,6 +941,7 @@ const App = {
             let totalRent = 0, totalUtilCost = 0;
             Object.values(bzSnap.val() || {}).forEach(b => {
                 if ((b.category || 'bazar') !== 'utility') return;
+                if (!b.date || !b.date.startsWith(month)) return;
                 const amt = parseFloat(b.cost) || 0;
                 if ((b.name || '').toLowerCase() === 'rent') totalRent += amt;
                 else totalUtilCost += amt;
@@ -977,6 +978,7 @@ const App = {
             Object.values(bzSnap.val() || {}).forEach(b => {
                 const amt = parseFloat(b.cost) || 0;
                 if (!amt) return;
+                if (!b.date || !b.date.startsWith(month)) return;
                 if (b.category === 'utility') {
                     const n = (b.splitWith || b.memberId || '').trim();
                     if (!n) return;
