@@ -826,6 +826,7 @@ const App = {
         document.getElementById('flat-tab-members').style.display = tab === 'members' ? '' : 'none';
         document.getElementById('flat-tab-peoples').style.display = tab === 'peoples' ? '' : 'none';
         document.getElementById('flat-tab-permissions').style.display = tab === 'permissions' ? '' : 'none';
+        if (tab === 'peoples' && this._flatMembers) this.loadFlatPeoples(this._flatMembers);
         if (tab === 'permissions' && this._flatMembers) this.loadFlatPermissions(this._flatMembers);
     },
 
@@ -936,7 +937,7 @@ const App = {
                 const isAdmin = m.role === 'admin';
                 const color = colors[i % colors.length];
                 const email = u.email || m.email || '';
-                const isYou = id === this.currentUser.uid;
+                const isYou = id === (this.currentUser ? this.currentUser.uid : '');
                 let profilePic = '';
                 try { const picSnap = await db.ref(`users/${id}/profilePicture`).once('value'); profilePic = picSnap.val() || ''; } catch (e) {}
                 const avatarStyle = profilePic ? `background-image:url(${profilePic});background-size:cover;background-position:center;color:transparent` : `background:${color}`;
