@@ -2804,15 +2804,17 @@ const App = {
             if (meta) meta.setAttribute('content', bgColor);
             else { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bgColor; document.head.appendChild(m); }
         } catch (e) {}
+        const isDark = bgColor === '#000000';
         try {
             if (window.Capacitor?.Plugins?.StatusBar) {
-                window.Capacitor.Plugins.StatusBar.setStyle({ style: bgColor === '#111111' ? 'DARK' : 'LIGHT' });
+                window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
                 window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
             }
         } catch (e) {}
         try {
             if (window.Capacitor?.Plugins?.NavigationBar) {
                 window.Capacitor.Plugins.NavigationBar.setColor({ color: bgColor });
+                window.Capacitor.Plugins.NavigationBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
             }
         } catch (e) {}
         try {
