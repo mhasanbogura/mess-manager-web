@@ -1116,7 +1116,6 @@ const App = {
     mealPickMonth() {
         this.changeMonth();
     },
-    },
 
     async loadMeals() {
         if (!this.messId) return;
