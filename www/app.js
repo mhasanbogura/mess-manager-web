@@ -2782,10 +2782,35 @@ const App = {
         } else {
             document.documentElement.removeAttribute('data-theme');
         }
+        const isOled = document.documentElement.getAttribute('data-theme') === 'oled';
+        this._setSystemBars(isOled ? '#111111' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
         const dt = document.getElementById('prof-device-theme');
         const ot = document.getElementById('prof-oled-theme');
         if (dt) dt.checked = saved === 'system';
         if (ot) ot.checked = saved === 'oled';
+    },
+    _setSystemBars(bgColor, fgColor) {
+        try {
+            const meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', bgColor);
+            else { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bgColor; document.head.appendChild(m); }
+        } catch (e) {}
+        try {
+            if (window.Capacitor?.Plugins?.StatusBar) {
+                window.Capacitor.Plugins.StatusBar.setStyle({ style: bgColor === '#111111' ? 'DARK' : 'LIGHT' });
+                window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
+            }
+        } catch (e) {}
+        try {
+            if (window.Capacitor?.Plugins?.NavigationBar) {
+                window.Capacitor.Plugins.NavigationBar.setColor({ color: bgColor });
+            }
+        } catch (e) {}
+        try {
+            if (window.AndroidFullScreen) {
+                window.AndroidFullScreen.setSystemBarsColor?.(bgColor, fgColor);
+            }
+        } catch (e) {}
     },
     toggleLanguage() {
         const lang = localStorage.getItem('mess_lang') || 'en';
