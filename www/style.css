@@ -2694,7 +2694,7 @@ img, canvas { max-width: 100%; }
 .am-bal-val { width: 70px; font-size: 13px; font-weight: 600; text-align: right; }
 .am-bal-val.am-bal-pos { color: #2E7D32; }
 .am-bal-val.am-bal-neg { color: #d32f2f; }
-.am-card canvas { width: 100% !important; height: auto !important; display: block; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
+.am-card canvas { display: block; image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges; }
 .am-chart-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; padding: 0 4px; }
 .am-chart-scroll canvas { display: block; min-width: 500px; }
 .am-donut-wrap { display: flex; align-items: center; gap: 16px; }

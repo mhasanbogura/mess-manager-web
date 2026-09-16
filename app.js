@@ -2951,14 +2951,24 @@ const App = {
         document.getElementById(`am-tab-${tab}`)?.classList.add('active');
     },
 
-    _setupHiDPI(canvas) {
+    _setupHiDPI(canvas, forcedW, forcedH) {
         const dpr = window.devicePixelRatio || 1;
-        const w = canvas.width, h = canvas.height;
-        canvas.width = w * dpr;
-        canvas.height = h * dpr;
+        let displayW, displayH;
+        if (forcedW && forcedH) {
+            displayW = forcedW;
+            displayH = forcedH;
+        } else {
+            const parent = canvas.parentElement;
+            displayW = parent ? parent.clientWidth - 24 : 350;
+            displayH = Math.round(displayW * 0.514);
+        }
+        canvas.style.width = displayW + 'px';
+        canvas.style.height = displayH + 'px';
+        canvas.width = Math.round(displayW * dpr);
+        canvas.height = Math.round(displayH * dpr);
         const ctx = canvas.getContext('2d');
         ctx.scale(dpr, dpr);
-        return { ctx, w, h };
+        return { ctx, w: displayW, h: displayH };
     },
 
     _drawRoundBar(ctx, x, y, w, h, r) {
@@ -3151,7 +3161,7 @@ const App = {
     drawDonut(share) {
         const c = document.getElementById('am-donut');
         if (!c) return;
-        const { ctx, w, h } = this._setupHiDPI(c);
+        const { ctx, w, h } = this._setupHiDPI(c, 160, 160);
         const cx = w / 2, cy = h / 2, r = 58, inner = 34;
         const total = share.reduce((s, m) => s + m.meals, 0);
         const colors = ['#1565C0', '#0d4fb5', '#FFB300', '#2E7D32'];
