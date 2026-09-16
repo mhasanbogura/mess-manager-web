@@ -327,6 +327,7 @@ const App = {
         const splash = document.getElementById('splash-screen');
         this.applyTheme();
         this.applyLanguage();
+        this._cacheDriveFiles();
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
@@ -2841,11 +2842,60 @@ const App = {
             navigator.clipboard?.writeText(shareData.text).then(() => this.toast('Copied!', 'success'));
         }
     },
+    _driveFiles: {
+        about: { id: '1s45exjbMZhDk-Yt7oHSYjO6P_FiPs3YY', key: 'cache_about_md' },
+        contact: { id: '1VNmXxG33NWMphp1mz2xQGWcm9NdCc3oH', key: 'cache_contact_md' }
+    },
+    async _cacheDriveFiles() {
+        for (const [name, cfg] of Object.entries(this._driveFiles)) {
+            try {
+                const resp = await fetch(`https://drive.google.com/uc?export=download&id=${cfg.id}`);
+                const text = await resp.text();
+                if (text && text.length > 10 && !text.includes('<!DOCTYPE')) {
+                    localStorage.setItem(cfg.key, text);
+                } else if (!localStorage.getItem(cfg.key)) {
+                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading... Check your internet connection.`);
+                }
+            } catch (e) {
+                if (!localStorage.getItem(cfg.key)) {
+                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading... Check your internet connection.`);
+                }
+            }
+        }
+    },
+    _mdToHtml(md) {
+        let html = md
+            .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+            .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+            .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`(.+?)`/g, '<code>$1</code>')
+            .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" style="color:var(--primary)">$1</a>')
+            .replace(/^- (.+)$/gm, '<li>$1</li>')
+            .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">')
+            .replace(/\n{2,}/g, '</p><p>')
+            .replace(/\n/g, '<br>');
+        html = html.replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:18px;margin:8px 0">$1</ul>');
+        return `<div style="font-size:14px;line-height:1.7;color:var(--text)">${html}</div>`;
+    },
     aboutApp() {
-        window.open('https://drive.google.com/file/d/1s45exjbMZhDk-Yt7oHSYjO6P_FiPs3YY/view?usp=drive_link', '_blank');
+        const md = localStorage.getItem(this._driveFiles.about.key) || '# About App\n\nLoading...';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = this._mdToHtml(md);
+        body.style.maxHeight = '70vh';
+        body.style.overflowY = 'auto';
+        document.getElementById('modal-title').textContent = 'About App';
+        this.openModal();
     },
     contactDeveloper() {
-        window.open('https://drive.google.com/file/d/1VNmXxG33NWMphp1mz2xQGWcm9NdCc3oH/view?usp=drive_link', '_blank');
+        const md = localStorage.getItem(this._driveFiles.contact.key) || '# Contact Developer\n\nLoading...';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = this._mdToHtml(md);
+        body.style.maxHeight = '70vh';
+        body.style.overflowY = 'auto';
+        document.getElementById('modal-title').textContent = 'Contact Developer';
+        this.openModal();
     },
         document.getElementById('modal-overlay').classList.add('active');
     },
