@@ -2729,8 +2729,8 @@ const App = {
             }
         } catch (e) {}
         const saved = localStorage.getItem('mess_theme') || 'light';
+        const ot = document.getElementById('prof-oled-theme');
         const toggle = document.getElementById('prof-lang-toggle');
-        if (dt) dt.checked = saved === 'system';
         if (ot) ot.checked = saved === 'oled';
         if (toggle) {
             const lang = localStorage.getItem('mess_lang') || 'en';
@@ -2746,7 +2746,6 @@ const App = {
     toggleOledTheme(checked) {
         if (checked) {
             this.theme = 'oled';
-            document.getElementById('prof-device-theme').checked = false;
             document.documentElement.setAttribute('data-theme', 'oled');
         } else {
             this.theme = 'light';
