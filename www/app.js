@@ -1160,7 +1160,7 @@ const App = {
                     memberData[mid].dinnerTotal += dinner;
                 });
             });
-            const today = now.getDate();
+            const today = new Date().getDate();
             const viewHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
             const showBf = !viewHide.breakfast;
             const showLc = !viewHide.lunch;
