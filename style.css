@@ -1555,6 +1555,7 @@ select.input-sm { cursor: pointer; }
     padding: 10px 8px;
     display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; align-items: stretch;
 }
+.adash-fin-label { grid-column: 1 / -1; justify-self: start; }
 .adash-fin-box {
     border: 1px solid var(--card-border); border-radius: 12px; padding: 8px 6px;
     text-align: center; min-width: 0;

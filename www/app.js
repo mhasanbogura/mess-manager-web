@@ -746,19 +746,22 @@ const App = {
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
-    _userPerms: null,
+    _userPerms: {},
+    _permsLoaded: false,
     async loadMyPerms() {
         if (!this.messId || !this.currentUser) return;
         try {
             const membersSnap = await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
             const m = membersSnap.val() || {};
-            if (m.role === 'admin') { this._userPerms = null; return; }
+            if (m.role === 'admin') { this._userPerms = null; this._permsLoaded = true; return; }
             const permSnap = await db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value');
             this._userPerms = permSnap.val() || {};
         } catch (e) { this._userPerms = {}; }
+        this._permsLoaded = true;
     },
     canDo(key) {
-        if (!this._userPerms) return true;
+        if (!this._permsLoaded) return false;
+        if (this._userPerms === null) return true;
         return !!this._userPerms[key];
     },
     checkPerm(key) {
