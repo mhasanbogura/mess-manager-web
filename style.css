@@ -1578,8 +1578,9 @@ select.input-sm { cursor: pointer; }
 .adash-analyse {
     background: linear-gradient(135deg, #e0e0e0, #ccc); border: none; border-radius: 12px;
     padding: 6px 10px; font-family: inherit; font-size: 14px; color: #111;
-    display: flex; align-items: center; gap: 4px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 4px; cursor: pointer;
     box-shadow: 0 2px 6px rgba(0,0,0,.1); white-space: nowrap;
+    grid-column: 1 / -1; justify-self: center; margin-top: 2px;
 }
 .adash-analyse .material-icons-round { font-size: 18px; }
 
