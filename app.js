@@ -335,6 +335,8 @@ const App = {
             return;
         }
         try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { /* ignore */ }
+        try { db.goOnline(); } catch (e) {}
+        this._setupConnectivity();
         this.handleRedirectResult();
         this.bindEvents();
         this.bindBackButton();
@@ -721,6 +723,7 @@ const App = {
     },
 
     async saveNotice() {
+        this._hintOffline();
         const body = document.getElementById('notice-body').value.trim();
         if (!body) { this.toast('Write something first', 'error'); return; }
         try {
@@ -912,6 +915,7 @@ const App = {
     },
 
     async addFlatMember() {
+        this._hintOffline();
         if (!this.checkPerm('manage')) return;
         const inp = document.getElementById('flat-add-member-input');
         const name = inp.value.trim();
@@ -1136,6 +1140,7 @@ const App = {
     },
 
     async editMessName() {
+        this._hintOffline();
         const name = prompt('Enter new mess name:', this.messName || '');
         if (!name || !name.trim()) return;
         try {
@@ -1720,6 +1725,7 @@ const App = {
     },
 
     async aamSave() {
+        this._hintOffline();
         if (!this.messId || !this._aamData) return;
         const dateKey = this._aamDate;
         let saved = 0;
@@ -2546,6 +2552,7 @@ const App = {
     },
 
     async bzSave() {
+        this._hintOffline();
         const dateKey = this._bzDate;
         const userName = this.currentUser?.displayName || 'Unknown';
         if (this._bzTab === 'bazar') {
@@ -2716,6 +2723,7 @@ const App = {
     },
 
     async saveDeposit() {
+        this._hintOffline();
         const memberName = this._depSelected;
         const amount = parseFloat(document.getElementById('dep-amount')?.value) || 0;
         if (!memberName) { this.toast('Money from: pick a name', 'error'); return; }
@@ -2804,6 +2812,76 @@ const App = {
                 window.AndroidFullScreen.setSystemBarsColor?.(bgColor, fgColor);
             }
         } catch (e) {}
+    },
+    _setupConnectivity() {
+        this._isOnline = navigator.onLine;
+        this._showOnlineStatus(this._isOnline);
+        window.addEventListener('online', () => {
+            this._isOnline = true;
+            this._showOnlineStatus(true);
+            this._refreshCurrentPage();
+        });
+        window.addEventListener('offline', () => {
+            this._isOnline = false;
+            this._showOnlineStatus(false);
+        });
+        try {
+            db.ref('.info/connected').on('value', (snap) => {
+                const connected = snap.val();
+                if (connected && !this._wasConnected) {
+                    this._wasConnected = true;
+                    this._refreshCurrentPage();
+                } else if (!connected) {
+                    this._wasConnected = false;
+                }
+            });
+        } catch (e) {}
+    },
+    _showOnlineStatus(online) {
+        let banner = document.getElementById('connectivity-banner');
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'connectivity-banner';
+            banner.innerHTML = `<span class="material-icons-round"></span><span class="conn-text"></span>`;
+            document.body.appendChild(banner);
+        }
+        if (online) {
+            banner.classList.add('hidden');
+            banner.classList.remove('offline');
+        } else {
+            banner.classList.remove('hidden');
+            banner.classList.add('offline');
+            banner.querySelector('.material-icons-round').textContent = 'wifi_off';
+            banner.querySelector('.conn-text').textContent = 'Offline — changes will sync when connected';
+        }
+    },
+    _refreshCurrentPage() {
+        const page = this.currentPage;
+        if (!page) return;
+        const loaders = {
+            dashboard: () => this.loadDashboard(),
+            meals: () => this.loadMeals(),
+            bazaar: () => this.loadBazarList(),
+            balance: () => this.loadManagerMoney(),
+            monthly: () => this.loadMonthly(),
+            notices: () => this.loadNotices(),
+            members: () => this.loadFlat(),
+            bazarnote: () => this.loadBazarNote(),
+            menu: () => this.loadMenu(),
+            mealhistory: () => this.loadMealHistory(),
+            profile: () => this.loadProfile(),
+            addmeal: () => this.loadAddMeal(),
+            addcost: () => this.loadAddCost(),
+            adddeposit: () => this.loadAddDeposit(),
+        };
+        if (loaders[page]) {
+            try { loaders[page](); } catch (e) {}
+        }
+    },
+    _hintOffline() {
+        if (!navigator.onLine) {
+            this.toast('Saved offline — will sync when connected', 'info');
+        }
     },
     toggleLanguage() {
         const lang = localStorage.getItem('mess_lang') || 'en';
@@ -2903,6 +2981,7 @@ const App = {
     },
 
     async addBazarNote() {
+        this._hintOffline();
         const inp = document.getElementById('abn-input');
         const name = inp.value.trim();
         if (!name) return;
@@ -3046,6 +3125,7 @@ const App = {
     },
 
     async saveMenu(dateKey) {
+        this._hintOffline();
         const bf = document.getElementById('menu-bf')?.value.trim() || '';
         const ln = document.getElementById('menu-ln')?.value.trim() || '';
         const dn = document.getElementById('menu-dn')?.value.trim() || '';
@@ -3621,6 +3701,7 @@ const App = {
     },
 
     changeProfilePicture() {
+        this._hintOffline();
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';

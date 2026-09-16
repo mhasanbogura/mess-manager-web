@@ -3180,3 +3180,13 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .bz-overlay-box { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .aam-overlay { background: rgba(0,0,0,.7); }
 [data-theme="oled"] .aam-box { background: #1a1a1a; border-color: #2a2a2a; }
+
+#connectivity-banner {
+    position: fixed; bottom: 56px; left: 0; right: 0; z-index: 9998;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 16px; font-size: 13px; font-weight: 500;
+    background: #333; color: #fff; transition: transform .3s, opacity .3s;
+}
+#connectivity-banner.hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
+#connectivity-banner .material-icons-round { font-size: 18px; }
+[data-theme="oled"] #connectivity-banner { background: #222; }
