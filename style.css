@@ -2391,10 +2391,7 @@ img, canvas { max-width: 100%; }
     font-family: inherit; position: relative; transition: color .2s;
 }
 .aflat-tab.active { background: linear-gradient(135deg, #555, #333); color: #fff; }
-.aflat-tab.active::after {
-    content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
-    height: 3px; background: #fff; border-radius: 3px 3px 0 0;
-}
+.aflat-tab.active::after { display: none; }
 
 .aflat-tab-content { padding: 12px; }
 .aflat-info-box {
@@ -2920,7 +2917,6 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .aflat-tabs { background: #222; }
 [data-theme="oled"] .aflat-tab { color: #999; }
 [data-theme="oled"] .aflat-tab.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #111; }
-[data-theme="oled"] .aflat-tab.active::after { background: #111; }
 [data-theme="oled"] .aflat-member-item { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .aflat-people-item { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .aflat-perm-card { background: #1a1a1a; border-color: #2a2a2a; }
