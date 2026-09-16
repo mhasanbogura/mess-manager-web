@@ -2825,7 +2825,7 @@ const App = {
                         <div class="am-card">
                             <h3>Cost per meal trend</h3>
                             <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
-                            <canvas id="am-rate-chart" width="350" height="180"></canvas>
+                            <div class="am-chart-scroll"><canvas id="am-rate-chart"></canvas></div>
                         </div>
                         ${mealShare.length ? `<div class="am-card">
                             <h3>Meal share by member</h3>
@@ -2841,12 +2841,12 @@ const App = {
                         <div class="am-card">
                             <h3>Bazar by day</h3>
                             <p class="am-sub">৳ ${this.fmtNum(totalMealBazar)} spent across the month</p>
-                            <canvas id="am-bz-chart" width="350" height="180"></canvas>
+                            <div class="am-chart-scroll"><canvas id="am-bz-chart"></canvas></div>
                         </div>
                         <div class="am-card">
                             <h3>Meals by day</h3>
                             <p class="am-sub">${totalMeals} meals across the month</p>
-                            <canvas id="am-ml-chart" width="350" height="180"></canvas>
+                            <div class="am-chart-scroll"><canvas id="am-ml-chart"></canvas></div>
                         </div>
                         ${topMealItems.length ? `<div class="am-card">
                             <h3>Top 10 bazar items by cost</h3>
@@ -2890,12 +2890,12 @@ const App = {
                         <div class="am-card">
                             <h3>Cost per utility trend</h3>
                             <p class="am-sub">${utilRateDiff >= 0 ? '▲' : '▼'} ${Math.abs(utilRateDiff)}% vs last month · ${utilRateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
-                            <canvas id="am-util-rate-chart" width="350" height="180"></canvas>
+                            <div class="am-chart-scroll"><canvas id="am-util-rate-chart"></canvas></div>
                         </div>
                         <div class="am-card">
                             <h3>Utility cost by day</h3>
                             <p class="am-sub">৳ ${this.fmtNum(totalUtilBazar)} utility cost across the month</p>
-                            <canvas id="am-util-bz-chart" width="350" height="180"></canvas>
+                            <div class="am-chart-scroll"><canvas id="am-util-bz-chart"></canvas></div>
                         </div>
                         ${topUtilItems.length ? `<div class="am-card">
                             <h3>Top 10 utility items by cost</h3>
@@ -2953,15 +2953,8 @@ const App = {
 
     _setupHiDPI(canvas, forcedW, forcedH) {
         const dpr = window.devicePixelRatio || 1;
-        let displayW, displayH;
-        if (forcedW && forcedH) {
-            displayW = forcedW;
-            displayH = forcedH;
-        } else {
-            const parent = canvas.parentElement;
-            displayW = parent ? parent.clientWidth - 24 : 350;
-            displayH = Math.round(displayW * 0.514);
-        }
+        let displayW = forcedW || 350;
+        let displayH = forcedH || 180;
         canvas.style.width = displayW + 'px';
         canvas.style.height = displayH + 'px';
         canvas.width = Math.round(displayW * dpr);
@@ -2988,7 +2981,8 @@ const App = {
     drawRateChart(bzByDay, mealsByDay, days) {
         const c = document.getElementById('am-rate-chart');
         if (!c) return;
-        const { ctx, w, h } = this._setupHiDPI(c);
+        const cw = Math.max(days * 24, 350);
+        const { ctx, w, h } = this._setupHiDPI(c, cw, 180);
         const pad = { t: 20, r: 15, b: 30, l: 40 };
         ctx.clearRect(0, 0, w, h);
         const data = [];
@@ -3054,7 +3048,8 @@ const App = {
     drawBarChart(canvasId, data, days, color) {
         const c = document.getElementById(canvasId);
         if (!c) return;
-        const { ctx, w, h } = this._setupHiDPI(c);
+        const cw = Math.max(days * 24, 350);
+        const { ctx, w, h } = this._setupHiDPI(c, cw, 180);
         const pad = { t: 25, r: 15, b: 30, l: 40 };
         ctx.clearRect(0, 0, w, h);
         const vals = [];
@@ -3105,7 +3100,8 @@ const App = {
     drawUtilRateChart(utilBzByDay, days, memberCount) {
         const c = document.getElementById('am-util-rate-chart');
         if (!c) return;
-        const { ctx, w, h } = this._setupHiDPI(c);
+        const cw = Math.max(days * 24, 350);
+        const { ctx, w, h } = this._setupHiDPI(c, cw, 180);
         const pad = { t: 20, r: 15, b: 30, l: 40 };
         ctx.clearRect(0, 0, w, h);
         const data = [];
