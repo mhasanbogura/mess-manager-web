@@ -1074,22 +1074,35 @@ const App = {
     },
 
     changeMonth() {
-        const input = document.createElement('input');
-        input.type = 'month';
         const sm = this.getSelMonth();
-        input.value = sm.key;
-        input.addEventListener('change', () => {
-            const v = input.value;
-            if (v) {
-                const [y, m] = v.split('-').map(Number);
-                this._selYear = y;
-                this._selMonth = m - 1;
-                const page = this.currentPage;
-                if (page === 'dashboard') this.loadDashboard();
-                else this.navigate(page);
-            }
-        });
-        input.click();
+        let options = '';
+        const now = new Date();
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const y = d.getFullYear();
+            const m = d.getMonth();
+            const val = `${y}-${String(m + 1).padStart(2, '0')}`;
+            const label = `${d.toLocaleString('en-US', { month: 'long' })} ${y}`;
+            const sel = y === sm.year && m === sm.month ? ' selected' : '';
+            options += `<option value="${val}"${sel}>${label}</option>`;
+        }
+        document.getElementById('modal-title').textContent = 'Select Month';
+        document.getElementById('modal-body').innerHTML = `<select id="month-picker-select" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:15px;background:var(--card);color:var(--text);outline:none">${options}</select>`;
+        document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.confirmChangeMonth()" style="width:100%;padding:12px;border-radius:10px">OK</button></div>`;
+        this.openModal();
+    },
+
+    confirmChangeMonth() {
+        const sel = document.getElementById('month-picker-select');
+        if (sel && sel.value) {
+            const [y, m] = sel.value.split('-').map(Number);
+            this._selYear = y;
+            this._selMonth = m - 1;
+        }
+        this.closeModal();
+        const page = this.currentPage;
+        if (page === 'dashboard') this.loadDashboard();
+        else this.navigate(page);
     },
 
     goToAddMeal(type) {
@@ -1101,20 +1114,8 @@ const App = {
     },
 
     mealPickMonth() {
-        const input = document.createElement('input');
-        input.type = 'month';
-        const sm = this.getSelMonth();
-        input.value = sm.key;
-        input.addEventListener('change', () => {
-            const v = input.value;
-            if (v) {
-                const [y, m] = v.split('-').map(Number);
-                this._selYear = y;
-                this._selMonth = m - 1;
-                this.loadMeals();
-            }
-        });
-        input.click();
+        this.changeMonth();
+    },
     },
 
     async loadMeals() {
