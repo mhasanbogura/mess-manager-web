@@ -1066,8 +1066,9 @@ const App = {
     changeMonth() {
         const input = document.createElement('input');
         input.type = 'month';
-        const now = new Date();
-        input.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+        const year = this._mealYear || new Date().getFullYear();
+        const mon = this._mealMonth != null ? this._mealMonth : new Date().getMonth();
+        input.value = `${year}-${String(mon+1).padStart(2,'0')}`;
         input.addEventListener('change', () => {
             const v = input.value;
             if (v) {
@@ -1081,8 +1082,11 @@ const App = {
     },
 
     goToAddMeal(type) {
-        this.navigate('meals');
-        setTimeout(() => this.showAddMeal(type), 200);
+        const now = new Date();
+        this._aamDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+        this._aamEditName = null;
+        this._aamEditType = null;
+        this.navigate('addmeal');
     },
 
     mealPickMonth() {
