@@ -2828,22 +2828,22 @@ const App = {
         }
     },
     _driveFiles: {
-        about: { id: '1s45exjbMZhDk-Yt7oHSYjO6P_FiPs3YY', key: 'cache_about_md' },
-        contact: { id: '1VNmXxG33NWMphp1mz2xQGWcm9NdCc3oH', key: 'cache_contact_md' }
+        about: { url: 'about.md', key: 'cache_about_md' },
+        contact: { url: 'contact.md', key: 'cache_contact_md' }
     },
     async _cacheDriveFiles() {
         for (const [name, cfg] of Object.entries(this._driveFiles)) {
             try {
-                const resp = await fetch(`https://drive.google.com/uc?export=download&id=${cfg.id}`);
+                const resp = await fetch(cfg.url);
                 const text = await resp.text();
                 if (text && text.length > 10 && !text.includes('<!DOCTYPE')) {
                     localStorage.setItem(cfg.key, text);
                 } else if (!localStorage.getItem(cfg.key)) {
-                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading... Check your internet connection.`);
+                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading...`);
                 }
             } catch (e) {
                 if (!localStorage.getItem(cfg.key)) {
-                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading... Check your internet connection.`);
+                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading...`);
                 }
             }
         }
