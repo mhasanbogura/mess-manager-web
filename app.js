@@ -115,7 +115,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.3.1 (build 22)',
+        prof_version:'Version 1.3.2 (build 25)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -370,23 +370,44 @@ const App = {
     showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
 
     bindBackButton() {
+        this._pageHistory = [];
         window.addEventListener('popstate', (e) => {
             if (!document.getElementById('app-screen')?.classList.contains('active')) return;
             if (e.state && e.state.page) {
                 this._fromPopstate = true;
                 this.navigate(e.state.page);
+            } else if (this._pageHistory.length) {
+                const prev = this._pageHistory.pop();
+                this._fromPopstate = true;
+                this.navigate(prev);
             } else if (this.currentPage && this.currentPage !== 'dashboard') {
                 this.navigate('dashboard');
             }
         });
         const hwBack = () => {
-            const appActive = document.getElementById('app-screen')?.classList.contains('active');
             if (document.getElementById('bz-overlay')) { this.bzClose(); return; }
             const modal = document.getElementById('modal-overlay');
             if (modal && modal.classList.contains('active')) { this.closeModal(); return; }
-            if (appActive && this.currentPage && this.currentPage !== 'dashboard') {
-                this.navigate('dashboard');
-            } else if (appActive && this.currentPage === 'dashboard') {
+            const appActive = document.getElementById('app-screen')?.classList.contains('active');
+            const authActive = document.getElementById('auth-screen')?.classList.contains('active');
+            const messActive = document.getElementById('mess-select-screen')?.classList.contains('active');
+            if (appActive) {
+                if (this.currentPage && this.currentPage !== 'dashboard') {
+                    this._fromPopstate = true;
+                    if (this._pageHistory.length) {
+                        const prev = this._pageHistory.pop();
+                        this.navigate(prev);
+                    } else {
+                        this.navigate('dashboard');
+                    }
+                } else {
+                    try { navigator.app?.exitApp?.(); } catch (e) {}
+                    try { window.Capacitor?.Plugins?.App?.exitApp?.(); } catch (e) {}
+                }
+            } else if (authActive) {
+                try { navigator.app?.exitApp?.(); } catch (e) {}
+                try { window.Capacitor?.Plugins?.App?.exitApp?.(); } catch (e) {}
+            } else if (messActive) {
                 this.signOut();
             }
         };
@@ -593,6 +614,10 @@ const App = {
     },
 
     navigate(page) {
+        if (!this._fromPopstate && this.currentPage && this.currentPage !== page) {
+            if (!this._pageHistory) this._pageHistory = [];
+            if (this._pageHistory.length < 30) this._pageHistory.push(this.currentPage);
+        }
         this.currentPage = page;
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const pg = document.getElementById('page-' + page);
