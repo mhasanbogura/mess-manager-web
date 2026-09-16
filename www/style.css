@@ -1974,7 +1974,7 @@ select.input-sm { cursor: pointer; }
     border: 1px solid #ccc; border-radius: 20px; padding: 6px 12px;
     font-size: 13px; color: #555; cursor: pointer; font-family: inherit;
 }
-.abazar-filter-btn.active { background: #0b3d91; color: #fff; border-color: #0b3d91; }
+.abazar-filter-btn.active { background: linear-gradient(135deg, #555, #333); color: #fff; border-color: #555; }
 .abazar-filter-btn.active .material-icons-round { color: #fff; }
 .abazar-filter-btn .material-icons-round { font-size: 16px; }
 .abazar-filter-total { margin-left: auto; font-size: 14px; font-weight: 700; color: #d32f2f; white-space: nowrap; }
@@ -2387,10 +2387,10 @@ img, canvas { max-width: 100%; }
     font-size: 14px; font-weight: 600; color: #888; cursor: pointer;
     font-family: inherit; position: relative; transition: color .2s;
 }
-.aflat-tab.active { background: var(--primary); color: #fff; }
+.aflat-tab.active { background: linear-gradient(135deg, #555, #333); color: #fff; }
 .aflat-tab.active::after {
     content: ''; position: absolute; bottom: 0; left: 20%; right: 20%;
-    height: 3px; background: var(--primary); border-radius: 3px 3px 0 0;
+    height: 3px; background: #fff; border-radius: 3px 3px 0 0;
 }
 
 .aflat-tab-content { padding: 12px; }
@@ -2728,6 +2728,7 @@ img, canvas { max-width: 100%; }
 }
 /* Dashboard special */
 [data-theme="oled"] .adash-mess-card { background: #1a1a1a; }
+[data-theme="oled"] .adash-share { color: #fff; }
 [data-theme="oled"] .adash-avatar { background: #2a2a2a; color: #fff; }
 [data-theme="oled"] .dash-meal-box.breakfast,
 [data-theme="oled"] .dash-meal-box.lunch,
@@ -2836,7 +2837,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-head h2 { color: #e8ebf1; }
 [data-theme="oled"] .abazar-action .material-icons-round { color: #ccc; }
 [data-theme="oled"] .abazar-filter { background: #222; border-color: #333; }
-[data-theme="oled"] .abazar-filter-btn.active { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .abazar-filter-btn.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #111; }
 /* Deposit */
 [data-theme="oled"] .dep-chip { background: #222; border-color: #333; color: #ccc; }
 [data-theme="oled"] .dep-chip.active { background: #1a3a6b; border-color: #3b7bdd; color: #fff; }
@@ -2908,7 +2909,8 @@ img, canvas { max-width: 100%; }
 /* Mess page */
 [data-theme="oled"] .aflat-tabs { background: #222; }
 [data-theme="oled"] .aflat-tab { color: #999; }
-[data-theme="oled"] .aflat-tab.active { color: #fff; }
+[data-theme="oled"] .aflat-tab.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #111; }
+[data-theme="oled"] .aflat-tab.active::after { background: #111; }
 [data-theme="oled"] .aflat-member-item { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .aflat-people-item { background: #1a1a1a; border-color: #2a2a2a; }
 [data-theme="oled"] .aflat-perm-card { background: #1a1a1a; border-color: #2a2a2a; }
@@ -2924,7 +2926,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .bz-chip { background: #222; border-color: #333; color: #ccc; }
 [data-theme="oled"] .bz-chip.active { background: #1a3a6b; color: #fff; }
 [data-theme="oled"] .abazar-filter-btn { background: #222; border-color: #333; color: #ccc; }
-[data-theme="oled"] .abazar-filter-btn.active { background: #3b7bdd; color: #fff; }
+[data-theme="oled"] .abazar-filter-btn.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #111; }
 [data-theme="oled"] .abazar-view-btn { background: #222; border-color: #333; color: #ccc; }
 /* Meal page */
 [data-theme="oled"] .amealhist-card { background: #1a1a1a; border-color: #2a2a2a; }
