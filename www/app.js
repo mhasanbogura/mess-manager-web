@@ -2666,23 +2666,38 @@ const App = {
 
             const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
             const allBz = bzSnap.val() || {};
-            let totalBazar = 0;
+            let totalBazar = 0, totalMealBazar = 0, totalUtilBazar = 0;
             const bzByName = {};
             const bzByDay = {};
+            const mealBzByDay = {};
+            const utilBzByDay = {};
             const itemFreq = {};
+            const mealItemFreq = {};
+            const utilItemFreq = {};
             Object.values(allBz).forEach(b => {
                 const amt = parseFloat(b.cost) || 0;
                 if (b.date && b.date.startsWith(month)) {
                     totalBazar += amt;
+                    const isUtil = (b.category || 'bazar') === 'utility';
+                    if (isUtil) totalUtilBazar += amt;
+                    else totalMealBazar += amt;
                     const n = (b.memberId || '').trim();
                     if (n) bzByName[n] = (bzByName[n] || 0) + amt;
                     const day = parseInt(b.date.slice(8, 10), 10);
-                    if (day) bzByDay[day] = (bzByDay[day] || 0) + amt;
+                    if (day) {
+                        bzByDay[day] = (bzByDay[day] || 0) + amt;
+                        if (isUtil) utilBzByDay[day] = (utilBzByDay[day] || 0) + amt;
+                        else mealBzByDay[day] = (mealBzByDay[day] || 0) + amt;
+                    }
                     if (b.name) {
                         const iname = b.name.trim().toLowerCase();
+                        const targetFreq = isUtil ? utilItemFreq : mealItemFreq;
                         if (!itemFreq[iname]) itemFreq[iname] = { name: b.name.trim(), count: 0, total: 0 };
                         itemFreq[iname].count++;
                         itemFreq[iname].total += amt;
+                        if (!targetFreq[iname]) targetFreq[iname] = { name: b.name.trim(), count: 0, total: 0 };
+                        targetFreq[iname].count++;
+                        targetFreq[iname].total += amt;
                     }
                 }
             });
@@ -2701,35 +2716,41 @@ const App = {
                 });
             });
 
-            const rate = totalMeals > 0 ? totalBazar / totalMeals : 0;
+            const rate = totalMeals > 0 ? totalMealBazar / totalMeals : 0;
 
             const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
             const depAll = depSnap.val() || {};
             const depByName = {};
-            let totalDep = 0;
+            let totalDep = 0, totalMealDep = 0, totalUtilDep = 0;
             Object.values(depAll).forEach(v => {
                 if (v && typeof v.amount === 'number' && v.memberId) {
                     totalDep += v.amount;
-                    if ((v.category || 'meal') === 'meal') {
+                    const cat = v.category || 'meal';
+                    if (cat === 'utility') {
+                        totalUtilDep += v.amount;
+                    } else {
                         depByName[v.memberId] = (depByName[v.memberId] || 0) + v.amount;
+                        totalMealDep += v.amount;
                     }
                 }
             });
 
-            const utilSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
             let totalUtility = 0, totalRent = 0;
-            Object.values(utilSnap.val() || {}).forEach(b => {
-                if (b.date && b.date.startsWith(month) && b.category === 'utility') {
+            Object.values(allBz).forEach(b => {
+                if (b.date && b.date.startsWith(month) && (b.category || 'bazar') === 'utility') {
                     const amt = parseFloat(b.cost) || 0;
                     if ((b.name || '').toLowerCase() === 'rent') totalRent += amt;
                     else totalUtility += amt;
                 }
             });
 
-            const paidIn = totalDep + totalBazar;
-            const charged = totalMeals * rate + totalUtility + totalRent;
+            const mealPaidIn = totalMealDep + totalMealBazar;
+            const mealCharged = totalMeals * rate;
+            const utilPaidIn = totalUtilDep;
+            const utilCharged = totalUtility + totalRent;
 
-            const topItems = Object.values(itemFreq).sort((a, b) => b.total - a.total).slice(0, 8);
+            const topMealItems = Object.values(mealItemFreq).sort((a, b) => b.total - a.total).slice(0, 8);
+            const topUtilItems = Object.values(utilItemFreq).sort((a, b) => b.total - a.total).slice(0, 8);
 
             const memberBalances = mids.map(mid => {
                 const name = members[mid]?.name || 'Unknown';
@@ -2775,13 +2796,18 @@ const App = {
                     <div class="am-tab-content active" id="am-tab-meal">
                         <div class="am-stats-row">
                             <div class="am-stat-card"><small>Total meals</small><strong>${totalMeals}</strong></div>
-                            <div class="am-stat-card"><small>Total bazar</small><strong>৳ ${this.fmtNum(totalBazar)}</strong><small>${mids.length} Members ৳${this.fmtNum(totalBazar)}</small></div>
-                            <div class="am-stat-card"><small>Cost per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
+                            <div class="am-stat-card"><small>Meal bazar</small><strong>৳ ${this.fmtNum(totalMealBazar)}</strong><small>${mids.length} Members</small></div>
+                            <div class="am-stat-card"><small>Cost per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalMealBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
                         </div>
                         <div class="am-card">
                             <h3>Cost per meal trend</h3>
                             <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
                             <canvas id="am-rate-chart" width="350" height="200"></canvas>
+                        </div>
+                        <div class="am-card">
+                            <h3>Meal bazar by day</h3>
+                            <p class="am-sub">৳ ${this.fmtNum(totalMealBazar)} spent across the month</p>
+                            <canvas id="am-bz-chart" width="350" height="200"></canvas>
                         </div>
                         <div class="am-card">
                             <h3>Meals by day</h3>
@@ -2818,7 +2844,7 @@ const App = {
                         </div>
                         <div class="am-card">
                             <h3>Manager collection – Spending = Balance</h3>
-                            <div class="am-calc-row"><span>৳ ${this.fmtNum(totalDep)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(totalUtility + totalRent)}</span><span class="am-op">=</span><span class="${totalDep - totalUtility - totalRent >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(totalDep - totalUtility - totalRent)}</span></div>
+                            <div class="am-calc-row"><span>৳ ${this.fmtNum(totalUtilDep)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(totalUtility + totalRent)}</span><span class="am-op">=</span><span class="${totalUtilDep - totalUtility - totalRent >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(totalUtilDep - totalUtility - totalRent)}</span></div>
                             <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
                             <p class="am-sub">Spending breakdown</p>
                             <p class="am-sub">Utility: ৳ ${this.fmtNum(totalUtility + totalRent)}</p>
@@ -2826,24 +2852,24 @@ const App = {
                         <div class="am-card">
                             <h3>Members paid in – Charged = Balance</h3>
                             <p class="am-desc">What the house took in, and what it actually spent</p>
-                            <div class="am-calc-row"><span>৳ ${this.fmtNum(paidIn)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(charged)}</span><span class="am-op">=</span><span class="${paidIn - charged >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(paidIn - charged)}</span></div>
+                            <div class="am-calc-row"><span>৳ ${this.fmtNum(utilPaidIn)}</span><span class="am-op">−</span><span>৳ ${this.fmtNum(utilCharged)}</span><span class="am-op">=</span><span class="${utilPaidIn - utilCharged >= 0 ? 'am-pos' : 'am-neg'}">৳ ${this.fmtNum(utilPaidIn - utilCharged)}</span></div>
                             <div class="am-calc-labels"><span>Paid in</span><span>Charged</span><span>Balance</span></div>
                             <p class="am-sub">Paid in breakdown</p>
-                            <p class="am-sub">To manager: ৳${this.fmtNum(totalDep)} &nbsp; Own bazar: ৳${this.fmtNum(totalBazar)}</p>
+                            <p class="am-sub">Utility deposits: ৳${this.fmtNum(totalUtilDep)}</p>
                             <p class="am-sub">Charged breakdown</p>
-                            <p class="am-sub">Meals: ৳${this.fmtNum(totalMeals * rate)} &nbsp; Utility: ৳${this.fmtNum(totalUtility + totalRent)}</p>
+                            <p class="am-sub">Rent: ৳${this.fmtNum(totalRent)} &nbsp; Utility: ৳${this.fmtNum(totalUtility)}</p>
                         </div>
                         <div class="am-card">
-                            <h3>Bazar by day</h3>
-                            <p class="am-sub">৳ ${this.fmtNum(totalBazar)} spent across the month</p>
-                            <canvas id="am-bz-chart" width="350" height="200"></canvas>
+                            <h3>Utility bazar by day</h3>
+                            <p class="am-sub">৳ ${this.fmtNum(totalUtilBazar)} utility bazar across the month</p>
+                            <canvas id="am-util-bz-chart" width="350" height="200"></canvas>
                         </div>
-                        ${topItems.length ? `<div class="am-card">
-                            <h3>Top items by cost</h3>
-                            <p class="am-sub">${topItems.length} items from ${Object.keys(allBz).length} bazar entries</p>
-                            <div class="am-top-items">${topItems.map((it, i) => {
-                                const pct = it.total / topItems[0].total * 100;
-                                const barColors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2','#42A5F5','#64B5F6'];
+                        ${topUtilItems.length ? `<div class="am-card">
+                            <h3>Top utility items by cost</h3>
+                            <p class="am-sub">${topUtilItems.length} items</p>
+                            <div class="am-top-items">${topUtilItems.map((it, i) => {
+                                const pct = it.total / topUtilItems[0].total * 100;
+                                const barColors = ['#FFB300','#FF8F00','#F57C00','#E65100','#D84315','#C62828','#AD1457','#6A1B9A'];
                                 return `<div class="am-item-row"><span class="am-item-name">${this.esc(it.name)} ${it.count > 1 ? '×' + it.count : ''}</span><div class="am-item-bar"><div class="am-item-fill" style="width:${pct}%;background:${barColors[i % barColors.length]}"></div></div><span class="am-item-cost">৳${this.fmtNum(it.total)}</span></div>`;
                             }).join('')}</div>
                         </div>` : ''}
@@ -2852,10 +2878,11 @@ const App = {
                 </div>`;
 
             setTimeout(() => {
-                this.drawRateChart(bzByDay, mealsByDay, daysInMonth);
-                this.drawBzChart(bzByDay, daysInMonth);
+                this.drawRateChart(mealBzByDay, mealsByDay, daysInMonth);
+                this.drawBzChart(mealBzByDay, daysInMonth);
                 this.drawMlChart(mealsByDay, daysInMonth);
                 if (mealShare.length) this.drawDonut(mealShare);
+                if (Object.keys(utilBzByDay).length) this.drawUtilBzChart(utilBzByDay, daysInMonth);
             }, 100);
         } catch (e) { console.error('loadMonthly error:', e); }
     },
@@ -2942,6 +2969,34 @@ const App = {
             const x = pad.l + i * gap + (gap - barW) / 2;
             const bh = (v / maxV) * (h - pad.t - pad.b);
             ctx.fillStyle = '#FFB300';
+            ctx.fillRect(x, h - pad.b - bh, barW, bh);
+            if (v > 0) {
+                ctx.fillStyle = '#333'; ctx.font = '9px sans-serif';
+                ctx.fillText('৳' + this.fmtNum(v), x, h - pad.b - bh - 4);
+            }
+        });
+        ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
+        for (let d = 1; d <= days; d += Math.ceil(days / 10)) {
+            ctx.fillText(d, pad.l + (d - 1) * gap + gap / 2 - 5, h - 5);
+        }
+    },
+
+    drawUtilBzChart(data, days) {
+        const c = document.getElementById('am-util-bz-chart');
+        if (!c) return;
+        const ctx = c.getContext('2d');
+        const w = c.width, h = c.height;
+        const pad = { t: 20, r: 10, b: 30, l: 40 };
+        ctx.clearRect(0, 0, w, h);
+        const vals = [];
+        for (let d = 1; d <= days; d++) vals.push(data[d] || 0);
+        const maxV = Math.max(...vals, 1);
+        const barW = (w - pad.l - pad.r) / days * 0.7;
+        const gap = (w - pad.l - pad.r) / days;
+        vals.forEach((v, i) => {
+            const x = pad.l + i * gap + (gap - barW) / 2;
+            const bh = (v / maxV) * (h - pad.t - pad.b);
+            ctx.fillStyle = '#F57C00';
             ctx.fillRect(x, h - pad.b - bh, barW, bh);
             if (v > 0) {
                 ctx.fillStyle = '#333'; ctx.font = '9px sans-serif';
