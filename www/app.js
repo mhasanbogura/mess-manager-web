@@ -893,6 +893,7 @@ const App = {
             const paidBy = {};
             Object.values(bzSnap.val() || {}).forEach(b => {
                 if ((b.category || 'bazar') === 'utility') return;
+                if (!b.date || !b.date.startsWith(month)) return;
                 const amt = parseFloat(b.cost) || 0;
                 bazTotal += amt;
                 const n = (b.memberId || '').trim();
@@ -916,6 +917,7 @@ const App = {
             const mealDepByName = {}; const utilDepByName = {}; let totalDep = 0; let totalMealDep = 0; let totalUtilDep = 0;
             Object.values(depAll).forEach(v => {
                 if (!v || typeof v !== 'object') return;
+                if (!v.date || !v.date.startsWith(month)) return;
                 if (typeof v.amount === 'number' && v.memberId) {
                     totalDep += v.amount;
                     const cat = v.category || 'meal';
