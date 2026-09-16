@@ -875,14 +875,6 @@ const App = {
             } catch (e) { /* notices may not exist */ }
             document.getElementById('dash-notice-preview').textContent = preview;
 
-            let dutyName = 'Not assigned';
-            try {
-                const dSnap = await db.ref(`messes/${this.messId}/bazarDuty/${todayKey}`).once('value');
-                const dutyMid = dSnap.val();
-                if (dutyMid && members[dutyMid] && members[dutyMid].name) dutyName = members[dutyMid].name;
-            } catch (e) { /* duty may not exist */ }
-            document.getElementById('dash-duty-name').textContent = dutyName;
-
             const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
             let bazTotal = 0;
             const paidBy = {};

@@ -1556,9 +1556,9 @@ select.input-sm { cursor: pointer; }
     display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 6px; align-items: stretch;
 }
 .adash-fin-box {
-    border: none; border-radius: 12px; padding: 6px 4px;
+    border: 1px solid var(--card-border); border-radius: 12px; padding: 8px 6px;
     text-align: center; min-width: 0;
-    background: transparent;
+    background: var(--card);
 }
 .adash-fin-box small { font-size: 11px; color: #888; display: block; }
 .adash-fin-box strong { font-size: 16px; font-weight: 600; color: var(--text); white-space: nowrap; }
