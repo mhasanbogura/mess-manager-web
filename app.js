@@ -342,6 +342,14 @@ const App = {
             if (user) {
                 this.currentUser = user;
                 this.loadMyMesses();
+                const params = new URLSearchParams(window.location.search);
+                const joinCode = params.get('join');
+                if (joinCode) {
+                    setTimeout(() => {
+                        const input = document.getElementById('join-mess-code');
+                        if (input) { input.value = joinCode.toUpperCase(); this.joinMess(); }
+                    }, 1000);
+                }
             } else {
                 this.currentUser = null;
                 this.messId = null;
@@ -1154,9 +1162,10 @@ const App = {
 
     async shareMessCode() {
         if (!this.messCode) { this.toast('No mess code', 'error'); return; }
-        const text = `Join my mess "${this.messName || ''}" with code: ${this.messCode}`;
-        try { await navigator.clipboard.writeText(text); this.toast('Invite copied!', 'success'); }
-        catch (e) { prompt('Copy mess code:', this.messCode); }
+        const joinUrl = `${window.location.origin}${window.location.pathname}?join=${this.messCode}`;
+        const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
+        try { await navigator.share?.({ title: 'Mess Manager', text }); }
+        catch (e) { navigator.clipboard?.writeText(text).then(() => this.toast('Copied!', 'success')); }
     },
 
     async loadDashboard() {
@@ -3581,7 +3590,14 @@ const App = {
         });
     },
     copyUid() { if (this.currentUser) navigator.clipboard.writeText(this.currentUser.uid).then(() => this.toast('UID copied!', 'info')); },
-    shareMessCode() { if (this.messCode) navigator.share?.({ title: 'Mess Manager', text: `Join my mess: ${this.messCode}` }).catch(() => {}); },
+    shareMessCode() {
+        if (!this.messCode) return;
+        const joinUrl = `${window.location.origin}${window.location.pathname}?join=${this.messCode}`;
+        const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
+        navigator.share?.({ title: 'Mess Manager', text }).catch(() => {
+            navigator.clipboard?.writeText(text).then(() => this.toast('Copied!', 'success'));
+        });
+    },
     sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
     signOut() { auth.signOut(); },
     setProfilePic(dataUrl) {
