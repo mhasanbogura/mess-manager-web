@@ -2721,7 +2721,6 @@ const App = {
             });
 
             const rate = totalMeals > 0 ? totalMealBazar / totalMeals : 0;
-            const utilRate = mids.length > 0 ? (totalUtility + totalRent) / mids.length : 0;
 
             const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
             const depAll = depSnap.val() || {};
@@ -2748,6 +2747,8 @@ const App = {
                     else totalUtility += amt;
                 }
             });
+
+            const utilRate = mids.length > 0 ? (totalUtility + totalRent) / mids.length : 0;
 
             const mealPaidIn = totalMealDep + totalMealBazar;
             const mealCharged = totalMeals * rate;
@@ -2779,11 +2780,11 @@ const App = {
             const prevRate = prevMeals > 0 ? prevBzTotal / prevMeals : 0;
             const rateDiff = prevRate > 0 ? ((rate - prevRate) / prevRate * 100).toFixed(0) : 0;
 
-            let prevUtilBz = 0, prevUtilMembers = 0;
+            let prevUtilBz = 0;
             Object.values(prevBzSnap.val() || {}).forEach(b => {
                 if (b.date && b.date >= prevMonth + '-01' && b.date <= prevEnd && (b.category || 'bazar') === 'utility') prevUtilBz += parseFloat(b.cost) || 0;
             });
-            const prevUtilRate = prevUtilMembers > 0 ? prevUtilBz / prevUtilMembers : 0;
+            const prevUtilRate = mids.length > 0 ? prevUtilBz / mids.length : 0;
             const utilRateDiff = prevUtilRate > 0 ? ((utilRate - prevUtilRate) / prevUtilRate * 100).toFixed(0) : 0;
 
             const mealShare = mids.map(mid => {
