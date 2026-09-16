@@ -262,7 +262,6 @@
                             <h3 id="flat-mess-name">My Mess</h3>
                         </div>
                         <div class="aflat-card-actions">
-                            <button class="aflat-icon-btn" onclick="App.toast('Theme coming soon','info')"><span class="material-icons-round">palette</span></button>
                             <button class="aflat-icon-btn" onclick="App.editMessName()"><span class="material-icons-round">edit</span></button>
                         </div>
                     </div>
@@ -271,7 +270,7 @@
                             <div class="aflat-card-box-head"><span class="material-icons-round">vpn_key</span> Mess ID <button class="aflat-share-inline" onclick="App.shareMessCode()"><span class="material-icons-round">share</span></button></div>
                             <strong id="flat-mess-code">------</strong>
                         </div>
-                        <div class="aflat-card-box">
+                        <div class="aflat-card-box" onclick="App.switchFlatTab('peoples')" style="cursor:pointer">
                             <div class="aflat-card-box-head"><span class="material-icons-round">person</span> Manager <span class="material-icons-round" style="font-size:18px">chevron_right</span></div>
                             <strong id="flat-manager-name">-</strong>
                         </div>
