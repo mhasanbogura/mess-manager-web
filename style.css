@@ -1804,13 +1804,13 @@ select.input-sm { cursor: pointer; }
 }
 .ameal-table thead th {
     position: sticky; top: 0; z-index: 3;
-    background: var(--primary); color: #fff; font-weight: 600;
+    background: linear-gradient(135deg, #e0e0e0, #ccc); color: #000; font-weight: 600;
     text-align: center; padding: 7px 3px; font-size: 12px;
-    border: 1px solid #08306b;
+    border: 1px solid #bbb;
 }
 .ameal-table thead th.am-col-view {
     position: sticky; left: 0; z-index: 4;
-    text-align: center; background: var(--primary);
+    text-align: center; background: var(--primary); color: #fff;
     min-width: 160px; width: 160px;
 }
 .ameal-table tbody td {
@@ -3100,7 +3100,8 @@ img, canvas { max-width: 100%; }
 /* Tables */
 [data-theme="oled"] .ameal-table { background: #1a1a1a; }
 [data-theme="oled"] .ameal-table tbody td { background: #1a1a1a; color: #e8ebf1; border-color: #2a2a2a; }
-[data-theme="oled"] .ameal-table thead th { background: #333; color: #ccc; }
+[data-theme="oled"] .ameal-table thead th { background: linear-gradient(135deg, #555, #333); color: #eee; border-color: #444; }
+[data-theme="oled"] .ameal-table thead th.am-col-view { background: var(--primary); color: #fff; }
 [data-theme="oled"] .ameal-table thead th[data-today] { background: linear-gradient(135deg, #e0e0e0, #ccc) !important; color: #111 !important; }
 [data-theme="oled"] .ameal-grid-scroll { border-color: #2a2a2a; }
 /* Form elements */
