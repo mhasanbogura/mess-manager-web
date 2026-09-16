@@ -180,7 +180,7 @@
                     <div class="adash-fin-label" onclick="App.navigate('meal')"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">lunch_dining</span><strong>Meal</strong></div>
                     <div class="adash-fin-box"><small>Deposit</small><strong id="dash-deposit">৳ 0</strong></div>
                     <div class="adash-fin-box"><small>Balance</small><strong id="dash-balance" class="pos">৳ 0</strong></div>
-                    <div class="adash-fin-box"><small>Cost per meal</small><strong id="dash-rate">৳ 0</strong></div>
+                    <div class="adash-fin-box"><small>Expense per meal</small><strong id="dash-rate">৳ 0</strong></div>
                 </div>
                 </div>
                 <div class="adash-finance-card" style="margin-top:8px">
@@ -203,7 +203,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Total</th>
-                                    <th>Cost(৳)</th>
+                                    <th>Expense(৳)</th>
                                     <th>Deposit(৳)</th>
                                     <th>Balance(৳)</th>
                                 </tr>
@@ -241,7 +241,7 @@
             <div class="page" id="page-duty">
                 <div class="aduty-head">
                     <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
-                    <h2>Cost Today</h2>
+                    <h2>Expense Today</h2>
                 </div>
                 <div class="aduty-banner" id="duty-banner"></div>
                 <div class="aduty-card">
@@ -252,7 +252,7 @@
             </div>
             <div class="page" id="page-members">
                 <div class="aflat-head">
-                    <h2>Mess</h2>
+                    <h2>Mess Management</h2>
                     <button class="aflat-leave" onclick="App.leaveMess()"><span class="material-icons-round">logout</span> Leave</button>
                 </div>
                 <div class="aflat-card">
@@ -360,7 +360,7 @@
 
             <div class="page" id="page-bazaar">
                 <div class="abazar-head">
-                    <h2>Cost List</h2>
+                    <h2>Expense List</h2>
                     <button class="icon-btn" onclick="App.navigate('costtrash')"><span class="material-icons-round">delete</span></button>
                 </div>
                 <div class="abazar-month-row"><span>Current Month:</span><strong id="abazar-month">-</strong></div>
@@ -389,7 +389,7 @@
             <div class="page" id="page-addcost">
                 <div class="aam-head">
                     <button class="icon-btn" onclick="App.navigate('bazaar')"><span class="material-icons-round">arrow_back</span></button>
-                    <h2>Add Cost</h2>
+                    <h2>Add Expense</h2>
                 </div>
                 <div class="aam-body" id="addcost-body"></div>
                 <div class="aam-footer">
@@ -408,7 +408,7 @@
             </div>
             <div class="page" id="page-costtrash">
                 <div class="abazar-head">
-                    <h2>Cost Trash</h2>
+                    <h2>Deleted Costs</h2>
                 </div>
                 <div class="abazar-month-row"><span>Current Month:</span><strong id="costtrash-month">-</strong></div>
                 <div id="costtrash-list"></div>
@@ -559,7 +559,7 @@
         <div class="bottom-nav-items">
             <button class="bottom-nav-item active" data-page="dashboard" onclick="App.navigate('dashboard')"><span class="material-icons-round">dashboard</span>Dashboard</button>
             <button class="bottom-nav-item" data-page="members" onclick="App.navigate('members')"><span class="material-icons-round">home</span>Mess</button>
-            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Cost</button>
+            <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span>Expense</button>
             <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant</span>Meal</button>
             <button class="bottom-nav-item" data-page="balance" onclick="App.navigate('balance')"><span class="material-icons-round">account_balance_wallet</span>Money</button>
             <button class="bottom-nav-item" data-page="profile" onclick="App.navigate('profile')"><span class="material-icons-round">person</span>Profile</button>

@@ -285,7 +285,7 @@ const App = {
         document.getElementById('app-screen').classList.toggle('on-bazarnote', page === 'bazarnote');
         document.getElementById('app-screen').classList.toggle('on-menu', page === 'menu');
         document.getElementById('app-screen').classList.toggle('on-monthly', page === 'monthly');
-        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal Entry', bazaar: 'Cost List', balance: 'Manager Money', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile & Settings', duty: 'Cost Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Edits', costtrash: 'Cost Trash', deptrash: 'Manager Trash' };
+        const titles = { dashboard: 'Dashboard', members: 'Mess', meals: 'Meal Entry', bazaar: 'Expense List', balance: 'Money Management', notices: 'Notice Board', monthly: 'Analysis', profile: 'Profile & Settings', duty: 'Expense Today', bazarnote: 'Bazar Note', menu: 'Menu Today', mealhistory: 'Meal Records', costtrash: 'Deleted Costs', deptrash: 'Deleted Transactions' };
         const hideTopbar = [];
         document.getElementById('page-title').textContent = titles[page] || page.charAt(0).toUpperCase() + page.slice(1);
         document.querySelector('.topbar').style.display = '';
@@ -405,7 +405,7 @@ const App = {
             const tMid = duty[todayKey];
             const tName = (tMid && members[tMid] && members[tMid].name) || null;
             document.getElementById('duty-banner').innerHTML =
-                `<span class="material-icons-round">event</span><p><strong>Cost today (${now.getDate()} ${shortMon}):</strong> ` +
+                `<span class="material-icons-round">event</span><p><strong>Expense today (${now.getDate()} ${shortMon}):</strong> ` +
                 (tName ? this.esc(tName) : '<span class="unassigned">Nobody assigned</span>') + `</p>`;
 
             const assignedDays = new Set(Object.keys(duty).map(dk => parseInt(dk.slice(8, 10), 10)));
@@ -622,7 +622,7 @@ const App = {
                 if (isYou && isAdmin) {
                     actionsHtml = `<div class="fp-actions">
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
-                        <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.stepDownManager()">Step down as manager</button>
+                        <button class="fp-btn fp-btn-green" onclick="event.stopPropagation();App.stepDownManager()">Step down as manager</button>
                     </div>`;
                 } else if (isYou && !isAdmin) {
                     actionsHtml = `<div class="fp-actions">
@@ -630,7 +630,7 @@ const App = {
                     </div>`;
                 } else if (!isYou && canManage) {
                     actionsHtml = `<div class="fp-actions">
-                        <button class="fp-btn fp-btn-gray" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>
+                        <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>
                         ${!isAdmin ? `<button class="fp-btn fp-btn-yellow" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote as manager</button>` : ''}
                     </div>`;
                 }
@@ -698,7 +698,7 @@ const App = {
             const pSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = pSnap.val() || {};
             const permKeys = ['manage', 'mealEntry', 'mealEdit', 'bazarEntry', 'togglePerms'];
-            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Cost Entry', 'Turn on/off Permissions'];
+            const permLabels = ['Manage Peoples and Members', 'Meal Entry', 'Meal Edit', 'Expense Entry', 'Turn on/off Permissions'];
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
             const iAmAdmin = this.userRole === 'admin';
             const iCanToggle = iAmAdmin || this.canDo('togglePerms');
@@ -1560,7 +1560,7 @@ const App = {
                             <span>Deleted by: <strong>${this.esc(v.deletedBy || '?')}</strong></span>
                             <span> · ${dateStr} ${timeStr}</span>
                         </div>
-                        <div class="amealhist-detail-info">Cost: ৳${Number(v.cost || 0).toLocaleString()} — ${catLabel}</div>
+                        <div class="amealhist-detail-info">Expense: ৳${Number(v.cost || 0).toLocaleString()} — ${catLabel}</div>
                         ${v.addedBy ? `<div class="amealhist-detail-info">Originally added by: ${this.esc(v.addedBy)}</div>` : ''}
                     </div>
                 </div>`;
@@ -1776,12 +1776,12 @@ const App = {
         const currentName = (members[memberId] || {}).name || memberId || 'Manager';
         const names = ['Manager', ...Object.values(members).map(m => m.name || 'Unknown').filter(n => n !== 'Manager')];
         const dateVal = date || new Date().toISOString().slice(0,10);
-        document.getElementById('modal-title').textContent = 'Edit Cost';
+        document.getElementById('modal-title').textContent = 'Edit Expense';
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label>Item name</label><input type="text" id="edit-bz-name" value="${this.esc(name)}"></div>
             <div class="form-group"><label>Money from</label><select id="edit-bz-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
             <div class="form-group"><label>Date</label><input type="date" id="edit-bz-date" value="${dateVal}"></div>
-            <div class="form-group"><label>Cost (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>`;
+            <div class="form-group"><label>Expense (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>`;
         document.getElementById('modal-footer').innerHTML = `
             <div class="dep-footer-btns">
                 <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
@@ -1963,7 +1963,7 @@ const App = {
         this._bzUtilSelected = names.slice();
         document.getElementById('addcost-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 8px">
-                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Cost</button>
+                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Expense</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
@@ -1980,7 +1980,7 @@ const App = {
                 <div id="bz-item-rows">
                     <div class="bz-item-row">
                         <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
-                        <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
+                        <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
                 <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
@@ -1993,7 +1993,7 @@ const App = {
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
+                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Expense from: Manager</span></div>
                 <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
@@ -2033,10 +2033,10 @@ const App = {
         this._bzUtilAmount = '';
         this._bzUtilSelected = names.slice();
 
-        document.getElementById('modal-title').textContent = 'Add Cost';
+        document.getElementById('modal-title').textContent = 'Add Expense';
         document.getElementById('modal-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 12px">
-                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Cost</button>
+                <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">shopping_cart</span> Expense</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
@@ -2053,7 +2053,7 @@ const App = {
                 <div id="bz-item-rows">
                     <div class="bz-item-row">
                         <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
-                        <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
+                        <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
                 <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
@@ -2066,7 +2066,7 @@ const App = {
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Cost from: Manager</span></div>
+                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Expense from: Manager</span></div>
                 <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
@@ -2138,7 +2138,7 @@ const App = {
         const row = document.createElement('div');
         row.className = 'bz-item-row';
         row.innerHTML = `<div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(${idx},'name',this.value)"></div>
-            <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Cost" oninput="App.bzUpdateItem(${idx},'cost',this.value)"></div>`;
+            <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(${idx},'cost',this.value)"></div>`;
         div.appendChild(row);
     },
 
@@ -2810,7 +2810,7 @@ const App = {
                         <div class="am-stats-row">
                             <div class="am-stat-card"><small>Total meals</small><strong>${totalMeals}</strong></div>
                             <div class="am-stat-card"><small>Meal bazar</small><strong>৳ ${this.fmtNum(totalMealBazar)}</strong><small>${mids.length} Members</small></div>
-                            <div class="am-stat-card"><small>Cost per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalMealBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
+                            <div class="am-stat-card"><small>Expense per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalMealBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
                         </div>
                         ${memberBalances.length ? `<div class="am-card">
                             <h3>Member balances</h3>
@@ -2823,7 +2823,7 @@ const App = {
                             }).join('')}</div>
                         </div>` : ''}
                         <div class="am-card">
-                            <h3>Cost per meal trend</h3>
+                            <h3>Expense per meal trend</h3>
                             <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
                             <div class="am-chart-scroll"><canvas id="am-rate-chart"></canvas></div>
                         </div>
@@ -2888,7 +2888,7 @@ const App = {
                             </div>` : '';
                         })()}
                         <div class="am-card">
-                            <h3>Cost per utility trend</h3>
+                            <h3>Expense per utility trend</h3>
                             <p class="am-sub">${utilRateDiff >= 0 ? '▲' : '▼'} ${Math.abs(utilRateDiff)}% vs last month · ${utilRateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
                             <div class="am-chart-scroll"><canvas id="am-util-rate-chart"></canvas></div>
                         </div>
