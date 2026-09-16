@@ -24,9 +24,14 @@ task bumpVersion {
     }
 }
 
+tasks.whenTaskAdded { task ->
+    if (task.name == 'assembleDebug') {
+        task.dependsOn bumpVersion
+    }
+}
+
 task release {
-    dependsOn bumpVersion
-    finalizedBy 'assembleDebug'
+    dependsOn 'assembleDebug'
     doLast {
         def v = project.ext.newVersion
         def b = project.ext.newBuild
@@ -81,8 +86,8 @@ android {
         applicationId "com.mahmuduls.messmanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 49
-        versionName "1.3.10"
+        versionCode 52
+        versionName "1.3.11"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
