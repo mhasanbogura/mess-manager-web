@@ -527,19 +527,19 @@
                     </div>
                 </div>
                 <div class="aprof-section">
-                    <div class="aprof-section-title" onclick="this.parentElement.querySelector('.aprof-card').classList.toggle('collapsed')" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between">ACCOUNT<span class="material-icons-round" style="font-size:18px;color:var(--text);opacity:.5">chevron_right</span></div>
+                    <div class="aprof-section-title">ACCOUNT</div>
                     <div class="aprof-card">
-                        <div class="aprof-row" onclick="App.signOut()"><span class="material-icons-round">logout</span><span class="aprof-label">Log out</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.signOut()"><span class="material-icons-round">logout</span><span class="aprof-label">Log out</span></div>
                         <div class="aprof-row" onclick="App.sendResetFromProfile()"><span class="material-icons-round">lock_reset</span><span class="aprof-label">Reset password</span></div>
-                        <div class="aprof-row danger" onclick="App.deleteAccount()"><span class="material-icons-round">delete_forever</span><span class="aprof-label">Delete account</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row danger" onclick="App.deleteAccount()"><span class="material-icons-round">delete_forever</span><span class="aprof-label">Delete account</span></div>
                     </div>
                 </div>
                 <div class="aprof-section">
                     <div class="aprof-section-title">MORE</div>
                     <div class="aprof-card">
-                        <div class="aprof-row" onclick="App.shareMessCode()"><span class="material-icons-round">share</span><span class="aprof-label">Share</span><span class="material-icons-round">chevron_right</span></div>
-                        <div class="aprof-row" onclick="App.toast('About coming soon','info')"><span class="material-icons-round">info</span><span class="aprof-label">About App</span><span class="material-icons-round">chevron_right</span></div>
-                        <div class="aprof-row" onclick="App.contactDeveloper()"><span class="material-icons-round">mail</span><span class="aprof-label">Contact Developer</span><span class="material-icons-round">chevron_right</span></div>
+                        <div class="aprof-row" onclick="App.shareMessCode()"><span class="material-icons-round">share</span><span class="aprof-label">Share</span></div>
+                        <div class="aprof-row" onclick="App.toast('About coming soon','info')"><span class="material-icons-round">info</span><span class="aprof-label">About App</span></div>
+                        <div class="aprof-row" onclick="App.contactDeveloper()"><span class="material-icons-round">mail</span><span class="aprof-label">Contact Developer</span></div>
                     </div>
                 </div>
                 <div class="aprof-version">
