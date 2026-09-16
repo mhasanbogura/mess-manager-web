@@ -111,7 +111,7 @@ const App = {
         // Profile
         prof_title:'Profile & Settings',
         prof_general:'GENERAL SETTINGS',prof_device_theme:'Device Theme',prof_device_theme_desc:'Automatically switch theme based on system',
-        prof_oled_theme:'OLED Theme',prof_oled_desc:'Use OLED black backdrop for eye comfort',
+        prof_oled_theme:'Dark Theme',prof_oled_desc:'Use Dark backdrop for eye comfort',
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
@@ -278,7 +278,7 @@ const App = {
             // Profile
             prof_title:'প্রোফাইল ও সেটিংস',
             prof_general:'সাধারণ সেটিংস',prof_device_theme:'ডিভাইস থিম',prof_device_theme_desc:'সিস্টেম অনুযায়ী থিম পরিবর্তন',
-            prof_oled_theme:'OLED থিম',prof_oled_desc:'চোখের সুবিধার জন্য OLED ব্ল্যাক ব্যাকড্রপ',
+            prof_oled_theme:'ডার্ক থিম',prof_oled_desc:'চোখের সুবিধার জন্য ডার্ক ব্যাকড্রপ',
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
@@ -2786,7 +2786,7 @@ const App = {
             document.documentElement.removeAttribute('data-theme');
         }
         const isOled = document.documentElement.getAttribute('data-theme') === 'oled';
-        this._setSystemBars(isOled ? '#000000' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
+        this._setSystemBars(isOled ? '#111111' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
         const dt = document.getElementById('prof-device-theme');
         const ot = document.getElementById('prof-oled-theme');
         if (dt) dt.checked = saved === 'system';
@@ -2804,7 +2804,7 @@ const App = {
             if (meta) meta.setAttribute('content', bgColor);
             else { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bgColor; document.head.appendChild(m); }
         } catch (e) {}
-        const isDark = bgColor === '#000000';
+        const isDark = bgColor === '#111111';
         try {
             if (window.Capacitor?.Plugins?.StatusBar) {
                 window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
