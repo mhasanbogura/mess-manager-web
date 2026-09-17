@@ -434,7 +434,12 @@ const App = {
         }, { passive: true });
     },
 
-    showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
+    showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        const nav = document.getElementById('bottom-nav');
+        if (nav) nav.classList.toggle('hidden-nav', id !== 'app-screen');
+    },
 
     bindBackButton() {
         this._pageHistory = [];
@@ -519,13 +524,7 @@ const App = {
         const btn = document.getElementById('google-login'); const orig = btn.innerHTML;
         btn.innerHTML = '<span class="material-icons-round" style="animation:spin 1s linear infinite">refresh</span> Connecting...'; btn.disabled = true;
         try {
-            if (window.Capacitor?.Plugins?.GoogleAuth) {
-                const result = await window.Capacitor.Plugins.GoogleAuth.signIn();
-                const credential = firebase.auth.GoogleAuthProvider.credential(result.authentication.idToken);
-                const c = await auth.signInWithCredential(credential);
-                const s = await db.ref(`users/${c.user.uid}`).once('value');
-                if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName || result.displayName, email: c.user.email || result.email, createdAt: Date.now() });
-            } else if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
+            if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
                 const p = new firebase.auth.GoogleAuthProvider();
                 await auth.signInWithRedirect(p);
             } else {
