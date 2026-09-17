@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "714155755588",
+    "firebase_url": "https://mess-manager-a91c8-default-rtdb.firebaseio.com",
+    "project_id": "mess-manager-a91c8",
+    "storage_bucket": "mess-manager-a91c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714155755588:android:7b0a9ff01e4f830f789411",
+        "android_client_info": {
+          "package_name": "com.mahmuduls.messmanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714155755588-t8q4gbukrdmhiu3j312ad77glpn2i93a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahmuduls.messmanager",
+            "certificate_hash": "4e8e70902a44c0f05f501fa8d62c08ec011ce875"
+          }
+        },
+        {
+          "client_id": "714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOiKvc3ruNOsTvaTH_T4I8XPyP4dCX9Uw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
