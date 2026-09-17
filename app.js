@@ -524,17 +524,19 @@ const App = {
         const btn = document.getElementById('google-login'); const orig = btn.innerHTML;
         btn.innerHTML = '<span class="material-icons-round" style="animation:spin 1s linear infinite">refresh</span> Connecting...'; btn.disabled = true;
         try {
-            if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
-                const p = new firebase.auth.GoogleAuthProvider();
-                await auth.signInWithRedirect(p);
-            } else {
-                const p = new firebase.auth.GoogleAuthProvider();
-                const c = await auth.signInWithPopup(p);
-                const s = await db.ref(`users/${c.user.uid}`).once('value');
-                if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() });
-            }
+            const p = new firebase.auth.GoogleAuthProvider();
+            const c = await auth.signInWithPopup(p);
+            const s = await db.ref(`users/${c.user.uid}`).once('value');
+            if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() });
         }
-        catch (e) { let m = e.message; if (e.code === 'auth/popup-closed-by-user') m = 'Cancelled'; this.toast(m, 'error'); }
+        catch (e) {
+            let m = e.message;
+            if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') m = 'Cancelled';
+            else if (e.code === 'auth/popup-blocked') {
+                try { await auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider()); return; } catch (e2) { m = e2.message; }
+            }
+            this.toast(m, 'error');
+        }
         finally { btn.innerHTML = orig; btn.disabled = false; }
     },
 
