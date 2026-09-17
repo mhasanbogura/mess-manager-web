@@ -2799,21 +2799,13 @@ const App = {
         const isDark = bgColor === '#111111';
         try {
             if (window.Capacitor?.Plugins?.StatusBar) {
-                window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: true });
                 window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
                 window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
             }
         } catch (e) {}
         try {
             if (window.Capacitor?.Plugins?.NavigationBar) {
-                window.Capacitor.Plugins.NavigationBar.setOverlaysWebView({ overlay: true });
-                window.Capacitor.Plugins.NavigationBar.setColor({ color: bgColor });
-                window.Capacitor.Plugins.NavigationBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
-            }
-        } catch (e) {}
-        try {
-            if (window.AndroidFullScreen) {
-                window.AndroidFullScreen.setSystemBarsColor?.(bgColor, fgColor);
+                window.Capacitor.Plugins.NavigationBar.setNavigationBarColor({ color: bgColor });
             }
         } catch (e) {}
     },
