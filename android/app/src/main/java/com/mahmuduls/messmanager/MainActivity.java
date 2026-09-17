@@ -4,6 +4,7 @@ import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 import com.capacitorjs.plugins.statusbar.StatusBarPlugin;
 import ee.forgr.capacitor_navigation_bar.CapgoNavigationBarPlugin;
+import com.codetrixstudio.capacitor.GoogleAuth.GoogleAuth;
 
 public class MainActivity extends BridgeActivity {
     @Override
@@ -11,6 +12,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(StatusBarPlugin.class);
         registerPlugin(CapgoNavigationBarPlugin.class);
         registerPlugin(SystemBarsPlugin.class);
+        registerPlugin(GoogleAuth.class);
         super.onCreate(savedInstanceState);
     }
 }

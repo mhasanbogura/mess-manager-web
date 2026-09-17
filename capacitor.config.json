@@ -17,6 +17,11 @@
       "showSpinner": false,
       "backgroundColor": "#0b3d91",
       "duration": 1500
+    },
+    "GoogleAuth": {
+      "scopes": ["profile", "email"],
+      "serverClientId": "714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com",
+      "forceCodeForRefreshToken": true
     }
   }
 }
