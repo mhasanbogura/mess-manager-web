@@ -627,6 +627,33 @@ const App = {
         try { this.setupPresence(); } catch (e) {}
         try { await this.loadMyPerms(); } catch (e) {}
         this.showApp();
+        this._proactiveCache(mid);
+    },
+
+    async _proactiveCache(mid) {
+        if (!navigator.onLine) return;
+        try {
+            const [members, bazarItems, deposits, meals] = await Promise.all([
+                db.ref(`messes/${mid}/members`).once('value'),
+                db.ref(`messes/${mid}/bazarItems`).once('value'),
+                db.ref(`messes/${mid}/deposits`).once('value'),
+                db.ref(`messes/${mid}/meals`).once('value')
+            ]);
+            this._cacheSet('members', members.val() || {});
+            this._cacheSet('bazarItems', bazarItems.val() || {});
+            this._cacheSet('deposits', deposits.val() || {});
+            this._cacheSet('meals_month', meals.val() || {});
+            try {
+                const settingsSnap = await db.ref(`messes/${mid}/settings`).once('value');
+                this._cacheSet('settings', settingsSnap.val() || {});
+                try { localStorage.setItem(`mess_settings_${mid}`, JSON.stringify(settingsSnap.val() || {})); } catch (e) {}
+            } catch (e) {}
+            try {
+                const todayKey = this.dk(new Date());
+                const todaySnap = await db.ref(`messes/${mid}/meals/${todayKey}`).once('value');
+                this._cacheSet('meals_today_' + todayKey, todaySnap.val() || {});
+            } catch (e) {}
+        } catch (e) {}
     },
 
     setupPresence() {
