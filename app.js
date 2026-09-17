@@ -397,10 +397,7 @@ const App = {
         $('login-btn').addEventListener('click', () => this.emailLogin());
         $('show-login-btn').addEventListener('click', () => this.showScreen('auth-login-screen'));
         $('show-register-welcome').addEventListener('click', () => this.showScreen('auth-register-screen'));
-        $('login-back-btn').addEventListener('click', () => this.showScreen('auth-screen'));
-        $('register-back-btn').addEventListener('click', () => this.showScreen('auth-screen'));
         $('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
-        $('forgot-back-login').addEventListener('click', () => this.showScreen('auth-login-screen'));
         $('google-login-welcome').addEventListener('click', () => this.googleLogin());
         $('google-login-email').addEventListener('click', () => this.googleLogin());
         $('google-register').addEventListener('click', () => this.googleLogin());
@@ -527,7 +524,8 @@ const App = {
     },
 
     async googleLogin() {
-        const btn = document.getElementById('google-login'); const orig = btn.innerHTML;
+        const btn = document.querySelector('.screen.active .btn-auth-google, .screen.active .btn-google') || document.getElementById('google-login-welcome');
+        const orig = btn ? btn.innerHTML : '';
         btn.innerHTML = '<span class="material-icons-round" style="animation:spin 1s linear infinite">refresh</span> Connecting...'; btn.disabled = true;
         try {
             if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
