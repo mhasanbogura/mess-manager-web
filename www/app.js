@@ -143,7 +143,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.3.6 (build 37)',
+        prof_version:'Version 1.3.41 (build 142)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -312,7 +312,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন ১.৩.৬ (বিল্ড ৩৭)',
+            prof_version:'ভার্সন ১.৩.৪১ (বিল্ড ১৪২)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -395,12 +395,18 @@ const App = {
     bindEvents() {
         const $ = id => document.getElementById(id);
         $('login-btn').addEventListener('click', () => this.emailLogin());
-        $('google-login').addEventListener('click', () => this.googleLogin());
-        $('show-register').addEventListener('click', () => { document.querySelector('#auth-screen .auth-card').style.display = 'none'; $('register-card').style.display = 'block'; });
-        $('back-to-login').addEventListener('click', () => { $('register-card').style.display = 'none'; document.querySelector('#auth-screen .auth-card').style.display = 'block'; });
-        $('register-btn').addEventListener('click', () => this.emailRegister());
+        $('show-login-btn').addEventListener('click', () => this.showScreen('auth-login-screen'));
+        $('show-register-welcome').addEventListener('click', () => this.showScreen('auth-register-screen'));
+        $('login-back-btn').addEventListener('click', () => this.showScreen('auth-screen'));
+        $('register-back-btn').addEventListener('click', () => this.showScreen('auth-screen'));
         $('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
-        $('forgot-back-login').addEventListener('click', () => this.showScreen('auth-screen'));
+        $('forgot-back-login').addEventListener('click', () => this.showScreen('auth-login-screen'));
+        $('google-login-welcome').addEventListener('click', () => this.googleLogin());
+        $('google-login-email').addEventListener('click', () => this.googleLogin());
+        $('google-register').addEventListener('click', () => this.googleLogin());
+        $('show-register-login').addEventListener('click', () => this.showScreen('auth-register-screen'));
+        $('back-to-login-login').addEventListener('click', () => this.showScreen('auth-login-screen'));
+        $('register-btn').addEventListener('click', () => this.emailRegister());
         $('send-reset-btn').addEventListener('click', () => this.sendResetEmail());
         $('create-mess-btn').addEventListener('click', () => this.createMess());
         $('join-mess-btn').addEventListener('click', () => this.joinMess());
@@ -2872,6 +2878,13 @@ const App = {
         document.getElementById('prof-name').textContent = u.displayName || 'User';
         document.getElementById('prof-email').textContent = u.email || '-';
         document.getElementById('prof-uid-text').textContent = u.uid ? u.uid.slice(0, 12) + '...' : '-';
+        try {
+            if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
+                const info = await Capacitor.Plugins.App.getInfo();
+                const vEl = document.querySelector('[data-lang-key="prof_version"]');
+                if (vEl) vEl.textContent = `Version ${info.version} (build ${info.build})`;
+            }
+        } catch (e) {}
         try {
             const snap = await db.ref(`users/${u.uid}/profilePicture`).once('value');
             const photo = snap.val();
