@@ -526,7 +526,7 @@ const App = {
         try {
             if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
                 const { GoogleAuth } = Capacitor.Plugins;
-                await GoogleAuth.initialize({ clientId: '714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com', scopes: 'profile,email', grantOfflineAccess: true });
+                await GoogleAuth.initialize({ clientId: '714155755588-t8q4gbukrdmhiu3j312ad77glpn2i93a.apps.googleusercontent.com', scopes: 'profile,email', grantOfflineAccess: true });
                 const result = await GoogleAuth.signIn();
                 const credential = firebase.auth.GoogleAuthProvider.credential(result.authentication.idToken);
                 const c = await auth.signInWithCredential(credential);
