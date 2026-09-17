@@ -17,6 +17,7 @@
         <item name="android:navigationBarColor">#f2f4f8</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
 

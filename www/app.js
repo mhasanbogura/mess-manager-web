@@ -158,6 +158,8 @@ const App = {
 
     applyLanguage() {
         const lang = localStorage.getItem('mess_lang') || 'en';
+        document.documentElement.lang = lang === 'bn' ? 'bn' : 'en';
+        document.documentElement.setAttribute('data-lang', lang);
         document.querySelectorAll('[data-lang-key]').forEach(el => {
             const key = el.getAttribute('data-lang-key');
             const text = this._translations[key];
@@ -2797,12 +2799,14 @@ const App = {
         const isDark = bgColor === '#111111';
         try {
             if (window.Capacitor?.Plugins?.StatusBar) {
+                window.Capacitor.Plugins.StatusBar.setOverlaysWebView({ overlay: true });
                 window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
                 window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
             }
         } catch (e) {}
         try {
             if (window.Capacitor?.Plugins?.NavigationBar) {
+                window.Capacitor.Plugins.NavigationBar.setOverlaysWebView({ overlay: true });
                 window.Capacitor.Plugins.NavigationBar.setColor({ color: bgColor });
                 window.Capacitor.Plugins.NavigationBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
             }

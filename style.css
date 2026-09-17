@@ -55,7 +55,7 @@ html { -webkit-text-size-adjust: 100%; }
 .splash-icon { width: 80px; height: 80px; border-radius: 18px; object-fit: contain; }
 
 body {
-    font-family: 'Times New Roman', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Times New Roman', 'Noto Sans Bengali', serif;
     background: var(--bg);
     background-image: var(--bg-gradient);
     color: var(--text);
@@ -3190,3 +3190,8 @@ img, canvas { max-width: 100%; }
 #connectivity-banner.hidden { transform: translateY(100%); opacity: 0; pointer-events: none; }
 #connectivity-banner .material-icons-round { font-size: 18px; }
 [data-theme="oled"] #connectivity-banner { background: #222; }
+[data-lang="bn"] body, [lang="bn"] body { font-family: 'Noto Sans Bengali', 'Times New Roman', serif; }
+[data-lang="bn"] .aprof-label, [data-lang="bn"] .aprof-desc-inline,
+[data-lang="bn"] .aprof-section-title, [data-lang="bn"] h1, [data-lang="bn"] h2,
+[data-lang="bn"] h3, [data-lang="bn"] h4, [data-lang="bn"] p,
+[data-lang="bn"] .dash-mess-name, [data-lang="bn"] .dash-date-text { font-family: 'Noto Sans Bengali', serif; }
