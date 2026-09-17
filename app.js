@@ -143,7 +143,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.3.41 (build 142)',
+        prof_version:'Version 1.3.42 (build 145)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -312,7 +312,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন ১.৩.৪১ (বিল্ড ১৪২)',
+            prof_version:'ভার্সন ১.৩.৪২ (বিল্ড ১৪৫)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
