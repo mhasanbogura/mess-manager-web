@@ -25,10 +25,23 @@ task bumpVersion {
 }
 
 task release {
-    dependsOn bumpVersion, 'assembleDebug'
+    dependsOn 'assembleDebug'
     doLast {
-        def v = project.ext.newVersion
-        def b = project.ext.newBuild
+        def content = versionFile.text
+        def currentCodeMatcher = (content =~ /versionCode (\d+)/)
+        def currentNameMatcher = (content =~ /versionName "([\d.]+)"/)
+        def v = currentNameMatcher[0][1]
+        def b = currentCodeMatcher[0][1] as int
+
+        def newCode = b + 3
+        def parts = v.split('\\.')
+        parts[parts.length - 1] = (parts[parts.length - 1] as int + 1).toString()
+        def newName = parts.join('.')
+        def newContent = content
+            .replaceFirst(/versionCode \d+/, "versionCode ${newCode}")
+            .replaceFirst(/versionName "[\d.]+"/, "versionName \"${newName}\"")
+        versionFile.text = newContent
+
         def apkName = "mess-manager.apk"
         def apkPath = file("${buildDir}/outputs/apk/debug/app-debug.apk")
         def tagName = "v${v}"
@@ -37,7 +50,7 @@ task release {
         def apkStore = "/home/mhasanbogura/Google Drive/mahmudulhasandhk70/Apk Store/Android"
         def storeApkName = "Mess Manager_com.mahmuduls.messmanager_v${v}_build_${b}.apk"
 
-        println "Releasing ${tagName} (build ${b})..."
+        println "Release v${v} build ${b} (next: v${newName} build ${newCode})..."
 
         exec {
             workingDir rootDir
