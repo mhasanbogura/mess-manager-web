@@ -13,7 +13,6 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(StatusBarPlugin.class);
         registerPlugin(CapgoNavigationBarPlugin.class);
         registerPlugin(SystemBarsPlugin.class);
-        super.onCreate();
+        super.onCreate(savedInstanceState);
     }
-}
 }
