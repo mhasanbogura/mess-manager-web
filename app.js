@@ -9,6 +9,12 @@ const App = {
     _cacheGet(key) {
         try { const v = localStorage.getItem('mc_' + this.messId + '_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
     },
+    _cacheSetGlobal(key, data) {
+        try { localStorage.setItem('mcg_' + key, JSON.stringify(data)); } catch (e) {}
+    },
+    _cacheGetGlobal(key) {
+        try { const v = localStorage.getItem('mcg_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
+    },
     async _dbGet(path, cacheKey) {
         try {
             const snap = await db.ref(path).once('value');
@@ -16,11 +22,11 @@ const App = {
             if (cacheKey) this._cacheSet(cacheKey, data);
             return data;
         } catch (e) {
-            if (!navigator.onLine && cacheKey) {
+            if (cacheKey) {
                 const cached = this._cacheGet(cacheKey);
                 if (cached) return cached;
             }
-            throw e;
+            return {};
         }
     },
 
@@ -554,51 +560,73 @@ const App = {
         if (!this.currentUser) return;
         const splash = document.getElementById('splash-screen');
         if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+        const cacheKey = `user_messes_${this.currentUser.uid}`;
+        let data = {};
         try {
             const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
-            const data = snap.val() || {};
-            const ids = Object.keys(data);
-            if (ids.length === 1) { this.enterMess(ids[0]); return; }
-            if (ids.length > 1) {
-                this.showScreen('mess-select-screen');
-                const div = document.getElementById('my-messes-list');
-                let html = '<div class="card-body">';
-                for (const mid of ids) {
-                    const ms = await db.ref(`messes/${mid}/settings`).once('value');
-                    const s = ms.val() || {};
-                    html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
-                        <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
-                        <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
-                        <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
-                    </div>`;
-                }
-                div.innerHTML = html + '</div>';
-                return;
-            }
-            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
-            this.showScreen('mess-select-screen');
-            document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">No mess yet. Create or join one below.</p></div>';
+            data = snap.val() || {};
+            try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
         } catch (e) {
-            console.error('loadMyMesses error:', e);
-            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
-            this.showScreen('mess-select-screen');
-            document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">Error loading mess. Check connection.</p></div>';
+            try { const c = JSON.parse(localStorage.getItem(cacheKey) || '{}'); if (Object.keys(c).length) data = c; } catch (e2) {}
         }
+        const ids = Object.keys(data);
+        if (ids.length === 1) { this.enterMess(ids[0]); return; }
+        if (ids.length > 1) {
+            this.showScreen('mess-select-screen');
+            const div = document.getElementById('my-messes-list');
+            let html = '<div class="card-body">';
+            for (const mid of ids) {
+                let s = {};
+                try {
+                    const ms = await db.ref(`messes/${mid}/settings`).once('value');
+                    s = ms.val() || {};
+                    try { localStorage.setItem(`mess_settings_${mid}`, JSON.stringify(s)); } catch (e) {}
+                } catch (e) {
+                    try { s = JSON.parse(localStorage.getItem(`mess_settings_${mid}`) || '{}'); } catch (e2) {}
+                }
+                html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
+                    <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
+                    <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
+                    <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
+                </div>`;
+            }
+            div.innerHTML = html + '</div>';
+            return;
+        }
+        if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+        this.showScreen('mess-select-screen');
+        document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">No mess yet. Create or join one below.</p></div>';
     },
 
-    enterMess(mid) {
+    async enterMess(mid) {
         this.messId = mid;
         this.messCode = null;
-        db.ref(`messes/${mid}/settings`).once('value').then(async s => {
+        const settingsCacheKey = `mess_settings_${mid}`;
+        const roleCacheKey = `mess_role_${mid}`;
+        try {
+            const s = await db.ref(`messes/${mid}/settings`).once('value');
             const v = s.val() || {};
             this.messCode = v.messCode;
             this.messName = v.messName;
-            const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
-            this.userRole = roleSnap.val() || 'member';
-            this.setupPresence();
-            await this.loadMyPerms();
-            this.showApp();
-        }).catch(e => { console.error('enterMess error:', e); this.toast('Error loading mess', 'error'); });
+            try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e) {}
+            try {
+                const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
+                this.userRole = roleSnap.val() || 'member';
+                try { localStorage.setItem(roleCacheKey, this.userRole); } catch (e) {}
+            } catch (e) {
+                try { this.userRole = localStorage.getItem(roleCacheKey) || 'member'; } catch (e2) {}
+            }
+        } catch (e) {
+            try {
+                const cached = JSON.parse(localStorage.getItem(settingsCacheKey) || '{}');
+                this.messCode = cached.messCode || null;
+                this.messName = cached.messName || 'My Mess';
+                this.userRole = localStorage.getItem(roleCacheKey) || 'member';
+            } catch (e2) {}
+        }
+        try { this.setupPresence(); } catch (e) {}
+        try { await this.loadMyPerms(); } catch (e) {}
+        this.showApp();
     },
 
     setupPresence() {
@@ -1169,13 +1197,17 @@ const App = {
     _permsLoaded: false,
     async loadMyPerms() {
         if (!this.messId || !this.currentUser) return;
+        const cacheKey = `perms_${this.messId}_${this.currentUser.uid}`;
         try {
             const membersSnap = await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
             const m = membersSnap.val() || {};
-            if (m.role === 'admin') { this._userPerms = null; this._permsLoaded = true; return; }
+            if (m.role === 'admin') { this._userPerms = null; this._permsLoaded = true; try { localStorage.setItem(cacheKey, JSON.stringify(null)); } catch (e) {} return; }
             const permSnap = await db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value');
             this._userPerms = permSnap.val() || {};
-        } catch (e) { this._userPerms = {}; }
+            try { localStorage.setItem(cacheKey, JSON.stringify(this._userPerms)); } catch (e) {}
+        } catch (e) {
+            try { this._userPerms = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e2) { this._userPerms = {}; }
+        }
         this._permsLoaded = true;
     },
     canDo(key) {
@@ -1289,6 +1321,7 @@ const App = {
             const allMids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             const mids = allMids.filter(id => (members[id] || {}).status !== 'pending');
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
+            let managerName = '-';
             if (adminFound) managerName = adminFound[1].name || '-';
             else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
             document.getElementById('dash-manager').textContent = managerName;
@@ -1324,7 +1357,10 @@ const App = {
                 if (n) paidBy[n] = (paidBy[n] || 0) + amt;
             });
 
-            const mlMData = await this._dbGet(`messes/${this.messId}/meals`, 'meals_month');
+            let mlMData = {};
+            try {
+                mlMData = await this._dbGet(`messes/${this.messId}/meals`, 'meals_month');
+            } catch (e) {}
             const memberMeals = {};
             let totalMeals = 0;
             Object.entries(mlMData).forEach(([key, d]) => {
