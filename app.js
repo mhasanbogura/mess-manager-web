@@ -526,9 +526,11 @@ const App = {
         try {
             if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
                 const { GoogleAuth } = Capacitor.Plugins;
-                await GoogleAuth.initialize({ clientId: '714155755588-t8q4gbukrdmhiu3j312ad77glpn2i93a.apps.googleusercontent.com', scopes: 'profile,email', grantOfflineAccess: true });
+                await GoogleAuth.initialize({ clientId: '714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com', scopes: 'profile,email', grantOfflineAccess: true });
                 const result = await GoogleAuth.signIn();
-                const credential = firebase.auth.GoogleAuthProvider.credential(result.authentication.idToken);
+                const idToken = result.authentication?.idToken || result.idToken;
+                if (!idToken) { this.toast('Google login failed: no ID token received', 'error'); return; }
+                const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
                 const c = await auth.signInWithCredential(credential);
                 const s = await db.ref(`users/${c.user.uid}`).once('value');
                 if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() });
@@ -539,7 +541,20 @@ const App = {
                 if (!s.exists()) await db.ref(`users/${c.user.uid}`).set({ name: c.user.displayName, email: c.user.email, createdAt: Date.now() });
             }
         }
-        catch (e) { let m = e.message; if (e.code === 'auth/popup-closed-by-user') m = 'Cancelled'; this.toast(m, 'error'); }
+        catch (e) {
+            console.error('Google login error:', JSON.stringify(e));
+            let m = e.message || e.details || 'Unknown error';
+            if (e.code === 'auth/popup-closed-by-user') m = 'Cancelled';
+            else if (e.code === 'auth/invalid-credential') m = 'Invalid credentials - check Firebase config';
+            else if (e.code === 'auth/user-disabled') m = 'Account disabled';
+            else if (e.code === 'auth/account-exists-with-different-credential') m = 'Account exists with different login method';
+            else if (e.message?.includes('12500')) m = 'Google Sign-In config error (status 12500)';
+            else if (e.message?.includes('12501')) m = 'Google Sign-In cancelled';
+            else if (e.message?.includes('12502')) m = 'Sign-in already in progress';
+            else if (e.message?.includes('10')) m = 'Developer error (status 10) - SHA-1 or client ID mismatch';
+            else if (e.message?.includes('7')) m = 'Network error';
+            this.toast(m + ' [' + (e.code || e.details || '') + ']', 'error');
+        }
         finally { btn.innerHTML = orig; btn.disabled = false; }
     },
 
