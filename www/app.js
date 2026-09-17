@@ -378,6 +378,31 @@ const App = {
         $('logout-from-setup').addEventListener('click', () => auth.signOut());
         $('modal-close').addEventListener('click', () => this.closeModal());
         $('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
+        this._setupSwipe();
+    },
+
+    _setupSwipe() {
+        const navPages = ['dashboard','members','bazaar','meals','balance','profile'];
+        let startX = 0, startY = 0, swiping = false;
+        const appScreen = document.getElementById('app-screen');
+        if (!appScreen) return;
+        appScreen.addEventListener('touchstart', e => {
+            if (e.touches.length !== 1) return;
+            const t = e.touches[0];
+            startX = t.clientX; startY = t.clientY; swiping = true;
+        }, { passive: true });
+        appScreen.addEventListener('touchend', e => {
+            if (!swiping) return;
+            swiping = false;
+            const t = e.changedTouches[0];
+            const dx = t.clientX - startX;
+            const dy = t.clientY - startY;
+            if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.75) return;
+            const idx = navPages.indexOf(this.currentPage);
+            if (idx === -1) return;
+            if (dx < 0 && idx < navPages.length - 1) this.navigate(navPages[idx + 1]);
+            else if (dx > 0 && idx > 0) this.navigate(navPages[idx - 1]);
+        }, { passive: true });
     },
 
     showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); },
@@ -499,12 +524,12 @@ const App = {
     async loadMyMesses() {
         if (!this.currentUser) return;
         const splash = document.getElementById('splash-screen');
+        if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
         try {
             const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
             const data = snap.val() || {};
             const ids = Object.keys(data);
             if (ids.length === 1) { this.enterMess(ids[0]); return; }
-            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             if (ids.length > 1) {
                 this.showScreen('mess-select-screen');
                 const div = document.getElementById('my-messes-list');
@@ -623,7 +648,9 @@ const App = {
         const splash = document.getElementById('splash-screen');
         if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
         try { history.pushState({ page: 'dashboard' }, ''); } catch (e) { /* ignore */ }
-        this.navigate('dashboard');
+        const savedPage = localStorage.getItem('mess_currentPage');
+        const validPages = ['dashboard','members','bazaar','meals','balance','profile'];
+        this.navigate(validPages.includes(savedPage) ? savedPage : 'dashboard');
     },
 
     navigate(page) {
@@ -632,6 +659,7 @@ const App = {
             if (this._pageHistory.length < 30) this._pageHistory.push(this.currentPage);
         }
         this.currentPage = page;
+        try { localStorage.setItem('mess_currentPage', page); } catch (e) {}
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         const pg = document.getElementById('page-' + page);
         if (pg) pg.classList.add('active');
@@ -2797,17 +2825,20 @@ const App = {
             else { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bgColor; document.head.appendChild(m); }
         } catch (e) {}
         const isDark = bgColor === '#111111';
-        try {
-            if (window.Capacitor?.Plugins?.StatusBar) {
-                window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
-                window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
-            }
-        } catch (e) {}
-        try {
-            if (window.Capacitor?.Plugins?.NavigationBar) {
-                window.Capacitor.Plugins.NavigationBar.setNavigationBarColor({ color: bgColor });
-            }
-        } catch (e) {}
+        const setBars = (retry) => {
+            try {
+                if (window.Capacitor?.Plugins?.StatusBar) {
+                    window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
+                    window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
+                }
+            } catch (e) { if (retry > 0) setTimeout(() => setBars(retry - 1), 200); }
+            try {
+                if (window.Capacitor?.Plugins?.NavigationBar) {
+                    window.Capacitor.Plugins.NavigationBar.setNavigationBarColor({ color: bgColor });
+                }
+            } catch (e) { if (retry > 0) setTimeout(() => setBars(retry - 1), 200); }
+        };
+        setBars(3);
     },
     _setupConnectivity() {
         this._isOnline = navigator.onLine;

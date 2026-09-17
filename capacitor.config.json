@@ -3,11 +3,20 @@
   "appName": "Mess Manager",
   "webDir": "www",
   "server": {
-    "androidScheme": "https",
-    "url": "https://mhasanbogura.github.io/mess-manager-web/",
-    "cleartext": true
+    "androidScheme": "https"
   },
   "android": {
     "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "androidScaleType": "CENTER_CROP",
+      "splashFullScreen": true,
+      "splashImmersive": false,
+      "showSpinner": false,
+      "backgroundColor": "#0b3d91",
+      "duration": 1500
+    }
   }
 }
