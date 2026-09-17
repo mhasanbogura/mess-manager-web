@@ -2804,6 +2804,7 @@ const App = {
             document.documentElement.removeAttribute('data-theme');
         }
         localStorage.setItem('mess_theme', this.theme);
+        this._setSystemBars(this.theme === 'oled' ? '#111111' : '#f2f4f8', this.theme === 'oled' ? '#ffffff' : '#14181f');
     },
     applyTheme() {
         const saved = localStorage.getItem('mess_theme') || 'light';
@@ -2824,21 +2825,28 @@ const App = {
             if (meta) meta.setAttribute('content', bgColor);
             else { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bgColor; document.head.appendChild(m); }
         } catch (e) {}
-        const isDark = bgColor === '#111111';
         const setBars = (retry) => {
             try {
+                if (window.Capacitor?.Plugins?.SystemBars) {
+                    window.Capacitor.Plugins.SystemBars.setColors({ color: bgColor });
+                    return;
+                }
+            } catch (e) {}
+            try {
                 if (window.Capacitor?.Plugins?.StatusBar) {
+                    const isDark = bgColor === '#111111';
                     window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
                     window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
                 }
-            } catch (e) { if (retry > 0) setTimeout(() => setBars(retry - 1), 200); }
+            } catch (e) {}
             try {
                 if (window.Capacitor?.Plugins?.NavigationBar) {
                     window.Capacitor.Plugins.NavigationBar.setNavigationBarColor({ color: bgColor });
                 }
-            } catch (e) { if (retry > 0) setTimeout(() => setBars(retry - 1), 200); }
+            } catch (e) {}
+            if (retry > 0) setTimeout(() => setBars(retry - 1), 300);
         };
-        setBars(3);
+        setBars(5);
     },
     _setupConnectivity() {
         this._isOnline = navigator.onLine;

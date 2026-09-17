@@ -1,10 +1,6 @@
 package com.mahmuduls.messmanager;
 
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
 import com.getcapacitor.BridgeActivity;
 import com.codetrixstudio.capacitor.GoogleAuth.GoogleAuth;
 import com.capacitorjs.plugins.statusbar.StatusBarPlugin;
@@ -16,6 +12,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(GoogleAuth.class);
         registerPlugin(StatusBarPlugin.class);
         registerPlugin(CapgoNavigationBarPlugin.class);
-        super.onCreate(savedInstanceState);
+        registerPlugin(SystemBarsPlugin.class);
+        super.onCreate();
     }
+}
 }
