@@ -2,6 +2,28 @@ const App = {
     currentUser: null, messId: null, messCode: null, messName: null,
     currentPage: 'dashboard', userRole: 'member',
 
+    // ── offline cache helpers ──────────────────────────────────
+    _cacheSet(key, data) {
+        try { localStorage.setItem('mc_' + this.messId + '_' + key, JSON.stringify(data)); } catch (e) {}
+    },
+    _cacheGet(key) {
+        try { const v = localStorage.getItem('mc_' + this.messId + '_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
+    },
+    async _dbGet(path, cacheKey) {
+        try {
+            const snap = await db.ref(path).once('value');
+            const data = snap.val() || {};
+            if (cacheKey) this._cacheSet(cacheKey, data);
+            return data;
+        } catch (e) {
+            if (!navigator.onLine && cacheKey) {
+                const cached = this._cacheGet(cacheKey);
+                if (cached) return cached;
+            }
+            throw e;
+        }
+    },
+
     // ── i18n ───────────────────────────────────────────────────
     _translations: {
         // Nav
@@ -337,6 +359,7 @@ const App = {
             return;
         }
         try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { /* ignore */ }
+        try { await db.enablePersistence({ synchronizeTabs: true }); } catch (e) { /* already enabled or not supported */ }
         try { db.goOnline(); } catch (e) {}
         this._setupConnectivity();
         this.handleRedirectResult();
@@ -438,13 +461,19 @@ const App = {
                     } else {
                         this.navigate('dashboard');
                     }
-                } else {
-                    try { navigator.app?.exitApp?.(); } catch (e) {}
-                    try { window.Capacitor?.Plugins?.App?.exitApp?.(); } catch (e) {}
+                } else if (this.currentPage === 'dashboard') {
+                    this.showScreen('mess-select-screen');
+                    this.loadMyMesses();
                 }
             } else if (authActive) {
-                try { navigator.app?.exitApp?.(); } catch (e) {}
-                try { window.Capacitor?.Plugins?.App?.exitApp?.(); } catch (e) {}
+                const registerCard = document.getElementById('register-card');
+                const forgotScreen = document.getElementById('forgot-screen');
+                if (registerCard && registerCard.style.display !== 'none') {
+                    registerCard.style.display = 'none';
+                    document.querySelector('#auth-screen .auth-card').style.display = '';
+                } else if (forgotScreen && forgotScreen.classList.contains('active')) {
+                    this.showScreen('auth-screen');
+                }
             } else if (messActive) {
                 this.signOut();
             }
@@ -900,13 +929,11 @@ const App = {
     async loadFlat() {
         if (!this.messId) return;
         try {
-            const sSnap = await db.ref(`messes/${this.messId}/settings`).once('value');
-            const s = sSnap.val() || {};
+            const s = await this._dbGet(`messes/${this.messId}/settings`, 'settings');
             document.getElementById('flat-mess-name').textContent = s.messName || 'My Mess';
             document.getElementById('flat-mess-code').textContent = s.messCode || '------';
 
-            const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-            const members = mSnap.val() || {};
+            const members = await this._dbGet(`messes/${this.messId}/members`, 'members');
             this._flatMembers = members;
             const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             let adminName = '-';
@@ -1258,8 +1285,7 @@ const App = {
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
 
-            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-            const members = membersSnap.val() || {};
+            const members = await this._dbGet(`messes/${this.messId}/members`, 'members');
             const allMids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             const mids = allMids.filter(id => (members[id] || {}).status !== 'pending');
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
@@ -1272,8 +1298,7 @@ const App = {
             const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
             document.getElementById('dash-date').textContent = `Today is ${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()} (${weekdays[now.getDay()]})`;
 
-            const mlSnap = await db.ref(`messes/${this.messId}/meals/${todayKey}`).once('value');
-            const todayMeals = mlSnap.val() || {};
+            const todayMeals = await this._dbGet(`messes/${this.messId}/meals/${todayKey}`, 'meals_today_' + todayKey);
             let bf = 0, ln = 0, dn = 0;
             Object.values(todayMeals).forEach(m => { bf += (m.breakfast || 0); ln += (m.lunch || 0); dn += (m.dinner || 0); });
             document.getElementById('dash-breakfast').textContent = bf;
@@ -1287,10 +1312,10 @@ const App = {
             } catch (e) { /* notices may not exist */ }
             document.getElementById('dash-notice-preview').textContent = preview;
 
-            const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
+            const bzData = await this._dbGet(`messes/${this.messId}/bazarItems`, 'bazarItems');
             let bazTotal = 0;
             const paidBy = {};
-            Object.values(bzSnap.val() || {}).forEach(b => {
+            Object.values(bzData).forEach(b => {
                 if ((b.category || 'bazar') === 'utility') return;
                 if (!b.date || !b.date.startsWith(month)) return;
                 const amt = parseFloat(b.cost) || 0;
@@ -1299,11 +1324,12 @@ const App = {
                 if (n) paidBy[n] = (paidBy[n] || 0) + amt;
             });
 
-            const mlMSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(monthEnd).once('value');
+            const mlMData = await this._dbGet(`messes/${this.messId}/meals`, 'meals_month');
             const memberMeals = {};
             let totalMeals = 0;
-            mlMSnap.forEach(d => {
-                Object.entries(d.val() || {}).forEach(([memberName, m]) => {
+            Object.entries(mlMData).forEach(([key, d]) => {
+                if (key < month + '-01' || key > monthEnd) return;
+                Object.entries(d || {}).forEach(([memberName, m]) => {
                     const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
                     memberMeals[memberName] = (memberMeals[memberName] || 0) + base;
                     totalMeals += base;
@@ -1311,8 +1337,7 @@ const App = {
             });
             const rate = totalMeals > 0 ? bazTotal / totalMeals : 0;
 
-            const depSnap = await db.ref(`messes/${this.messId}/deposits`).once('value');
-            const depAll = depSnap.val() || {};
+            const depAll = await this._dbGet(`messes/${this.messId}/deposits`, 'deposits');
             const mealDepByName = {}; const utilDepByName = {}; let totalDep = 0; let totalMealDep = 0; let totalUtilDep = 0;
             Object.values(depAll).forEach(v => {
                 if (!v || typeof v !== 'object') return;
@@ -1338,7 +1363,7 @@ const App = {
             document.getElementById('dash-rate').textContent = '৳ ' + rate.toFixed(2);
 
             let totalRent = 0, totalUtilCost = 0;
-            Object.values(bzSnap.val() || {}).forEach(b => {
+            Object.values(bzData).forEach(b => {
                 if ((b.category || 'bazar') !== 'utility') return;
                 if (!b.date || !b.date.startsWith(month)) return;
                 const amt = parseFloat(b.cost) || 0;
@@ -1374,7 +1399,7 @@ const App = {
             const utilRows = document.getElementById('dash-utility-rows');
             const utilByName = {};
             const rentByName = {};
-            Object.values(bzSnap.val() || {}).forEach(b => {
+            Object.values(bzData).forEach(b => {
                 const amt = parseFloat(b.cost) || 0;
                 if (!amt) return;
                 if (!b.date || !b.date.startsWith(month)) return;
@@ -1532,12 +1557,10 @@ const App = {
         loader.style.display = 'flex';
         scroll.style.display = 'none';
         try {
-            const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-            const members = membersSnap.val() || {};
-            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+            const members = await this._dbGet(`messes/${this.messId}/members`, 'members');
+            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             if (!mids.length) { loader.innerHTML = '<p class="empty-state">No members</p>'; return; }
-            const mealsSnap = await db.ref(`messes/${this.messId}/meals`).orderByKey().startAt(month + '-01').endAt(month + '-' + String(daysInMonth).padStart(2,'0')).once('value');
-            const allMeals = mealsSnap.val() || {};
+            const allMeals = await this._dbGet(`messes/${this.messId}/meals`, 'meals_month');
             const memberData = {};
             const nameToMid = {};
             mids.forEach(mid => {
@@ -2031,12 +2054,11 @@ const App = {
         const div = document.getElementById('abazar-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
-            const [bazarSnap, membersSnap] = await Promise.all([
-                db.ref(`messes/${this.messId}/bazarItems`).orderByChild('date').once('value'),
-                db.ref(`messes/${this.messId}/members`).once('value')
+            const [bazarData, members] = await Promise.all([
+                this._dbGet(`messes/${this.messId}/bazarItems`, 'bazarItems'),
+                this._dbGet(`messes/${this.messId}/members`, 'members')
             ]);
-            const members = membersSnap.val() || {};
-            this._allBazar = Object.entries(bazarSnap.val() || {})
+            this._allBazar = Object.entries(bazarData)
                 .filter(([, v]) => v.date && v.date.startsWith(month))
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
             this._bazarMembers = members;
@@ -2216,12 +2238,11 @@ const App = {
         const div = document.getElementById('abalance-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
-            const [depSnap, membersSnap] = await Promise.all([
-                db.ref(`messes/${this.messId}/deposits`).orderByChild('date').once('value'),
-                db.ref(`messes/${this.messId}/members`).once('value')
+            const [depData, members] = await Promise.all([
+                this._dbGet(`messes/${this.messId}/deposits`, 'deposits'),
+                this._dbGet(`messes/${this.messId}/members`, 'members')
             ]);
-            const members = membersSnap.val() || {};
-            this._allDeps = Object.entries(depSnap.val() || {})
+            this._allDeps = Object.entries(depData)
                 .filter(([, v]) => v.date && v.date.startsWith(month))
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
             this._depMembers = members;
@@ -2865,11 +2886,36 @@ const App = {
                 const connected = snap.val();
                 if (connected && !this._wasConnected) {
                     this._wasConnected = true;
+                    this._flushOfflineQueue();
                     this._refreshCurrentPage();
                 } else if (!connected) {
                     this._wasConnected = false;
                 }
             });
+        } catch (e) {}
+    },
+    _queueOfflineWrite(path, data, method) {
+        try {
+            const queue = JSON.parse(localStorage.getItem('mess_offline_queue') || '[]');
+            queue.push({ path, data, method: method || 'set', ts: Date.now() });
+            localStorage.setItem('mess_offline_queue', JSON.stringify(queue));
+        } catch (e) {}
+    },
+    async _flushOfflineQueue() {
+        try {
+            const queue = JSON.parse(localStorage.getItem('mess_offline_queue') || '[]');
+            if (!queue.length) return;
+            const remaining = [];
+            for (const item of queue) {
+                try {
+                    if (item.method === 'set') await db.ref(item.path).set(item.data);
+                    else if (item.method === 'push') await db.ref(item.path).push(item.data);
+                    else if (item.method === 'update') await db.ref(item.path).update(item.data);
+                    else if (item.method === 'remove') await db.ref(item.path).remove();
+                } catch (e) { remaining.push(item); }
+            }
+            localStorage.setItem('mess_offline_queue', JSON.stringify(remaining));
+            if (remaining.length < queue.length) this.toast(`Synced ${queue.length - remaining.length} offline change(s)`, 'success');
         } catch (e) {}
     },
     _showOnlineStatus(online) {
