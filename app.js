@@ -360,8 +360,12 @@ const App = {
 
     async init() {
         const splash = document.getElementById('splash-screen');
-        const hideSplash = () => { if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); } };
-        setTimeout(hideSplash, 5000);
+        const hideSplash = () => {
+            if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+            try { if (window.Capacitor?.Plugins?.SplashScreen) Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
+        };
+        hideSplash();
+        setTimeout(hideSplash, 2000);
         this.applyTheme();
         this.applyLanguage();
         this._cacheDriveFiles();
