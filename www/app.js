@@ -143,7 +143,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.3.46 (build 157)',
+        prof_version:'Version 1.3.47 (build 160)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -312,7 +312,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন ১.৩.৪৬ (বিল্ড ১৫৭)',
+            prof_version:'ভার্সন ১.৩.৪৭ (বিল্ড ১৬০)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -480,14 +480,13 @@ const App = {
                     this.loadMyMesses();
                 }
             } else if (authActive) {
-                const registerCard = document.getElementById('register-card');
-                const forgotScreen = document.getElementById('forgot-screen');
-                if (registerCard && registerCard.style.display !== 'none') {
-                    registerCard.style.display = 'none';
-                    document.querySelector('#auth-screen .auth-card').style.display = '';
-                } else if (forgotScreen && forgotScreen.classList.contains('active')) {
-                    this.showScreen('auth-screen');
-                }
+                // from welcome screen - do nothing (stay or exit)
+            } else if (document.getElementById('auth-login-screen')?.classList.contains('active')) {
+                this.showScreen('auth-screen');
+            } else if (document.getElementById('auth-register-screen')?.classList.contains('active')) {
+                this.showScreen('auth-screen');
+            } else if (document.getElementById('forgot-screen')?.classList.contains('active')) {
+                this.showScreen('auth-login-screen');
             } else if (messActive) {
                 this.signOut();
             }
@@ -547,16 +546,17 @@ const App = {
         }
         catch (e) {
             console.error('Google login error:', JSON.stringify(e));
+            const msg = (e.message || '') + ' ' + (e.details || '') + ' ' + (e.code || '');
             let m = e.message || e.details || 'Unknown error';
             if (e.code === 'auth/popup-closed-by-user') m = 'Cancelled';
             else if (e.code === 'auth/invalid-credential') m = 'Invalid credentials - check Firebase config';
             else if (e.code === 'auth/user-disabled') m = 'Account disabled';
             else if (e.code === 'auth/account-exists-with-different-credential') m = 'Account exists with different login method';
-            else if (e.message?.includes('12500')) m = 'Google Sign-In config error (status 12500)';
-            else if (e.message?.includes('12501')) m = 'Google Sign-In cancelled';
-            else if (e.message?.includes('12502')) m = 'Sign-in already in progress';
-            else if (e.message?.includes('10')) m = 'Developer error (status 10) - SHA-1 or client ID mismatch';
-            else if (e.message?.includes('7')) m = 'Network error';
+            else if (msg.includes('12500')) m = 'Google Sign-In config error (status 12500)';
+            else if (msg.includes('12501')) m = 'Google Sign-In cancelled';
+            else if (msg.includes('12502')) m = 'Sign-in already in progress';
+            else if (msg.includes('10') || msg.includes('DEVELOPER_ERROR')) m = 'Developer error - SHA-1 or client ID mismatch';
+            else if (msg.includes('7')) m = 'Network error';
             this.toast(m + ' [' + (e.code || e.details || '') + ']', 'error');
         }
         finally { btn.innerHTML = orig; btn.disabled = false; }
