@@ -662,6 +662,13 @@ const App = {
         const settingsCacheKey = `mess_settings_${mid}`;
         const roleCacheKey = `mess_role_${mid}`;
         try {
+            const memberSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
+            if (!memberSnap.exists()) {
+                try { await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).remove(); } catch (e2) {}
+                this.toast('You are no longer a member of this mess', 'error');
+                this.messId = null;
+                return this.loadMyMesses();
+            }
             const s = await db.ref(`messes/${mid}/settings`).once('value');
             const v = s.val() || {};
             this.messCode = v.messCode;
@@ -1212,7 +1219,10 @@ const App = {
         if (!this.checkPerm('manage')) return;
         if (!confirm(`Remove ${name} from mess?`)) return;
         try {
-            await db.ref(`messes/${this.messId}/members/${uid}`).remove();
+            const updates = {};
+            updates[`messes/${this.messId}/members/${uid}`] = null;
+            updates[`users/${uid}/messes/${this.messId}`] = null;
+            await db.ref().update(updates);
             this.toast('Removed!', 'success');
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
@@ -1611,7 +1621,10 @@ const App = {
             const mSnap = await db.ref(`messes/${this.messId}/members/${uid}`).once('value');
             const m = mSnap.val() || {};
             if (!confirm(`Reject ${m.name || 'this member'}?`)) return;
-            await db.ref(`messes/${this.messId}/members/${uid}`).remove();
+            const updates = {};
+            updates[`messes/${this.messId}/members/${uid}`] = null;
+            updates[`users/${uid}/messes/${this.messId}`] = null;
+            await db.ref().update(updates);
             this.toast('Request rejected', 'success');
             this.loadDashboard();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
