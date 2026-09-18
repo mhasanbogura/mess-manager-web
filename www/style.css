@@ -249,7 +249,7 @@ body {
     min-height: 100vh;
     background: linear-gradient(135deg, #0b3d91, #0d4fb5);
     justify-content: flex-start;
-    padding-top: 40px;
+    padding-top: 20px;
     position: relative;
 }
 #mess-select-screen::before {
@@ -831,7 +831,7 @@ select.input-sm { cursor: pointer; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ==================== EMPTY STATE ==================== */
-.empty-state { text-align: center; color: #555; padding: 32px 16px; font-size: 14px; }
+.empty-state { text-align: center; color: rgba(255,255,255,0.6); padding: 16px 16px; font-size: 14px; font-style: italic; }
 
 /* ==================== ANALYSIS PAGE ==================== */
 .analysis-card {

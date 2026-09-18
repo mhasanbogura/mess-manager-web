@@ -143,7 +143,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.3.44 (build 151)',
+        prof_version:'Version 1.3.45 (build 154)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -312,7 +312,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন ১.৩.৪৪ (বিল্ড ১৫১)',
+            prof_version:'ভার্সন ১.৩.৪৫ (বিল্ড ১৫৪)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -614,11 +614,46 @@ const App = {
                 </div>`;
             }
             div.innerHTML = html + '</div>';
+            this._setupMessSelectPullRefresh();
             return;
         }
         if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
         this.showScreen('mess-select-screen');
         document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">No mess yet. Create or join one below.</p></div>';
+        this._setupMessSelectPullRefresh();
+    },
+
+    _setupMessSelectPullRefresh() {
+        const screen = document.getElementById('mess-select-screen');
+        if (!screen || screen._pullSetup) return;
+        screen._pullSetup = true;
+        let startY = 0, pulling = false;
+        const indicator = document.createElement('div');
+        indicator.style.cssText = 'position:fixed;top:0;left:50%;transform:translateX(-50%) translateY(-50px);background:white;color:#333;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:600;z-index:999;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:transform .2s';
+        indicator.textContent = 'Pull to refresh';
+        document.body.appendChild(indicator);
+        screen.addEventListener('touchstart', e => { if (screen.classList.contains('active')) { startY = e.touches[0].clientY; pulling = true; } }, { passive: true });
+        screen.addEventListener('touchmove', e => {
+            if (!pulling) return;
+            const dy = e.touches[0].clientY - startY;
+            if (dy > 10 && screen.scrollTop <= 0) {
+                indicator.style.transform = `translateX(-50%) translateY(${Math.min(dy * 0.5 - 20, 30)}px)`;
+                indicator.textContent = dy > 80 ? 'Release to refresh' : 'Pull to refresh';
+            }
+        }, { passive: true });
+        screen.addEventListener('touchend', e => {
+            if (!pulling) return;
+            pulling = false;
+            const dy = (e.changedTouches?.[0]?.clientY || 0) - startY;
+            indicator.style.transform = 'translateX(-50%) translateY(-50px)';
+            if (dy > 80 && screen.scrollTop <= 0) {
+                indicator.textContent = 'Refreshing...';
+                indicator.style.transform = 'translateX(-50%) translateY(30px)';
+                this.loadMyMesses().then(() => {
+                    setTimeout(() => { indicator.style.transform = 'translateX(-50%) translateY(-50px)'; }, 1000);
+                });
+            }
+        }, { passive: true });
     },
 
     async enterMess(mid) {

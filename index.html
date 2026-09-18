@@ -48,7 +48,7 @@
             </div>
             <div class="auth-card">
                 <div class="input-group"><span class="material-icons-round">email</span><input type="email" id="login-email" data-lang-ph="auth_email_ph" placeholder="Email address"></div>
-                <div class="input-group"><span class="material-icons-round">lock</span><input type="password" id="login-password" data-lang-ph="auth_pass_ph" placeholder="Password"><button type="button" class="pw-toggle" onclick="const p=this.parentElement.querySelector('input');p.type=p.type==='password'?'text':'password';this.querySelector('.material-icons-round').textContent=p.type==='password'?'visibility_off':'visibility'"><span class="material-icons-round">visibility_off</span></button></div>
+                <div class="input-group"><span class="material-icons-round">lock</span><input type="password" id="login-password" data-lang-ph="auth_pass_ph" placeholder="Password"></div>
                 <button class="btn-auth-dark" id="login-btn" data-lang-key="auth_login">Log in</button>
                 <button class="btn-auth-google" id="google-login-email">
                     <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -99,26 +99,26 @@
 
     <!-- MESS SELECTOR -->
     <div id="mess-select-screen" class="screen">
-        <div class="auth-container" style="max-width:500px">
-            <div class="auth-header">
+        <div class="auth-container" style="max-width:500px;padding-top:16px;padding-bottom:16px">
+            <div class="auth-header" style="margin-bottom:16px">
                 <div class="auth-logo"><span class="material-icons-round">home_work</span></div>
-                <h1 data-lang-key="ms_title">Your Messes</h1>
-                <p data-lang-key="ms_subtitle">Select a mess or create a new one</p>
+                <h1 data-lang-key="ms_title" style="font-size:22px">Your Messes</h1>
+                <p data-lang-key="ms_subtitle" style="font-size:13px">Select a mess or create a new one</p>
             </div>
-            <div id="my-messes-list" class="card" style="margin-bottom:16px"><div class="card-body"><p class="empty-state" data-lang-key="ms_no_mess">No messes yet</p></div></div>
-            <div class="auth-card">
-                <h4 style="margin-bottom:12px" data-lang-key="ms_create_title">Create New Mess</h4>
-                <div class="input-group"><span class="material-icons-round">badge</span><input type="text" id="create-mess-name" data-lang-ph="ms_name_ph" placeholder="Mess Name"></div>
-                <div class="input-group"><span class="material-icons-round">location_on</span><input type="text" id="create-mess-address" data-lang-ph="ms_addr_ph" placeholder="Address (optional)"></div>
+            <div id="my-messes-list" class="card" style="margin-bottom:10px"><div class="card-body" style="padding:10px"><p class="empty-state" data-lang-key="ms_no_mess">No messes yet</p></div></div>
+            <div class="auth-card" style="padding:18px 16px;margin-bottom:10px">
+                <h4 style="margin-bottom:8px;font-size:15px" data-lang-key="ms_create_title">Create New Mess</h4>
+                <div class="input-group" style="margin-bottom:10px"><span class="material-icons-round">badge</span><input type="text" id="create-mess-name" data-lang-ph="ms_name_ph" placeholder="Mess Name"></div>
+                <div class="input-group" style="margin-bottom:10px"><span class="material-icons-round">location_on</span><input type="text" id="create-mess-address" data-lang-ph="ms_addr_ph" placeholder="Address (optional)"></div>
                 <button class="btn-primary" id="create-mess-btn" data-lang-key="ms_create_btn">Create Mess</button>
             </div>
-            <div class="auth-card" style="margin-top:12px">
-                <h4 style="margin-bottom:12px" data-lang-key="ms_join_title">Join Existing Mess</h4>
-                <div class="input-group"><span class="material-icons-round">vpn_key</span><input type="text" id="join-mess-code" data-lang-ph="ms_code_ph" placeholder="6-digit Code" maxlength="6" style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:18px;font-weight:600"></div>
+            <div class="auth-card" style="padding:18px 16px;margin-bottom:10px">
+                <h4 style="margin-bottom:8px;font-size:15px" data-lang-key="ms_join_title">Join Existing Mess</h4>
+                <div class="input-group" style="margin-bottom:10px"><span class="material-icons-round">vpn_key</span><input type="text" id="join-mess-code" data-lang-ph="ms_code_ph" placeholder="6-digit Code" maxlength="6" style="text-transform:uppercase;letter-spacing:2px;text-align:center;font-size:18px;font-weight:600"></div>
                 <button class="btn-primary" id="join-mess-btn" data-lang-key="ms_join_btn">Join Mess</button>
                 <p class="hint-text" data-lang-key="ms_code_hint">Ask your mess admin for the code</p>
             </div>
-            <button class="btn-text" id="logout-from-setup" style="color:var(--text-secondary)" data-lang-key="ms_signout">Sign Out</button>
+            <button class="btn-text" id="logout-from-setup" style="color:#333;font-weight:600" data-lang-key="ms_signout">Sign Out</button>
         </div>
     </div>
 
@@ -571,7 +571,7 @@
                     </div>
                 </div>
                 <div class="aprof-version">
-                    <span data-lang-key="prof_version">Version 1.3.44 (build 151)</span>
+                    <span data-lang-key="prof_version">Version 1.3.45 (build 154)</span>
                 </div>
             </div>
         </main>
