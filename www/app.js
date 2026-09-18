@@ -529,7 +529,7 @@ const App = {
         try {
             if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
                 const { GoogleAuth } = Capacitor.Plugins;
-                const cfg = await GoogleAuth.initialize({ clientId: '714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com', scopes: ['profile','email'], forceCodeForRefreshToken: true, serverClientId: '714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com' });
+                await GoogleAuth.initialize({ clientId: '714155755588-psvicqsasbnb6j2flmfqg9ttd60h9o3a.apps.googleusercontent.com', scopes: 'profile,email', grantOfflineAccess: true });
                 const result = await GoogleAuth.signIn();
                 const idToken = result.authentication?.idToken || result.idToken;
                 if (!idToken) { this.toast('Google login failed: no ID token received', 'error'); return; }

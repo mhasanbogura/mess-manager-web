@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "714155755588-ogc70d2vqho0342u5njur46uqpo8envr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mahmuduls.messmanager",
+            "certificate_hash": "982c9d4cdce6bcc1f4cc629539e3c49134d39c28"
+          }
+        },
+        {
           "client_id": "714155755588-t8q4gbukrdmhiu3j312ad77glpn2i93a.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
