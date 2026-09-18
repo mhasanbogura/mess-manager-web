@@ -29,6 +29,9 @@ const App = {
             return {};
         }
     },
+    _dbGetSync(cacheKey) {
+        try { const v = this._cacheGet(cacheKey); return v || {}; } catch (e) { return {}; }
+    },
 
     // ── i18n ───────────────────────────────────────────────────
     _translations: {
@@ -666,7 +669,7 @@ const App = {
         const roleCacheKey = `mess_role_${mid}`;
         try {
             const memberSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
-            if (!memberSnap.exists()) {
+            if (!memberSnap.exists() && navigator.onLine) {
                 try { await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).remove(); } catch (e2) {}
                 this.toast('You are no longer a member of this mess', 'error');
                 this.messId = null;
@@ -3069,6 +3072,18 @@ const App = {
             queue.push({ path, data, method: method || 'set', ts: Date.now() });
             localStorage.setItem('mess_offline_queue', JSON.stringify(queue));
         } catch (e) {}
+    },
+    async _dbWrite(path, data, method) {
+        method = method || 'set';
+        try {
+            if (method === 'set') await db.ref(path).set(data);
+            else if (method === 'update') await db.ref(path).update(data);
+            else if (method === 'push') await db.ref(path).push(data);
+            else if (method === 'remove') await db.ref(path).remove();
+        } catch (e) {
+            this._queueOfflineWrite(path, data, method);
+            if (!navigator.onLine) this.toast('Saved offline — will sync when connected', 'info');
+        }
     },
     async _flushOfflineQueue() {
         try {
