@@ -2610,14 +2610,15 @@ img, canvas { max-width: 100%; }
 .aflat-perm-list { display: flex; flex-direction: column; gap: 8px; }
 .aflat-perm-row { display: flex; align-items: center; gap: 10px; }
 .aflat-perm-check {
-    width: 22px; height: 22px; border-radius: 4px; border: 2px solid #999;
+    width: 24px; height: 24px; border-radius: 6px; border: 2px solid #bbb;
     background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
     flex-shrink: 0; transition: all .2s;
 }
 .aflat-perm-check.checked { background: #d32f2f; border-color: #d32f2f; }
-.aflat-perm-check .material-icons-round { font-size: 16px; color: #fff; display: none; }
+.aflat-perm-check .material-icons-round { font-size: 18px; color: #fff; display: none; }
 .aflat-perm-check.checked .material-icons-round { display: block; }
-.aflat-perm-label { font-size: 14px; color: #333; }
+.aflat-perm-check[style*="pointer-events:none"] { opacity: 1 !important; }
+.aflat-perm-label { font-size: 13px; color: #333; }
 .aflat-perm-sep { height: 1px; background: #eef1f6; margin: 8px 0; }
 .aflat-perm-note { font-size: 12px; color: #999; display: flex; align-items: flex-start; gap: 6px; margin-top: 8px; }
 .aflat-perm-note .material-icons-round { font-size: 16px; flex-shrink: 0; margin-top: 1px; }

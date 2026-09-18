@@ -415,12 +415,15 @@ const App = {
 
     _setupSwipe() {
         const navPages = ['dashboard','members','bazaar','meals','balance','profile'];
+        const tabPages = ['members'];
         let startX = 0, startY = 0, swiping = false;
         const appScreen = document.getElementById('app-screen');
         if (!appScreen) return;
         appScreen.addEventListener('touchstart', e => {
             if (e.touches.length !== 1) return;
             const t = e.touches[0];
+            const el = e.target;
+            if (el.closest('.ameal-grid-scroll') || el.closest('.aflat-tabs') || el.closest('.aflat-tab-content') || el.closest('input') || el.closest('button') || el.closest('.aflat-add-row')) return;
             startX = t.clientX; startY = t.clientY; swiping = true;
         }, { passive: true });
         appScreen.addEventListener('touchend', e => {
@@ -847,7 +850,7 @@ const App = {
         if (page === 'dashboard') this.loadDashboard();
         if (page === 'notices') this.loadNotices();
         if (page === 'duty') this.loadDuty();
-        if (page === 'members') this.loadFlat();
+        if (page === 'members') { this.loadFlat(); this._setupFlatTabSwipe(); }
         if (page === 'meals') this.loadMeals();
         if (page === 'addmeal') this.loadAddMeal();
         if (page === 'addcost') this.loadAddCost();
@@ -1044,6 +1047,31 @@ const App = {
         document.getElementById('flat-tab-permissions').style.display = tab === 'permissions' ? '' : 'none';
         if (tab === 'peoples' && this._flatMembers) this.loadFlatPeoples(this._flatMembers);
         if (tab === 'permissions' && this._flatMembers) this.loadFlatPermissions(this._flatMembers);
+        this._currentFlatTab = tab;
+    },
+    _setupFlatTabSwipe() {
+        const content = document.getElementById('page-members');
+        if (!content || content._flatSwipeSetup) return;
+        content._flatSwipeSetup = true;
+        const tabOrder = ['members', 'peoples', 'permissions'];
+        let startX = 0, startY = 0, swiping = false;
+        content.addEventListener('touchstart', e => {
+            if (e.touches.length !== 1 || this.currentPage !== 'members') return;
+            const t = e.touches[0];
+            startX = t.clientX; startY = t.clientY; swiping = true;
+        }, { passive: true });
+        content.addEventListener('touchend', e => {
+            if (!swiping || this.currentPage !== 'members') return;
+            swiping = false;
+            const t = e.changedTouches[0];
+            const dx = t.clientX - startX;
+            const dy = t.clientY - startY;
+            if (Math.abs(dx) < 80 || Math.abs(dy) > Math.abs(dx) * 0.6) return;
+            const cur = this._currentFlatTab || 'members';
+            const idx = tabOrder.indexOf(cur);
+            if (dx < 0 && idx < tabOrder.length - 1) this.switchFlatTab(tabOrder[idx + 1]);
+            else if (dx > 0 && idx > 0) this.switchFlatTab(tabOrder[idx - 1]);
+        }, { passive: true });
     },
 
     async loadFlat() {
