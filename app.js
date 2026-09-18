@@ -19,27 +19,37 @@ const App = {
         if (cacheKey) {
             const cached = this._cacheGet(cacheKey);
             if (cached && Object.keys(cached).length) {
-                if (navigator.onLine) {
-                    db.ref(path).once('value').then(snap => {
-                        const d = snap.val() || {};
-                        this._cacheSet(cacheKey, d);
-                    }).catch(() => {});
-                }
+                if (navigator.onLine) this._dbBgRefresh(path, cacheKey);
                 return cached;
             }
         }
+        if (!navigator.onLine) return {};
         try {
-            const snap = await db.ref(path).once('value');
+            const snap = await Promise.race([
+                db.ref(path).once('value'),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('fb-timeout')), 5000))
+            ]);
             const data = snap.val() || {};
             if (cacheKey) this._cacheSet(cacheKey, data);
             return data;
         } catch (e) {
-            if (cacheKey) {
-                const cached = this._cacheGet(cacheKey);
-                if (cached) return cached;
-            }
             return {};
         }
+    },
+    async _dbBgRefresh(path, cacheKey) {
+        try {
+            const snap = await db.ref(path).once('value');
+            this._cacheSet(cacheKey, snap.val() || {});
+        } catch (e) {}
+    },
+    async _dbRef(query) {
+        try {
+            const snap = await Promise.race([
+                query.once('value'),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('fb-timeout')), 5000))
+            ]);
+            return snap;
+        } catch (e) { return { val: () => null, exists: () => false }; }
     },
 
     // ── i18n ───────────────────────────────────────────────────
@@ -385,6 +395,29 @@ const App = {
         try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
         try { await db.enablePersistence({ synchronizeTabs: true }); } catch (e) {}
         try { db.goOnline(); } catch (e) {}
+        try {
+            const _origOnce = firebase.database.Reference.prototype.once;
+            firebase.database.Reference.prototype.once = function(...args) {
+                return Promise.race([
+                    _origOnce.apply(this, args),
+                    new Promise((_, rej) => setTimeout(() => rej(new Error('fb-timeout')), 5000))
+                ]);
+            };
+            const _origSet = firebase.database.Reference.prototype.set;
+            const _origPush = firebase.database.Reference.prototype.push;
+            const _origRemove = firebase.database.Reference.prototype.remove;
+            const _origUpdate = firebase.database.Reference.prototype.update;
+            const _writeTimeout = (fn) => function(...args) {
+                return Promise.race([
+                    fn.apply(this, args),
+                    new Promise((_, rej) => setTimeout(() => rej(new Error('fb-timeout')), 10000))
+                ]);
+            };
+            firebase.database.Reference.prototype.set = _writeTimeout(_origSet);
+            firebase.database.Reference.prototype.push = _writeTimeout(_origPush);
+            firebase.database.Reference.prototype.remove = _writeTimeout(_origRemove);
+            firebase.database.Reference.prototype.update = _writeTimeout(_origUpdate);
+        } catch (e) {}
         this._setupConnectivity();
         this.bindEvents();
         this.bindBackButton();
