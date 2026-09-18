@@ -143,7 +143,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.3.45 (build 154)',
+        prof_version:'Version 1.3.46 (build 157)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -312,7 +312,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন ১.৩.৪৫ (বিল্ড ১৫৪)',
+            prof_version:'ভার্সন ১.৩.৪৬ (বিল্ড ১৫৭)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -3154,18 +3154,60 @@ const App = {
         return `<div style="font-size:14px;line-height:1.7;color:var(--text)">${html}</div>`;
     },
     aboutApp() {
-        const md = localStorage.getItem(this._driveFiles.about.key) || '# About App\n\nLoading...';
         const body = document.getElementById('modal-body');
-        body.innerHTML = this._mdToHtml(md);
+        body.innerHTML = `
+            <div style="text-align:center;padding:12px 0 20px">
+                <img src="app-icon.png" alt="" style="width:72px;height:72px;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:12px">
+                <h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mess Manager</h3>
+                <p style="margin:4px 0 0;font-size:13px;color:#888">Manage your mess easily</p>
+            </div>
+            <div style="font-size:14px;color:var(--text);line-height:1.7">
+                <h4 style="font-size:15px;margin:16px 0 8px;color:var(--primary)">Overview</h4>
+                <p>A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.</p>
+                <h4 style="font-size:15px;margin:16px 0 8px;color:var(--primary)">Features</h4>
+                <ul style="padding-left:18px;margin:0">
+                    <li>Manage mess members</li>
+                    <li>Track daily meals</li>
+                    <li>Manage meal rates and meal counts</li>
+                    <li>Record shared expenses</li>
+                    <li>Monthly balance calculations</li>
+                    <li>Notice board for announcements</li>
+                    <li>Dark theme support</li>
+                    <li>Multi-language support (English & Bangla)</li>
+                </ul>
+                <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">Version ${document.querySelector('[data-lang-key="prof_version"]')?.textContent || '1.3.46'}</p>
+            </div>`;
         body.style.maxHeight = '70vh';
         body.style.overflowY = 'auto';
         document.getElementById('modal-title').textContent = 'About App';
         this.openModal();
     },
     contactDeveloper() {
-        const md = localStorage.getItem(this._driveFiles.contact.key) || '# Contact Developer\n\nLoading...';
         const body = document.getElementById('modal-body');
-        body.innerHTML = this._mdToHtml(md);
+        body.innerHTML = `
+            <div style="text-align:center;padding:8px 0 20px">
+                <div style="width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;font-family:'Times New Roman',sans-serif">M</div>
+                <h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mahmudul Hasan</h3>
+                <p style="margin:6px 0 0;font-size:13px;color:#888;line-height:1.5">I'm an Android developer who enjoys turning ideas into fast, reliable, and user-friendly apps.</p>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:0 4px">
+                <a href="https://wa.me/8801712345678" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#25D366';this.style.background='#f0fff4'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    WhatsApp
+                </a>
+                <a href="https://m.me/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#0084FF';this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#0084FF"><path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.2 5.42 3.15 7.2V22l3.04-1.67c.85.24 1.76.37 2.81.37 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm1 12.5l-2.5-2.7L5.5 14.5l5.5-5.8 2.5 2.7 4.5-2.7-5.5 5.8z"/></svg>
+                    Messenger
+                </a>
+                <a href="https://instagram.com/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#E4405F';this.style.background='#fff5f7'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    Instagram
+                </a>
+                <a href="https://github.com/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#333';this.style.background='#f5f5f5'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#333"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    GitHub
+                </a>
+            </div>`;
         body.style.maxHeight = '70vh';
         body.style.overflowY = 'auto';
         document.getElementById('modal-title').textContent = 'Contact Developer';
