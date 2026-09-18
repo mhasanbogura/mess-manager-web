@@ -16,10 +16,17 @@ const App = {
         try { const v = localStorage.getItem('mcg_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
     },
     async _dbGet(path, cacheKey) {
-        const offline = !navigator.onLine;
-        if (offline && cacheKey) {
+        if (cacheKey) {
             const cached = this._cacheGet(cacheKey);
-            if (cached && Object.keys(cached).length) return cached;
+            if (cached && Object.keys(cached).length) {
+                if (navigator.onLine) {
+                    db.ref(path).once('value').then(snap => {
+                        const d = snap.val() || {};
+                        this._cacheSet(cacheKey, d);
+                    }).catch(() => {});
+                }
+                return cached;
+            }
         }
         try {
             const snap = await db.ref(path).once('value');
@@ -375,9 +382,12 @@ const App = {
             hideSplash();
             return;
         }
+        try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
+        try { await db.enablePersistence({ synchronizeTabs: true }); } catch (e) {}
+        try { db.goOnline(); } catch (e) {}
+        this._setupConnectivity();
         this.bindEvents();
         this.bindBackButton();
-        this._setupConnectivity();
         auth.onAuthStateChanged(user => {
             if (user) {
                 this.currentUser = user;
@@ -397,9 +407,6 @@ const App = {
                 hideSplash();
             }
         });
-        try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
-        try { db.enablePersistence({ synchronizeTabs: true }); } catch (e) {}
-        try { db.goOnline(); } catch (e) {}
     },
 
     bindEvents() {
@@ -732,16 +739,20 @@ const App = {
     async _proactiveCache(mid) {
         if (!navigator.onLine) return;
         try {
-            const [members, bazarItems, deposits, meals] = await Promise.all([
+            const [members, bazarItems, deposits, meals, perms, notices] = await Promise.all([
                 db.ref(`messes/${mid}/members`).once('value'),
                 db.ref(`messes/${mid}/bazarItems`).once('value'),
                 db.ref(`messes/${mid}/deposits`).once('value'),
-                db.ref(`messes/${mid}/meals`).once('value')
+                db.ref(`messes/${mid}/meals`).once('value'),
+                db.ref(`messes/${mid}/permissions`).once('value'),
+                db.ref(`messes/${mid}/notices`).once('value')
             ]);
             this._cacheSet('members', members.val() || {});
             this._cacheSet('bazarItems', bazarItems.val() || {});
             this._cacheSet('deposits', deposits.val() || {});
             this._cacheSet('meals_month', meals.val() || {});
+            this._cacheSet('permissions', perms.val() || {});
+            this._cacheSet('notices', notices.val() || {});
             try {
                 const settingsSnap = await db.ref(`messes/${mid}/settings`).once('value');
                 this._cacheSet('settings', settingsSnap.val() || {});
@@ -751,6 +762,11 @@ const App = {
                 const todayKey = this.dk(new Date());
                 const todaySnap = await db.ref(`messes/${mid}/meals/${todayKey}`).once('value');
                 this._cacheSet('meals_today_' + todayKey, todaySnap.val() || {});
+            } catch (e) {}
+            try {
+                const picSnap = await db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value');
+                const pic = picSnap.val();
+                if (pic) this._cacheSetGlobal('profilePic', pic);
             } catch (e) {}
         } catch (e) {}
     },
@@ -1443,9 +1459,12 @@ const App = {
             if (avatarEl) {
                 avatarEl.textContent = initial;
                 try {
-                    const picSnap = await db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value');
-                    const pic = picSnap.val();
-                    if (pic) {
+                    let pic = this._cacheGetGlobal('profilePic');
+                    if (!pic) {
+                        pic = await db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value').then(s => s.val());
+                        if (pic) this._cacheSetGlobal('profilePic', pic);
+                    }
+                    if (pic && typeof pic === 'string') {
                         avatarEl.style.backgroundImage = `url(${pic})`;
                         avatarEl.style.backgroundSize = 'cover';
                         avatarEl.style.backgroundPosition = 'center';
@@ -1499,8 +1518,11 @@ const App = {
 
             let preview = 'Pin a notice for the whole house';
             try {
-                const nSnap = await db.ref(`messes/${this.messId}/notices`).orderByChild('createdAt').limitToLast(1).once('value');
-                if (nSnap.exists()) { const v = nSnap.val(); const k = Object.keys(v)[0]; preview = v[k].body || v[k].title || preview; }
+                const noticesData = await this._dbGet(`messes/${this.messId}/notices`, 'notices');
+                if (noticesData && Object.keys(noticesData).length) {
+                    const entries = Object.entries(noticesData).sort((a, b) => ((a[1]?.createdAt || 0) - (b[1]?.createdAt || 0)));
+                    if (entries.length) { const v = entries[entries.length - 1][1]; preview = v.body || v.title || preview; }
+                }
             } catch (e) { /* notices may not exist */ }
             document.getElementById('dash-notice-preview').textContent = preview;
 
@@ -2996,9 +3018,12 @@ const App = {
             }
         } catch (e) {}
         try {
-            const snap = await db.ref(`users/${u.uid}/profilePicture`).once('value');
-            const photo = snap.val();
-            if (photo) {
+            let photo = this._cacheGetGlobal('profilePic');
+            if (!photo) {
+                photo = await db.ref(`users/${u.uid}/profilePicture`).once('value').then(s => s.val());
+                if (photo) this._cacheSetGlobal('profilePic', photo);
+            }
+            if (photo && typeof photo === 'string') {
                 this.setProfilePic(photo);
             } else {
                 const initial = (u.displayName || 'U').charAt(0).toUpperCase();
