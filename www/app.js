@@ -369,13 +369,9 @@ const App = {
             if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             return;
         }
-        try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) { /* ignore */ }
-        try { await db.enablePersistence({ synchronizeTabs: true }); } catch (e) { /* already enabled or not supported */ }
-        try { db.goOnline(); } catch (e) {}
-        this._setupConnectivity();
-        this.handleRedirectResult();
         this.bindEvents();
         this.bindBackButton();
+        this._setupConnectivity();
         auth.onAuthStateChanged(user => {
             if (user) {
                 this.currentUser = user;
@@ -395,6 +391,9 @@ const App = {
                 if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             }
         });
+        try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
+        try { db.enablePersistence({ synchronizeTabs: true }); } catch (e) {}
+        try { db.goOnline(); } catch (e) {}
     },
 
     bindEvents() {
