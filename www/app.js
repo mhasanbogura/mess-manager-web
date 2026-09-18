@@ -16,6 +16,11 @@ const App = {
         try { const v = localStorage.getItem('mcg_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
     },
     async _dbGet(path, cacheKey) {
+        const offline = !navigator.onLine;
+        if (offline && cacheKey) {
+            const cached = this._cacheGet(cacheKey);
+            if (cached && Object.keys(cached).length) return cached;
+        }
         try {
             const snap = await db.ref(path).once('value');
             const data = snap.val() || {};
@@ -28,9 +33,6 @@ const App = {
             }
             return {};
         }
-    },
-    _dbGetSync(cacheKey) {
-        try { const v = this._cacheGet(cacheKey); return v || {}; } catch (e) { return {}; }
     },
 
     // ── i18n ───────────────────────────────────────────────────
@@ -591,12 +593,17 @@ const App = {
         if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
         const cacheKey = `user_messes_${this.currentUser.uid}`;
         let data = {};
-        try {
-            const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
-            data = snap.val() || {};
-            try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
-        } catch (e) {
-            try { const c = JSON.parse(localStorage.getItem(cacheKey) || '{}'); if (Object.keys(c).length) data = c; } catch (e2) {}
+        const offline = !navigator.onLine;
+        if (offline) {
+            try { data = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e) {}
+        } else {
+            try {
+                const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
+                data = snap.val() || {};
+                try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
+            } catch (e) {
+                try { const c = JSON.parse(localStorage.getItem(cacheKey) || '{}'); if (Object.keys(c).length) data = c; } catch (e2) {}
+            }
         }
         const ids = Object.keys(data);
         if (ids.length === 1) { this.enterMess(ids[0]); return; }
@@ -607,9 +614,13 @@ const App = {
             for (const mid of ids) {
                 let s = {};
                 try {
-                    const ms = await db.ref(`messes/${mid}/settings`).once('value');
-                    s = ms.val() || {};
-                    try { localStorage.setItem(`mess_settings_${mid}`, JSON.stringify(s)); } catch (e) {}
+                    if (offline) {
+                        s = JSON.parse(localStorage.getItem(`mess_settings_${mid}`) || '{}');
+                    } else {
+                        const ms = await db.ref(`messes/${mid}/settings`).once('value');
+                        s = ms.val() || {};
+                        try { localStorage.setItem(`mess_settings_${mid}`, JSON.stringify(s)); } catch (e) {}
+                    }
                 } catch (e) {
                     try { s = JSON.parse(localStorage.getItem(`mess_settings_${mid}`) || '{}'); } catch (e2) {}
                 }
@@ -667,25 +678,35 @@ const App = {
         this.messCode = null;
         const settingsCacheKey = `mess_settings_${mid}`;
         const roleCacheKey = `mess_role_${mid}`;
+        const offline = !navigator.onLine;
         try {
-            const memberSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
-            if (!memberSnap.exists() && navigator.onLine) {
-                try { await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).remove(); } catch (e2) {}
-                this.toast('You are no longer a member of this mess', 'error');
-                this.messId = null;
-                return this.loadMyMesses();
-            }
-            const s = await db.ref(`messes/${mid}/settings`).once('value');
-            const v = s.val() || {};
-            this.messCode = v.messCode;
-            this.messName = v.messName;
-            try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e) {}
-            try {
-                const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
-                this.userRole = roleSnap.val() || 'member';
-                try { localStorage.setItem(roleCacheKey, this.userRole); } catch (e) {}
-            } catch (e) {
-                try { this.userRole = localStorage.getItem(roleCacheKey) || 'member'; } catch (e2) {}
+            if (!offline) {
+                const memberSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
+                if (!memberSnap.exists()) {
+                    try { await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).remove(); } catch (e2) {}
+                    this.toast('You are no longer a member of this mess', 'error');
+                    this.messId = null;
+                    return this.loadMyMesses();
+                }
+                const s = await db.ref(`messes/${mid}/settings`).once('value');
+                const v = s.val() || {};
+                this.messCode = v.messCode;
+                this.messName = v.messName;
+                try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e) {}
+                try {
+                    const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
+                    this.userRole = roleSnap.val() || 'member';
+                    try { localStorage.setItem(roleCacheKey, this.userRole); } catch (e) {}
+                } catch (e) {
+                    try { this.userRole = localStorage.getItem(roleCacheKey) || 'member'; } catch (e2) {}
+                }
+            } else {
+                try {
+                    const cached = JSON.parse(localStorage.getItem(settingsCacheKey) || '{}');
+                    this.messCode = cached.messCode || null;
+                    this.messName = cached.messName || 'My Mess';
+                    this.userRole = localStorage.getItem(roleCacheKey) || 'member';
+                } catch (e2) {}
             }
         } catch (e) {
             try {
@@ -698,7 +719,7 @@ const App = {
         try { this.setupPresence(); } catch (e) {}
         try { await this.loadMyPerms(); } catch (e) {}
         this.showApp();
-        this._proactiveCache(mid);
+        if (!offline) this._proactiveCache(mid);
     },
 
     async _proactiveCache(mid) {
@@ -1324,14 +1345,18 @@ const App = {
     async loadMyPerms() {
         if (!this.messId || !this.currentUser) return;
         const cacheKey = `perms_${this.messId}_${this.currentUser.uid}`;
+        const offline = !navigator.onLine;
         try {
-            const membersSnap = await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
-            const m = membersSnap.val() || {};
-            if (m.role === 'admin') { this._userPerms = null; this._permsLoaded = true; try { localStorage.setItem(cacheKey, JSON.stringify(null)); } catch (e) {} return; }
-            const permSnap = await db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value');
-            this._userPerms = permSnap.val() || {};
-            try { localStorage.setItem(cacheKey, JSON.stringify(this._userPerms)); } catch (e) {}
-        } catch (e) {
+            if (!offline) {
+                const membersSnap = await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
+                const m = membersSnap.val() || {};
+                if (m.role === 'admin') { this._userPerms = null; this._permsLoaded = true; try { localStorage.setItem(cacheKey, JSON.stringify(null)); } catch (e) {} return; }
+                const permSnap = await db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value');
+                this._userPerms = permSnap.val() || {};
+                try { localStorage.setItem(cacheKey, JSON.stringify(this._userPerms)); } catch (e) {}
+            } else {
+                try { this._userPerms = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e2) { this._userPerms = {}; }
+            }
             try { this._userPerms = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e2) { this._userPerms = {}; }
         }
         this._permsLoaded = true;
