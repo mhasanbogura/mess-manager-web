@@ -360,13 +360,15 @@ const App = {
 
     async init() {
         const splash = document.getElementById('splash-screen');
+        const hideSplash = () => { if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); } };
+        setTimeout(hideSplash, 5000);
         this.applyTheme();
         this.applyLanguage();
         this._cacheDriveFiles();
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
-            if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+            hideSplash();
             return;
         }
         this.bindEvents();
@@ -388,7 +390,7 @@ const App = {
                 this.currentUser = null;
                 this.messId = null;
                 this.showScreen('auth-screen');
-                if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+                hideSplash();
             }
         });
         try { auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
@@ -398,22 +400,24 @@ const App = {
 
     bindEvents() {
         const $ = id => document.getElementById(id);
-        $('login-btn').addEventListener('click', () => this.emailLogin());
-        $('show-login-btn').addEventListener('click', () => this.showScreen('auth-login-screen'));
-        $('show-register-welcome').addEventListener('click', () => this.showScreen('auth-register-screen'));
-        $('forgot-password-link').addEventListener('click', () => this.showScreen('forgot-screen'));
-        $('google-login-welcome').addEventListener('click', () => this.googleLogin());
-        $('google-login-email').addEventListener('click', () => this.googleLogin());
-        $('google-register').addEventListener('click', () => this.googleLogin());
-        $('show-register-login').addEventListener('click', () => this.showScreen('auth-register-screen'));
-        $('back-to-login-login').addEventListener('click', () => this.showScreen('auth-login-screen'));
-        $('register-btn').addEventListener('click', () => this.emailRegister());
-        $('send-reset-btn').addEventListener('click', () => this.sendResetEmail());
-        $('create-mess-btn').addEventListener('click', () => this.createMess());
-        $('join-mess-btn').addEventListener('click', () => this.joinMess());
-        $('logout-from-setup').addEventListener('click', () => auth.signOut());
-        $('modal-close').addEventListener('click', () => this.closeModal());
-        $('modal-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
+        const bind = (id, evt, fn) => { const el = $(id); if (el) el.addEventListener(evt, fn); };
+        bind('login-btn', 'click', () => this.emailLogin());
+        bind('show-login-btn', 'click', () => this.showScreen('auth-login-screen'));
+        bind('show-register-welcome', 'click', () => this.showScreen('auth-register-screen'));
+        bind('forgot-password-link', 'click', () => this.showScreen('forgot-screen'));
+        bind('google-login-welcome', 'click', () => this.googleLogin());
+        bind('google-login-email', 'click', () => this.googleLogin());
+        bind('google-register', 'click', () => this.googleLogin());
+        bind('show-register-login', 'click', () => this.showScreen('auth-register-screen'));
+        bind('back-to-login-login', 'click', () => this.showScreen('auth-login-screen'));
+        bind('register-btn', 'click', () => this.emailRegister());
+        bind('send-reset-btn', 'click', () => this.sendResetEmail());
+        bind('create-mess-btn', 'click', () => this.createMess());
+        bind('join-mess-btn', 'click', () => this.joinMess());
+        bind('logout-from-setup', 'click', () => auth.signOut());
+        bind('modal-close', 'click', () => this.closeModal());
+        const overlay = $('modal-overlay');
+        if (overlay) overlay.addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
         this._setupSwipe();
     },
 
@@ -1356,6 +1360,7 @@ const App = {
             } else {
                 try { this._userPerms = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e2) { this._userPerms = {}; }
             }
+        } catch (e) {
             try { this._userPerms = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e2) { this._userPerms = {}; }
         }
         this._permsLoaded = true;
