@@ -2539,12 +2539,14 @@ const App = {
         const currentName = (members[memberId] || {}).name || memberId || 'Manager';
         const names = ['Manager', ...Object.values(members).map(m => m.name || 'Unknown').filter(n => n !== 'Manager')];
         const dateVal = date || new Date().toISOString().slice(0,10);
+        const isBazar = category === 'bazar';
         document.getElementById('modal-title').textContent = 'Edit Expense';
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label>Item name</label><input type="text" id="edit-bz-name" value="${this.esc(name)}"></div>
             <div class="form-group"><label>Money from</label><select id="edit-bz-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
             <div class="form-group"><label>Date</label><input type="date" id="edit-bz-date" value="${dateVal}"></div>
-            <div class="form-group"><label>Expense (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>`;
+            <div class="form-group"><label>Expense (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>
+            <div class="form-group"><label>Type</label><select id="edit-bz-category"><option value="bazar" ${isBazar?'selected':''}>Meal</option><option value="utility" ${!isBazar?'selected':''}>Utility & Others</option></select></div>`;
         document.getElementById('modal-footer').innerHTML = `
             <div class="dep-footer-btns">
                 <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
@@ -2558,12 +2560,12 @@ const App = {
         const cost = parseFloat(document.getElementById('edit-bz-cost').value) || 0;
         const memberName = document.getElementById('edit-bz-member').value;
         const date = document.getElementById('edit-bz-date').value;
+        const newCategory = document.getElementById('edit-bz-category').value;
         if (!name) { this.toast('Enter name', 'error'); return; }
         if (cost <= 0) { this.toast('Enter cost', 'error'); return; }
-        const members = this._bazarMembers || {};
-        const memberId = memberName === 'Manager' ? 'Manager' : Object.entries(members).find(([, m]) => m.name === memberName)?.[0] || memberName;
+        const memberId = memberName;
         const userName = this.currentUser?.displayName || 'Unknown';
-        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost, memberId, date, editedBy: userName, editedAt: Date.now() });
+        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost, memberId, date, category: newCategory, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
         this._cacheClearAll();
         this.loadBazarList();
