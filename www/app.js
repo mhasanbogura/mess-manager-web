@@ -211,7 +211,7 @@ const App = {
         ms_title:'Your Messes',ms_subtitle:'Select a mess or create a new one',ms_no_mess:'No messes yet',
         ms_create_title:'Create New Mess',ms_name_ph:'Mess Name',ms_addr_ph:'Address (optional)',
         ms_create_btn:'Create Mess',ms_join_title:'Join Existing Mess',ms_code_ph:'6-digit Code',
-        ms_join_btn:'Join Mess',ms_code_hint:'Ask your mess admin for the code',ms_signout:'Sign Out',
+        ms_join_btn:'Join Mess',ms_code_hint:'Ask your mess admin for the code',ms_signout:'Sign Out',ms_delete_account:'Delete Account',
         // Delete Account
         da_title:'Delete Account',da_confirm_text:'This will permanently delete your account and all data. Type DELETE to confirm:',
         da_confirm:'Confirm',da_cancel:'Cancel',
@@ -380,7 +380,7 @@ const App = {
             ms_title:'আপনার মেস',ms_subtitle:'একটি মেস নির্বাচন করুন বা নতুন তৈরি করুন',ms_no_mess:'এখনো কোনো মেস নেই',
             ms_create_title:'নতুন মেস তৈরি',ms_name_ph:'মেসের নাম',ms_addr_ph:'ঠিকানা (ঐচ্ছিক)',
             ms_create_btn:'মেস তৈরি',ms_join_title:'বিদ্যমান মেসে যোগ দিন',ms_code_ph:'৬ ডিজিট কোড',
-            ms_join_btn:'মেসে যোগ দিন',ms_code_hint:'মেস অ্যাডমিনের কাছ থেকে কোড নিন',ms_signout:'সাইন আউট',
+            ms_join_btn:'মেসে যোগ দিন',ms_code_hint:'মেস অ্যাডমিনের কাছ থেকে কোড নিন',ms_signout:'সাইন আউট',ms_delete_account:'অ্যাকাউন্ট মুছুন',
             // Delete Account
             da_title:'অ্যাকাউন্ট মুছুন',da_confirm_text:'এটি আপনার অ্যাকাউন্ট ও সব তথ্য মুছে দেবে। DELETE টাইপ করে নিশ্চিত করুন:',
             da_confirm:'নিশ্চিত',da_cancel:'বাতিল',
@@ -477,6 +477,7 @@ const App = {
         bind('create-mess-btn', 'click', () => this.createMess());
         bind('join-mess-btn', 'click', () => this.joinMess());
         bind('logout-from-setup', 'click', () => auth.signOut());
+        bind('delete-account-from-setup', 'click', () => this.deleteAccount());
         bind('modal-close', 'click', () => this.closeModal());
         const overlay = $('modal-overlay');
         if (overlay) overlay.addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
@@ -4309,9 +4310,15 @@ const App = {
             if (!confirmed) return;
             try {
                 const uid = this.currentUser.uid;
-                const messId = this.messId || 'default';
-                await db.ref(`users/${uid}`).remove();
-                await db.ref(`messes/${messId}/members/${this.currentUser.displayName}`).remove();
+                const messSnap = await db.ref(`users/${uid}/messes`).once('value');
+                const messes = messSnap.val() || {};
+                const updates = {};
+                Object.keys(messes).forEach(mid => {
+                    updates[`messes/${mid}/members/${uid}`] = null;
+                    updates[`messes/${mid}/permissions/${uid}`] = null;
+                });
+                updates[`users/${uid}`] = null;
+                await db.ref().update(updates);
                 await this.currentUser.delete();
                 this.toast('Account deleted', 'success');
             } catch (e) { this.toast(e.message, 'error'); }
