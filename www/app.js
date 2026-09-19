@@ -2858,11 +2858,11 @@ const App = {
             const sum = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
             left.textContent = `Money from: ${this._bzMoneyBy || 'none'}  total`;
             total.textContent = '৳ ' + this.fmtNum(sum);
+            left.style.display = '';
+            total.style.display = '';
         } else {
-            const amt = parseFloat(this._bzUtilAmount) || 0;
-            const count = this._bzUtilSelected?.length || 0;
-            left.textContent = `Money from: Manager  total`;
-            total.textContent = '৳ ' + this.fmtNum(amt);
+            left.style.display = 'none';
+            total.style.display = 'none';
         }
     },
 
