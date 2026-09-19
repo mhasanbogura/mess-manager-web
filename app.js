@@ -848,9 +848,20 @@ const App = {
         if (!confirm('Are you sure you want to leave this mess?')) return;
         if (!this.messId || !this.currentUser) return;
         try {
-            await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).remove();
-            await db.ref(`users/${this.currentUser.uid}/messes/${this.messId}`).remove();
-            this.toast('Left mess', 'success');
+            const uid = this.currentUser.uid;
+            const updates = {};
+            updates[`messes/${this.messId}/members/${uid}`] = null;
+            updates[`messes/${this.messId}/permissions/${uid}`] = null;
+            updates[`users/${uid}/messes/${this.messId}`] = null;
+            await db.ref().update(updates);
+            const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const remaining = Object.keys(mSnap.val() || {}).filter(id => !id.startsWith('member_'));
+            if (!remaining.length) {
+                await this.deleteMessFully(this.messId);
+                this.toast('Last person left — mess deleted', 'success');
+            } else {
+                this.toast('Left mess', 'success');
+            }
             this.messId = null; this.messCode = null; this.messName = null;
             this.loadMyMesses();
         } catch (e) { this.toast('Error leaving mess', 'error'); }
@@ -1266,13 +1277,50 @@ const App = {
 
     async removeFlatMember(id) {
         if (!this.checkPerm('manage')) return;
-        if (!confirm('Remove this member?')) return;
+        const m = (this._flatMembers || {})[id] || {};
+        const name = m.name || 'Unknown';
+        if (!confirm(`Remove "${name}" from mess?\n\nThis will permanently delete ALL their data:\n• All meals\n• All expenses\n• All deposits\n• Meal history\n\nThis cannot be undone.`)) return;
         try {
-            await db.ref(`messes/${this.messId}/members/${id}`).remove();
-            this.toast('Member removed', 'success');
+            const prefix = `messes/${this.messId}`;
+            const snap = await db.ref(prefix).once('value');
+            const messData = snap.val() || {};
+            const updates = {};
+            updates[`${prefix}/members/${id}`] = null;
+            Object.entries(messData.meals || {}).forEach(([date, members]) => {
+                if (members && members[name]) updates[`${prefix}/meals/${date}/${name}`] = null;
+            });
+            Object.entries(messData.bazarItems || {}).forEach(([key, item]) => {
+                if (!item) return;
+                if (item.memberId === name || item.doneBy === name) updates[`${prefix}/bazarItems/${key}`] = null;
+                if (Array.isArray(item.splitWith) && item.splitWith.includes(name)) {
+                    const nw = item.splitWith.filter(n => n !== name);
+                    updates[`${prefix}/bazarItems/${key}/splitWith`] = nw.length ? nw : null;
+                }
+            });
+            Object.entries(messData.deposits || {}).forEach(([key, dep]) => {
+                if (dep && dep.memberId === name) updates[`${prefix}/deposits/${key}`] = null;
+            });
+            Object.entries(messData.mealHistory || {}).forEach(([key, h]) => {
+                if (h && h.member === name) updates[`${prefix}/mealHistory/${key}`] = null;
+            });
+            await db.ref().update(updates);
             this._cacheClearAll();
+            this.toast('Member removed with all data', 'success');
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async deleteMessFully(messId) {
+        try {
+            const mSnap = await db.ref(`messes/${messId}/members`).once('value');
+            const members = mSnap.val() || {};
+            const updates = {};
+            Object.keys(members).forEach(uid => {
+                if (!uid.startsWith('member_')) updates[`users/${uid}/messes/${messId}`] = null;
+            });
+            updates[`messes/${messId}`] = null;
+            await db.ref().update(updates);
+        } catch (e) { console.error('deleteMessFully error:', e); }
     },
 
     async loadFlatPeoples(members) {
@@ -1360,12 +1408,22 @@ const App = {
 
     async removePerson(uid, name) {
         if (!this.checkPerm('manage')) return;
-        if (!confirm(`Remove ${name} from mess?`)) return;
+        if (!confirm(`Remove ${name} from mess?\n\nTheir meal/expense data will remain in the mess.`)) return;
         try {
             const updates = {};
             updates[`messes/${this.messId}/members/${uid}`] = null;
+            updates[`messes/${this.messId}/permissions/${uid}`] = null;
             updates[`users/${uid}/messes/${this.messId}`] = null;
             await db.ref().update(updates);
+            const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
+            const remaining = Object.keys(mSnap.val() || {}).filter(id => !id.startsWith('member_'));
+            if (!remaining.length) {
+                await this.deleteMessFully(this.messId);
+                this.toast('Last person removed — mess deleted', 'success');
+                this.messId = null; this.messCode = null; this.messName = null;
+                this.loadMyMesses();
+                return;
+            }
             this.toast('Removed!', 'success');
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
