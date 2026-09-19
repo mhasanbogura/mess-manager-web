@@ -4047,7 +4047,7 @@ const App = {
                                 const name = members[mid]?.name || 'Unknown';
                                 const rent = rentByName[name] || 0;
                                 const util = utilByName[name] || 0;
-                                const utilDepRaw = Object.values(depAll).filter(v => v && v.memberId === mid && v.category === 'utility' && v.date && v.date.startsWith(month)).reduce((s, v) => s + (v.amount || 0), 0);
+                                const utilDepRaw = Object.values(depAll).filter(v => v && resolveName(v.memberId) === name && v.category === 'utility' && v.date && v.date.startsWith(month)).reduce((s, v) => s + (v.amount || 0), 0);
                                 const utilDepBz = utilPaidBy[name] || 0;
                                 return { name, balance: utilDepRaw + utilDepBz - rent - util };
                             }).sort((a, b) => a.name.localeCompare(b.name));
