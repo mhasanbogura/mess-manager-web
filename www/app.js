@@ -886,13 +886,12 @@ const App = {
         btn.textContent = 'Creating...'; btn.disabled = true;
         try {
             const code = this.genCode(6);
-            const ref = db.ref('messes').push();
             const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Connection timeout')), 15000));
-            const write = ref.set({
+            const ref = db.ref('messes').push({
                 settings: { messName: name, messCode: code, owner: this.currentUser.uid, createdAt: Date.now() },
                 members: { [this.currentUser.uid]: { name: this.currentUser.displayName || 'Admin', email: this.currentUser.email, role: 'admin', joinedAt: Date.now() } }
             });
-            await Promise.race([write, timeout]);
+            await Promise.race([ref, timeout]);
             await Promise.race([db.ref(`users/${this.currentUser.uid}/messes/${ref.key}`).set({ role: 'admin', joinedAt: Date.now() }), timeout]);
             this.toast('Mess created!', 'success');
             document.getElementById('create-mess-name').value = '';
