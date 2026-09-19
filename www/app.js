@@ -2673,10 +2673,8 @@ const App = {
         const category = document.getElementById('edit-dep-cat').value;
         const date = document.getElementById('edit-dep-date').value;
         if (amount <= 0) { this.toast('Enter amount', 'error'); return; }
-        const members = this._depMembers || {};
-        const memberId = Object.entries(members).find(([, m]) => m.name === memberName)?.[0] || '';
         const userName = this.currentUser?.displayName || 'Unknown';
-        await db.ref(`messes/${this.messId}/deposits/${key}`).update({ memberId, amount, category, date, editedBy: userName, editedAt: Date.now() });
+        await db.ref(`messes/${this.messId}/deposits/${key}`).update({ memberId: memberName, amount, category, date, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
         this._cacheClearAll();
         this.loadManagerMoney();
