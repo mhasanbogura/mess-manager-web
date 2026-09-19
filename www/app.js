@@ -2650,7 +2650,7 @@ const App = {
 
     editDeposit(key, memberId, amount, category, date) {
         const members = this._depMembers || {};
-        const currentName = (members[memberId] || {}).name || '';
+        const currentName = memberId || Object.values(members)[0]?.name || '';
         const names = Object.values(members).map(m => m.name || 'Unknown');
         const dateVal = date || new Date().toISOString().slice(0,10);
         document.getElementById('modal-title').textContent = 'Edit Deposit';
