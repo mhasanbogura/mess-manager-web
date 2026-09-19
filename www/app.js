@@ -1653,6 +1653,7 @@ const App = {
 
             const allMids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             const mids = allMids.filter(id => (members[id] || {}).status !== 'pending');
+            const memberMids = mids.filter(id => id.startsWith('member_'));
             const uidToName = {};
             allMids.forEach(id => { const n = (members[id] || {}).name; if (n) uidToName[id] = n; });
             const resolveName = (id) => uidToName[id] || id;
@@ -1754,9 +1755,9 @@ const App = {
             utilBalEl.className = utilBal < 0 ? 'neg' : 'pos';
 
             const rowsEl = document.getElementById('dash-member-rows');
-            if (!mids.length) { rowsEl.innerHTML = '<tr><td colspan="5" class="empty-state">No data</td></tr>'; return; }
+            if (!memberMids.length) { rowsEl.innerHTML = '<tr><td colspan="5" class="empty-state">No data</td></tr>'; return; }
             let html = '';
-            mids.forEach(mid => {
+            memberMids.forEach(mid => {
                 const m = members[mid] || {};
                 const name = m.name || 'Unknown';
                 const total = memberMeals[name] || 0;
@@ -1791,7 +1792,7 @@ const App = {
                 }
             });
             let utilHtml = '';
-            mids.forEach(mid => {
+            memberMids.forEach(mid => {
                 const m = members[mid] || {};
                 const name = m.name || 'Unknown';
                 const rent = rentByName[name] || 0;
@@ -1938,7 +1939,7 @@ const App = {
         scroll.style.display = 'none';
         try {
             const members = await this._dbGet(`messes/${this.messId}/members`, 'members');
-            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+            const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             if (!mids.length) { loader.innerHTML = '<p class="empty-state">No members</p>'; return; }
             const allMeals = await this._dbGet(`messes/${this.messId}/meals`, 'meals_month');
             const memberData = {};
@@ -2615,7 +2616,7 @@ const App = {
         this._editBzCategory = category;
         const members = this._bazarMembers || {};
         const currentName = (members[memberId] || {}).name || memberId || 'Manager';
-        const names = ['Manager', ...Object.values(members).map(m => m.name || 'Unknown').filter(n => n !== 'Manager')];
+        const names = ['Manager', ...Object.entries(members).filter(([id]) => id.startsWith('member_')).map(([, m]) => m.name || 'Unknown').filter(n => n !== 'Manager')];
         const dateVal = date || new Date().toISOString().slice(0,10);
         const isBazar = category === 'bazar';
         document.getElementById('modal-title').textContent = 'Edit Expense';
@@ -2756,7 +2757,7 @@ const App = {
     editDeposit(key, memberId, amount, category, date) {
         const members = this._depMembers || {};
         const currentName = memberId || Object.values(members)[0]?.name || '';
-        const names = Object.values(members).map(m => m.name || 'Unknown');
+        const names = Object.entries(members).filter(([id]) => id.startsWith('member_')).map(([, m]) => m.name || 'Unknown');
         const dateVal = date || new Date().toISOString().slice(0,10);
         document.getElementById('modal-title').textContent = 'Edit Deposit';
         document.getElementById('modal-body').innerHTML = `
@@ -2791,7 +2792,7 @@ const App = {
         if (!this.checkPerm('bazarEntry')) { this.navigate('bazaar'); return; }
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+        const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
         const names = [...new Set(mids.map(id => members[id]?.name || 'Unknown'))].sort((a, b) => a.localeCompare(b));
         const now = new Date();
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
@@ -2867,7 +2868,7 @@ const App = {
         if (!this.checkPerm('bazarEntry')) { this.navigate('balance'); return; }
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+        const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
         const names = [...new Set(mids.map(id => members[id]?.name || 'Unknown'))].sort((a, b) => a.localeCompare(b));
         const now = new Date();
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
@@ -3100,7 +3101,7 @@ const App = {
         if (!this.checkPerm('bazarEntry')) { this.navigate('balance'); return; }
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+        const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
         const names = mids.map(id => members[id]?.name || 'Unknown');
         const now = new Date();
         this._depDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
