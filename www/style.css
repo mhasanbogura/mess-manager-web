@@ -255,6 +255,7 @@ body {
 #mess-select-screen::before {
     content: ''; position: absolute; inset: 0;
     background: radial-gradient(circle at 60% 30%, rgba(11,61,145,0.1) 0%, transparent 50%);
+    pointer-events: none;
 }
 
 /* ==================== TOPBAR ==================== */
