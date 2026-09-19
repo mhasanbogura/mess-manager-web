@@ -3014,7 +3014,8 @@ const App = {
         if (!memberName) { this.toast('Money from: pick a name', 'error'); return; }
         if (!amount) { this.toast('Enter an amount', 'error'); return; }
         const category = this._depCategory || 'meal';
-        db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, createdAt: Date.now() });
+        const addedBy = this.currentUser?.displayName || 'Unknown';
+        db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, addedBy, createdAt: Date.now() });
         this._cacheClearAll();
         this.loadManagerMoney();
         this.toast('Deposit added!', 'success');
@@ -3105,7 +3106,8 @@ const App = {
         if (!memberName) { this.toast('Money from: pick a name', 'error'); return; }
         if (!amount) { this.toast('Enter an amount', 'error'); return; }
         const category = this._depCategory || 'meal';
-        await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, createdAt: Date.now() });
+        const addedBy = this.currentUser?.displayName || 'Unknown';
+        await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, addedBy, createdAt: Date.now() });
         this.closeModal(); this._cacheClearAll(); this.loadManagerMoney(); this.toast('Deposit added!', 'success');
     },
 
