@@ -1594,14 +1594,16 @@ const App = {
             document.getElementById('dash-notice-preview').textContent = preview;
 
             let bazTotal = 0;
-            const paidBy = {};
+            const mealPaidBy = {};
             Object.values(bzData).forEach(b => {
-                if ((b.category || 'bazar') === 'utility') return;
                 if (!b.date || !b.date.startsWith(month)) return;
                 const amt = parseFloat(b.cost) || 0;
-                bazTotal += amt;
-                const n = (b.memberId || '').trim();
-                if (n) paidBy[n] = (paidBy[n] || 0) + amt;
+                const cat = b.category || 'bazar';
+                if (cat === 'bazar') {
+                    bazTotal += amt;
+                    const n = (b.memberId || '').trim();
+                    if (n && n !== 'Manager') mealPaidBy[n] = (mealPaidBy[n] || 0) + amt;
+                }
             });
 
             const memberMeals = {};
@@ -1630,6 +1632,10 @@ const App = {
                         totalMealDep += v.amount;
                     }
                 }
+            });
+            Object.entries(mealPaidBy).forEach(([name, amt]) => {
+                mealDepByName[name] = (mealDepByName[name] || 0) + amt;
+                totalMealDep += amt;
             });
 
             document.getElementById('dash-deposit').textContent = '৳ ' + this.fmtNum(totalMealDep);
