@@ -2,6 +2,7 @@ const App = {
     currentUser: null, messId: null, messCode: null, messName: null,
     currentPage: 'dashboard', userRole: 'member',
     _skipCache: new Set(),
+    _cacheVersion: 0,
 
     // ── offline cache helpers ──────────────────────────────────
     _cacheSet(key, data) {
@@ -17,9 +18,11 @@ const App = {
         try { const v = localStorage.getItem('mcg_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
     },
     _cacheClear(...keys) {
+        this._cacheVersion++;
         keys.forEach(k => { try { localStorage.removeItem('mc_' + this.messId + '_' + k); } catch (e) {} });
     },
     _cacheClearAll() {
+        this._cacheVersion++;
         const prefix = 'mc_' + this.messId + '_';
         try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith(prefix)) localStorage.removeItem(k); } } catch (e) {}
     },
@@ -50,8 +53,10 @@ const App = {
         return s.replace(/[\u09E6-\u09EF]/g, d => '০১২৩৪৫৬৭৮৯'.indexOf(d));
     },
     async _dbBgRefresh(path, cacheKey) {
+        const ver = this._cacheVersion;
         try {
             const snap = await db.ref(path).once('value');
+            if (this._cacheVersion !== ver) return;
             this._cacheSet(cacheKey, snap.val() || {});
         } catch (e) {}
     },
@@ -2122,11 +2127,7 @@ const App = {
         const userName = this.currentUser?.displayName || 'Unknown';
         const typeLabel = mealType.charAt(0).toUpperCase() + mealType.slice(1);
         try {
-            const snap = await db.ref(`messes/${this.messId}/meals/${dateKey}/${memberName}`).once('value');
-            const data = snap.val() || {};
-            const newVal = { breakfast: data.breakfast || 0, lunch: data.lunch || 0, dinner: data.dinner || 0 };
-            newVal[mealType] = 0;
-            await db.ref(`messes/${this.messId}/meals/${dateKey}/${memberName}`).set(newVal);
+            await db.ref(`messes/${this.messId}/meals/${dateKey}/${memberName}/${mealType}`).set(0);
             await db.ref(`messes/${this.messId}/mealHistory`).push({
                 member: memberName, date: dateKey, type: typeLabel,
                 count: currentVal, action: 'removed', user: userName, createdAt: Date.now()
