@@ -396,7 +396,7 @@ const App = {
     async init() {
         const splash = document.getElementById('splash-screen');
         const offlineWarn = document.getElementById('offline-warning');
-        const hideSplash = () => {
+        this._hideSplash = () => {
             if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             try { if (window.Capacitor?.Plugins?.SplashScreen) Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
         };
@@ -410,13 +410,12 @@ const App = {
             }, { once: true });
             return;
         }
-        hideSplash();
-        setTimeout(hideSplash, 2000);
+        setTimeout(() => { if (splash && !splash.classList.contains('hidden')) this._hideSplash(); }, 5000);
         this._cacheDriveFiles();
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
-            hideSplash();
+            this._hideSplash();
             return;
         }
         try { await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL); } catch (e) {}
@@ -451,7 +450,7 @@ const App = {
         auth.onAuthStateChanged(user => {
             if (user) {
                 this.currentUser = user;
-                if (this.messId && document.getElementById('app-screen')?.classList.contains('active')) return;
+                if (this.messId && document.getElementById('app-screen')?.classList.contains('active')) { this._hideSplash(); return; }
                 this.loadMyMesses();
                 const params = new URLSearchParams(window.location.search);
                 const joinCode = params.get('join');
@@ -465,7 +464,7 @@ const App = {
                 this.currentUser = null;
                 this.messId = null;
                 this.showScreen('auth-screen');
-                hideSplash();
+                this._hideSplash();
             }
         });
     },
@@ -712,8 +711,7 @@ const App = {
 
     async loadMyMesses() {
         if (!this.currentUser) return;
-        const splash = document.getElementById('splash-screen');
-        if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+        this._hideSplash();
         const cacheKey = `user_messes_${this.currentUser.uid}`;
         let data = {};
         const offline = !navigator.onLine;
@@ -757,7 +755,7 @@ const App = {
             this._setupMessSelectPullRefresh();
             return;
         }
-        if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+        this._hideSplash();
         this.showScreen('mess-select-screen');
         document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">No mess yet. Create or join one below.</p></div>';
         this._setupMessSelectPullRefresh();
@@ -966,8 +964,7 @@ const App = {
 
     showApp() {
         this.showScreen('app-screen');
-        const splash = document.getElementById('splash-screen');
-        if (splash) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
+        this._hideSplash();
         try { history.pushState({ page: 'dashboard' }, ''); } catch (e) { /* ignore */ }
         const savedPage = localStorage.getItem('mess_currentPage');
         const validPages = ['dashboard','members','bazaar','meals','balance','profile'];
