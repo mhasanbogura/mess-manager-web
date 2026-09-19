@@ -1595,6 +1595,7 @@ const App = {
 
             let bazTotal = 0;
             const mealPaidBy = {};
+            const utilPaidBy = {};
             Object.values(bzData).forEach(b => {
                 if (!b.date || !b.date.startsWith(month)) return;
                 const amt = parseFloat(b.cost) || 0;
@@ -1603,6 +1604,9 @@ const App = {
                     bazTotal += amt;
                     const n = (b.memberId || '').trim();
                     if (n && n !== 'Manager') mealPaidBy[n] = (mealPaidBy[n] || 0) + amt;
+                } else if (cat === 'utility') {
+                    const n = (b.memberId || '').trim();
+                    if (n && n !== 'Manager') utilPaidBy[n] = (utilPaidBy[n] || 0) + amt;
                 }
             });
 
@@ -1636,6 +1640,10 @@ const App = {
             Object.entries(mealPaidBy).forEach(([name, amt]) => {
                 mealDepByName[name] = (mealDepByName[name] || 0) + amt;
                 totalMealDep += amt;
+            });
+            Object.entries(utilPaidBy).forEach(([name, amt]) => {
+                utilDepByName[name] = (utilDepByName[name] || 0) + amt;
+                totalUtilDep += amt;
             });
 
             document.getElementById('dash-deposit').textContent = '৳ ' + this.fmtNum(totalMealDep);
@@ -2706,6 +2714,7 @@ const App = {
         this._bzDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         this._bzItems = [{ name: '', cost: '' }];
         this._bzMoneyBy = 'Manager';
+        this._bzUtilMoneyBy = 'Manager';
         this._bzDoneBy = '';
         this._bzTab = 'bazar';
         this._bzUtilType = '';
@@ -2744,7 +2753,11 @@ const App = {
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Expense from: Manager</span></div>
+                <div class="dep-label">Expense from:</div>
+                <select id="bz-util-money-by" class="bz-util-money-select" onchange="App._bzUtilMoneyBy=this.value">
+                    <option value="Manager" selected>Manager</option>
+                    ${names.map(n => `<option value="${n}">${n}</option>`).join('')}
+                </select>
                 <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
@@ -2778,6 +2791,7 @@ const App = {
         this._bzDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         this._bzItems = [{ name: '', cost: '' }];
         this._bzMoneyBy = 'Manager';
+        this._bzUtilMoneyBy = 'Manager';
         this._bzDoneBy = '';
         this._bzTab = 'bazar';
         this._bzUtilType = '';
@@ -2818,7 +2832,11 @@ const App = {
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
-                <div style="display:flex;align-items:center;gap:6px;margin:4px 0 2px;padding:5px 10px;background:#f0f7ff;border-radius:10px;border:1px solid #d6e4f5" class="bz-util-info-box"><span class="material-icons-round" style="font-size:18px;color:var(--primary)">account_balance_wallet</span><span style="font-weight:600;color:var(--primary);font-size:13px">Expense from: Manager</span></div>
+                <div class="dep-label">Expense from:</div>
+                <select id="bz-util-money-by" class="bz-util-money-select" onchange="App._bzUtilMoneyBy=this.value">
+                    <option value="Manager" selected>Manager</option>
+                    ${names.map(n => `<option value="${n}">${n}</option>`).join('')}
+                </select>
                 <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
@@ -2958,7 +2976,7 @@ const App = {
             for (const name of this._bzUtilSelected) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
                     name: this._bzUtilType, cost: Math.round(share * 100) / 100,
-                    memberId: 'Manager', splitWith: name, date: dateKey, category: 'utility', addedBy: userName, createdAt: Date.now()
+                    memberId: this._bzUtilMoneyBy || 'Manager', splitWith: name, date: dateKey, category: 'utility', addedBy: userName, createdAt: Date.now()
                 });
             }
         }

@@ -3158,6 +3158,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .bz-util-count { color: #999; }
 [data-theme="oled"] .bz-util-info-box { background: #333 !important; border-color: #444 !important; }
 [data-theme="oled"] .bz-util-info-box span { color: #fff !important; }
+.bz-util-money-select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--text); font-size: 14px; font-weight: 600; margin: 4px 0 8px; appearance: auto; }
 /* Deposit modal */
 [data-theme="oled"] .dep-label { color: #999; }
 [data-theme="oled"] .dep-input-wrap { border-color: #333; }
