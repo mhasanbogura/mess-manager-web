@@ -592,7 +592,7 @@ const App = {
         if (!email || !pass) { this.toast('Fill all fields', 'error'); return; }
         const btn = document.getElementById('login-btn'); btn.textContent = 'Logging in...'; btn.disabled = true;
         try { await auth.signInWithEmailAndPassword(email, pass); }
-        catch (e) { let m = e.message; if (e.code === 'auth/invalid-credential') m = 'Invalid email or password'; this.toast(m, 'error'); }
+        catch (e) { let m = e.message; if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found') m = 'No account found with this email. Please sign up first.'; else if (e.code === 'auth/wrong-password') m = 'Incorrect password'; this.toast(m, 'error'); }
         finally { btn.textContent = 'Login'; btn.disabled = false; }
     },
 
