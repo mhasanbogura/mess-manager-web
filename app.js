@@ -15,6 +15,13 @@ const App = {
     _cacheGetGlobal(key) {
         try { const v = localStorage.getItem('mcg_' + key); return v ? JSON.parse(v) : null; } catch (e) { return null; }
     },
+    _cacheClear(...keys) {
+        keys.forEach(k => { try { localStorage.removeItem('mc_' + this.messId + '_' + k); } catch (e) {} });
+    },
+    _cacheClearAll() {
+        const prefix = 'mc_' + this.messId + '_';
+        try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith(prefix)) localStorage.removeItem(k); } } catch (e) {}
+    },
     async _dbGet(path, cacheKey) {
         if (cacheKey) {
             const cached = this._cacheGet(cacheKey);
@@ -1005,7 +1012,7 @@ const App = {
                 author: this.currentUser?.displayName || 'Manager',
                 createdAt: Date.now()
             });
-            this.closeModal(); this.loadNotices(); this.toast('Notice pinned!', 'success');
+            this.closeModal(); this._cacheClearAll(); this.loadNotices(); this.toast('Notice pinned!', 'success');
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
@@ -1013,7 +1020,7 @@ const App = {
         if (!confirm('Remove this notice?')) return;
         try {
             await db.ref(`messes/${this.messId}/notices/${key}`).remove();
-            this.loadNotices(); this.toast('Notice removed', 'success');
+            this._cacheClearAll(); this.loadNotices(); this.toast('Notice removed', 'success');
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
@@ -1225,6 +1232,7 @@ const App = {
             const tempId = 'member_' + Date.now();
             await db.ref(`messes/${this.messId}/members/${tempId}`).set({ name, addedBy: this.currentUser.uid, addedAt: Date.now() });
             this.toast('Member added!', 'success');
+            this._cacheClearAll();
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
@@ -1236,6 +1244,7 @@ const App = {
         if (name.trim() === currentName) return;
         try {
             await db.ref(`messes/${this.messId}/members/${id}/name`).set(name.trim());
+            this._cacheClearAll();
             this.loadFlat();
             this.toast('Member renamed', 'success');
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
@@ -1247,6 +1256,7 @@ const App = {
         try {
             await db.ref(`messes/${this.messId}/members/${id}`).remove();
             this.toast('Member removed', 'success');
+            this._cacheClearAll();
             this.loadFlat();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
@@ -2062,7 +2072,7 @@ const App = {
                 saved++;
             }
         }
-        if (saved) { try { this.closeModal(); } catch(e) {} this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
+        if (saved) { try { this.closeModal(); } catch(e) {} this._cacheClearAll(); this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
         else this.toast('Set at least one meal', 'error');
     },
 
@@ -2099,6 +2109,7 @@ const App = {
                 count: currentVal, action: 'removed', user: userName, createdAt: Date.now()
             });
             this.toast(`${typeLabel} deleted for ${memberName}`, 'success');
+            this._cacheClearAll();
             this.loadMeals();
         } catch (err) { console.error(err); this.toast('Delete failed', 'error'); }
     },
@@ -2450,6 +2461,7 @@ const App = {
             await db.ref(`messes/${this.messId}/costTrash`).push({ ...item, deletedBy: userName, deletedAt: Date.now() });
         }
         await db.ref(`messes/${this.messId}/bazarItems/${key}`).remove();
+        this._cacheClearAll();
         this.loadBazarList();
         this.toast('Deleted!', 'success');
     },
@@ -2487,6 +2499,7 @@ const App = {
         const userName = this.currentUser?.displayName || 'Unknown';
         await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost, memberId, date, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
+        this._cacheClearAll();
         this.loadBazarList();
         this.toast('Updated!', 'success');
     },
@@ -2589,6 +2602,7 @@ const App = {
             await db.ref(`messes/${this.messId}/depTrash`).push({ ...item, deletedBy: userName, deletedAt: Date.now() });
         }
         await db.ref(`messes/${this.messId}/deposits/${key}`).remove();
+        this._cacheClearAll();
         this.loadManagerMoney();
         this.toast('Deleted!', 'success');
     },
@@ -2623,6 +2637,7 @@ const App = {
         const userName = this.currentUser?.displayName || 'Unknown';
         await db.ref(`messes/${this.messId}/deposits/${key}`).update({ memberId, amount, category, date, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
+        this._cacheClearAll();
         this.loadManagerMoney();
         this.toast('Updated!', 'success');
     },
@@ -2649,6 +2664,7 @@ const App = {
             <div class="bz-tabs" style="padding:0 0 8px">
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+                <span id="bz-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div id="bz-bazar-section">
@@ -2722,6 +2738,7 @@ const App = {
             <div class="bz-tabs" style="padding:0 0 12px">
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">restaurant</span> Meal</button>
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+                <span id="bz-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div id="bz-bazar-section">
@@ -2852,18 +2869,19 @@ const App = {
     bzRenderFooter() {
         const left = document.getElementById('bz-footer-left');
         const total = document.getElementById('bz-footer-total');
-        if (!left || !total) return;
+        const headerTotal = document.getElementById('bz-header-total');
+        let sum = 0;
         if (this._bzTab === 'bazar') {
             const items = this._bzItems.filter(i => i.name || i.cost);
-            const sum = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
-            left.textContent = `Money from: ${this._bzMoneyBy || 'none'}  total`;
-            total.textContent = '৳ ' + this.fmtNum(sum);
-            left.style.display = '';
-            total.style.display = '';
+            sum = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
+            if (left) { left.textContent = `Money from: ${this._bzMoneyBy || 'none'}  total`; left.style.display = ''; }
+            if (total) { total.textContent = '৳ ' + this.fmtNum(sum); total.style.display = ''; }
         } else {
-            left.style.display = 'none';
-            total.style.display = 'none';
+            sum = parseFloat(this._bzUtilAmount) || 0;
+            if (left) left.style.display = 'none';
+            if (total) total.style.display = 'none';
         }
+        if (headerTotal) headerTotal.textContent = '৳ ' + this.fmtNum(sum);
     },
 
     async bzSave() {
@@ -2894,6 +2912,7 @@ const App = {
             }
         }
         this.closeModal();
+        this._cacheClearAll();
         this.loadBazarList();
         this.toast('Added!', 'success');
     },
@@ -2955,6 +2974,7 @@ const App = {
         if (!amount) { this.toast('Enter an amount', 'error'); return; }
         const category = this._depCategory || 'meal';
         db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, createdAt: Date.now() });
+        this._cacheClearAll();
         this.loadManagerMoney();
         this.toast('Deposit added!', 'success');
         this.navigate('balance');
@@ -3045,7 +3065,7 @@ const App = {
         if (!amount) { this.toast('Enter an amount', 'error'); return; }
         const category = this._depCategory || 'meal';
         await db.ref(`messes/${this.messId}/deposits`).push({ memberId: memberName, amount, date: this._depDate, category, createdAt: Date.now() });
-        this.closeModal(); this.loadManagerMoney(); this.toast('Deposit added!', 'success');
+        this.closeModal(); this._cacheClearAll(); this.loadManagerMoney(); this.toast('Deposit added!', 'success');
     },
 
     async loadProfile() {
@@ -3397,6 +3417,7 @@ const App = {
         try {
             await db.ref(`messes/${this.messId}/bazarNote`).push({ name, addedBy: this.currentUser?.displayName || 'User', createdAt: Date.now() });
             inp.value = '';
+            this._cacheClearAll();
             this.loadBazarNote();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
@@ -3404,6 +3425,7 @@ const App = {
     async removeBazarNote(key) {
         try {
             await db.ref(`messes/${this.messId}/bazarNote/${key}`).remove();
+            this._cacheClearAll();
             this.loadBazarNote();
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
@@ -3549,6 +3571,7 @@ const App = {
                 await db.ref(`messes/${this.messId}/menus/${dateKey}`).remove();
             }
             this.closeModal();
+            this._cacheClearAll();
             this.loadMenu();
             this.toast('Menu saved!', 'success');
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
