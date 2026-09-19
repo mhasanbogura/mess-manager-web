@@ -4316,9 +4316,37 @@ const App = {
     },
     deleteAccount() {
         if (!this.currentUser) return;
-        this.showConfirm('Delete Account', 'This will permanently delete your account and all data. Type DELETE to confirm:', async (confirmed) => {
-            if (!confirmed) return;
+        const isGoogle = (this.currentUser.providerData || []).some(p => p.providerId === 'google.com');
+        const body = document.getElementById('modal-body');
+        if (isGoogle) {
+            body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Sign in with Google to confirm.</p>
+                <div style="display:flex;gap:10px;justify-content:flex-end">
+                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Sign in & Delete</button>
+                    <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
+                </div>`;
+        } else {
+            body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Enter your password to confirm.</p>
+                <input id="delete-pw" type="password" placeholder="Password" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:16px;box-sizing:border-box">
+                <div style="display:flex;gap:10px;justify-content:flex-end">
+                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Delete Account</button>
+                    <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
+                </div>`;
+        }
+        document.getElementById('modal-title').textContent = 'Delete Account';
+        document.getElementById('modal-overlay').classList.add('active');
+        document.getElementById('confirm-no').onclick = () => document.getElementById('modal-overlay').classList.remove('active');
+        document.getElementById('confirm-yes').onclick = async () => {
+            document.getElementById('modal-overlay').classList.remove('active');
             try {
+                if (!isGoogle) {
+                    const pw = (document.getElementById('delete-pw') || {}).value || '';
+                    if (!pw) { this.toast('Enter your password', 'error'); return; }
+                    const cred = firebase.auth.EmailAuthProvider.credential(this.currentUser.email, pw);
+                    await this.currentUser.reauthenticateWithCredential(cred);
+                } else {
+                    const p = new firebase.auth.GoogleAuthProvider();
+                    await this.currentUser.reauthenticateWithPopup(p);
+                }
                 const uid = this.currentUser.uid;
                 const messSnap = await db.ref(`users/${uid}/messes`).once('value');
                 const messes = messSnap.val() || {};
@@ -4332,7 +4360,7 @@ const App = {
                 await this.currentUser.delete();
                 this.toast('Account deleted', 'success');
             } catch (e) { this.toast(e.message, 'error'); }
-        });
+        };
     },
     showConfirm(title, msg, cb) {
         const body = document.getElementById('modal-body');
