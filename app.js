@@ -109,7 +109,7 @@ const App = {
         el_title:'Expense List',el_current_month:'Current Month:',
         el_tab_meal:'Meal',el_tab_utility:'Utility & Others',el_add:'Add',
         el_no_items:'No cost items this month',el_item:'ITEM',el_money_from:'MONEY FROM',el_total:'TOTAL',
-        el_divided_to:'DIVIDED TO',el_each:'EACH',el_delete:'Delete',el_edit:'Edit',
+        el_divided_to:'MEMBER',el_each:'EACH',el_delete:'Delete',el_edit:'Edit',
         el_each_label:'each',el_members:'member(s)',
         // Money Management
         mm2_title:'Money Management',mm2_current_month:'Current Month:',
@@ -2382,7 +2382,7 @@ const App = {
                     <span class="material-icons-round">expand_more</span>
                 </div>
                 <div class="abazar-day-items${isUtility ? ' abazar-util-grid' : ''}" style="${expanded?'':'display:none'}">
-                    <div class="abazar-day-items-head${isUtility ? ' abazar-util-grid' : ''}"><span>ITEM</span>${isUtility ? '<span>DIVIDED TO</span><span>EACH</span>' : '<span>MONEY FROM</span>'}<span>TOTAL</span></div>
+                    <div class="abazar-day-items-head${isUtility ? ' abazar-util-grid' : ''}"><span>ITEM</span>${isUtility ? '<span>MEMBER</span><span>EACH</span>' : '<span>MONEY FROM</span>'}<span>TOTAL</span></div>
                     ${isUtility ? (() => {
                         let html2 = '';
                         const utilItems = dayItems.filter(i => (i.category || 'bazar') === 'utility');
