@@ -3810,6 +3810,11 @@ const App = {
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
             const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+            const allMids = Object.keys(members);
+            const currentNames = new Set(allMids.map(id => (members[id] || {}).name).filter(Boolean));
+            const uidToName = {};
+            allMids.forEach(id => { const n = (members[id] || {}).name; if (n) uidToName[id] = n; });
+            const resolveName = (id) => uidToName[id] || id;
 
             const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
             const allBz = bzSnap.val() || {};
@@ -3821,6 +3826,8 @@ const App = {
             const itemFreq = {};
             const mealItemFreq = {};
             const utilItemFreq = {};
+            const mealPaidBy = {};
+            const utilPaidBy = {};
             Object.values(allBz).forEach(b => {
                 const amt = parseFloat(b.cost) || 0;
                 if (b.date && b.date.startsWith(month)) {
@@ -3830,6 +3837,13 @@ const App = {
                     else totalMealBazar += amt;
                     const n = (b.memberId || '').trim();
                     if (n) bzByName[n] = (bzByName[n] || 0) + amt;
+                    if (!isUtil) {
+                        const rn = resolveName(n);
+                        if (rn && rn !== 'Manager') mealPaidBy[rn] = (mealPaidBy[rn] || 0) + amt;
+                    } else {
+                        const rn = resolveName(n);
+                        if (rn && rn !== 'Manager') utilPaidBy[rn] = (utilPaidBy[rn] || 0) + amt;
+                    }
                     const day = parseInt(b.date.slice(8, 10), 10);
                     if (day) {
                         bzByDay[day] = (bzByDay[day] || 0) + amt;
@@ -3856,6 +3870,7 @@ const App = {
             mlSnap.forEach(d => {
                 const day = parseInt(d.key.slice(8, 10), 10);
                 Object.entries(d.val() || {}).forEach(([name, m]) => {
+                    if (!currentNames.has(name)) return;
                     const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
                     memberMeals[name] = (memberMeals[name] || 0) + base;
                     totalMeals += base;
@@ -3872,14 +3887,22 @@ const App = {
             Object.values(depAll).forEach(v => {
                 if (v && typeof v.amount === 'number' && v.memberId && v.date && v.date.startsWith(month)) {
                     totalDep += v.amount;
+                    const resolvedId = resolveName(v.memberId);
                     const cat = v.category || 'meal';
                     if (cat === 'utility') {
                         totalUtilDep += v.amount;
                     } else {
-                        depByName[v.memberId] = (depByName[v.memberId] || 0) + v.amount;
+                        depByName[resolvedId] = (depByName[resolvedId] || 0) + v.amount;
                         totalMealDep += v.amount;
                     }
                 }
+            });
+            Object.entries(mealPaidBy).forEach(([name, amt]) => {
+                depByName[name] = (depByName[name] || 0) + amt;
+                totalMealDep += amt;
+            });
+            Object.entries(utilPaidBy).forEach(([name, amt]) => {
+                totalUtilDep += amt;
             });
 
             let totalUtility = 0, totalRent = 0;
