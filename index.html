@@ -118,8 +118,8 @@
                 <button class="btn-primary" id="join-mess-btn" data-lang-key="ms_join_btn">Join Mess</button>
                 <p class="hint-text" data-lang-key="ms_code_hint">Ask your mess admin for the code</p>
             </div>
-            <button class="btn-text" id="logout-from-setup" style="font-weight:600" data-lang-key="ms_signout">Sign Out</button>
-            <button class="btn-text" id="delete-account-from-setup" style="color:#d32f2f;font-weight:600" data-lang-key="ms_delete_account">Delete Account</button>
+            <button class="btn-text" onclick="auth.signOut()" style="font-weight:600" data-lang-key="ms_signout">Sign Out</button>
+            <button class="btn-text" onclick="App.deleteAccount()" style="color:#d32f2f;font-weight:600" data-lang-key="ms_delete_account">Delete Account</button>
         </div>
     </div>
 
