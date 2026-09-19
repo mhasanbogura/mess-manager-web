@@ -2662,7 +2662,7 @@ const App = {
             <div id="bz-utility-section" style="display:none">
                 <div class="dep-label">Type:</div>
                 <div class="dep-chips" id="bz-type-chips">
-                    ${['Rent','Electricity','Wi-Fi'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
+                    ${['Rent','Electricity','Wi-Fi','Cook'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
@@ -2735,7 +2735,7 @@ const App = {
             <div id="bz-utility-section" style="display:none">
                 <div class="dep-label">Type:</div>
                 <div class="dep-chips" id="bz-type-chips">
-                    ${['Rent','Electricity','Wi-Fi'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
+                    ${['Rent','Electricity','Wi-Fi','Cook'].map(t => `<button class="dep-chip" data-type="${t}" onclick="App.bzPickType(this)">${t}</button>`).join('')}
                     <button class="dep-chip" onclick="App.bzAddType()"><span class="material-icons-round" style="font-size:16px">add</span> Others</button>
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
