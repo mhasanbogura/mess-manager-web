@@ -1207,9 +1207,9 @@ const App = {
 
             const members = await this._dbGet(`messes/${this.messId}/members`, 'members');
             this._flatMembers = members;
-            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
+            const mids = Object.keys(members).filter(id => id.startsWith('member_') || !(members[id] || {}).role).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             let adminName = '-';
-            const admin = mids.find(id => members[id] && members[id].role === 'admin');
+            const admin = Object.keys(members).find(id => members[id] && members[id].role === 'admin');
             if (admin) adminName = members[admin].name || '-';
             document.getElementById('flat-manager-name').textContent = adminName;
 
