@@ -515,6 +515,12 @@ const App = {
         document.getElementById(id).classList.add('active');
         const nav = document.getElementById('bottom-nav');
         if (nav) nav.classList.toggle('hidden-nav', id !== 'app-screen');
+        if (id === 'app-screen') {
+            const isOled = this.theme === 'oled';
+            this._setSystemBars(isOled ? '#111111' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
+        } else {
+            this._setSystemBars('#ffffff', '#14181f');
+        }
     },
 
     bindBackButton() {
