@@ -697,7 +697,7 @@ const App = {
             }
         }
         const ids = Object.keys(data);
-        if (ids.length === 1) { this.enterMess(ids[0]); return; }
+        if (ids.length === 1) { this.enterMess(ids[0], { skipMemberCheck: true }); return; }
         if (ids.length > 1) {
             this.showScreen('mess-select-screen');
             const div = document.getElementById('my-messes-list');
@@ -715,7 +715,7 @@ const App = {
                 } catch (e) {
                     try { s = JSON.parse(localStorage.getItem(`mess_settings_${mid}`) || '{}'); } catch (e2) {}
                 }
-                html += `<div class="mess-item" onclick="App.enterMess('${mid}')">
+                html += `<div class="mess-item" onclick="App.enterMess('${mid}', {skipMemberCheck:true})">
                     <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
                     <div class="mess-item-info"><h4>${this.esc(s.messName || 'Unnamed')}</h4><p>${data[mid].role || 'member'} | ${s.messCode || ''}</p></div>
                     <span class="material-icons-round" style="color:var(--text-secondary)">chevron_right</span>
