@@ -711,7 +711,6 @@ const App = {
 
     async loadMyMesses() {
         if (!this.currentUser) return;
-        this._hideSplash();
         const cacheKey = `user_messes_${this.currentUser.uid}`;
         let data = {};
         const offline = !navigator.onLine;
