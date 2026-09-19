@@ -395,14 +395,23 @@ const App = {
 
     async init() {
         const splash = document.getElementById('splash-screen');
+        const offlineWarn = document.getElementById('offline-warning');
         const hideSplash = () => {
             if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
             try { if (window.Capacitor?.Plugins?.SplashScreen) Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
         };
-        hideSplash();
-        setTimeout(hideSplash, 2000);
         this.applyTheme();
         this.applyLanguage();
+        if (!navigator.onLine) {
+            if (offlineWarn) offlineWarn.style.display = 'block';
+            window.addEventListener('online', () => {
+                if (offlineWarn) offlineWarn.style.display = 'none';
+                this.init();
+            }, { once: true });
+            return;
+        }
+        hideSplash();
+        setTimeout(hideSplash, 2000);
         this._cacheDriveFiles();
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
@@ -3310,7 +3319,7 @@ const App = {
                 if (avatar) avatar.textContent = initial;
             }
         } catch (e) {}
-        const saved = localStorage.getItem('mess_theme') || 'light';
+        const saved = localStorage.getItem('mess_theme') || 'oled';
         const ot = document.getElementById('prof-oled-theme');
         const toggle = document.getElementById('prof-lang-toggle');
         if (ot) ot.checked = saved === 'oled';
@@ -3337,7 +3346,7 @@ const App = {
         this._setSystemBars(this.theme === 'oled' ? '#111111' : '#f2f4f8', this.theme === 'oled' ? '#ffffff' : '#14181f');
     },
     applyTheme() {
-        const saved = localStorage.getItem('mess_theme') || 'light';
+        const saved = localStorage.getItem('mess_theme') || 'oled';
         this.theme = saved;
         if (saved === 'oled') {
             document.documentElement.setAttribute('data-theme', 'oled');
