@@ -36,6 +36,9 @@ const App = {
             return {};
         }
     },
+    _toEnDigits(s) {
+        return s.replace(/[\u09E6-\u09EF]/g, d => '০১২৩৪৫৬৭৮৯'.indexOf(d));
+    },
     async _dbBgRefresh(path, cacheKey) {
         try {
             const snap = await db.ref(path).once('value');
@@ -463,6 +466,14 @@ const App = {
         const overlay = $('modal-overlay');
         if (overlay) overlay.addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
         this._setupSwipe();
+        document.addEventListener('input', e => {
+            const el = e.target;
+            if (el.tagName === 'INPUT' && el.type === 'number' && /[\u09E6-\u09EF]/.test(el.value)) {
+                const pos = el.selectionStart;
+                el.value = this._toEnDigits(el.value);
+                el.setSelectionRange(pos, pos);
+            }
+        });
     },
 
     _setupSwipe() {
