@@ -2354,14 +2354,10 @@ const App = {
         const isUtility = filter === 'utility';
 
         if (isUtility) {
-            const grouped = {};
-            items.forEach(([k, v]) => {
-                const gKey = `${v.date}_${v.name}`;
-                if (!grouped[gKey]) grouped[gKey] = { name: v.name, date: v.date, total: 0, members: [], key: k, category: v.category, addedBy: v.addedBy, createdAt: v.createdAt };
-                grouped[gKey].total += parseFloat(v.cost) || 0;
-                if (v.splitWith && !grouped[gKey].members.includes(v.splitWith)) grouped[gKey].members.push(v.splitWith);
+            items = items.map(([k, v]) => {
+                const count = v.splitWith ? 1 : 0;
+                return [k, { ...v, _count: count }];
             });
-            items = Object.values(grouped).map(g => [g.key, { name: g.name, cost: g.total, splitWith: g.members.join(', '), date: g.date, category: g.category, addedBy: g.addedBy, createdAt: g.createdAt, _count: g.members.length }]);
         }
 
         const total = items.reduce((s, [, v]) => s + (parseFloat(v.cost) || 0), 0);
@@ -2403,7 +2399,7 @@ const App = {
                                 <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
                                 ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                             </div>
-                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (${i._count || 0} members)</div>
+                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (personal, ${this.esc(i.splitWith || 'N/A')})</div>
                             <div class="abazar-item-detail-btns">
                                 <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
                             </div>
