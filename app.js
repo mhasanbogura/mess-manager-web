@@ -1581,6 +1581,9 @@ const App = {
 
             const allMids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             const mids = allMids.filter(id => (members[id] || {}).status !== 'pending');
+            const uidToName = {};
+            allMids.forEach(id => { const n = (members[id] || {}).name; if (n) uidToName[id] = n; });
+            const resolveName = (id) => uidToName[id] || id;
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
             let managerName = '-';
             if (adminFound) managerName = adminFound[1].name || '-';
@@ -1610,10 +1613,10 @@ const App = {
                 const cat = b.category || 'bazar';
                 if (cat === 'bazar') {
                     bazTotal += amt;
-                    const n = (b.memberId || '').trim();
+                    const n = resolveName((b.memberId || '').trim());
                     if (n && n !== 'Manager') mealPaidBy[n] = (mealPaidBy[n] || 0) + amt;
                 } else if (cat === 'utility') {
-                    const n = (b.memberId || '').trim();
+                    const n = resolveName((b.memberId || '').trim());
                     if (n && n !== 'Manager') utilPaidBy[n] = (utilPaidBy[n] || 0) + amt;
                 }
             });
@@ -1635,12 +1638,13 @@ const App = {
                 if (!v.date || !v.date.startsWith(month)) return;
                 if (typeof v.amount === 'number' && v.memberId) {
                     totalDep += v.amount;
+                    const resolvedId = resolveName(v.memberId);
                     const cat = v.category || 'meal';
                     if (cat === 'utility') {
-                        utilDepByName[v.memberId] = (utilDepByName[v.memberId] || 0) + v.amount;
+                        utilDepByName[resolvedId] = (utilDepByName[resolvedId] || 0) + v.amount;
                         totalUtilDep += v.amount;
                     } else {
-                        mealDepByName[v.memberId] = (mealDepByName[v.memberId] || 0) + v.amount;
+                        mealDepByName[resolvedId] = (mealDepByName[resolvedId] || 0) + v.amount;
                         totalMealDep += v.amount;
                     }
                 }
@@ -1703,7 +1707,7 @@ const App = {
                 if (!amt) return;
                 if (!b.date || !b.date.startsWith(month)) return;
                 if (b.category === 'utility') {
-                    const n = (b.splitWith || b.memberId || '').trim();
+                    const n = resolveName((b.splitWith || b.memberId || '').trim());
                     if (!n) return;
                     if ((b.name || '').toLowerCase() === 'rent') {
                         rentByName[n] = (rentByName[n] || 0) + amt;
