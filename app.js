@@ -442,6 +442,7 @@ const App = {
         auth.onAuthStateChanged(user => {
             if (user) {
                 this.currentUser = user;
+                if (this.messId && document.getElementById('app-screen')?.classList.contains('active')) return;
                 this.loadMyMesses();
                 const params = new URLSearchParams(window.location.search);
                 const joinCode = params.get('join');
@@ -539,6 +540,7 @@ const App = {
 
     bindBackButton() {
         this._pageHistory = [];
+        this._lastBackToast = 0;
         window.addEventListener('popstate', (e) => {
             if (!document.getElementById('app-screen')?.classList.contains('active')) return;
             if (e.state && e.state.page) {
@@ -569,8 +571,14 @@ const App = {
                         this.navigate('dashboard');
                     }
                 } else if (this.currentPage === 'dashboard') {
-                    this.showScreen('mess-select-screen');
-                    this.loadMyMesses();
+                    const now = Date.now();
+                    if (now - this._lastBackToast < 2000) {
+                        try { navigator.app?.exitApp?.(); } catch (e) {}
+                        try { window.close(); } catch (e) {}
+                    } else {
+                        this._lastBackToast = now;
+                        this.toast('Press back again to exit', 'info');
+                    }
                 }
             } else if (authActive) {
                 // from welcome screen - do nothing (stay or exit)
@@ -588,6 +596,16 @@ const App = {
         try {
             if (window.Capacitor?.Plugins?.App) {
                 window.Capacitor.Plugins.App.addListener('backButton', hwBack);
+            }
+        } catch (e) { /* not running in Capacitor */ }
+        try {
+            if (window.Capacitor?.Plugins?.App) {
+                window.Capacitor.Plugins.App.addListener('appStateChange', (state) => {
+                    if (state.isActive && this.currentUser && this.messId) {
+                        this.showApp();
+                        this.loadDashboard();
+                    }
+                });
             }
         } catch (e) { /* not running in Capacitor */ }
     },
