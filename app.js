@@ -3929,7 +3929,7 @@ const App = {
                 const dep = depByName[name] || 0;
                 const mealCost = (memberMeals[name] || 0) * rate;
                 return { name, balance: dep - mealCost };
-            }).sort((a, b) => b.balance - a.balance);
+            }).sort((a, b) => a.name.localeCompare(b.name));
 
             let monthPrev = new Date(year, mon - 1, 1);
             const prevMonth = `${monthPrev.getFullYear()}-${String(monthPrev.getMonth() + 1).padStart(2, '0')}`;
@@ -4039,9 +4039,10 @@ const App = {
                             const utilCostPerMember = mids.length > 0 ? (totalUtility + totalRent) / mids.length : 0;
                             const utilMemberBalances = mids.map(mid => {
                                 const name = members[mid]?.name || 'Unknown';
-                                const utilDep = Object.values(depAll).filter(v => v && v.memberId === mid && v.category === 'utility' && v.date && v.date.startsWith(month)).reduce((s, v) => s + (v.amount || 0), 0);
-                                return { name, balance: utilDep - utilCostPerMember };
-                            }).sort((a, b) => b.balance - a.balance);
+                                const utilDepRaw = Object.values(depAll).filter(v => v && v.memberId === mid && v.category === 'utility' && v.date && v.date.startsWith(month)).reduce((s, v) => s + (v.amount || 0), 0);
+                                const utilDepBz = utilPaidBy[name] || 0;
+                                return { name, balance: utilDepRaw + utilDepBz - utilCostPerMember };
+                            }).sort((a, b) => a.name.localeCompare(b.name));
                             return utilMemberBalances.length ? `<div class="am-card">
                                 <h3>Member balances</h3>
                                 <p class="am-sub">Green = in credit · Red = owes (utility deposit – cost share)</p>
