@@ -394,11 +394,11 @@ const App = {
     },
 
     async init() {
+        try { if (window.Capacitor?.Plugins?.SplashScreen) Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
         const splash = document.getElementById('splash-screen');
         const offlineWarn = document.getElementById('offline-warning');
         this._hideSplash = () => {
             if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
-            try { if (window.Capacitor?.Plugins?.SplashScreen) Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
         };
         this.applyTheme();
         this.applyLanguage();
