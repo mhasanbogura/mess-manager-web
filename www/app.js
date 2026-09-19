@@ -1,6 +1,7 @@
 const App = {
     currentUser: null, messId: null, messCode: null, messName: null,
     currentPage: 'dashboard', userRole: 'member',
+    _skipCache: new Set(),
 
     // ── offline cache helpers ──────────────────────────────────
     _cacheSet(key, data) {
@@ -23,7 +24,9 @@ const App = {
         try { for (let i = localStorage.length - 1; i >= 0; i--) { const k = localStorage.key(i); if (k && k.startsWith(prefix)) localStorage.removeItem(k); } } catch (e) {}
     },
     async _dbGet(path, cacheKey) {
-        if (cacheKey) {
+        const forceFresh = cacheKey && this._skipCache.has(cacheKey);
+        if (forceFresh && cacheKey) this._skipCache.delete(cacheKey);
+        if (cacheKey && !forceFresh) {
             const cached = this._cacheGet(cacheKey);
             if (cached && Object.keys(cached).length) {
                 if (navigator.onLine) this._dbBgRefresh(path, cacheKey);
@@ -2092,7 +2095,7 @@ const App = {
                 saved++;
             }
         }
-        if (saved) { try { this.closeModal(); } catch(e) {} this._cacheClearAll(); this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
+        if (saved) { try { this.closeModal(); } catch(e) {} this._skipCache.add('meals_month'); this._cacheClearAll(); this.toast(`${saved} member meal${saved>1?'s':''} saved!`, 'success'); this.navigate('meals'); }
         else this.toast('Set at least one meal', 'error');
     },
 
@@ -2129,6 +2132,7 @@ const App = {
                 count: currentVal, action: 'removed', user: userName, createdAt: Date.now()
             });
             this.toast(`${typeLabel} deleted for ${memberName}`, 'success');
+            this._skipCache.add('meals_month');
             this._cacheClearAll();
             this.loadMeals();
         } catch (err) { console.error(err); this.toast('Delete failed', 'error'); }
