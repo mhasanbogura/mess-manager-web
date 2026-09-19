@@ -1074,7 +1074,7 @@ const App = {
             const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+            const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
             const dutySnap = await db.ref(`messes/${this.messId}/bazarDuty`).once('value');
             const dutyAll = dutySnap.val() || {};
             const duty = {};
@@ -2048,7 +2048,7 @@ const App = {
         if (dateEl) dateEl.textContent = dateStr;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+        const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
         const colors = ['#0b3d91','#0d4fb5','#1565C0','#08306b','#3b7bdd','#1976D2'];
         this._aamData = {};
         let cardsHtml = '';
@@ -2094,7 +2094,7 @@ const App = {
         if (!this.checkPerm('mealEntry')) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+        const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
         const viewHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
         const showBf = !viewHide.breakfast;
         const showLc = !viewHide.lunch;
@@ -3141,7 +3141,7 @@ const App = {
         if (!this.checkPerm('bazarEntry')) return;
         const snap = await db.ref(`messes/${this.messId}/members`).once('value');
         const members = snap.val() || {};
-        const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+        const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
         const names = mids.map(id => members[id]?.name || 'Unknown');
         const now = new Date();
         this._depDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
@@ -3747,7 +3747,7 @@ const App = {
         try {
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
-            const mids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
+            const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
 
             const bzSnap = await db.ref(`messes/${this.messId}/bazarItems`).once('value');
             const allBz = bzSnap.val() || {};
