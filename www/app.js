@@ -889,15 +889,16 @@ const App = {
         try {
             const code = this.genCode(6);
             const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Connection timeout')), 15000));
-            const ref = db.ref('messes').push({
+            const newKey = db.ref('messes').push().key;
+            const write = db.ref(`messes/${newKey}`).set({
                 settings: { messName: name, messCode: code, owner: this.currentUser.uid, createdAt: Date.now() },
                 members: { [this.currentUser.uid]: { name: this.currentUser.displayName || 'Admin', email: this.currentUser.email, role: 'admin', joinedAt: Date.now() } }
             });
-            await Promise.race([ref, timeout]);
-            await Promise.race([db.ref(`users/${this.currentUser.uid}/messes/${ref.key}`).set({ role: 'admin', joinedAt: Date.now() }), timeout]);
+            await Promise.race([write, timeout]);
+            await Promise.race([db.ref(`users/${this.currentUser.uid}/messes/${newKey}`).set({ role: 'admin', joinedAt: Date.now() }), timeout]);
             this.toast('Mess created!', 'success');
             document.getElementById('create-mess-name').value = '';
-            this.enterMess(ref.key, { skipMemberCheck: true });
+            this.enterMess(newKey, { skipMemberCheck: true });
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
         finally { btn.textContent = 'Create Mess'; btn.disabled = false; }
     },
