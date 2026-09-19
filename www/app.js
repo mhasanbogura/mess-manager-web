@@ -3828,6 +3828,8 @@ const App = {
             const utilItemFreq = {};
             const mealPaidBy = {};
             const utilPaidBy = {};
+            const utilByName = {};
+            const rentByName = {};
             Object.values(allBz).forEach(b => {
                 const amt = parseFloat(b.cost) || 0;
                 if (b.date && b.date.startsWith(month)) {
@@ -3843,6 +3845,11 @@ const App = {
                     } else {
                         const rn = resolveName(n);
                         if (rn && rn !== 'Manager') utilPaidBy[rn] = (utilPaidBy[rn] || 0) + amt;
+                        const sw = resolveName((b.splitWith || b.memberId || '').trim());
+                        if (sw) {
+                            if ((b.name || '').toLowerCase() === 'rent') rentByName[sw] = (rentByName[sw] || 0) + amt;
+                            else utilByName[sw] = (utilByName[sw] || 0) + amt;
+                        }
                     }
                     const day = parseInt(b.date.slice(8, 10), 10);
                     if (day) {
@@ -4036,12 +4043,13 @@ const App = {
                             <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
                         </div>
                         ${(() => {
-                            const utilCostPerMember = mids.length > 0 ? (totalUtility + totalRent) / mids.length : 0;
                             const utilMemberBalances = mids.map(mid => {
                                 const name = members[mid]?.name || 'Unknown';
+                                const rent = rentByName[name] || 0;
+                                const util = utilByName[name] || 0;
                                 const utilDepRaw = Object.values(depAll).filter(v => v && v.memberId === mid && v.category === 'utility' && v.date && v.date.startsWith(month)).reduce((s, v) => s + (v.amount || 0), 0);
                                 const utilDepBz = utilPaidBy[name] || 0;
-                                return { name, balance: utilDepRaw + utilDepBz - utilCostPerMember };
+                                return { name, balance: utilDepRaw + utilDepBz - rent - util };
                             }).sort((a, b) => a.name.localeCompare(b.name));
                             return utilMemberBalances.length ? `<div class="am-card">
                                 <h3>Member balances</h3>
