@@ -1584,6 +1584,7 @@ const App = {
             const uidToName = {};
             allMids.forEach(id => { const n = (members[id] || {}).name; if (n) uidToName[id] = n; });
             const resolveName = (id) => uidToName[id] || id;
+            const currentNames = new Set(allMids.map(id => (members[id] || {}).name).filter(Boolean));
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
             let managerName = '-';
             if (adminFound) managerName = adminFound[1].name || '-';
@@ -1626,6 +1627,7 @@ const App = {
             Object.entries(mlMData).forEach(([key, d]) => {
                 if (key < month + '-01' || key > monthEnd) return;
                 Object.entries(d || {}).forEach(([memberName, m]) => {
+                    if (!currentNames.has(memberName)) return;
                     const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
                     memberMeals[memberName] = (memberMeals[memberName] || 0) + base;
                     totalMeals += base;
