@@ -764,7 +764,7 @@ const App = {
         }, { passive: true });
     },
 
-    async enterMess(mid) {
+    async enterMess(mid, opts) {
         this.messId = mid;
         this.messCode = null;
         const settingsCacheKey = `mess_settings_${mid}`;
@@ -772,12 +772,14 @@ const App = {
         const offline = !navigator.onLine;
         try {
             if (!offline) {
-                const memberSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
-                if (!memberSnap.exists()) {
-                    try { await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).remove(); } catch (e2) {}
-                    this.toast('You are no longer a member of this mess', 'error');
-                    this.messId = null;
-                    return this.loadMyMesses();
+                if (!opts || !opts.skipMemberCheck) {
+                    const memberSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
+                    if (!memberSnap.exists()) {
+                        try { await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).remove(); } catch (e2) {}
+                        this.toast('You are no longer a member of this mess', 'error');
+                        this.messId = null;
+                        return this.loadMyMesses();
+                    }
                 }
                 const s = await db.ref(`messes/${mid}/settings`).once('value');
                 const v = s.val() || {};
@@ -895,7 +897,7 @@ const App = {
             await Promise.race([db.ref(`users/${this.currentUser.uid}/messes/${ref.key}`).set({ role: 'admin', joinedAt: Date.now() }), timeout]);
             this.toast('Mess created!', 'success');
             document.getElementById('create-mess-name').value = '';
-            this.enterMess(ref.key);
+            this.enterMess(ref.key, { skipMemberCheck: true });
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
         finally { btn.textContent = 'Create Mess'; btn.disabled = false; }
     },
