@@ -481,6 +481,11 @@ const App = {
         bind('modal-close', 'click', () => this.closeModal());
         const overlay = $('modal-overlay');
         if (overlay) overlay.addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
+        document.addEventListener('click', e => {
+            const mf = document.getElementById('abazar-member-filter');
+            const dd = document.getElementById('abazar-member-dropdown');
+            if (mf && dd && !mf.contains(e.target)) dd.classList.remove('open');
+        });
         this._setupSwipe();
         document.addEventListener('input', e => {
             const el = e.target;
@@ -2441,6 +2446,17 @@ const App = {
                 .filter(([, v]) => v.date && v.date.startsWith(month))
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
             this._bazarMembers = members;
+            const memberNames = Object.entries(members)
+                .filter(([id]) => id.startsWith('member_'))
+                .map(([, m]) => m.name).filter(Boolean).sort((a, b) => a.localeCompare(b));
+            const dd = document.getElementById('abazar-member-dropdown');
+            if (dd) {
+                let ddHtml = '<button class="abazar-member-dropdown-item active" data-member="" onclick="App.filterBazarMember(\'\')">No Filter</button>';
+                ddHtml += '<button class="abazar-member-dropdown-item" data-member="Manager" onclick="App.filterBazarMember(\'Manager\')">Manager</button>';
+                memberNames.forEach(n => { ddHtml += `<button class="abazar-member-dropdown-item" data-member="${this.esc(n)}" onclick="App.filterBazarMember('${this.esc(n)}')">${this.esc(n)}</button>`; });
+                dd.innerHTML = ddHtml;
+            }
+            if (!this._bazarMemberFilter) this._bazarMemberFilter = '';
             this.renderBazarList();
         } catch (e) { console.error('loadBazarList error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
@@ -2451,11 +2467,35 @@ const App = {
         this.renderBazarList();
     },
 
+    toggleMemberDropdown() {
+        const dd = document.getElementById('abazar-member-dropdown');
+        if (dd) dd.classList.toggle('open');
+    },
+
+    filterBazarMember(name) {
+        this._bazarMemberFilter = name || '';
+        const label = document.getElementById('abazar-member-label');
+        if (label) label.textContent = name || 'No Filter';
+        const dd = document.getElementById('abazar-member-dropdown');
+        if (dd) dd.classList.remove('open');
+        document.querySelectorAll('#abazar-member-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', b.dataset.member === (name || '')));
+        this.renderBazarList();
+    },
+
     renderBazarList() {
         const filter = this._bazarFilter || 'bazar';
         let items = filter === 'all' ? (this._allBazar || []) : (this._allBazar || []).filter(([, v]) => (v.category || 'bazar') === filter);
         const members = this._bazarMembers || {};
         const isUtility = filter === 'utility';
+        const memberFilter = this._bazarMemberFilter || '';
+        if (memberFilter) {
+            items = items.filter(([, v]) => {
+                if (memberFilter === 'Manager') return !v.memberId || v.memberId === 'Manager';
+                if (isUtility) return (v.splitWith || '').trim() === memberFilter;
+                const mName = (members[v.memberId] || {}).name || v.memberId || '';
+                return mName.trim() === memberFilter;
+            });
+        }
 
         if (isUtility) {
             items = items.map(([k, v]) => {
