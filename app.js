@@ -1493,8 +1493,11 @@ const App = {
                 avatarEl.textContent = initial;
                 try {
                     let pic = this._cacheGetGlobal('profilePic');
-                    if (!pic) {
-                        pic = await db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value').then(s => s.val());
+                    if (!pic && navigator.onLine) {
+                        pic = await Promise.race([
+                            db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value').then(s => s.val()),
+                            new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
+                        ]);
                         if (pic) this._cacheSetGlobal('profilePic', pic);
                     }
                     if (pic && typeof pic === 'string') {
@@ -1528,7 +1531,19 @@ const App = {
 
             document.getElementById('dash-mess-name').textContent = this.messName || 'My Mess';
 
-            const members = await this._dbGet(`messes/${this.messId}/members`, 'members');
+            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('dash-date').textContent = `Today is ${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()} (${weekdays[now.getDay()]})`;
+
+            const [members, todayMeals, noticesData, bzData, mlMData, depAll] = await Promise.all([
+                this._dbGet(`messes/${this.messId}/members`, 'members'),
+                this._dbGet(`messes/${this.messId}/meals/${todayKey}`, 'meals_today_' + todayKey),
+                this._dbGet(`messes/${this.messId}/notices`, 'notices'),
+                this._dbGet(`messes/${this.messId}/bazarItems`, 'bazarItems'),
+                this._dbGet(`messes/${this.messId}/meals`, 'meals_month'),
+                this._dbGet(`messes/${this.messId}/deposits`, 'deposits')
+            ]);
+
             const allMids = Object.keys(members).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
             const mids = allMids.filter(id => (members[id] || {}).status !== 'pending');
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
@@ -1538,11 +1553,6 @@ const App = {
             document.getElementById('dash-manager').textContent = managerName;
             document.getElementById('dash-month').textContent = this.fmtMonth(this.getSelMonth().date);
 
-            const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            document.getElementById('dash-date').textContent = `Today is ${now.getDate()} ${months[now.getMonth()]}, ${now.getFullYear()} (${weekdays[now.getDay()]})`;
-
-            const todayMeals = await this._dbGet(`messes/${this.messId}/meals/${todayKey}`, 'meals_today_' + todayKey);
             let bf = 0, ln = 0, dn = 0;
             Object.values(todayMeals).forEach(m => { bf += (m.breakfast || 0); ln += (m.lunch || 0); dn += (m.dinner || 0); });
             document.getElementById('dash-breakfast').textContent = bf;
@@ -1550,16 +1560,12 @@ const App = {
             document.getElementById('dash-dinner').textContent = dn;
 
             let preview = 'Pin a notice for the whole house';
-            try {
-                const noticesData = await this._dbGet(`messes/${this.messId}/notices`, 'notices');
-                if (noticesData && Object.keys(noticesData).length) {
-                    const entries = Object.entries(noticesData).sort((a, b) => ((a[1]?.createdAt || 0) - (b[1]?.createdAt || 0)));
-                    if (entries.length) { const v = entries[entries.length - 1][1]; preview = v.body || v.title || preview; }
-                }
-            } catch (e) { /* notices may not exist */ }
+            if (noticesData && Object.keys(noticesData).length) {
+                const entries = Object.entries(noticesData).sort((a, b) => ((a[1]?.createdAt || 0) - (b[1]?.createdAt || 0)));
+                if (entries.length) { const v = entries[entries.length - 1][1]; preview = v.body || v.title || preview; }
+            }
             document.getElementById('dash-notice-preview').textContent = preview;
 
-            const bzData = await this._dbGet(`messes/${this.messId}/bazarItems`, 'bazarItems');
             let bazTotal = 0;
             const paidBy = {};
             Object.values(bzData).forEach(b => {
@@ -1571,10 +1577,6 @@ const App = {
                 if (n) paidBy[n] = (paidBy[n] || 0) + amt;
             });
 
-            let mlMData = {};
-            try {
-                mlMData = await this._dbGet(`messes/${this.messId}/meals`, 'meals_month');
-            } catch (e) {}
             const memberMeals = {};
             let totalMeals = 0;
             Object.entries(mlMData).forEach(([key, d]) => {
@@ -1586,8 +1588,6 @@ const App = {
                 });
             });
             const rate = totalMeals > 0 ? bazTotal / totalMeals : 0;
-
-            const depAll = await this._dbGet(`messes/${this.messId}/deposits`, 'deposits');
             const mealDepByName = {}; const utilDepByName = {}; let totalDep = 0; let totalMealDep = 0; let totalUtilDep = 0;
             Object.values(depAll).forEach(v => {
                 if (!v || typeof v !== 'object') return;
@@ -2301,9 +2301,9 @@ const App = {
         const sm = this.getSelMonth();
         const month = sm.key;
         document.getElementById('abazar-month').textContent = this.fmtMonth(sm.date);
-        this._bazarFilter = 'bazar';
+        if (!this._bazarFilter) this._bazarFilter = 'bazar';
         const filterBtns = document.querySelectorAll('#abazar-filters .abazar-filter-btn');
-        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'bazar'));
+        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === this._bazarFilter));
         const div = document.getElementById('abazar-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
@@ -2485,9 +2485,9 @@ const App = {
         const sm = this.getSelMonth();
         const month = sm.key;
         document.getElementById('abalance-month').textContent = this.fmtMonth(sm.date);
-        this._depFilter = 'meal';
+        if (!this._depFilter) this._depFilter = 'meal';
         const filterBtns = document.querySelectorAll('#abalance-filters .abazar-filter-btn');
-        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'meal'));
+        filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === this._depFilter));
         const div = document.getElementById('abalance-list');
         div.innerHTML = '<p class="empty-state">Loading...</p>';
         try {
