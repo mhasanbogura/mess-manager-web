@@ -964,7 +964,6 @@ const App = {
 
     showApp() {
         this.showScreen('app-screen');
-        this._hideSplash();
         try { history.pushState({ page: 'dashboard' }, ''); } catch (e) { /* ignore */ }
         const savedPage = localStorage.getItem('mess_currentPage');
         const validPages = ['dashboard','members','bazaar','meals','balance','profile'];
@@ -1838,7 +1837,8 @@ const App = {
             });
             utilRows.innerHTML = utilHtml || '<tr><td colspan="5" class="empty-state">No data</td></tr>';
             this.loadJoinRequests(members);
-        } catch (e) { console.error('loadDashboard error:', e); }
+            this._hideSplash();
+        } catch (e) { console.error('loadDashboard error:', e); this._hideSplash(); }
     },
 
     async loadJoinRequests(members) {
