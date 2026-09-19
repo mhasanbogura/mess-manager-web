@@ -394,7 +394,6 @@ const App = {
     },
 
     async init() {
-        try { if (window.Capacitor?.Plugins?.SplashScreen) Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
         const splash = document.getElementById('splash-screen');
         const offlineWarn = document.getElementById('offline-warning');
         this._hideSplash = () => {
