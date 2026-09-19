@@ -2107,6 +2107,8 @@ select.input-sm { cursor: pointer; }
     cursor: pointer; transition: background .15s; text-align: center;
 }
 .abazar-item-row.abazar-util-grid { grid-template-columns: 1fr 1.2fr 0.7fr 0.8fr; gap: 8px; text-align: center; }
+.abazar-util-subtotal { display: grid; padding: 10px 14px; grid-template-columns: 1fr 1.2fr 0.7fr 0.8fr; gap: 8px; text-align: center; border-bottom: 1px solid var(--border); }
+.abazar-util-subtotal span:last-child { font-size: 14px; font-weight: 700; color: var(--primary); }
 .abazar-item-row.abazar-dep-grid { grid-template-columns: 1fr 120px; gap: 0; text-align: center; }
 .abazar-item-row:hover { background: #f8f9fb; }
 .abazar-item-row.expanded { background: #f0f4fa; border-radius: 8px 8px 0 0; }

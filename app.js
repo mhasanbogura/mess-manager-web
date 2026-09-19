@@ -2383,28 +2383,73 @@ const App = {
                 </div>
                 <div class="abazar-day-items${isUtility ? ' abazar-util-grid' : ''}" style="${expanded?'':'display:none'}">
                     <div class="abazar-day-items-head${isUtility ? ' abazar-util-grid' : ''}"><span>ITEM</span>${isUtility ? '<span>DIVIDED TO</span><span>EACH</span>' : '<span>MONEY FROM</span>'}<span>TOTAL</span></div>
-                    ${dayItems.map(i => {
-                        const isUtil = (i.category || 'bazar') === 'utility';
-                        if (isUtil) {
-                            const each = i._count ? Math.round((parseFloat(i.cost) || 0) / i._count * 100) / 100 : parseFloat(i.cost) || 0;
-                            return `<div class="abazar-item-row abazar-util-grid" onclick="App.toggleBazarItem(this)">
+                    ${isUtility ? (() => {
+                        let html2 = '';
+                        const utilItems = dayItems.filter(i => (i.category || 'bazar') === 'utility');
+                        const nonUtilItems = dayItems.filter(i => (i.category || 'bazar') !== 'utility');
+                        const groups = {};
+                        utilItems.forEach(i => {
+                            const n = i.name || '-';
+                            if (!groups[n]) groups[n] = [];
+                            groups[n].push(i);
+                        });
+                        Object.entries(groups).forEach(([typeName, items]) => {
+                            const groupTotal = items.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
+                            items.forEach(i => {
+                                const each = i._count ? Math.round((parseFloat(i.cost) || 0) / i._count * 100) / 100 : parseFloat(i.cost) || 0;
+                                html2 += `<div class="abazar-item-row abazar-util-grid" onclick="App.toggleBazarItem(this)">
+                                <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
+                                <span class="abazar-item-buyer">${this.esc(i.splitWith || '-')}</span>
+                                <span class="abazar-item-each">৳${this.fmtNum(each)}</span>
+                                <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
+                            </div>
+                            <div class="abazar-item-detail" style="display:none">
+                                <div class="abazar-item-detail-info">
+                                    <span class="abazar-detail-dot green"></span>
+                                    <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
+                                    ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+                                </div>
+                                <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (personal, ${this.esc(i.splitWith || 'N/A')})</div>
+                                <div class="abazar-item-detail-btns">
+                                    <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                                </div>
+                            </div>`;
+                            });
+                            html2 += `<div class="abazar-util-subtotal abazar-util-grid" style="background:var(--bg);font-weight:700;font-size:13px;border-top:2px solid var(--border)">
+                                <span>${this.esc(typeName)} (${items.length})</span><span></span><span></span>
+                                <span style="color:var(--primary)">৳${this.fmtNum(groupTotal)}</span>
+                            </div>`;
+                        });
+                        nonUtilItems.forEach(i => {
+                            const buyerName = (members[i.memberId]||{}).name || i.memberId || '-';
+                            html2 += `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
                             <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
-                            <span class="abazar-item-buyer">${this.esc(i.splitWith || '-')}</span>
-                            <span class="abazar-item-each">৳${this.fmtNum(each)}</span>
+                            <span class="abazar-item-buyer">${this.esc(buyerName)}</span>
                             <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                         </div>
                         <div class="abazar-item-detail" style="display:none">
+                            ${i.splitWith ? `<div class="abazar-detail-price">৳${this.fmtNum(parseFloat(i.cost)||0)} each</div>
+                            <div class="abazar-detail-split">${this.esc(i.splitWith)}</div>` : ''}
                             <div class="abazar-item-detail-info">
                                 <span class="abazar-detail-dot green"></span>
                                 <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
                                 ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                             </div>
-                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (personal, ${this.esc(i.splitWith || 'N/A')})</div>
+                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
+                            ${i.editedBy ? `<div class="abazar-item-detail-info">
+                                <span class="abazar-detail-dot orange"></span>
+                                <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
+                                ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+                            </div>
+                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
                             <div class="abazar-item-detail-btns">
                                 <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                                <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
                             </div>
                         </div>`;
-                        }
+                        });
+                        return html2;
+                    })() : dayItems.filter(i => (i.category || 'bazar') !== 'utility').map(i => {
                         const buyerName = (members[i.memberId]||{}).name || i.memberId || '-';
                         return `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
                         <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
