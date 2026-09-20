@@ -47,12 +47,15 @@ html { -webkit-text-size-adjust: 100%; }
 
 .splash-screen {
     position: fixed; inset: 0; z-index: 9999;
-    background: #111111;
+    background: var(--bg);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
     transition: opacity 0.3s ease;
 }
 .splash-screen.hidden { opacity: 0; pointer-events: none; }
-.splash-icon { width: 120px; height: 120px; border-radius: 28px; object-fit: contain; }
+.splash-icon { width: 80px; height: 80px; border-radius: 18px; box-shadow: var(--shadow-lg); object-fit: contain; animation: splashPulse 2s ease-in-out infinite; }
+@keyframes splashPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: .8; } }
+.spinner { width: 26px; height: 26px; border: 3px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .8s linear infinite; margin: 18px auto; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 body {
     font-family: 'Times New Roman', 'Kalpurush', serif;
