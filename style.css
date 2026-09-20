@@ -796,6 +796,21 @@ select.input-sm { cursor: pointer; }
 }
 .modal-confirm-actions .btn-primary-action:active { filter: brightness(.85); }
 
+.dialog-wrap { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; padding: 20px; }
+.dialog-wrap:not([hidden]) { display: flex; align-items: center; justify-content: center; }
+.dialog {
+    background: var(--card-solid); border-radius: var(--radius); width: 100%; max-width: 420px;
+    padding: 22px; box-shadow: var(--shadow-lg); max-height: 94vh; overflow-y: auto;
+    border: 1px solid var(--card-border);
+}
+.dialog h3 { margin-bottom: 14px; font-size: 17px; font-weight: 700; color: var(--text); }
+.dialog-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
+.dialog-actions .btn { flex: 1; padding: 12px 18px; border: 0; border-radius: 11px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .1s; -webkit-tap-highlight-color: transparent; user-select: none; }
+.dialog-actions .btn.secondary { background: var(--card-solid); color: var(--text); border: 1px solid var(--border); }
+.dialog-actions .btn.secondary:active { filter: brightness(.9); }
+.dialog-actions .btn.danger { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+.dialog-actions .btn.danger:active { filter: brightness(.85); }
+
 .modal-footer {
     padding: 14px 18px; border-top: 1px solid var(--card-border);
     display: flex; gap: 10px; justify-content: flex-end;

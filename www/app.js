@@ -3569,39 +3569,37 @@ const App = {
         return `<div style="font-size:14px;line-height:1.7;color:var(--text)">${html}</div>`;
     },
     aboutApp() {
-        const body = document.getElementById('modal-body');
-        body.innerHTML = `
-            <div style="text-align:center;padding:12px 0 20px">
+        const lang = this._currentLang || 'en';
+        const title = lang === 'bn' ? 'অ্যাপ সম্পর্কে' : 'About App';
+        const bodyHtml = `
+            <div style="text-align:center;padding:0 0 16px">
                 <img src="app-icon.png" alt="" style="width:72px;height:72px;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:12px">
                 <h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mess Manager</h3>
-                <p style="margin:4px 0 0;font-size:13px;color:#888">Manage your mess easily</p>
+                <p style="margin:4px 0 0;font-size:13px;color:var(--text);opacity:.5">${lang === 'bn' ? 'আপনার মেস সহজে পরিচালনা করুন' : 'Manage your mess easily'}</p>
             </div>
             <div style="font-size:14px;color:var(--text);line-height:1.7">
-                <h4 style="font-size:15px;margin:16px 0 8px;color:var(--primary)">Overview</h4>
-                <p>A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.</p>
-                <h4 style="font-size:15px;margin:16px 0 8px;color:var(--primary)">Features</h4>
+                <h4 style="font-size:15px;margin:14px 0 8px;color:var(--primary)">${lang === 'bn' ? 'সারসংক্ষেপ' : 'Overview'}</h4>
+                <p>${lang === 'bn' ? 'একটি সাধারণ মেস ব্যবস্থাপনা অ্যাপ যা ব্যবহারকারীদের শেয়ারড মেস তথ্য, সদস্য, খাবার, খরচ এবং মাসিক হিসাব এক জায়গায় পরিচালনা করতে সাহায্য করে।' : 'A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.'}</p>
+                <h4 style="font-size:15px;margin:14px 0 8px;color:var(--primary)">${lang === 'bn' ? 'বৈশিষ্ট্য' : 'Features'}</h4>
                 <ul style="padding-left:18px;margin:0">
-                    <li>Manage mess members</li>
-                    <li>Track daily meals</li>
-                    <li>Manage meal rates and meal counts</li>
-                    <li>Record shared expenses</li>
-                    <li>Monthly balance calculations</li>
-                    <li>Notice board for announcements</li>
-                    <li>Dark theme support</li>
-                    <li>Multi-language support (English & Bangla)</li>
+                    <li>${lang === 'bn' ? 'মেস সদস্য পরিচালনা' : 'Manage mess members'}</li>
+                    <li>${lang === 'bn' ? 'দৈনিক খাবার ট্র্যাক' : 'Track daily meals'}</li>
+                    <li>${lang === 'bn' ? 'খাবারের হার ও পরিমাণ পরিচালনা' : 'Manage meal rates and meal counts'}</li>
+                    <li>${lang === 'bn' ? 'শেয়ার্ড খরচ রেকর্ড' : 'Record shared expenses'}</li>
+                    <li>${lang === 'bn' ? 'মাসিক ব্যালেন্স হিসাব' : 'Monthly balance calculations'}</li>
+                    <li>${lang === 'bn' ? 'নোটিশ বোর্ড' : 'Notice board for announcements'}</li>
+                    <li>${lang === 'bn' ? 'ডার্ক থিম সাপোর্ট' : 'Dark theme support'}</li>
+                    <li>${lang === 'bn' ? 'বহু ভাষা সাপোর্ট (ইংরেজি ও বাংলা)' : 'Multi-language support (English & Bangla)'}</li>
                 </ul>
-                <p style="margin-top:16px;font-size:12px;color:#999;text-align:center">Version ${document.querySelector('[data-lang-key="prof_version"]')?.textContent || '1.3.46'}</p>
+                <p style="margin-top:16px;font-size:12px;color:var(--text);opacity:.4;text-align:center">${document.querySelector('[data-lang-key="prof_version"]')?.textContent || 'Version 1.4.21 (build 385)'}</p>
             </div>`;
-        body.style.maxHeight = '70vh';
-        body.style.overflowY = 'auto';
-        document.getElementById('modal-title').textContent = 'About App';
-        this.openModal();
+        this.openDialog(title, bodyHtml, []);
     },
     contactDeveloper() {
-        const body = document.getElementById('modal-body');
-        body.innerHTML = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">Loading...</p></div>`;
-        document.getElementById('modal-title').textContent = 'Contact Developer';
-        this.openModal();
+        const lang = this._currentLang || 'en';
+        const title = lang === 'bn' ? 'ডেভেলপারের সাথে যোগাযোগ' : 'Contact Developer';
+        const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
+        this.openDialog(title, loadingHtml, []);
         const cached = localStorage.getItem('cache_contact_md');
         if (cached && !cached.includes('Content loading')) { this._renderContactFromMd(cached); return; }
         localStorage.removeItem('cache_contact_md');
@@ -3652,8 +3650,8 @@ const App = {
         for (const { label, value } of entries) {
             const lower = label.toLowerCase();
             let href = value;
-            if (lower.includes('whatsapp')) { const digits = value.replace(/[^0-9]/g, ''); href = digits.length >= 7 ? 'https://wa.me/' + digits : value; }
-            else if (lower.includes('messenger')) href = 'https://m.me/' + value.replace(/^https?:\/\/(www\.)?(m\.me|facebook\.com\/messages)\//, '');
+            if (lower.includes('whatsapp')) { href = value.startsWith('http') ? value : 'https://wa.me/' + value.replace(/[^a-zA-Z0-9_]/g, ''); }
+            else if (lower.includes('messenger')) href = value.startsWith('http') ? value : 'https://m.me/' + value.replace(/^https?:\/\/(www\.)?(m\.me|facebook\.com\/messages)\//, '');
             else if (lower.includes('email') || lower.includes('mail')) href = 'mailto:' + value;
             else if (lower.includes('github')) href = 'https://github.com/' + value.replace(/^https?:\/\/github\.com\//, '');
             else if (lower.includes('instagram')) href = 'https://instagram.com/' + value.replace(/^https?:\/\/(www\.)?instagram\.com\//, '');
@@ -3667,16 +3665,10 @@ const App = {
             html += `<a href="${this.esc(href)}" ${isPhone ? '' : 'target="_blank" rel="noopener"'} style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 14px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s"><span style="display:flex;align-items:center">${iconKey ? icons[iconKey] : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>'}</span><span style="text-align:center">${this.esc(label)}</span></a>`;
         }
         html += '</div>';
-        const body = document.getElementById('modal-body');
-        body.innerHTML = html;
-        body.style.maxHeight = '70vh';
-        body.style.overflowY = 'auto';
+        document.getElementById('dlgBody').innerHTML = html;
     },
     _renderContactFallback() {
-        const body = document.getElementById('modal-body');
-        body.innerHTML = `<div style="text-align:center;padding:8px 0 20px"><div style="width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;font-family:'Times New Roman',sans-serif">M</div><h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mahmudul Hasan</h3><p style="margin:6px 0 0;font-size:13px;color:var(--text);opacity:.5;line-height:1.5">I'm an Android developer who enjoys turning ideas into fast, reliable, and user-friendly apps.</p></div><div style="display:flex;flex-direction:column;gap:10px;padding:0 4px"><a href="https://wa.me/8801712345678" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px"><svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a><a href="https://github.com/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>GitHub</a></div>`;
-        body.style.maxHeight = '70vh';
-        body.style.overflowY = 'auto';
+        document.getElementById('dlgBody').innerHTML = `<div style="text-align:center;padding:8px 0 20px"><div style="width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;font-family:'Times New Roman',sans-serif">M</div><h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mahmudul Hasan</h3><p style="margin:6px 0 0;font-size:13px;color:var(--text);opacity:.5;line-height:1.5">I'm an Android developer who enjoys turning ideas into fast, reliable, and user-friendly apps.</p></div><div style="display:flex;flex-direction:column;gap:10px;padding:0 4px"><a href="https://wa.me/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px"><svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a><a href="https://m.me/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px"><svg width="24" height="24" viewBox="0 0 24 24" fill="#0084FF"><path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.2 5.42 3.15 7.2V22l3.04-1.67c.85.24 1.76.37 2.81.37 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm1 12.5l-2.5-2.7L5.5 14.5l5.5-5.8 2.5 2.7 4.5-2.7-5.5 5.8z"/></svg>Messenger</a></div>`;
     },
 
     // ==================== BAZAR NOTE PAGE ====================
@@ -4569,6 +4561,20 @@ const App = {
     },
     openModal() { document.getElementById('modal').classList.remove('confirm-mode'); document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
+    openDialog(title, bodyHtml, actions = []) {
+        document.getElementById('dlgTitle').textContent = title;
+        document.getElementById('dlgBody').innerHTML = bodyHtml;
+        document.getElementById('dlgActions').innerHTML = actions.map(a =>
+            `<button class="btn ${a.cls || 'secondary'}" data-act="${a.key}">${a.label}</button>`).join('');
+        document.getElementById('dlg').hidden = false;
+        document.getElementById('dlgActions').onclick = ev => {
+            const btn = ev.target.closest('[data-act]'); if (!btn) return;
+            const act = actions.find(a => a.key === btn.dataset.act);
+            if (act && act.fn) act.fn(btn);
+        };
+        document.getElementById('dlg').onclick = e => { if (e.target.id === 'dlg') this.closeDialog(); };
+    },
+    closeDialog() { document.getElementById('dlg').hidden = true; },
 
     esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; },
 
