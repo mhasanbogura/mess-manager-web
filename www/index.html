@@ -14,7 +14,10 @@
     <div id="splash-screen" class="splash-screen">
         <img src="app-icon.png" alt="Mess Manager" class="splash-icon">
         <div class="spinner" style="margin-top:16px"></div>
-        <p id="offline-warning" style="color:#ff6b6b;font-size:14px;display:none;margin-top:8px">No internet connection. Please check your network.</p>
+        <div id="offline-warning" class="offline-card" style="display:none">
+            <span class="material-icons-round" style="color:#ff6b6b;font-size:20px">wifi_off</span>
+            <span style="color:#ff6b6b;font-size:14px;line-height:1.5">No internet connection.<br>Please check your network.</span>
+        </div>
     </div>
 
     <!-- AUTH -->

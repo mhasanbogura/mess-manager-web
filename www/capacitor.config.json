@@ -10,13 +10,13 @@
   },
   "plugins": {
     "SplashScreen": {
-      "launchAutoHide": false,
+      "launchAutoHide": true,
       "androidScaleType": "CENTER_CROP",
       "splashFullScreen": true,
       "splashImmersive": false,
       "showSpinner": false,
-      "backgroundColor": "#0b3d91",
-      "duration": 1500
+      "backgroundColor": "#111111",
+      "duration": 0
     },
     "GoogleAuth": {
       "scopes": "profile,email",
