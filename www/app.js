@@ -3603,7 +3603,8 @@ const App = {
         document.getElementById('modal-title').textContent = 'Contact Developer';
         this.openModal();
         const cached = localStorage.getItem('cache_contact_md');
-        if (cached) { this._renderContactFromMd(cached); return; }
+        if (cached && !cached.includes('Content loading')) { this._renderContactFromMd(cached); return; }
+        localStorage.removeItem('cache_contact_md');
         const DRIVE_FOLDER_ID = '1PBrhSIvDk0QrgNS6XeTeA1RDLFPeTqKV';
         const DRIVE_API_KEY = 'AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8';
         const q = encodeURIComponent(`'${DRIVE_FOLDER_ID}' in parents and name='Contact.md' and trashed=false`);
