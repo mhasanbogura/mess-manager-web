@@ -4440,10 +4440,10 @@ const App = {
         if (!email) { this.toast('No email found', 'error'); return; }
         const lang = this._currentLang || 'en';
         const msg = lang === 'bn'
-            ? `আপনার ইমেইল (${email})-এ পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।`
-            : `A password reset link will be sent to ${email}.`;
+            ? `আপনার ইমেইল (${email})-এ পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।\n\nএটি কিছু সময় লাগতে পারে এবং আপনার Spam / Junk ফোল্ডারে পড়তে পারে — সেখানেও চেক করুন।`
+            : `A password reset link will be sent to ${email}.\n\nIt can take a few minutes and may land in your Spam / Junk folder — please check there too.`;
         const body = document.getElementById('modal-body');
-        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text)">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();App._doResetPassword()" style="padding:10px 24px;border:none;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'পাঠান' : 'Send'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text);white-space:pre-line;line-height:1.6">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();App._doResetPassword()" style="padding:10px 24px;border:none;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'পাঠান' : 'Send'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
         document.getElementById('modal-title').textContent = lang === 'bn' ? 'পাসওয়ার্ড রিসেট' : 'Reset Password';
         this.openModal();
     },
