@@ -401,7 +401,13 @@ const App = {
         };
         this.applyTheme();
         this.applyLanguage();
-        if (!navigator.onLine) {
+        const isOnline = await new Promise(resolve => {
+            if (!navigator.onLine) return resolve(false);
+            fetch('https://firebasedynamiclinks.googleapis.com/v1', { method: 'HEAD', mode: 'no-cors', cache: 'no-store' })
+                .then(() => resolve(true))
+                .catch(() => resolve(false));
+        });
+        if (!isOnline) {
             const spinner = splash?.querySelector('.spinner');
             if (spinner) spinner.style.display = 'none';
             if (offlineWarn) offlineWarn.style.display = 'block';
