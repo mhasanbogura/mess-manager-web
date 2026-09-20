@@ -402,9 +402,13 @@ const App = {
         this.applyTheme();
         this.applyLanguage();
         if (!navigator.onLine) {
+            const spinner = splash?.querySelector('.spinner');
+            if (spinner) spinner.style.display = 'none';
             if (offlineWarn) offlineWarn.style.display = 'block';
             window.addEventListener('online', () => {
                 if (offlineWarn) offlineWarn.style.display = 'none';
+                const sp = splash?.querySelector('.spinner');
+                if (sp) sp.style.display = '';
                 this.init();
             }, { once: true });
             return;
