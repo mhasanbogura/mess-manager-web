@@ -1616,7 +1616,7 @@ const App = {
 
     async shareMessCode() {
         if (!this.messCode) { this.toast('No mess code', 'error'); return; }
-        const joinUrl = `${window.location.origin}${window.location.pathname}?join=${this.messCode}`;
+        const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
         const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
@@ -4418,7 +4418,7 @@ const App = {
     copyUid() { if (this.currentUser) navigator.clipboard.writeText(this.currentUser.uid).then(() => this.toast('UID copied!', 'info')); },
     shareMessCode() {
         if (!this.messCode) return;
-        const joinUrl = `${window.location.origin}${window.location.pathname}?join=${this.messCode}`;
+        const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
         const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
