@@ -73,7 +73,7 @@ const App = {
     // ── i18n ───────────────────────────────────────────────────
     _translations: {
         // Nav
-        nav_dashboard:'Dashboard',nav_mess:'Mess',nav_expense:'Expense',nav_meal:'Meal',nav_money:'Money',nav_profile:'Profile',
+        nav_dashboard:'Dashboard',nav_mess:'Mess',nav_expense:'Expense',nav_meal:'Meal',nav_money:'Money',nav_settings:'Settings',
         // Dashboard
         dash_greet_morning:'Good morning',dash_greet_afternoon:'Good afternoon',dash_greet_evening:'Good evening',
         dash_share:'Share Mess ID',dash_manager:'Manager',dash_current_month:'Current month',dash_notice:'Notice Board',
@@ -177,12 +177,12 @@ const App = {
         an_util_by_day:'Utility cost by day',an_util_across:'utility cost across the month',
         an_top10_util:'Top 10 utility items by cost',
         // Profile
-        prof_title:'Profile & Settings',
-        prof_general:'GENERAL SETTINGS',prof_device_theme:'Device Theme',prof_device_theme_desc:'Automatically switch theme based on system',
+        prof_title:'Settings',
+        prof_general:'GENERAL',
         prof_oled_theme:'Dark Theme',prof_oled_desc:'Use Dark backdrop for eye comfort',
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
-        prof_account:'ACCOUNT',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
-        prof_more:'MORE',prof_share:'Share',prof_about:'About App',prof_contact:'Contact Developer',
+        prof_account:'ACCOUNT',prof_leave_mess:'Leave Mess',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
+        prof_more:'MORE',prof_share_app:'Share App',prof_about:'About App',prof_contact:'Contact Developer',
         prof_version:'Version 1.3.86 (build 280)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
@@ -243,7 +243,7 @@ const App = {
     _bnText(key) {
         const map = {
             // Nav
-            nav_dashboard:'ড্যাশবোর্ড',nav_mess:'মেস',nav_expense:'খরচ',nav_meal:'খাবার',nav_money:'টাকা',nav_profile:'প্রোফাইল',
+            nav_dashboard:'ড্যাশবোর্ড',nav_mess:'মেস',nav_expense:'খরচ',nav_meal:'খাবার',nav_money:'টাকা',nav_settings:'সেটিংস',
             // Dashboard
             dash_greet_morning:'সুপ্রভাত',dash_greet_afternoon:'শুভ অপরাহ্ন',dash_greet_evening:'শুভ সন্ধ্যা',
             dash_share:'মেস আইডি শেয়ার',dash_manager:'ম্যানেজার',dash_current_month:'বর্তমান মাস',dash_notice:'নোটিশ বোর্ড',
@@ -346,12 +346,12 @@ const App = {
             an_util_by_day:'দিন অনুযায়ী ইউটিলিটি খরচ',an_util_across:'পুরো মাসে ইউটিলিটি খরচ',
             an_top10_util:'খরচ অনুযায়ী শীর্ষ ১০ ইউটিলিটি আইটেম',
             // Profile
-            prof_title:'প্রোফাইল ও সেটিংস',
-            prof_general:'সাধারণ সেটিংস',prof_device_theme:'ডিভাইস থিম',prof_device_theme_desc:'সিস্টেম অনুযায়ী থিম পরিবর্তন',
+            prof_title:'সেটিংস',
+            prof_general:'সাধারণ',
             prof_oled_theme:'ডার্ক থিম',prof_oled_desc:'চোখের সুবিধার জন্য ডার্ক ব্যাকড্রপ',
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
-            prof_account:'অ্যাকাউন্ট',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
-            prof_more:'আরও',prof_share:'শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
+            prof_account:'অ্যাকাউন্ট',prof_leave_mess:'মেস ছাড়ুন',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
+            prof_more:'আরও',prof_share_app:'অ্যাপ শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
             prof_version:'ভার্সন ১.৩.৪৭ (বিল্ড ১৬০)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
@@ -897,7 +897,16 @@ const App = {
     },
 
     async leaveMess() {
-        if (!confirm('Are you sure you want to leave this mess?')) return;
+        const lang = this._currentLang || 'en';
+        const msg = lang === 'bn'
+            ? 'আপনি কি সত্যিই এই মেস ছাড়তে চান?'
+            : 'Are you sure you want to leave this mess?';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text)">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();App._doLeaveMess()" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'ছাড়ুন' : 'Leave'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        document.getElementById('modal-title').textContent = lang === 'bn' ? 'মেস ছাড়ুন' : 'Leave Mess';
+        this.openModal();
+    },
+    async _doLeaveMess() {
         if (!this.messId || !this.currentUser) return;
         try {
             const uid = this.currentUser.uid;
@@ -910,13 +919,13 @@ const App = {
             const remaining = Object.keys(mSnap.val() || {}).filter(id => !id.startsWith('member_'));
             if (!remaining.length) {
                 await this.deleteMessFully(this.messId);
-                this.toast('Last person left — mess deleted', 'success');
+                this.toast(this._currentLang === 'bn' ? 'শেষ ব্যক্তি চলে গেছে — মেস মুছে ফেলা হয়েছে' : 'Last person left — mess deleted', 'success');
             } else {
-                this.toast('Left mess', 'success');
+                this.toast(this._currentLang === 'bn' ? 'মেস ছাড়া হয়েছে' : 'Left mess', 'success');
             }
             this.messId = null; this.messCode = null; this.messName = null;
             this.loadMyMesses();
-        } catch (e) { this.toast('Error leaving mess', 'error'); }
+        } catch (e) { this.toast(this._currentLang === 'bn' ? 'মেস ছাড়তে সমস্যা' : 'Error leaving mess', 'error'); }
     },
 
     async createMess() {
@@ -3591,34 +3600,83 @@ const App = {
     },
     contactDeveloper() {
         const body = document.getElementById('modal-body');
-        body.innerHTML = `
-            <div style="text-align:center;padding:8px 0 20px">
-                <div style="width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;font-family:'Times New Roman',sans-serif">M</div>
-                <h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mahmudul Hasan</h3>
-                <p style="margin:6px 0 0;font-size:13px;color:#888;line-height:1.5">I'm an Android developer who enjoys turning ideas into fast, reliable, and user-friendly apps.</p>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:12px;padding:0 4px">
-                <a href="https://wa.me/8801712345678" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#25D366';this.style.background='#f0fff4'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                    WhatsApp
-                </a>
-                <a href="https://m.me/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#0084FF';this.style.background='#f0f7ff'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#0084FF"><path d="M12 2C6.36 2 2 6.13 2 11.7c0 2.91 1.2 5.42 3.15 7.2V22l3.04-1.67c.85.24 1.76.37 2.81.37 5.64 0 10-4.13 10-9.7S17.64 2 12 2zm1 12.5l-2.5-2.7L5.5 14.5l5.5-5.8 2.5 2.7 4.5-2.7-5.5 5.8z"/></svg>
-                    Messenger
-                </a>
-                <a href="https://instagram.com/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#E4405F';this.style.background='#fff5f7'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#E4405F"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-                    Instagram
-                </a>
-                <a href="https://github.com/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s" onmouseover="this.style.borderColor='#333';this.style.background='#f5f5f5'" onmouseout="this.style.borderColor='#e0e0e0';this.style.background='transparent'">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="#333"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    GitHub
-                </a>
-            </div>`;
-        body.style.maxHeight = '70vh';
-        body.style.overflowY = 'auto';
+        body.innerHTML = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">Loading...</p></div>`;
         document.getElementById('modal-title').textContent = 'Contact Developer';
         this.openModal();
+        const cached = localStorage.getItem('cache_contact_md');
+        if (cached) { this._renderContactFromMd(cached); return; }
+        const DRIVE_FOLDER_ID = '1PBrhSIvDk0QrgNS6XeTeA1RDLFPeTqKV';
+        const DRIVE_API_KEY = 'AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8';
+        const q = encodeURIComponent(`'${DRIVE_FOLDER_ID}' in parents and name='Contact.md' and trashed=false`);
+        fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&key=${DRIVE_API_KEY}&fields=files(id)`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data.files || !data.files.length) throw new Error('not found');
+                return fetch(`https://www.googleapis.com/drive/v3/files/${data.files[0].id}?alt=media&key=${DRIVE_API_KEY}`);
+            })
+            .then(r => r.text())
+            .then(md => { localStorage.setItem('cache_contact_md', md); this._renderContactFromMd(md); })
+            .catch(() => { this._renderContactFallback(); });
+    },
+    _renderContactFromMd(md) {
+        let developerName = 'Developer', bio = '';
+        const entries = [];
+        for (const line of md.split('\n')) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith('##')) continue;
+            const cleaned = trimmed.replace(/^[-*]\s*/, '');
+            if (!cleaned.includes(':')) { if (developerName && bio !== false) bio += (bio ? '\n' : '') + cleaned; continue; }
+            const idx = cleaned.indexOf(':');
+            const label = cleaned.slice(0, idx).trim();
+            const value = cleaned.slice(idx + 1).trim();
+            if (!label || !value) continue;
+            if (label.toLowerCase() === 'name') { developerName = value; continue; }
+            if (['bio','description','about'].includes(label.toLowerCase())) { bio = value; continue; }
+            entries.push({ label, value });
+        }
+        const icons = {
+            whatsapp: '<svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>',
+            messenger: '<svg width="20" height="20" viewBox="0 0 24 24" fill="#00B2FF"><path d="M12 2C6.477 2 2 6.145 2 11.243c0 2.907 1.438 5.502 3.681 7.18V22l3.436-1.885c.915.252 1.887.385 2.883.385 5.523 0 10-4.145 10-9.257C22 6.145 17.523 2 12 2zm1.062 12.517l-2.55-2.735-4.979 2.735 5.494-5.832 2.614 2.735 4.916-2.735-5.495 5.832z"/></svg>',
+            email: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>',
+            github: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10 10 0 002 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>',
+            facebook: '<svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
+            instagram: '<svg width="20" height="20" viewBox="0 0 24 24" fill="url(#ig2)"><defs><linearGradient id="ig2" x1="0" y1="24" x2="24" y2="0"><stop offset="0%" stop-color="#feda75"/><stop offset="25%" stop-color="#fa7e1e"/><stop offset="50%" stop-color="#d62976"/><stop offset="75%" stop-color="#962fbf"/><stop offset="100%" stop-color="#4f5bd5"/></linearGradient></defs><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>',
+            telegram: '<svg width="20" height="20" viewBox="0 0 24 24" fill="#0088cc"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>',
+            mobile: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>',
+            phone: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>',
+            website: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>'
+        };
+        let html = `<div style="text-align:center;margin-bottom:16px"><div style="font-weight:700;font-size:22px;margin-bottom:12px;color:var(--text)">${this.esc(developerName)}</div>`;
+        if (bio) html += `<div style="font-size:14px;line-height:1.7;color:var(--text);opacity:.6;margin-bottom:16px;text-align:center">${this.esc(bio)}</div>`;
+        html += '</div><div style="display:flex;flex-direction:column;gap:10px">';
+        for (const { label, value } of entries) {
+            const lower = label.toLowerCase();
+            let href = value;
+            if (lower.includes('whatsapp')) { const digits = value.replace(/[^0-9]/g, ''); href = digits.length >= 7 ? 'https://wa.me/' + digits : value; }
+            else if (lower.includes('messenger')) href = 'https://m.me/' + value.replace(/^https?:\/\/(www\.)?(m\.me|facebook\.com\/messages)\//, '');
+            else if (lower.includes('email') || lower.includes('mail')) href = 'mailto:' + value;
+            else if (lower.includes('github')) href = 'https://github.com/' + value.replace(/^https?:\/\/github\.com\//, '');
+            else if (lower.includes('instagram')) href = 'https://instagram.com/' + value.replace(/^https?:\/\/(www\.)?instagram\.com\//, '');
+            else if (lower.includes('facebook')) href = 'https://facebook.com/' + value.replace(/^https?:\/\/(www\.)?facebook\.com\//, '');
+            else if (lower.includes('telegram')) href = 'https://t.me/' + value.replace(/^https?:\/\/t\.me\//, '');
+            else if (lower.includes('twitter') || lower === 'x') href = 'https://x.com/' + value.replace(/^https?:\/\/(www\.)?(twitter|x)\.com\//, '');
+            else if (lower.includes('phone') || lower.includes('mobile')) href = 'tel:' + value.replace(/[^0-9+]/g, '');
+            else if (lower.includes('website') || lower.includes('url')) href = value.startsWith('http') ? value : 'https://' + value;
+            const isPhone = lower.includes('phone') || lower.includes('mobile');
+            const iconKey = lower.includes('messenger') ? 'messenger' : isPhone ? 'mobile' : lower.includes('instagram') ? 'instagram' : Object.keys(icons).find(k => lower.includes(k));
+            html += `<a href="${this.esc(href)}" ${isPhone ? '' : 'target="_blank" rel="noopener"'} style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 14px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s"><span style="display:flex;align-items:center">${iconKey ? icons[iconKey] : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>'}</span><span style="text-align:center">${this.esc(label)}</span></a>`;
+        }
+        html += '</div>';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = html;
+        body.style.maxHeight = '70vh';
+        body.style.overflowY = 'auto';
+    },
+    _renderContactFallback() {
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `<div style="text-align:center;padding:8px 0 20px"><div style="width:72px;height:72px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 12px;font-family:'Times New Roman',sans-serif">M</div><h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mahmudul Hasan</h3><p style="margin:6px 0 0;font-size:13px;color:var(--text);opacity:.5;line-height:1.5">I'm an Android developer who enjoys turning ideas into fast, reliable, and user-friendly apps.</p></div><div style="display:flex;flex-direction:column;gap:10px;padding:0 4px"><a href="https://wa.me/8801712345678" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px"><svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>WhatsApp</a><a href="https://github.com/mhasanbogura" target="_blank" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>GitHub</a></div>`;
+        body.style.maxHeight = '70vh';
+        body.style.overflowY = 'auto';
     },
 
     // ==================== BAZAR NOTE PAGE ====================
@@ -4377,7 +4435,32 @@ const App = {
             navigator.clipboard?.writeText(text).then(() => this.toast('Copied!', 'success'));
         }
     },
-    sendResetFromProfile() { if (this.currentUser?.email) { auth.sendPasswordResetEmail(this.currentUser.email).then(() => this.toast('Reset email sent!', 'success')).catch(e => this.toast(e.message, 'error')); } },
+    sendResetConfirm() {
+        const email = this.currentUser?.email;
+        if (!email) { this.toast('No email found', 'error'); return; }
+        const lang = this._currentLang || 'en';
+        const msg = lang === 'bn'
+            ? `আপনার ইমেইল (${email})-এ পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।`
+            : `A password reset link will be sent to ${email}.`;
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text)">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();App._doResetPassword()" style="padding:10px 24px;border:none;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'পাঠান' : 'Send'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        document.getElementById('modal-title').textContent = lang === 'bn' ? 'পাসওয়ার্ড রিসেট' : 'Reset Password';
+        this.openModal();
+    },
+    _doResetPassword() {
+        if (!this.currentUser?.email) return;
+        auth.sendPasswordResetEmail(this.currentUser.email)
+            .then(() => this.toast(this._currentLang === 'bn' ? 'রিসেট ইমেইল পাঠানো হয়েছে!' : 'Reset email sent!', 'success'))
+            .catch(e => this.toast(e.message, 'error'));
+    },
+    signOutConfirm() {
+        const lang = this._currentLang || 'en';
+        const msg = lang === 'bn' ? 'আপনি কি সত্যিই লগ আউট করতে চান?' : 'Are you sure you want to log out?';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text)">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();auth.signOut()" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'লগ আউট' : 'Log Out'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        document.getElementById('modal-title').textContent = lang === 'bn' ? 'লগ আউট' : 'Log Out';
+        this.openModal();
+    },
     signOut() { auth.signOut(); },
     setProfilePic(dataUrl) {
         const ids = ['prof-avatar', 'dash-avatar'];
@@ -4422,39 +4505,30 @@ const App = {
         document.body.appendChild(input);
         input.click();
     },
-    deleteAccount() {
+    deleteAccountConfirm() {
+        if (!this.currentUser) return;
+        const lang = this._currentLang || 'en';
+        const isGoogle = (this.currentUser.providerData || []).some(p => p.providerId === 'google.com');
+        const msg = lang === 'bn'
+            ? 'এটি আপনার অ্যাকাউন্ট এবং সমস্ত ডেটা স্থায়ীভাবে মুছে দেবে।'
+            : 'This will permanently delete your account and all data.';
+        const body = document.getElementById('modal-body');
+        let html = `<p style="margin:0 0 20px;font-size:15px;color:var(--text)">${msg}</p>`;
+        if (!isGoogle) {
+            html += `<input id="delete-pw" type="password" placeholder="${lang === 'bn' ? 'পাসওয়ার্ড' : 'Password'}" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:16px;box-sizing:border-box;background:var(--card);color:var(--text)">`;
+        } else {
+            html += `<p style="margin:0 0 16px;font-size:13px;color:var(--text);opacity:.6">${lang === 'bn' ? 'নিশ্চিত করতে Google দিয়ে সাইন ইন করুন।' : 'Sign in with Google to confirm.'}</p>`;
+        }
+        html += `<div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();App._doDeleteAccount()" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'মুছে ফেলুন' : 'Delete'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        body.innerHTML = html;
+        document.getElementById('modal-title').textContent = lang === 'bn' ? 'অ্যাকাউন্ট মুছে ফেলুন' : 'Delete Account';
+        this.openModal();
+    },
+    _doDeleteAccount() {
         if (!this.currentUser) return;
         const isGoogle = (this.currentUser.providerData || []).some(p => p.providerId === 'google.com');
-        const body = document.getElementById('modal-body');
-        if (isGoogle) {
-            body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Sign in with Google to confirm.</p>
-                <div style="display:flex;gap:10px;justify-content:flex-end">
-                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Sign in & Delete</button>
-                    <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
-                </div>`;
-        } else {
-            body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Enter your password to confirm.</p>
-                <input id="delete-pw" type="password" placeholder="Password" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:16px;box-sizing:border-box">
-                <div style="display:flex;gap:10px;justify-content:flex-end">
-                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Delete Account</button>
-                    <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
-                </div>`;
-        }
-        document.getElementById('modal-title').textContent = 'Delete Account';
-        document.getElementById('modal-overlay').classList.add('active');
-        document.getElementById('confirm-no').onclick = () => document.getElementById('modal-overlay').classList.remove('active');
-        document.getElementById('confirm-yes').onclick = async () => {
-            document.getElementById('modal-overlay').classList.remove('active');
+        const doDelete = async () => {
             try {
-                if (!isGoogle) {
-                    const pw = (document.getElementById('delete-pw') || {}).value || '';
-                    if (!pw) { this.toast('Enter your password', 'error'); return; }
-                    const cred = firebase.auth.EmailAuthProvider.credential(this.currentUser.email, pw);
-                    await this.currentUser.reauthenticateWithCredential(cred);
-                } else {
-                    const p = new firebase.auth.GoogleAuthProvider();
-                    await this.currentUser.reauthenticateWithPopup(p);
-                }
                 const uid = this.currentUser.uid;
                 const messSnap = await db.ref(`users/${uid}/messes`).once('value');
                 const messes = messSnap.val() || {};
@@ -4466,9 +4540,19 @@ const App = {
                 updates[`users/${uid}`] = null;
                 await db.ref().update(updates);
                 await this.currentUser.delete();
-                this.toast('Account deleted', 'success');
+                this.toast(this._currentLang === 'bn' ? 'অ্যাকাউন্ট মুছে ফেলা হয়েছে' : 'Account deleted', 'success');
+                auth.signOut();
             } catch (e) { this.toast(e.message, 'error'); }
         };
+        if (isGoogle) {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            this.currentUser.reauthenticateWithPopup(provider).then(doDelete).catch(e => this.toast(e.message, 'error'));
+        } else {
+            const pw = document.getElementById('delete-pw')?.value;
+            if (!pw) { this.toast(this._currentLang === 'bn' ? 'পাসওয়ার্ড দিন' : 'Enter password', 'error'); return; }
+            const credential = firebase.auth.EmailAuthProvider.credential(this.currentUser.email, pw);
+            this.currentUser.reauthenticateWithCredential(credential).then(doDelete).catch(e => this.toast(e.message, 'error'));
+        }
     },
     showConfirm(title, msg, cb) {
         const body = document.getElementById('modal-body');

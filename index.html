@@ -124,7 +124,7 @@
                 <p class="hint-text" data-lang-key="ms_code_hint">Ask your mess admin for the code</p>
             </div>
             <button class="btn-text" onclick="auth.signOut()" style="font-weight:600;color:#fff" data-lang-key="ms_signout">Sign Out</button>
-            <button class="btn-text" onclick="App.deleteAccount()" style="color:#d32f2f;font-weight:600" data-lang-key="ms_delete_account">Delete Account</button>
+            <button class="btn-text" onclick="App.deleteAccountConfirm()" style="color:#d32f2f;font-weight:600" data-lang-key="ms_delete_account">Delete Account</button>
         </div>
     </div>
 
@@ -535,7 +535,12 @@
                 <button class="amenu-fab" onclick="App.showAddMenu()"><span class="material-icons-round">add</span> <span data-lang-key="mt_add">Add</span></button>
             </div>
             <div class="page" id="page-profile">
-                <div class="aprof-head"><h2 data-lang-key="prof_title">Profile & Settings</h2></div>
+                <div class="aprof-head">
+                    <div>
+                        <h2 data-lang-key="prof_title">Settings</h2>
+                        <p class="aprof-head-sub">Manage your account, profile, mess preferences, and theme.</p>
+                    </div>
+                </div>
                 <div class="aprof-card aprof-card-main">
                     <div class="aprof-avatar" id="prof-avatar">M</div>
                     <div class="aprof-info">
@@ -545,12 +550,11 @@
                 </div>
                 <div class="aprof-section">
                     <div class="aprof-card">
-                        <div class="aprof-section-title" data-lang-key="prof_general">GENERAL SETTINGS</div>
+                        <div class="aprof-section-title" data-lang-key="prof_general">GENERAL</div>
                         <div class="aprof-row">
                             <span class="material-icons-round">dark_mode</span>
                             <div class="aprof-text">
                                 <span class="aprof-label" data-lang-key="prof_oled_theme">Dark Theme</span>
-                                <p class="aprof-desc-inline" data-lang-key="prof_oled_desc">Use Dark backdrop for eye comfort</p>
                             </div>
                             <label class="aprof-toggle"><input type="checkbox" id="prof-oled-theme" onchange="App.toggleOledTheme(this.checked)"><span class="aprof-toggle-slider"></span></label>
                         </div>
@@ -558,7 +562,6 @@
                             <span class="material-icons-round">language</span>
                             <div class="aprof-text">
                                 <span class="aprof-label" data-lang-key="prof_language">Language</span>
-                                <p class="aprof-desc-inline" data-lang-key="prof_lang_desc">Choose your preferred language</p>
                             </div>
                             <div class="lang-toggle" id="prof-lang-toggle" data-lang="en" onclick="App.toggleLanguage()">
                                 <div class="lt-slider"></div>
@@ -566,22 +569,51 @@
                                 <span class="lt-label active">EN</span>
                             </div>
                         </div>
+                        <div class="aprof-row" onclick="App.shareApp()">
+                            <span class="material-icons-round">share</span>
+                            <span class="aprof-label" data-lang-key="prof_share_app">Share App</span>
+                            <span class="material-icons-round aprof-chevron">chevron_right</span>
+                        </div>
                     </div>
                 </div>
                 <div class="aprof-section">
                     <div class="aprof-card">
                         <div class="aprof-section-title" data-lang-key="prof_account">ACCOUNT</div>
-                        <div class="aprof-row" onclick="App.signOut()"><span class="material-icons-round">logout</span><span class="aprof-label" data-lang-key="prof_logout">Log out</span></div>
-                        <div class="aprof-row" onclick="App.sendResetFromProfile()"><span class="material-icons-round">lock_reset</span><span class="aprof-label" data-lang-key="prof_reset_pwd">Reset password</span></div>
-                        <div class="aprof-row danger" onclick="App.deleteAccount()"><span class="material-icons-round">delete_forever</span><span class="aprof-label" data-lang-key="prof_delete">Delete account</span></div>
+                        <div class="aprof-row" onclick="App.leaveMessConfirm()">
+                            <span class="material-icons-round">logout</span>
+                            <span class="aprof-label" data-lang-key="prof_leave_mess">Leave Mess</span>
+                            <span class="material-icons-round aprof-chevron">chevron_right</span>
+                        </div>
+                        <div class="aprof-row" onclick="App.signOutConfirm()">
+                            <span class="material-icons-round">logout</span>
+                            <span class="aprof-label" data-lang-key="prof_logout">Log out</span>
+                            <span class="material-icons-round aprof-chevron">chevron_right</span>
+                        </div>
+                        <div class="aprof-row" onclick="App.sendResetConfirm()">
+                            <span class="material-icons-round">lock_reset</span>
+                            <span class="aprof-label" data-lang-key="prof_reset_pwd">Reset password</span>
+                            <span class="material-icons-round aprof-chevron">chevron_right</span>
+                        </div>
+                        <div class="aprof-row danger" onclick="App.deleteAccountConfirm()">
+                            <span class="material-icons-round">delete_forever</span>
+                            <span class="aprof-label" data-lang-key="prof_delete">Delete account</span>
+                            <span class="material-icons-round aprof-chevron">chevron_right</span>
+                        </div>
                     </div>
                 </div>
                 <div class="aprof-section">
                     <div class="aprof-card">
                         <div class="aprof-section-title" data-lang-key="prof_more">MORE</div>
-                        <div class="aprof-row" onclick="App.shareApp()"><span class="material-icons-round">share</span><span class="aprof-label" data-lang-key="prof_share">Share</span></div>
-                        <div class="aprof-row" onclick="App.aboutApp()"><span class="material-icons-round">info</span><span class="aprof-label" data-lang-key="prof_about">About App</span></div>
-                        <div class="aprof-row" onclick="App.contactDeveloper()"><span class="material-icons-round">mail</span><span class="aprof-label" data-lang-key="prof_contact">Contact Developer</span></div>
+                        <div class="aprof-row" onclick="App.aboutApp()">
+                            <span class="material-icons-round">info</span>
+                            <span class="aprof-label" data-lang-key="prof_about">About App</span>
+                            <span class="material-icons-round aprof-chevron">chevron_right</span>
+                        </div>
+                        <div class="aprof-row" onclick="App.contactDeveloper()">
+                            <span class="material-icons-round">mail</span>
+                            <span class="aprof-label" data-lang-key="prof_contact">Contact Developer</span>
+                            <span class="material-icons-round aprof-chevron">chevron_right</span>
+                        </div>
                     </div>
                 </div>
                 <div class="aprof-version">
@@ -607,7 +639,7 @@
             <button class="bottom-nav-item" data-page="bazaar" onclick="App.navigate('bazaar')"><span class="material-icons-round">shopping_cart</span><span data-lang-key="nav_expense">Expense</span></button>
             <button class="bottom-nav-item" data-page="meals" onclick="App.navigate('meals')"><span class="material-icons-round">restaurant</span><span data-lang-key="nav_meal">Meal</span></button>
             <button class="bottom-nav-item" data-page="balance" onclick="App.navigate('balance')"><span class="material-icons-round">account_balance_wallet</span><span data-lang-key="nav_money">Money</span></button>
-            <button class="bottom-nav-item" data-page="profile" onclick="App.navigate('profile')"><span class="material-icons-round">person</span><span data-lang-key="nav_profile">Profile</span></button>
+            <button class="bottom-nav-item" data-page="profile" onclick="App.navigate('profile')"><span class="material-icons-round">settings</span><span data-lang-key="nav_settings">Settings</span></button>
         </div>
     </nav>
 
