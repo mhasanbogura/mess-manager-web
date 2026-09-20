@@ -573,6 +573,7 @@ const App = {
         });
         const hwBack = () => {
             if (document.getElementById('bz-overlay')) { this.bzClose(); return; }
+            if (document.getElementById('dlg') && !document.getElementById('dlg').hidden) { this.closeDialog(); return; }
             const modal = document.getElementById('modal-overlay');
             if (modal && modal.classList.contains('active')) { this.closeModal(); return; }
             const appActive = document.getElementById('app-screen')?.classList.contains('active');
