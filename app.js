@@ -898,13 +898,12 @@ const App = {
 
     async leaveMess() {
         const lang = this._currentLang || 'en';
-        const msg = lang === 'bn'
-            ? 'আপনি কি সত্যিই এই মেস ছাড়তে চান?'
-            : 'Are you sure you want to leave this mess?';
+        const msg = lang === 'bn' ? 'আপনি কি সত্যিই এই মেস ছাড়তে চান?' : 'Are you sure you want to leave this mess?';
         const body = document.getElementById('modal-body');
-        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text)">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();App._doLeaveMess()" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'ছাড়ুন' : 'Leave'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        body.innerHTML = `<p style="margin:0;font-size:15px">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-danger" onclick="App.closeModal();App._doLeaveMess()">${lang === 'bn' ? 'ছাড়ুন' : 'Leave'}</button></div>`;
         document.getElementById('modal-title').textContent = lang === 'bn' ? 'মেস ছাড়ুন' : 'Leave Mess';
         this.openModal();
+        document.getElementById('modal').classList.add('confirm-mode');
     },
     async _doLeaveMess() {
         if (!this.messId || !this.currentUser) return;
@@ -4439,13 +4438,14 @@ const App = {
         const email = this.currentUser?.email;
         if (!email) { this.toast('No email found', 'error'); return; }
         const lang = this._currentLang || 'en';
+        const body = document.getElementById('modal-body');
         const msg = lang === 'bn'
             ? `আপনার ইমেইল (${email})-এ পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।\n\nএটি কিছু সময় লাগতে পারে এবং আপনার Spam / Junk ফোল্ডারে পড়তে পারে — সেখানেও চেক করুন।`
             : `A password reset link will be sent to ${email}.\n\nIt can take a few minutes and may land in your Spam / Junk folder — please check there too.`;
-        const body = document.getElementById('modal-body');
-        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text);white-space:pre-line;line-height:1.6">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();App._doResetPassword()" style="padding:10px 24px;border:none;border-radius:8px;background:var(--primary);color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'পাঠান' : 'Send'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        body.innerHTML = `<p style="margin:0;font-size:15px;white-space:pre-line">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-primary-action" onclick="App.closeModal();App._doResetPassword()">${lang === 'bn' ? 'পাঠান' : 'Send'}</button></div>`;
         document.getElementById('modal-title').textContent = lang === 'bn' ? 'পাসওয়ার্ড রিসেট' : 'Reset Password';
         this.openModal();
+        document.getElementById('modal').classList.add('confirm-mode');
     },
     _doResetPassword() {
         if (!this.currentUser?.email) return;
@@ -4457,9 +4457,10 @@ const App = {
         const lang = this._currentLang || 'en';
         const msg = lang === 'bn' ? 'আপনি কি সত্যিই লগ আউট করতে চান?' : 'Are you sure you want to log out?';
         const body = document.getElementById('modal-body');
-        body.innerHTML = `<p style="margin:0 0 20px;font-size:15px;color:var(--text)">${msg}</p><div style="display:flex;gap:10px;justify-content:flex-end"><button onclick="App.closeModal();auth.signOut()" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">${lang === 'bn' ? 'লগ আউট' : 'Log Out'}</button><button onclick="App.closeModal()" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button></div>`;
+        body.innerHTML = `<p style="margin:0;font-size:15px">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-danger" onclick="App.closeModal();auth.signOut()">${lang === 'bn' ? 'লগ আউট' : 'Log Out'}</button></div>`;
         document.getElementById('modal-title').textContent = lang === 'bn' ? 'লগ আউট' : 'Log Out';
         this.openModal();
+        document.getElementById('modal').classList.add('confirm-mode');
     },
     signOut() { auth.signOut(); },
     setProfilePic(dataUrl) {
@@ -4565,7 +4566,7 @@ const App = {
         document.getElementById('confirm-yes').onclick = () => { document.getElementById('modal-overlay').classList.remove('active'); cb(true); };
         document.getElementById('confirm-no').onclick = () => { document.getElementById('modal-overlay').classList.remove('active'); cb(false); };
     },
-    openModal() { document.getElementById('modal-overlay').classList.add('active'); },
+    openModal() { document.getElementById('modal').classList.remove('confirm-mode'); document.getElementById('modal-overlay').classList.add('active'); },
     closeModal() { document.getElementById('modal-overlay').classList.remove('active'); },
 
     esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; },

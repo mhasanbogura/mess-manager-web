@@ -749,10 +749,10 @@ select.input-sm { cursor: pointer; }
 
 /* ==================== MODAL ==================== */
 .modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(6px);
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
     display: none; align-items: center; justify-content: center;
-    z-index: 300; padding: 16px;
+    z-index: 300; padding: 20px;
 }
 .modal-overlay.active { display: flex; }
 .modal-overlay.sheet { align-items: flex-end; justify-content: center; padding-bottom: 0; }
@@ -760,18 +760,41 @@ select.input-sm { cursor: pointer; }
 
 .modal {
     background: var(--card-solid); border-radius: var(--radius); width: 100%;
-    max-width: 460px; max-height: 85vh; overflow-y: auto;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
-    border: 1px solid var(--glass-border);
+    max-width: 420px; max-height: 85vh; overflow-y: auto;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    border: 1px solid var(--card-border);
 }
 
+.modal.confirm-mode .modal-header .close-btn,
+.modal.confirm-mode #modal-close { display: none; }
 .modal-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 18px; border-bottom: 1px solid var(--card-border); color: #14181f;
+    padding: 18px 22px 0; color: var(--text);
     flex-wrap: wrap; gap: 8px;
 }
-.modal-header h3 { font-size: 19px; font-weight: 700; }
-.modal-body { padding: 18px; color: #14181f; }
+.modal-header h3 { font-size: 17px; font-weight: 700; }
+.modal-body { padding: 14px 22px 20px; color: var(--text); }
+.modal-body p { line-height: 1.6; }
+
+.modal-confirm-actions { display: flex; gap: 10px; margin-top: 20px; }
+.modal-confirm-actions .btn-cancel {
+    flex: 1; padding: 12px 18px; border: 1px solid var(--border); border-radius: 11px;
+    background: var(--card-solid); color: var(--text); font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+}
+.modal-confirm-actions .btn-cancel:active { filter: brightness(.9); }
+.modal-confirm-actions .btn-danger {
+    flex: 1; padding: 12px 18px; border: none; border-radius: 11px;
+    background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);
+    font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.modal-confirm-actions .btn-danger:active { filter: brightness(.85); }
+.modal-confirm-actions .btn-primary-action {
+    flex: 1; padding: 12px 18px; border: none; border-radius: 11px;
+    background: var(--primary); color: #fff; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+}
+.modal-confirm-actions .btn-primary-action:active { filter: brightness(.85); }
 
 .modal-footer {
     padding: 14px 18px; border-top: 1px solid var(--card-border);
