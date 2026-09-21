@@ -3314,7 +3314,6 @@ const App = {
         const u = this.currentUser;
         document.getElementById('prof-name').textContent = u.displayName || 'User';
         document.getElementById('prof-email').textContent = u.email || '-';
-        document.getElementById('prof-uid-text').textContent = u.uid ? u.uid.slice(0, 12) + '...' : '-';
         try {
             if (window.Capacitor?.isNativePlatform && window.Capacitor.isNativePlatform()) {
                 const info = await Capacitor.Plugins.App.getInfo();
