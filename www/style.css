@@ -3017,7 +3017,7 @@ img, canvas { max-width: 100%; }
     background: #222; border-color: #333; color: #e8ebf1;
 }
 [data-theme="oled"] .input-group input, [data-theme="oled"] .bz-input, [data-theme="oled"] .dep-input {
-    background: transparent !important; color: #333 !important;
+    background: transparent !important; color: #e8ebf1 !important;
 }
 [data-theme="oled"] .input-group input::placeholder, [data-theme="oled"] .bz-input::placeholder, [data-theme="oled"] .dep-input::placeholder {
     color: #999 !important;
