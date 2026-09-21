@@ -549,7 +549,7 @@ const App = {
         if (nav) nav.classList.toggle('hidden-nav', id !== 'app-screen');
         if (id === 'app-screen') {
             const isOled = this.theme === 'oled';
-            this._setSystemBars(isOled ? '#111111' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
+        this._setSystemBars(isOled ? '#0a0a0a' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
         } else {
             this._setSystemBars('#ffffff', '#14181f');
         }
@@ -3357,7 +3357,7 @@ const App = {
             document.documentElement.removeAttribute('data-theme');
         }
         localStorage.setItem('mess_theme', this.theme);
-        this._setSystemBars(this.theme === 'oled' ? '#111111' : '#f2f4f8', this.theme === 'oled' ? '#ffffff' : '#14181f');
+        this._setSystemBars(this.theme === 'oled' ? '#0a0a0a' : '#f2f4f8', this.theme === 'oled' ? '#ffffff' : '#14181f');
     },
     applyTheme() {
         const saved = localStorage.getItem('mess_theme') || 'oled';
@@ -3387,7 +3387,7 @@ const App = {
             } catch (e) {}
             try {
                 if (window.Capacitor?.Plugins?.StatusBar) {
-                    const isDark = bgColor === '#111111';
+                    const isDark = bgColor === '#0a0a0a';
                     window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
                     window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
                 }
