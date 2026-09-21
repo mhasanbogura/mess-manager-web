@@ -3563,8 +3563,8 @@ const App = {
         }
     },
     _driveFiles: {
-        about: { url: 'about.md', key: 'cache_about_md' },
-        contact: { url: 'contact.md', key: 'cache_contact_md' }
+        about: { url: 'https://www.googleapis.com/drive/v3/files/1s45exjbMZhDk-Yt7oHSYjO6P_FiPs3YY?alt=media&key=AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8', key: 'cache_about_md' },
+        contact: { url: 'https://www.googleapis.com/drive/v3/files/18WzEWkMQbkbb3JzViS1jCYW0M4PKc-3f?alt=media&key=AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8', key: 'cache_contact_md' }
     },
     async _cacheDriveFiles() {
         for (const [name, cfg] of Object.entries(this._driveFiles)) {
@@ -3602,29 +3602,34 @@ const App = {
     aboutApp() {
         const lang = this._currentLang || 'en';
         const title = lang === 'bn' ? 'অ্যাপ সম্পর্কে' : 'About App';
-        const bodyHtml = `
+        const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
+        this.openDialog(title, loadingHtml, []);
+        const cached = localStorage.getItem('cache_about_md');
+        if (cached && !cached.includes('Content loading')) { this._renderAboutFromMd(cached); return; }
+        localStorage.removeItem('cache_about_md');
+        fetch(this._driveFiles.about.url)
+            .then(r => r.text())
+            .then(md => { localStorage.setItem('cache_about_md', md); this._renderAboutFromMd(md); })
+            .catch(() => {
+                const fallback = `# About App\n\nA simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\n## Features\n\n- Manage mess members\n- Track daily meals\n- Manage meal rates and meal counts\n- Record shared expenses\n- Track individual member expenses\n- Calculate monthly meal costs\n- Manage deposits and balances\n- View monthly summaries\n- Track mess-related transactions\n- Simple and organized interface`;
+                this._renderAboutFromMd(fallback);
+            });
+    },
+    _renderAboutFromMd(md) {
+        const lang = this._currentLang || 'en';
+        const versionEl = document.querySelector('[data-lang-key="prof_version"]');
+        const versionText = versionEl ? versionEl.textContent : 'Version';
+        const versionHtml = `<p style="margin-top:16px;font-size:12px;color:var(--text);opacity:.4;text-align:center">${versionText}</p>`;
+        const html = `
             <div style="text-align:center;padding:0 0 16px">
                 <img src="app-icon.png" alt="" style="width:72px;height:72px;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:12px">
                 <h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mess Manager</h3>
                 <p style="margin:4px 0 0;font-size:13px;color:var(--text);opacity:.5">${lang === 'bn' ? 'আপনার মেস সহজে পরিচালনা করুন' : 'Manage your mess easily'}</p>
             </div>
-            <div style="font-size:14px;color:var(--text);line-height:1.7">
-                <h4 style="font-size:15px;margin:14px 0 8px;color:var(--primary)">${lang === 'bn' ? 'সারসংক্ষেপ' : 'Overview'}</h4>
-                <p>${lang === 'bn' ? 'একটি সাধারণ মেস ব্যবস্থাপনা অ্যাপ যা ব্যবহারকারীদের শেয়ারড মেস তথ্য, সদস্য, খাবার, খরচ এবং মাসিক হিসাব এক জায়গায় পরিচালনা করতে সাহায্য করে।' : 'A simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.'}</p>
-                <h4 style="font-size:15px;margin:14px 0 8px;color:var(--primary)">${lang === 'bn' ? 'বৈশিষ্ট্য' : 'Features'}</h4>
-                <ul style="padding-left:18px;margin:0">
-                    <li>${lang === 'bn' ? 'মেস সদস্য পরিচালনা' : 'Manage mess members'}</li>
-                    <li>${lang === 'bn' ? 'দৈনিক খাবার ট্র্যাক' : 'Track daily meals'}</li>
-                    <li>${lang === 'bn' ? 'খাবারের হার ও পরিমাণ পরিচালনা' : 'Manage meal rates and meal counts'}</li>
-                    <li>${lang === 'bn' ? 'শেয়ার্ড খরচ রেকর্ড' : 'Record shared expenses'}</li>
-                    <li>${lang === 'bn' ? 'মাসিক ব্যালেন্স হিসাব' : 'Monthly balance calculations'}</li>
-                    <li>${lang === 'bn' ? 'নোটিশ বোর্ড' : 'Notice board for announcements'}</li>
-                    <li>${lang === 'bn' ? 'ডার্ক থিম সাপোর্ট' : 'Dark theme support'}</li>
-                    <li>${lang === 'bn' ? 'বহু ভাষা সাপোর্ট (ইংরেজি ও বাংলা)' : 'Multi-language support (English & Bangla)'}</li>
-                </ul>
-                <p style="margin-top:16px;font-size:12px;color:var(--text);opacity:.4;text-align:center">${document.querySelector('[data-lang-key="prof_version"]')?.textContent || 'Version 1.4.21 (build 385)'}</p>
-            </div>`;
-        this.openDialog(title, bodyHtml, []);
+            ${this._mdToHtml(md)}
+            ${versionHtml}`;
+        const dialogBody = document.querySelector('#dlg .dialog-body');
+        if (dialogBody) { dialogBody.innerHTML = html; }
     },
     contactDeveloper() {
         const lang = this._currentLang || 'en';
