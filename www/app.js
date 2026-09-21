@@ -3555,7 +3555,7 @@ const App = {
     shareApp() {
         const text = `Check out Mess Manager — A simple web-based mess management application designed to help users organize shared-mess information, manage members, track meals and expenses, and calculate rent, utility, cook, and other bills all in one place.\n\nDownload: https://mahmudulsapp.u.gy/mess-manager`;
         if (window.Capacitor?.Plugins?.Share) {
-            window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text, url: 'https://mahmudulsapp.u.gy/mess-manager' }).catch(() => {});
+            window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
         } else if (navigator.share) {
             navigator.share({ title: 'Mess Manager', text }).catch(() => {});
         } else {
