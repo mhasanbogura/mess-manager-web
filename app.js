@@ -3368,7 +3368,7 @@ const App = {
             document.documentElement.removeAttribute('data-theme');
         }
         const isOled = document.documentElement.getAttribute('data-theme') === 'oled';
-        this._setSystemBars(isOled ? '#111111' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
+        this._setSystemBars(isOled ? '#0a0a0a' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
         const ot = document.getElementById('prof-oled-theme');
         if (ot) ot.checked = saved === 'oled';
     },
