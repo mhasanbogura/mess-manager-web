@@ -551,8 +551,9 @@ const App = {
         const nav = document.getElementById('bottom-nav');
         if (nav) nav.classList.toggle('hidden-nav', id !== 'app-screen');
         if (id === 'app-screen') {
-            const isOled = this.theme === 'oled';
-        this._setSystemBars(isOled ? '#0a0a0a' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
+            const resolved = (this.theme === 'system') ? (this._isSystemDark() ? 'oled' : 'light') : this.theme;
+            const isOled = resolved === 'oled';
+            this._setSystemBars(isOled ? '#0a0a0a' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
         } else {
             this._setSystemBars('#ffffff', '#14181f');
         }
@@ -3335,10 +3336,12 @@ const App = {
                 if (avatar) avatar.textContent = initial;
             }
         } catch (e) {}
-        const saved = localStorage.getItem('mess_theme') || 'oled';
+        const saved = localStorage.getItem('mess_theme') || 'system';
+        const dt = document.getElementById('prof-device-theme');
         const ot = document.getElementById('prof-oled-theme');
-        const toggle = document.getElementById('prof-lang-toggle');
+        if (dt) dt.checked = saved === 'system';
         if (ot) ot.checked = saved === 'oled';
+        const toggle = document.getElementById('prof-lang-toggle');
         if (toggle) {
             const lang = localStorage.getItem('mess_lang') || 'en';
             toggle.dataset.lang = lang;
@@ -3381,7 +3384,7 @@ const App = {
         return window._androidDarkMode !== undefined ? window._androidDarkMode : window.matchMedia('(prefers-color-scheme: dark)').matches;
     },
     applyTheme() {
-        const saved = localStorage.getItem('mess_theme') || 'oled';
+        const saved = localStorage.getItem('mess_theme') || 'system';
         this.theme = saved;
         let resolved = saved;
         if (saved === 'system') {
@@ -3396,6 +3399,7 @@ const App = {
         const fgColor = resolved === 'oled' ? '#ffffff' : '#14181f';
         this._setSystemBars(bgColor, fgColor);
         this._updateThemeToggles();
+        try { if (window.AndroidBridge?.saveTheme) AndroidBridge.saveTheme(this.theme); } catch(e) {}
     },
     _setSystemBars(bgColor, fgColor) {
         try {
@@ -3403,6 +3407,7 @@ const App = {
             if (meta) meta.setAttribute('content', bgColor);
             else { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bgColor; document.head.appendChild(m); }
         } catch (e) {}
+        try { if (window.AndroidBridge?.setStatusBarColor) AndroidBridge.setStatusBarColor(bgColor); } catch(e) {}
         const setBars = (retry) => {
             try {
                 if (window.Capacitor?.Plugins?.SystemBars) {
