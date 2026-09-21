@@ -1621,7 +1621,7 @@ const App = {
     async shareMessCode() {
         if (!this.messCode) { this.toast('No mess code', 'error'); return; }
         const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
-        const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
+        const text = `Join my mess ${this.messName || ''}!\n\n🔗 Join via Website: ${joinUrl}\n\n📲 Join via App: Download and install Mess Manager, then enter the mess code below.\n\n🔑 Mess Code: ${this.messCode}\n\nDownload App: https://mahmudulsapp.u.gy/mess-manager`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
         } else if (navigator.share) {
@@ -4454,7 +4454,7 @@ const App = {
     shareMessCode() {
         if (!this.messCode) return;
         const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
-        const text = `Join my mess "${this.messName || ''}"\n\n${joinUrl}`;
+        const text = `Join my mess ${this.messName || ''}!\n\n🔗 Join via Website: ${joinUrl}\n\n📲 Join via App: Download and install Mess Manager, then enter the mess code below.\n\n🔑 Mess Code: ${this.messCode}\n\nDownload App: https://mahmudulsapp.u.gy/mess-manager`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
         } else if (navigator.share) {
