@@ -179,7 +179,8 @@ const App = {
         // Profile
         prof_title:'Settings',
         prof_general:'GENERAL',
-        prof_oled_theme:'Dark Theme',prof_oled_desc:'Use Dark backdrop for eye comfort',
+        prof_device_theme:'Device Theme',prof_device_theme_hint:'Automatically switch theme based on system',
+        prof_oled_theme:'OLED Theme',prof_oled_theme_hint:'Use OLED black backdrop for eye comfort',
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_leave_mess:'Leave Mess',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share_app:'Share App',prof_about:'About App',prof_contact:'Contact Developer',
@@ -348,7 +349,8 @@ const App = {
             // Profile
             prof_title:'সেটিংস',
             prof_general:'সাধারণ',
-            prof_oled_theme:'ডার্ক থিম',prof_oled_desc:'চোখের সুবিধার জন্য ডার্ক ব্যাকড্রপ',
+            prof_device_theme:'ডিভাইস থিম',prof_device_theme_hint:'সিস্টেমের সাথে স্বয়ংক্রিয়ভাবে থিম পরিবর্তন করুন',
+            prof_oled_theme:'OLED থিম',prof_oled_theme_hint:'চোখের সুবিধার জন্য OLED ব্ল্যাক ব্যাকড্রপ ব্যবহার করুন',
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_leave_mess:'মেস ছাড়ুন',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share_app:'অ্যাপ শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
@@ -400,6 +402,7 @@ const App = {
             if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
         };
         this.applyTheme();
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (this.theme === 'system') this.applyTheme(); });
         this.applyLanguage();
         const isOnline = await new Promise(resolve => {
             if (!navigator.onLine) return resolve(false);
@@ -3348,29 +3351,52 @@ const App = {
 
     copyCode() { if (this.messCode) navigator.clipboard.writeText(this.messCode).then(() => this.toast('Copied!', 'info')); },
 
+    toggleDeviceTheme(checked) {
+        if (checked) {
+            this.theme = 'system';
+        } else {
+            this.theme = 'light';
+        }
+        localStorage.setItem('mess_theme', this.theme);
+        this.applyTheme();
+        this._updateThemeToggles();
+    },
     toggleOledTheme(checked) {
         if (checked) {
             this.theme = 'oled';
-            document.documentElement.setAttribute('data-theme', 'oled');
         } else {
             this.theme = 'light';
-            document.documentElement.removeAttribute('data-theme');
         }
         localStorage.setItem('mess_theme', this.theme);
-        this._setSystemBars(this.theme === 'oled' ? '#0a0a0a' : '#f2f4f8', this.theme === 'oled' ? '#ffffff' : '#14181f');
+        this.applyTheme();
+        this._updateThemeToggles();
+    },
+    _updateThemeToggles() {
+        const saved = this.theme;
+        const dt = document.getElementById('prof-device-theme');
+        const ot = document.getElementById('prof-oled-theme');
+        if (dt) dt.checked = saved === 'system';
+        if (ot) ot.checked = saved === 'oled';
+    },
+    _isSystemDark() {
+        return window._androidDarkMode !== undefined ? window._androidDarkMode : window.matchMedia('(prefers-color-scheme: dark)').matches;
     },
     applyTheme() {
         const saved = localStorage.getItem('mess_theme') || 'oled';
         this.theme = saved;
-        if (saved === 'oled') {
+        let resolved = saved;
+        if (saved === 'system') {
+            resolved = this._isSystemDark() ? 'oled' : 'light';
+        }
+        if (resolved === 'oled') {
             document.documentElement.setAttribute('data-theme', 'oled');
         } else {
             document.documentElement.removeAttribute('data-theme');
         }
-        const isOled = document.documentElement.getAttribute('data-theme') === 'oled';
-        this._setSystemBars(isOled ? '#0a0a0a' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
-        const ot = document.getElementById('prof-oled-theme');
-        if (ot) ot.checked = saved === 'oled';
+        const bgColor = resolved === 'oled' ? '#0a0a0a' : '#f2f4f8';
+        const fgColor = resolved === 'oled' ? '#ffffff' : '#14181f';
+        this._setSystemBars(bgColor, fgColor);
+        this._updateThemeToggles();
     },
     _setSystemBars(bgColor, fgColor) {
         try {
