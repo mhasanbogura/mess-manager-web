@@ -550,13 +550,9 @@ const App = {
         document.getElementById(id).classList.add('active');
         const nav = document.getElementById('bottom-nav');
         if (nav) nav.classList.toggle('hidden-nav', id !== 'app-screen');
-        if (id === 'app-screen') {
-            const resolved = (this.theme === 'system') ? (this._isSystemDark() ? 'oled' : 'light') : this.theme;
-            const isOled = resolved === 'oled';
-            this._setSystemBars(isOled ? '#0a0a0a' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
-        } else {
-            this._setSystemBars('#ffffff', '#14181f');
-        }
+        const resolved = (this.theme === 'system') ? (this._isSystemDark() ? 'oled' : 'light') : this.theme;
+        const isOled = resolved === 'oled';
+        this._setSystemBars(isOled ? '#0a0a0a' : '#f2f4f8', isOled ? '#ffffff' : '#14181f');
     },
 
     bindBackButton() {
