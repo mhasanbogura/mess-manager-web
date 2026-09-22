@@ -4060,7 +4060,6 @@ const App = {
             const page = document.getElementById('page-monthly');
             page.innerHTML = `
                 <div class="am-head">
-                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
                     <h2>Analysis</h2>
                 </div>
                 <div class="am-body">

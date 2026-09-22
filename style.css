@@ -2833,7 +2833,7 @@ img, canvas { max-width: 100%; }
 .amenu-form-row input:focus { border-color: var(--primary); }
 
 /* ==================== ANALYSIS PAGE ==================== */
-.am-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--card); border: 1px solid var(--card-border); border-radius: 16px; margin: 10px 12px 8px; min-height: 56px; }
+.am-head { display: flex; align-items: center; gap: 12px; padding: 12px 14px; min-height: 56px; }
 .am-head .icon-btn { color: var(--primary); min-width: 40px; min-height: 40px; }
 .am-head .icon-btn:hover { background: rgba(11,61,145,0.1); }
 .am-head h2 { font-size: 22px; font-weight: 700; color: var(--text); flex: 1; }
