@@ -1522,11 +1522,9 @@ select.input-sm { cursor: pointer; }
 #page-dashboard.active { display: block; }
 
 .adash-head {
-    background: var(--card);
     display: flex; align-items: center; justify-content: space-between;
     padding: 10px 12px; gap: 8px;
-    border-radius: 16px; margin: 10px 12px 0;
-    border: 1px solid var(--card-border);
+    margin: 0;
 }
 .adash-banner { position: relative; flex: 1; height: 48px; overflow: hidden; }
 .adash-banner-slide {
