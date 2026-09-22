@@ -2782,7 +2782,8 @@ const App = {
             const expanded = day === Object.keys(grouped)[0];
             html += `<div class="abazar-day-card">
                 <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
-                    <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayDeps.length} entr${dayDeps.length>1?'ies':'y'} &middot; Total: ৳${this.fmtNum(dayTotal)}</p></div>
+                    <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayDeps.length} entr${dayDeps.length>1?'ies':'y'}</p></div>
+                    <span class="abazar-day-total">৳${this.fmtNum(dayTotal)}</span>
                     <span class="material-icons-round">expand_more</span>
                 </div>
                 <div class="abazar-day-items abazar-dep-grid" style="${expanded?'':'display:none'}">
@@ -3560,14 +3561,16 @@ const App = {
     },
     _driveFiles: {
         about: { url: 'https://www.googleapis.com/drive/v3/files/1s45exjbMZhDk-Yt7oHSYjO6P_FiPs3YY?alt=media&key=AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8', key: 'cache_about_md' },
-        contact: { url: 'https://www.googleapis.com/drive/v3/files/18WzEWkMQbkbb3JzViS1jCYW0M4PKc-3f?alt=media&key=AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8', key: 'cache_contact_md' }
+        contact: { url: 'https://www.googleapis.com/drive/v3/files/1VNmXxG33NWMphp1mz2xQGWcm9NdCc3oH?alt=media&key=AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8', key: 'cache_contact_md' }
     },
     async _cacheDriveFiles() {
         for (const [name, cfg] of Object.entries(this._driveFiles)) {
+            const existing = localStorage.getItem(cfg.key);
+            if (existing && existing.trimStart().startsWith('{')) localStorage.removeItem(cfg.key);
             try {
                 const resp = await fetch(cfg.url);
                 const text = await resp.text();
-                if (text && text.length > 10 && !text.includes('<!DOCTYPE')) {
+                if (text && text.length > 10 && !text.includes('<!DOCTYPE') && !text.trimStart().startsWith('{')) {
                     localStorage.setItem(cfg.key, text);
                 } else if (!localStorage.getItem(cfg.key)) {
                     localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading...`);
@@ -3600,16 +3603,14 @@ const App = {
         const title = lang === 'bn' ? 'অ্যাপ সম্পর্কে' : 'About App';
         const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
         this.openDialog(title, loadingHtml, []);
+        const fallback = `# About App\n\nA simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\n## Features\n\n- Manage mess members\n- Track daily meals\n- Manage meal rates and meal counts\n- Record shared expenses\n- Track individual member expenses\n- Calculate monthly meal costs\n- Manage deposits and balances\n- View monthly summaries\n- Track mess-related transactions\n- Simple and organized interface`;
         const cached = localStorage.getItem('cache_about_md');
-        if (cached && !cached.includes('Content loading')) { this._renderAboutFromMd(cached); return; }
+        if (cached && !cached.includes('Content loading') && !cached.trimStart().startsWith('{')) { this._renderAboutFromMd(cached); return; }
         localStorage.removeItem('cache_about_md');
         fetch(this._driveFiles.about.url)
             .then(r => r.text())
-            .then(md => { localStorage.setItem('cache_about_md', md); this._renderAboutFromMd(md); })
-            .catch(() => {
-                const fallback = `# About App\n\nA simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\n## Features\n\n- Manage mess members\n- Track daily meals\n- Manage meal rates and meal counts\n- Record shared expenses\n- Track individual member expenses\n- Calculate monthly meal costs\n- Manage deposits and balances\n- View monthly summaries\n- Track mess-related transactions\n- Simple and organized interface`;
-                this._renderAboutFromMd(fallback);
-            });
+            .then(md => { if (md && !md.trimStart().startsWith('{')) { localStorage.setItem('cache_about_md', md); this._renderAboutFromMd(md); } else { this._renderAboutFromMd(fallback); } })
+            .catch(() => { this._renderAboutFromMd(fallback); });
     },
     _renderAboutFromMd(md) {
         const lang = this._currentLang || 'en';
@@ -3624,7 +3625,7 @@ const App = {
             </div>
             ${this._mdToHtml(md)}
             ${versionHtml}`;
-        const dialogBody = document.querySelector('#dlg .dialog-body');
+        const dialogBody = document.getElementById('dlgBody');
         if (dialogBody) { dialogBody.innerHTML = html; }
     },
     contactDeveloper() {
@@ -3633,19 +3634,11 @@ const App = {
         const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
         this.openDialog(title, loadingHtml, []);
         const cached = localStorage.getItem('cache_contact_md');
-        if (cached && !cached.includes('Content loading')) { this._renderContactFromMd(cached); return; }
+        if (cached && !cached.includes('Content loading') && !cached.trimStart().startsWith('{')) { this._renderContactFromMd(cached); return; }
         localStorage.removeItem('cache_contact_md');
-        const DRIVE_FOLDER_ID = '1PBrhSIvDk0QrgNS6XeTeA1RDLFPeTqKV';
-        const DRIVE_API_KEY = 'AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8';
-        const q = encodeURIComponent(`'${DRIVE_FOLDER_ID}' in parents and name='Contact.md' and trashed=false`);
-        fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&key=${DRIVE_API_KEY}&fields=files(id)`)
-            .then(r => r.json())
-            .then(data => {
-                if (!data.files || !data.files.length) throw new Error('not found');
-                return fetch(`https://www.googleapis.com/drive/v3/files/${data.files[0].id}?alt=media&key=${DRIVE_API_KEY}`);
-            })
+        fetch(this._driveFiles.contact.url)
             .then(r => r.text())
-            .then(md => { localStorage.setItem('cache_contact_md', md); this._renderContactFromMd(md); })
+            .then(md => { if (md && !md.trimStart().startsWith('{')) { localStorage.setItem('cache_contact_md', md); this._renderContactFromMd(md); } else { this._renderContactFallback(); } })
             .catch(() => { this._renderContactFallback(); });
     },
     _renderContactFromMd(md) {
