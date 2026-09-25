@@ -2127,6 +2127,11 @@ select.input-sm { cursor: pointer; }
 }
 .abazar-member-dropdown-item:hover { background: var(--bg); }
 .abazar-member-dropdown-item.active { color: var(--primary); font-weight: 600; background: rgba(11,61,145,0.06); }
+.abazar-member-dropdown-head {
+    padding: 8px 14px 4px; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px; color: var(--text); opacity: .45;
+    border-top: 1px solid var(--border); margin-top: 4px;
+}
 .abazar-view-btn {
     width: 36px; height: 36px; border-radius: 8px; border: 1px solid #ccc;
     background: #fff; display: flex; align-items: center; justify-content: center;
