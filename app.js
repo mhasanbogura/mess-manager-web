@@ -184,7 +184,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_leave_mess:'Leave Mess',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share_app:'Share App',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.4.44 (build 454)',
+        prof_version:'Version 1.4.45 (build 457)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -354,7 +354,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_leave_mess:'মেস ছাড়ুন',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share_app:'অ্যাপ শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন 1.4.44 (বিল্ড 454)',
+            prof_version:'ভার্সন 1.4.45 (বিল্ড 457)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -2515,21 +2515,29 @@ const App = {
         const typeFilter = this._bazarTypeFilter || '';
         const dd = document.getElementById('abazar-type-dropdown');
         if (!dd) return;
-        const types = [...new Set((this._allBazar || [])
-            .filter(([, v]) => (v.category || 'bazar') === 'utility')
-            .map(([, v]) => (v.name || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        const cat = (this._bazarFilter || 'bazar') === 'utility' ? 'utility' : 'bazar';
+        const totals = {};
+        (this._allBazar || [])
+            .filter(([, v]) => (v.category || 'bazar') === cat)
+            .forEach(([, v]) => {
+                const n = (v.name || '').trim();
+                if (!n) return;
+                totals[n] = (totals[n] || 0) + (parseFloat(v.cost) || 0);
+            });
+        const types = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
         let ddHtml = `<button class="abazar-member-dropdown-item${!typeFilter ? ' active' : ''}" data-type="" onclick="App.filterBazarType('')">No Filter</button>`;
         types.forEach(t => { ddHtml += `<button class="abazar-member-dropdown-item${typeFilter === t ? ' active' : ''}" data-type="${this.esc(t)}" onclick="App.filterBazarType(this.dataset.type)">${this.esc(t)}</button>`; });
         dd.innerHTML = ddHtml;
         const label = document.getElementById('abazar-type-label');
         if (label) label.textContent = typeFilter || 'No Filter';
         const wrap = document.getElementById('abazar-type-filter');
-        if (wrap) wrap.style.display = (this._bazarFilter || 'bazar') === 'utility' ? '' : 'none';
+        if (wrap) wrap.style.display = '';
     },
 
     filterBazar(filter) {
         this._bazarFilter = filter;
         document.querySelectorAll('#abazar-filters .abazar-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+        this._bazarTypeFilter = '';
         this._buildBazarTypeDropdown();
         this.renderBazarList();
     },
@@ -2583,7 +2591,7 @@ const App = {
             });
         }
         const typeFilter = this._bazarTypeFilter || '';
-        if (typeFilter && isUtility) {
+        if (typeFilter) {
             items = items.filter(([, v]) => (v.name || '').trim() === typeFilter);
         }
 
