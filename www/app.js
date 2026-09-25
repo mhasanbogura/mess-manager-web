@@ -184,7 +184,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_leave_mess:'Leave Mess',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share_app:'Share App',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.4.43 (build 451)',
+        prof_version:'Version 1.4.44 (build 454)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -354,7 +354,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_leave_mess:'মেস ছাড়ুন',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share_app:'অ্যাপ শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন 1.4.43 (বিল্ড 451)',
+            prof_version:'ভার্সন 1.4.44 (বিল্ড 454)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -2490,6 +2490,7 @@ const App = {
             if (!this._bazarMemberFilter) this._bazarMemberFilter = '';
             if (!this._bazarTypeFilter) this._bazarTypeFilter = '';
             this._buildBazarDropdown();
+            this._buildBazarTypeDropdown();
             this.renderBazarList();
         } catch (e) { console.error('loadBazarList error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
@@ -2500,58 +2501,70 @@ const App = {
             .filter(([id]) => id.startsWith('member_'))
             .map(([, m]) => m.name).filter(Boolean).sort((a, b) => a.localeCompare(b));
         const memberFilter = this._bazarMemberFilter || '';
-        const typeFilter = this._bazarTypeFilter || '';
         const dd = document.getElementById('abazar-member-dropdown');
         if (!dd) return;
-        let ddHtml = `<button class="abazar-member-dropdown-item${!memberFilter && !typeFilter ? ' active' : ''}" data-member="" onclick="App.filterBazarMember('')">No Filter</button>`;
+        let ddHtml = `<button class="abazar-member-dropdown-item${!memberFilter ? ' active' : ''}" data-member="" onclick="App.filterBazarMember('')">No Filter</button>`;
         ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === 'Manager' ? ' active' : ''}" data-member="Manager" onclick="App.filterBazarMember('Manager')">Manager</button>`;
         memberNames.forEach(n => { ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === n ? ' active' : ''}" data-member="${this.esc(n)}" onclick="App.filterBazarMember('${this.esc(n)}')">${this.esc(n)}</button>`; });
-        if ((this._bazarFilter || 'bazar') === 'utility') {
-            const types = [...new Set((this._allBazar || [])
-                .filter(([, v]) => (v.category || 'bazar') === 'utility')
-                .map(([, v]) => (v.name || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-            if (types.length) {
-                ddHtml += '<div class="abazar-member-dropdown-head">Cost Type</div>';
-                types.forEach(t => { ddHtml += `<button class="abazar-member-dropdown-item${typeFilter === t ? ' active' : ''}" data-type="${this.esc(t)}" onclick="App.filterBazarType(this.dataset.type)">${this.esc(t)}</button>`; });
-            }
-        }
         dd.innerHTML = ddHtml;
         const label = document.getElementById('abazar-member-label');
-        if (label) label.textContent = typeFilter || memberFilter || 'No Filter';
+        if (label) label.textContent = memberFilter || 'No Filter';
+    },
+
+    _buildBazarTypeDropdown() {
+        const typeFilter = this._bazarTypeFilter || '';
+        const dd = document.getElementById('abazar-type-dropdown');
+        if (!dd) return;
+        const types = [...new Set((this._allBazar || [])
+            .filter(([, v]) => (v.category || 'bazar') === 'utility')
+            .map(([, v]) => (v.name || '').trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        let ddHtml = `<button class="abazar-member-dropdown-item${!typeFilter ? ' active' : ''}" data-type="" onclick="App.filterBazarType('')">No Filter</button>`;
+        types.forEach(t => { ddHtml += `<button class="abazar-member-dropdown-item${typeFilter === t ? ' active' : ''}" data-type="${this.esc(t)}" onclick="App.filterBazarType(this.dataset.type)">${this.esc(t)}</button>`; });
+        dd.innerHTML = ddHtml;
+        const label = document.getElementById('abazar-type-label');
+        if (label) label.textContent = typeFilter || 'No Filter';
+        const wrap = document.getElementById('abazar-type-filter');
+        if (wrap) wrap.style.display = (this._bazarFilter || 'bazar') === 'utility' ? '' : 'none';
     },
 
     filterBazar(filter) {
         this._bazarFilter = filter;
         document.querySelectorAll('#abazar-filters .abazar-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
-        this._bazarTypeFilter = '';
-        this._buildBazarDropdown();
+        this._buildBazarTypeDropdown();
         this.renderBazarList();
     },
 
     toggleMemberDropdown() {
         const dd = document.getElementById('abazar-member-dropdown');
         if (dd) dd.classList.toggle('open');
+        const td = document.getElementById('abazar-type-dropdown');
+        if (td) td.classList.remove('open');
+    },
+
+    toggleTypeDropdown() {
+        const td = document.getElementById('abazar-type-dropdown');
+        if (td) td.classList.toggle('open');
+        const dd = document.getElementById('abazar-member-dropdown');
+        if (dd) dd.classList.remove('open');
     },
 
     filterBazarMember(name) {
         this._bazarMemberFilter = name || '';
-        this._bazarTypeFilter = '';
         const label = document.getElementById('abazar-member-label');
         if (label) label.textContent = name || 'No Filter';
         const dd = document.getElementById('abazar-member-dropdown');
         if (dd) dd.classList.remove('open');
-        document.querySelectorAll('#abazar-member-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.member || '') === (name || '') && !b.dataset.type));
+        document.querySelectorAll('#abazar-member-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.member || '') === (name || '')));
         this.renderBazarList();
     },
 
     filterBazarType(name) {
         this._bazarTypeFilter = name || '';
-        this._bazarMemberFilter = '';
-        const label = document.getElementById('abazar-member-label');
+        const label = document.getElementById('abazar-type-label');
         if (label) label.textContent = name || 'No Filter';
-        const dd = document.getElementById('abazar-member-dropdown');
+        const dd = document.getElementById('abazar-type-dropdown');
         if (dd) dd.classList.remove('open');
-        document.querySelectorAll('#abazar-member-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', !!b.dataset.type && (b.dataset.type || '') === (name || '')));
+        document.querySelectorAll('#abazar-type-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.type || '') === (name || '')));
         this.renderBazarList();
     },
 
