@@ -184,7 +184,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_leave_mess:'Leave Mess',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share_app:'Share App',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.4.46 (build 460)',
+        prof_version:'Version 1.4.47 (build 463)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -354,7 +354,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_leave_mess:'মেস ছাড়ুন',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share_app:'অ্যাপ শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন 1.4.46 (বিল্ড 460)',
+            prof_version:'ভার্সন 1.4.47 (বিল্ড 463)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -2808,6 +2808,8 @@ const App = {
                 .filter(([, v]) => v.date && v.date.startsWith(month))
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
             this._depMembers = members;
+            if (!this._depMemberFilter) this._depMemberFilter = '';
+            this._buildDepDropdown();
             this.renderDeposits();
         } catch (e) { console.error('loadManagerMoney error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
@@ -2818,10 +2820,49 @@ const App = {
         this.renderDeposits();
     },
 
+    _buildDepDropdown() {
+        const members = this._depMembers || {};
+        const memberNames = Object.entries(members)
+            .filter(([id]) => id.startsWith('member_'))
+            .map(([, m]) => m.name).filter(Boolean).sort((a, b) => a.localeCompare(b));
+        const memberFilter = this._depMemberFilter || '';
+        const dd = document.getElementById('abalance-member-dropdown');
+        if (!dd) return;
+        let ddHtml = `<button class="abazar-member-dropdown-item${!memberFilter ? ' active' : ''}" data-member="" onclick="App.filterDepositMember('')">No Filter</button>`;
+        ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === 'Manager' ? ' active' : ''}" data-member="Manager" onclick="App.filterDepositMember('Manager')">Manager</button>`;
+        memberNames.forEach(n => { ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === n ? ' active' : ''}" data-member="${this.esc(n)}" onclick="App.filterDepositMember('${this.esc(n)}')">${this.esc(n)}</button>`; });
+        dd.innerHTML = ddHtml;
+        const label = document.getElementById('abalance-member-label');
+        if (label) label.textContent = memberFilter || 'No Filter';
+    },
+
+    toggleDepDropdown() {
+        const dd = document.getElementById('abalance-member-dropdown');
+        if (dd) dd.classList.toggle('open');
+    },
+
+    filterDepositMember(name) {
+        this._depMemberFilter = name || '';
+        const label = document.getElementById('abalance-member-label');
+        if (label) label.textContent = name || 'No Filter';
+        const dd = document.getElementById('abalance-member-dropdown');
+        if (dd) dd.classList.remove('open');
+        document.querySelectorAll('#abalance-member-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.member || '') === (name || '')));
+        this.renderDeposits();
+    },
+
     renderDeposits() {
         const filter = this._depFilter || 'meal';
-        const deps = filter === 'all' ? (this._allDeps || []) : (this._allDeps || []).filter(([, v]) => (v.category || 'meal') === filter);
+        let deps = filter === 'all' ? (this._allDeps || []) : (this._allDeps || []).filter(([, v]) => (v.category || 'meal') === filter);
         const members = this._depMembers || {};
+        const depMemberFilter = this._depMemberFilter || '';
+        if (depMemberFilter) {
+            deps = deps.filter(([, v]) => {
+                const mName = ((members[v.memberId] || {}).name || v.memberId || '').trim();
+                if (depMemberFilter === 'Manager') return !mName || mName === 'Manager';
+                return mName === depMemberFilter;
+            });
+        }
         const total = deps.reduce((s, [, v]) => s + (parseFloat(v.amount) || 0), 0);
         const totalEl = document.getElementById('abalance-filter-total');
         if (totalEl) totalEl.textContent = deps.length ? '৳ ' + this.fmtNum(total) : '';

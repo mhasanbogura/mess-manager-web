@@ -442,6 +442,14 @@
                     <button class="abazar-filter-btn" data-filter="utility" onclick="App.filterDeposits('utility')"><span class="material-icons-round">lightbulb</span> <span data-lang-key="mm2_tab_utility">Utility & Others</span></button>
                     <span class="abazar-filter-total" id="abalance-filter-total"></span>
                 </div>
+                <div class="abazar-member-filter" id="abalance-member-filter">
+                    <button class="abazar-filter-btn" id="abalance-member-btn" onclick="App.toggleDepDropdown()">
+                        <span class="material-icons-round">person</span>
+                        <span id="abalance-member-label">No Filter</span>
+                        <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                    </button>
+                    <div class="abazar-member-dropdown" id="abalance-member-dropdown"></div>
+                </div>
                 <div id="abalance-list"></div>
                 <button class="abazar-fab" onclick="App.openAddDepositToday()"><span class="material-icons-round">add</span> <span data-lang-key="mm2_add">Add</span></button>
             </div>
