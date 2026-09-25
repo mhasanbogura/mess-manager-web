@@ -29,6 +29,32 @@ task bumpVersion {
     }
 }
 
+task stampVersion {
+    doLast {
+        def content = versionFile.text
+        def codeMatcher = (content =~ /versionCode (\d+)/)
+        def nameMatcher = (content =~ /versionName "([\d.]+)"/)
+        if (codeMatcher.find() && nameMatcher.find()) {
+            def v = nameMatcher.group(1)
+            def b = codeMatcher.group(1)
+            def projRoot = project.projectDir.parentFile.parentFile
+            ["app.js", "www/app.js", "android/app/src/main/assets/public/app.js"].each { rel ->
+                def f = new File(projRoot, rel)
+                if (!f.exists()) return
+                def t = f.text
+                t = t.replaceAll(/prof_version:'Version [^']*'/, "prof_version:'Version ${v} (build ${b})'")
+                t = t.replaceAll(/prof_version:'ভার্সন [^']*'/, "prof_version:'ভার্সন ${v} (বিল্ড ${b})'")
+                f.text = t
+            }
+            println "Stamped web version: ${v} (build ${b})"
+        }
+    }
+}
+
+project.afterEvaluate {
+    tasks.findByName('assembleDebug')?.dependsOn('stampVersion')
+}
+
 task release {
     dependsOn 'assembleDebug'
     doLast {
@@ -116,8 +142,8 @@ android {
         applicationId "com.mahmuduls.messmanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 448
-        versionName "1.4.42"
+        versionCode 451
+        versionName "1.4.43"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
