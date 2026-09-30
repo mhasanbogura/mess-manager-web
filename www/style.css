@@ -2414,11 +2414,6 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 4px 10px rgba(0,0,0,.35);
     position: relative; color: #2b2b2b;
 }
-.anotice-card::before {
-    content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-    width: 22px; height: 22px; border-radius: 50%;
-    background: #D32F2F; box-shadow: 0 2px 4px rgba(0,0,0,.4);
-}
 .anotice-card p { font-size: 18px; line-height: 1.55; }
 .anotice-meta {
     display: flex; align-items: center; justify-content: space-between;
