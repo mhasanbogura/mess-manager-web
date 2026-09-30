@@ -3389,6 +3389,10 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .ameal-grid-scroll { border-color: #1a1a1a; }
 /* Form elements */
 [data-theme="oled"] .btn-modal-add { background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; }
+[data-theme="oled"] .btn-modal-add:hover, [data-theme="oled"] .btn-modal-add:active,
+[data-theme="oled"] .dep-footer-btns .btn-modal-add:hover, [data-theme="oled"] .dep-footer-btns .btn-modal-add:active,
+[data-theme="oled"] .aam-save-btn:hover, [data-theme="oled"] .aam-save-btn:active { background: linear-gradient(135deg, #6aa5f5, #1565C0); }
+[data-theme="oled"] .dep-footer-btns .btn-modal-cancel:hover, [data-theme="oled"] .dep-footer-btns .btn-modal-cancel:active { background: linear-gradient(135deg, #4d4d4d, #2c2c2c); }
 [data-theme="oled"] .bz-overlay { background: rgba(0,0,0,.7); }
 [data-theme="oled"] .bz-overlay-box { background: #0d0d0d; border-color: #1a1a1a; }
 [data-theme="oled"] .aam-overlay { background: rgba(0,0,0,.7); }
@@ -3419,4 +3423,17 @@ img, canvas { max-width: 100%; }
     .adash-finance-card, .amealhist-card, .aduty-banner,
     .aduty-card, .aduty-member, .aflat-tabs,
     .aflat-card, .adash-mess-card { margin-left: 0; margin-right: 0; }
+}
+
+/* Inner page bodies never add side gutters; the main column owns them. */
+.aam-body, .abn-body, .amenu-body, .am-body { padding-left: 0; padding-right: 0; }
+
+/* Wide screens: full-bleed pages join the 24px column system. */
+@media (min-width: 768px) {
+    #app-screen.on-bazarnote .main-content, #app-screen.on-menu .main-content, #app-screen.on-monthly .main-content { padding-left: 24px; padding-right: 24px; }
+}
+
+/* Phones: uniform 12px gutters on every page. */
+@media (max-width: 767px) {
+    #app-screen[class] .main-content { padding-left: 12px; padding-right: 12px; }
 }
