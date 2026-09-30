@@ -4645,7 +4645,7 @@ const App = {
         const msg = lang === 'bn'
             ? `আপনার ইমেইল (${email})-এ পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।\n\nএটি কিছু সময় লাগতে পারে এবং আপনার Spam / Junk ফোল্ডারে পড়তে পারে — সেখানেও চেক করুন।`
             : `A password reset link will be sent to ${email}.\n\nIt can take a few minutes and may land in your Spam / Junk folder — please check there too.`;
-        body.innerHTML = `<p style="margin:0;font-size:15px">` + msg.split('\n\n').map((ln, i) => i === 0 ? `<span style="display:block;white-space:nowrap;font-size:14px;max-width:100%;overflow-x:auto">` + ln + `</span>` : `<span style="display:block;color:#d32f2f;font-size:13px;margin-top:10px">` + ln + `</span>`).join('') + `</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-primary-action" onclick="App.closeModal();App._doResetPassword()">${lang === 'bn' ? 'পাঠান' : 'Send'}</button></div>`;
+        body.innerHTML = `<p style="margin:0;font-size:15px">` + msg.split('\n\n').map((ln, i) => i === 0 ? `<span class="reset-line1">` + ln + `</span>` : `<span style="display:block;color:#d32f2f;font-size:13px;margin-top:10px">` + ln + `</span>`).join('') + `</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-primary-action" onclick="App.closeModal();App._doResetPassword()">${lang === 'bn' ? 'পাঠান' : 'Send'}</button></div>`;
         document.getElementById('modal-title').textContent = lang === 'bn' ? 'পাসওয়ার্ড রিসেট' : 'Reset Password';
         this.openModal();
         document.getElementById('modal').classList.add('confirm-mode');

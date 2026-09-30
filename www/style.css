@@ -800,6 +800,10 @@ select.input-sm { cursor: pointer; }
     cursor: pointer; transition: all .15s;
 }
 .modal-confirm-actions .btn-primary-action:hover { background: linear-gradient(135deg, #6aa5f5, #1565C0); }
+.reset-line1 { display: block; white-space: nowrap; font-size: 14px; max-width: 100%; overflow-x: auto; }
+@media (max-width: 767px) {
+    .reset-line1 { white-space: normal; overflow-x: visible; }
+}
 
 .dialog-wrap { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; padding: 20px; }
 .dialog-wrap:not([hidden]) { display: flex; align-items: center; justify-content: center; }
