@@ -1479,9 +1479,7 @@ select.input-sm { cursor: pointer; }
     .abazar-day-card { margin: 0 0 10px; }
     .aprof-card { margin: 0 0 4px; }
     .amealhist-card { margin: 8px 0; }
-    .abazar-fab { right: calc(50% - 326px + 16px); }
     .bottom-nav { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 12px; border-radius: 16px; border: 1px solid var(--glass-border); }
-    .aam-footer { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 90px; background: transparent; padding: 6px 0; }
 }
 
 @media (max-width: 360px) {
@@ -2249,6 +2247,13 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 4px 12px rgba(229,57,53,.4); font-family: inherit; z-index: 20;
 }
 .abazar-fab .material-icons-round { font-size: 22px; }
+
+/* Wide screens: keep floating buttons inside the 652px card column.
+   Scoped to #app-screen so these beat the base rules regardless of order. */
+@media (min-width: 768px) {
+    #app-screen .abazar-fab { right: calc(50% - 326px + 16px); }
+    #app-screen .aam-footer { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 90px; background: transparent; padding: 6px 0; }
+}
 
 /* ==================== PROFILE & SETTINGS ==================== */
 .aprof-head { display: flex; flex-direction: column; padding: 12px 14px 4px; color: var(--text); margin: 0; }
