@@ -76,7 +76,7 @@ const App = {
         nav_dashboard:'Dashboard',nav_mess:'Mess',nav_expense:'Expense',nav_meal:'Meal',nav_money:'Money',nav_settings:'Settings',
         // Dashboard
         dash_greet_morning:'Good morning',dash_greet_afternoon:'Good afternoon',dash_greet_evening:'Good evening',
-        dash_share:'Share Mess ID',dash_manager:'Manager',dash_current_month:'Current month',dash_notice:'Notice Board',
+        dash_share:'Share Mess ID',dash_manager:'Manager',dash_current_month:'Current month',dash_notice:'Notice',
         dash_notice_preview:'Pin a notice for the whole house',dash_today:'Today is',dash_breakfast:'Breakfast',dash_lunch:'Lunch',dash_dinner:'Dinner',
         dash_meal:'Meal',dash_deposit:'Deposit',dash_balance:'Balance',dash_expense_per_meal:'Expense per Meal',
         dash_utility:'Utility',dash_expense_per_utility:'Expense per utility',dash_analyse:'Analyze',
@@ -247,7 +247,7 @@ const App = {
             nav_dashboard:'ড্যাশবোর্ড',nav_mess:'মেস',nav_expense:'খরচ',nav_meal:'খাবার',nav_money:'টাকা',nav_settings:'সেটিংস',
             // Dashboard
             dash_greet_morning:'সুপ্রভাত',dash_greet_afternoon:'শুভ অপরাহ্ন',dash_greet_evening:'শুভ সন্ধ্যা',
-            dash_share:'মেস আইডি শেয়ার',dash_manager:'ম্যানেজার',dash_current_month:'বর্তমান মাস',dash_notice:'নোটিশ বোর্ড',
+            dash_share:'মেস আইডি শেয়ার',dash_manager:'ম্যানেজার',dash_current_month:'বর্তমান মাস',dash_notice:'নোটিশ',
             dash_notice_preview:'পুরো বাড়ির জন্য একটি নোটিশ দিন',dash_today:'আজ',dash_breakfast:'সকালের নাস্তা',dash_lunch:'দুপুরের খাবার',dash_dinner:'রাতের খাবার',
             dash_meal:'খাবার',dash_deposit:'জমা',dash_balance:'ব্যালেন্স',dash_expense_per_meal:'প্রতি খাবারে খরচ',
             dash_utility:'ইউটিলিটি',dash_expense_per_utility:'প্রতি ইউটিলিটিতে খরচ',dash_analyse:'বিশ্লেষণ',
@@ -3201,7 +3201,7 @@ const App = {
         const cur = (this._bzItems[idx] && this._bzItems[idx].unit) ?? 'kg';
         const units = ['', 'kg', 'g', 'L', 'ml', 'pcs'];
         const opts = units.map(u => `<button type="button" class="bz-unit-opt${u === cur ? ' active' : ''}" data-unit="${u}" onclick="App.bzPickUnit(${idx},'${u}')">${u || '-'}</button>`).join('');
-        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Quantity" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><div class="bz-unit-picker"><button type="button" class="bz-unit-btn" id="bz-unit-btn-${idx}" onclick="App.bzToggleUnit(${idx})">${this.esc(cur || '-')}<span class="material-icons-round">expand_more</span></button><div class="bz-unit-menu" id="bz-unit-menu-${idx}" style="display:none">${opts}</div></div></div>`;
+        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><div class="bz-unit-picker"><button type="button" class="bz-unit-btn" id="bz-unit-btn-${idx}" onclick="App.bzToggleUnit(${idx})">${this.esc(cur || '-')}<span class="material-icons-round">expand_more</span></button><div class="bz-unit-menu" id="bz-unit-menu-${idx}" style="display:none">${opts}</div></div></div>`;
     },
 
     bzToggleUnit(idx) {

@@ -3442,6 +3442,7 @@ img, canvas { max-width: 100%; }
 /* Phones: uniform 12px gutters on every page. */
 @media (max-width: 767px) {
     #app-screen[class] .main-content { padding-left: 12px; padding-right: 12px; }
+    .adash-finance { grid-template-columns: 1fr 1fr 1.5fr auto; }
     .bz-item-row > .bz-input-wrap { flex: 2.5 1 0%; }
     .bz-item-row > .bz-qty-wrap { flex: 1.5 1 0%; }
     .bz-item-row > .bz-cost-wrap { flex: 2 1 0%; }
