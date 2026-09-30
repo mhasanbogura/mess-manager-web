@@ -82,7 +82,7 @@ const App = {
         dash_utility:'Utility',dash_expense_per_utility:'Expense per utility',dash_analyse:'Analyse',
         dash_meal_summary:'Meal Summary',dash_util_others:'Rent, Utilities & Others',
         dash_table_name:'Name',dash_table_total:'Total',dash_table_expense:'Expense(৳)',dash_table_deposit:'Deposit(৳)',dash_table_balance:'Balance(৳)',
-        dash_table_rent:'Rent(৳)',dash_table_util_others:'Rent, Utilities & Others(৳)',
+        dash_table_rent:'Rent(৳)',dash_table_util_others:'Utilities & Others(৳)',
         dash_no_data:'No data',
         // Expense Today
         dt_title:'Expense Today',dt_banner:'Expense today',dt_nobody:'Nobody assigned',
@@ -253,7 +253,7 @@ const App = {
             dash_utility:'ইউটিলিটি',dash_expense_per_utility:'প্রতি ইউটিলিটিতে খরচ',dash_analyse:'বিশ্লেষণ',
             dash_meal_summary:'খাবার সারসংক্ষেপ',dash_util_others:'ভাড়া, ইউটিলিটি ও অন্যান্য',
             dash_table_name:'নাম',dash_table_total:'মোট',dash_table_expense:'খরচ(৳)',dash_table_deposit:'জমা(৳)',dash_table_balance:'ব্যালেন্স(৳)',
-            dash_table_rent:'ভাড়া(৳)',dash_table_util_others:'ভাড়া, ইউটিলিটি ও অন্যান্য(৳)',dash_no_data:'কোনো তথ্য নেই',
+            dash_table_rent:'ভাড়া(৳)',dash_table_util_others:'ইউটিলিটি ও অন্যান্য(৳)',dash_no_data:'কোনো তথ্য নেই',
             // Expense Today
             dt_title:'আজকের খরচ',dt_banner:'আজকের খরচ',dt_nobody:'কেউ নিয়োগ করা হয়নি',
             dt_unassigned:'নিয়োগবিহীন তারিখ',dt_all_assigned:'সব তারিখ নিয়োগ করা হয়েছে',dt_day:'দিন',
