@@ -4645,7 +4645,7 @@ const App = {
         const msg = lang === 'bn'
             ? `আপনার ইমেইল (${email})-এ পাসওয়ার্ড রিসেট লিংক পাঠানো হবে।\n\nএটি কিছু সময় লাগতে পারে এবং আপনার Spam / Junk ফোল্ডারে পড়তে পারে — সেখানেও চেক করুন।`
             : `A password reset link will be sent to ${email}.\n\nIt can take a few minutes and may land in your Spam / Junk folder — please check there too.`;
-        body.innerHTML = `<p style="margin:0;font-size:15px;white-space:pre-line">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-primary-action" onclick="App.closeModal();App._doResetPassword()">${lang === 'bn' ? 'পাঠান' : 'Send'}</button></div>`;
+        body.innerHTML = `<p style="margin:0;font-size:15px">` + msg.split('\n\n').map((ln, i) => i === 0 ? `<span style="display:block;white-space:nowrap;font-size:14px;max-width:100%;overflow-x:auto">` + ln + `</span>` : `<span style="display:block;color:#d32f2f;font-size:13px;margin-top:10px">` + ln + `</span>`).join('') + `</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-primary-action" onclick="App.closeModal();App._doResetPassword()">${lang === 'bn' ? 'পাঠান' : 'Send'}</button></div>`;
         document.getElementById('modal-title').textContent = lang === 'bn' ? 'পাসওয়ার্ড রিসেট' : 'Reset Password';
         this.openModal();
         document.getElementById('modal').classList.add('confirm-mode');
@@ -4716,15 +4716,15 @@ const App = {
         if (isGoogle) {
             body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Sign in with Google to confirm.</p>
                 <div style="display:flex;gap:10px;justify-content:flex-end">
-                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Sign in & Delete</button>
-                    <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
+                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#E53935,#B71C1C);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Sign in & Delete</button>
+                    <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#6b7280,#434a54);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
                 </div>`;
         } else {
             body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Enter your password to confirm.</p>
                 <input id="delete-pw" type="password" placeholder="Password" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:16px;box-sizing:border-box">
                 <div style="display:flex;gap:10px;justify-content:flex-end">
-                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Delete Account</button>
-                    <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
+                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#E53935,#B71C1C);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Delete Account</button>
+                    <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#6b7280,#434a54);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
                 </div>`;
         }
         document.getElementById('modal-title').textContent = 'Delete Account';
@@ -4761,8 +4761,8 @@ const App = {
         const body = document.getElementById('modal-body');
         body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">${msg}</p>
             <div style="display:flex;gap:10px;justify-content:flex-end">
-                <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:#d32f2f;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Confirm</button>
-                <button id="confirm-no" style="padding:10px 24px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:14px;cursor:pointer">Cancel</button>
+                <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#E53935,#B71C1C);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Confirm</button>
+                <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#6b7280,#434a54);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
             </div>`;
         document.getElementById('modal-title').textContent = title;
         document.getElementById('modal-overlay').classList.add('active');
