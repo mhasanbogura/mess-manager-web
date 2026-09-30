@@ -52,7 +52,6 @@ task stampVersion {
 }
 
 project.afterEvaluate {
-    tasks.findByName('stampVersion')?.dependsOn('bumpVersion')
     tasks.findByName('assembleDebug')?.dependsOn('stampVersion')
     tasks.findByName('mergeDebugAssets')?.dependsOn('stampVersion')
 }
@@ -130,8 +129,8 @@ android {
         applicationId "com.mahmuduls.messmanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 481
-        versionName "1.4.53"
+        versionCode 499
+        versionName "1.4.59"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
