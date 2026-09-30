@@ -768,7 +768,8 @@ select.input-sm { cursor: pointer; }
 }
 
 .modal.confirm-mode .modal-header .close-btn,
-.modal.confirm-mode #modal-close { display: none; }
+.modal.confirm-mode #modal-close,
+.modal.confirm-mode #modal-footer { display: none; }
 .modal-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 18px 22px 0; color: var(--text);
@@ -785,18 +786,21 @@ select.input-sm { cursor: pointer; }
     cursor: pointer; transition: all .15s;
 }
 .modal-confirm-actions .btn-cancel:active { filter: brightness(.9); }
+.modal-confirm-actions .btn-cancel:hover { filter: brightness(.93); }
 .modal-confirm-actions .btn-danger {
     flex: 1; padding: 12px 18px; border: none; border-radius: 11px;
     background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);
     font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s;
 }
 .modal-confirm-actions .btn-danger:active { filter: brightness(.85); }
+.modal-confirm-actions .btn-danger:hover { filter: brightness(1.07); }
 .modal-confirm-actions .btn-primary-action {
     flex: 1; padding: 12px 18px; border: none; border-radius: 11px;
     background: var(--primary); color: #fff; font-size: 15px; font-weight: 600;
     cursor: pointer; transition: all .15s;
 }
 .modal-confirm-actions .btn-primary-action:active { filter: brightness(.85); }
+.modal-confirm-actions .btn-primary-action:hover { filter: brightness(1.12); }
 
 .dialog-wrap { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; padding: 20px; }
 .dialog-wrap:not([hidden]) { display: flex; align-items: center; justify-content: center; }
@@ -812,6 +816,7 @@ select.input-sm { cursor: pointer; }
 .dialog-actions .btn.secondary:active { filter: brightness(.9); }
 .dialog-actions .btn.danger { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
 .dialog-actions .btn.danger:active { filter: brightness(.85); }
+.dialog-actions .btn:hover { filter: brightness(1.06); }
 
 .modal-footer {
     padding: 14px 18px;
@@ -1176,7 +1181,7 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 4px 12px rgba(11,61,145,0.25);
     transition: all var(--transition);
 }
-.btn-modal-add:hover { background: linear-gradient(135deg, #3b7bdd, #FFB300); box-shadow: 0 6px 16px rgba(11,61,145,0.35); }
+.btn-modal-add:hover { filter: brightness(1.15); box-shadow: 0 6px 16px rgba(11,61,145,0.35); }
 
 .btn-modal-cancel {
     flex: 1; padding: 12px 20px;
