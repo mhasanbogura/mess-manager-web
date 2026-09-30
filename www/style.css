@@ -1317,11 +1317,11 @@ select.input-sm { cursor: pointer; }
 .bottom-nav-item.active { color: var(--primary); }
 .bottom-nav-item.active .material-icons-round { filter: drop-shadow(0 0 6px rgba(11,61,145,0.4)); }
 
-.main-content { padding-bottom: 72px !important; }
+.main-content { padding-bottom: 170px !important; }
 .analysis-export-wrap { position: relative; }
 
 @media (max-width: 768px) {
-    .main-content { padding-bottom: 72px !important; }
+    .main-content { padding-bottom: 170px !important; }
 }
 
 /* ==================== PROFILE PAGE ==================== */
@@ -3450,3 +3450,8 @@ img, canvas { max-width: 100%; }
     #app-screen .aam-footer { left: 12px; right: 12px; bottom: 84px; background: transparent; padding: 0; }
     #app-screen .abn-bottom { left: 12px; right: 12px; bottom: 12px; border-radius: 16px; border: 1px solid var(--border); }
 }
+
+/* Every scrollable page keeps enough bottom clearance so the last
+   content scrolls fully above the floating nav and action bars. */
+.main-content, #app-screen[class] .main-content { padding-bottom: 170px !important; }
+.aam-body, .abn-body, .amenu-body { padding-bottom: 170px !important; }
