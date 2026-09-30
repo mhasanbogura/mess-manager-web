@@ -169,13 +169,13 @@ const App = {
         an_meal_share:'Meal share by member',an_who_ate:'Who ate how much of the',an_meals_count:'meals',
         an_bazar_by_day:'Bazar by day',an_spent_across:'spent across the month',
         an_meals_by_day:'Meals by day',an_meals_across:'meals across the month',
-        an_top10_bazar:'Top 10 bazar items by cost',an_items:'items',
+        an_top10_bazar:'All bazar items by cost',an_items:'items',
         an_total_utility:'Total utility',an_rent:'Rent',an_other_utility:'Other utility',
         an_util_balance:'Balance',an_collection:'Collection',an_spending:'Spending',
         an_util_credit_hint:'Green = in credit · Red = owes (utility deposit − cost share)',
         an_util_expense_trend:'Expense per utility trend',
         an_util_by_day:'Utility cost by day',an_util_across:'utility cost across the month',
-        an_top10_util:'Top 10 utility items by cost',
+        an_top10_util:'All utility items by cost',
         // Profile
         prof_title:'Settings',
         prof_general:'GENERAL',
@@ -339,13 +339,13 @@ const App = {
             an_meal_share:'সদস্য অনুযায়ী খাবার অংশ',an_who_ate:'কারা কত খেয়েছে',an_meals_count:'খাবার',
             an_bazar_by_day:'দিন অনুযায়ী বাজার',an_spent_across:'পুরো মাসে খরচ',
             an_meals_by_day:'দিন অনুযায়ী খাবার',an_meals_across:'পুরো মাসে খাবার',
-            an_top10_bazar:'খরচ অনুযায়ী শীর্ষ ১০ বাজার আইটেম',an_items:'আইটেম',
+            an_top10_bazar:'খরচ অনুযায়ী সব বাজার আইটেম',an_items:'আইটেম',
             an_total_utility:'মোট ইউটিলিটি',an_rent:'ভাড়া',an_other_utility:'অন্যান্য ইউটিলিটি',
             an_util_balance:'ব্যালেন্স',an_collection:'সংগ্রহ',an_spending:'খরচ',
             an_util_credit_hint:'সবুজ = বাকি আছে · লাল = দেনা (ইউটিলিটি জমা − খরচ অংশ)',
             an_util_expense_trend:'প্রতি ইউটিলিটিতে খরচের প্রবণতা',
             an_util_by_day:'দিন অনুযায়ী ইউটিলিটি খরচ',an_util_across:'পুরো মাসে ইউটিলিটি খরচ',
-            an_top10_util:'খরচ অনুযায়ী শীর্ষ ১০ ইউটিলিটি আইটেম',
+            an_top10_util:'খরচ অনুযায়ী সব ইউটিলিটি আইটেম',
             // Profile
             prof_title:'সেটিংস',
             prof_general:'সাধারণ',
@@ -4109,8 +4109,8 @@ const App = {
             const utilPaidIn = totalUtilDep;
             const utilCharged = totalUtility + totalRent;
 
-            const topMealItems = Object.values(mealItemFreq).sort((a, b) => b.total - a.total).slice(0, 10);
-            const topUtilItems = Object.values(utilItemFreq).sort((a, b) => b.total - a.total).slice(0, 10);
+            const topMealItems = Object.values(mealItemFreq).sort((a, b) => b.total - a.total);
+            const topUtilItems = Object.values(utilItemFreq).sort((a, b) => b.total - a.total);
 
             const memberBalances = mids.map(mid => {
                 const name = members[mid]?.name || 'Unknown';
@@ -4202,7 +4202,7 @@ const App = {
                             <div class="am-chart-scroll"><canvas id="am-ml-chart"></canvas></div>
                         </div>
                         ${topMealItems.length ? `<div class="am-card">
-                            <h3>Top 10 bazar items by cost</h3>
+                            <h3>All bazar items by cost</h3>
                             <p class="am-sub">${topMealItems.length} items</p>
                             <div class="am-top-items">${topMealItems.map((it, i) => {
                                 const pct = it.total / topMealItems[0].total * 100;
@@ -4253,7 +4253,7 @@ const App = {
                             <div class="am-chart-scroll"><canvas id="am-util-bz-chart"></canvas></div>
                         </div>
                         ${topUtilItems.length ? `<div class="am-card">
-                            <h3>Top 10 utility items by cost</h3>
+                            <h3>All utility items by cost</h3>
                             <p class="am-sub">${topUtilItems.length} items</p>
                             <div class="am-top-items">${topUtilItems.map((it, i) => {
                                 const pct = it.total / topUtilItems[0].total * 100;
