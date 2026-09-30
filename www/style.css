@@ -2253,6 +2253,12 @@ select.input-sm { cursor: pointer; }
 @media (min-width: 768px) {
     #app-screen .abazar-fab { right: calc(50% - 326px + 16px); }
     #app-screen .aam-footer { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 90px; background: transparent; padding: 6px 0; }
+    #app-screen .anotice-fab { right: calc(50% - 326px + 16px); }
+    #app-screen .amenu-fab { right: calc(50% - 326px + 16px); }
+    #app-screen .abn-bottom { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 12px; border-radius: 16px; border: 1px solid var(--border); }
+    #app-screen .aam-body { padding-left: 0; padding-right: 0; }
+    #app-screen .abn-body { padding-left: 24px; padding-right: 24px; }
+    #app-screen .amenu-body { padding-left: 24px; padding-right: 24px; }
 }
 
 /* ==================== PROFILE & SETTINGS ==================== */
