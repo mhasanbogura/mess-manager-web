@@ -957,7 +957,7 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 6px 20px rgba(11,61,145,0.3);
     transition: all var(--transition);
 }
-.btn-export-pdf:hover { background: linear-gradient(135deg, #3b7bdd, #FFB300); box-shadow: 0 8px 24px rgba(11,61,145,0.4); transform: translateY(-1px); }
+.btn-export-pdf:hover { filter: brightness(1.15); box-shadow: 0 8px 24px rgba(11,61,145,0.4); transform: translateY(-1px); }
 .btn-export-pdf .material-icons-round { font-size: 22px; }
 
 /* ==================== FLAT PAGE ==================== */
@@ -2135,6 +2135,7 @@ select.input-sm { cursor: pointer; }
     background: var(--primary); color: #fff; font-size: 16px; font-weight: 700;
     cursor: pointer; font-family: inherit;
 }
+.aam-save-btn:hover { filter: brightness(1.15); }
 
 /* ==================== BAZAR LIST & MANAGER MONEY ==================== */
 .abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; color: var(--text); margin: 0; }
@@ -2254,6 +2255,7 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 4px 12px rgba(229,57,53,.4); font-family: inherit; z-index: 20;
 }
 .abazar-fab .material-icons-round { font-size: 22px; }
+.abazar-fab:hover { filter: brightness(1.12); }
 
 /* Wide screens: keep floating buttons inside the 652px card column.
    Scoped to #app-screen so these beat the base rules regardless of order. */
@@ -2436,7 +2438,7 @@ select.input-sm { cursor: pointer; }
     padding: 16px 26px; font-family: inherit; font-size: 20px;
     cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.4);
 }
-.anotice-fab:hover { background: #d32f2f; }
+.anotice-fab:hover { filter: brightness(1.12); }
 .anotice-fab .material-icons-round { font-size: 26px; }
 
 /* ==================== BAZAR DUTY ROSTER ==================== */
@@ -2892,6 +2894,7 @@ img, canvas { max-width: 100%; }
 .amenu-add-special .material-icons-round { font-size: 18px; }
 .amenu-fab { position: fixed; bottom: 24px; right: 16px; background: #FFB300; color: #1a1a1a; border: none; border-radius: 14px; padding: 14px 22px; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,179,0,.4); font-family: inherit; z-index: 20; }
 .amenu-fab .material-icons-round { font-size: 22px; }
+.amenu-fab:hover { filter: brightness(1.08); }
 .amenu-form-row { margin-bottom: 14px; }
 .amenu-form-row label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 4px; }
 .amenu-form-row input { width: 100%; padding: 10px 12px; border: 1px solid #d0d8e4; border-radius: 8px; font-size: 15px; outline: none; box-sizing: border-box; }
