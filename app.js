@@ -78,8 +78,8 @@ const App = {
         dash_greet_morning:'Good morning',dash_greet_afternoon:'Good afternoon',dash_greet_evening:'Good evening',
         dash_share:'Share Mess ID',dash_manager:'Manager',dash_current_month:'Current month',dash_notice:'Notice Board',
         dash_notice_preview:'Pin a notice for the whole house',dash_today:'Today is',dash_breakfast:'Breakfast',dash_lunch:'Lunch',dash_dinner:'Dinner',
-        dash_meal:'Meal',dash_deposit:'Deposit',dash_balance:'Balance',dash_expense_per_meal:'Expense per meal',
-        dash_utility:'Utility',dash_expense_per_utility:'Expense per utility',dash_analyse:'Analyse',
+        dash_meal:'Meal',dash_deposit:'Deposit',dash_balance:'Balance',dash_expense_per_meal:'Expense per Meal',
+        dash_utility:'Utility',dash_expense_per_utility:'Expense per utility',dash_analyse:'Analyze',
         dash_meal_summary:'Meal Summary',dash_util_others:'Rent, Utilities & Others',
         dash_table_name:'Name',dash_table_total:'Total',dash_table_expense:'Expense(৳)',dash_table_deposit:'Deposit(৳)',dash_table_balance:'Balance(৳)',
         dash_table_rent:'Rent(৳)',dash_table_util_others:'Utilities & Others(৳)',
@@ -162,9 +162,9 @@ const App = {
         // Analysis
         an_title:'Analysis',an_month:'Month',an_tab_meal:'Meal',an_tab_utility:'Utility',
         an_total_meals:'Total meals',an_meal_bazar:'Meal bazar',an_members:'Members',
-        an_expense_per_meal:'Expense per meal',an_bazar:'Bazar',an_meals_label:'Meals',
+        an_expense_per_meal:'Expense per Meal',an_bazar:'Bazar',an_meals_label:'Meals',
         an_member_balances:'Member balances',an_credit_hint:'Green = in credit · Red = owes (deposit − meal cost)',
-        an_expense_trend:'Expense per meal trend',an_vs_last_month:'vs last month',
+        an_expense_trend:'Expense per Meal trend',an_vs_last_month:'vs last month',
         an_costlier:'costlier',an_cheaper:'cheaper',
         an_meal_share:'Meal share by member',an_who_ate:'Who ate how much of the',an_meals_count:'meals',
         an_bazar_by_day:'Bazar by day',an_spent_across:'spent across the month',
@@ -4241,7 +4241,7 @@ const App = {
                         <div class="am-stats-row">
                             <div class="am-stat-card"><small>Total meals</small><strong>${totalMeals}</strong></div>
                             <div class="am-stat-card"><small>Meal bazar</small><strong>৳ ${this.fmtNum(totalMealBazar)}</strong><small>${mids.length} Members</small></div>
-                            <div class="am-stat-card"><small>Expense per meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalMealBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
+                            <div class="am-stat-card"><small>Expense per Meal</small><strong>৳ ${rate.toFixed(2)}</strong><small>Bazar ৳${this.fmtNum(totalMealBazar)}</small><small>÷ Meals ${totalMeals}</small></div>
                         </div>
                         ${memberBalances.length ? `<div class="am-card">
                             <h3>Member balances</h3>
@@ -4254,7 +4254,7 @@ const App = {
                             }).join('')}</div>
                         </div>` : ''}
                         <div class="am-card">
-                            <h3>Expense per meal trend</h3>
+                            <h3>Expense per Meal trend</h3>
                             <p class="am-sub">${rateDiff >= 0 ? '▲' : '▼'} ${Math.abs(rateDiff)}% vs last month · ${rateDiff >= 0 ? 'costlier' : 'cheaper'}</p>
                             <div class="am-chart-scroll"><canvas id="am-rate-chart"></canvas></div>
                         </div>
