@@ -428,6 +428,7 @@ body {
     transition: all var(--transition);
 }
 .btn-share:hover { background: linear-gradient(135deg, #e8f0fe, #c8ddf0); transform: scale(1.02); }
+.btn-share:active { background: linear-gradient(135deg, #e8f0fe, #c8ddf0); }
 .btn-share .material-icons-round { font-size: 16px; }
 
 .dash-mess-info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: relative; z-index: 1; }
@@ -537,6 +538,7 @@ body {
     transition: all var(--transition);
 }
 .btn-analyse:hover { background: linear-gradient(135deg, #3b7bdd, #0b3d91); box-shadow: 0 6px 16px rgba(11,61,145,0.35); transform: translateY(-1px); color: #fff; }
+.btn-analyse:active { background: linear-gradient(135deg, #3b7bdd, #0b3d91); }
 .btn-analyse .material-icons-round { font-size: 18px; }
 
 /* ==================== MEMBER STATS TABLE ==================== */
@@ -813,6 +815,8 @@ select.input-sm { cursor: pointer; }
 .dialog-actions .btn.secondary:hover { background: linear-gradient(135deg, #7d8694, #4d5460); }
 .dialog-actions .btn.danger { background: linear-gradient(135deg, #E53935, #B71C1C); color: #fff; }
 .dialog-actions .btn.danger:hover { background: linear-gradient(135deg, #F44336, #D32F2F); }
+#confirm-yes:hover { background: linear-gradient(135deg, #F44336, #D32F2F); }
+#confirm-no:hover { background: linear-gradient(135deg, #7d8694, #4d5460); }
 
 .modal-footer {
     padding: 14px 18px;
