@@ -107,7 +107,7 @@ const App = {
         me_no_members:'No members',me_error:'Error loading',
         // Add Meal
         am_title:'Add Meal',am_select_date:'Select meal date',am_set_counts:'Set member meal counts',
-        am_add_meal:'Add Meal',am_total:'Total:',am_breakfast:'Breakfast',am_lunch:'Lunch',am_dinner:'Dinner',
+        am_add_meal:'Add',am_total:'Total:',am_breakfast:'Breakfast',am_lunch:'Lunch',am_dinner:'Dinner',
         am_no_members:'No members',
         // Meal Records
         mr_title:'Meal Records',mr_current_month:'Current Month:',mr_loading:'Loading...',
@@ -277,7 +277,7 @@ const App = {
             me_no_members:'কোনো সদস্য নেই',me_error:'লোড হচ্ছে না',
             // Add Meal
             am_title:'খাবার যোগ',am_select_date:'খাবারের তারিখ নির্বাচন করুন',am_set_counts:'সদস্যদের খাবার সংখ্যা নির্ধারণ করুন',
-            am_add_meal:'খাবার যোগ',am_total:'মোট:',am_breakfast:'সকালের নাস্তা',am_lunch:'দুপুরের খাবার',am_dinner:'রাতের খাবার',
+            am_add_meal:'যোগ',am_total:'মোট:',am_breakfast:'সকালের নাস্তা',am_lunch:'দুপুরের খাবার',am_dinner:'রাতের খাবার',
             am_no_members:'কোনো সদস্য নেই',
             // Meal Records
             mr_title:'খাবার রেকর্ড',mr_current_month:'বর্তমান মাস:',mr_loading:'লোড হচ্ছে...',
