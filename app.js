@@ -3201,7 +3201,7 @@ const App = {
         if (!menu) return;
         const isOpen = menu.style.display !== 'none';
         document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
-        menu.style.display = isOpen ? 'none' : 'block';
+        menu.style.display = isOpen ? 'none' : 'flex';
         if (!this._bzUnitOutsideBound) {
             this._bzUnitOutsideBound = true;
             document.addEventListener('click', (e) => {

@@ -1848,6 +1848,7 @@ select.input-sm { cursor: pointer; }
 }
 .bz-unit-opt {
     border: none; background: transparent; padding: 8px 12px; margin: 0;
+    width: 100%; display: block;
     font-size: 14px; font-family: inherit; color: var(--text);
     cursor: pointer; text-align: left;
 }
