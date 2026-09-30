@@ -4716,15 +4716,15 @@ const App = {
         if (isGoogle) {
             body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Sign in with Google to confirm.</p>
                 <div style="display:flex;gap:10px;justify-content:flex-end">
-                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#E53935,#B71C1C);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Sign in & Delete</button>
-                    <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#6b7280,#434a54);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
+                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#F44336,#D32F2F);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Sign in & Delete</button>
+                    <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#9aa3af,#5b6472);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
                 </div>`;
         } else {
             body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">This will permanently delete your account and all data. Enter your password to confirm.</p>
                 <input id="delete-pw" type="password" placeholder="Password" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;margin-bottom:16px;box-sizing:border-box">
                 <div style="display:flex;gap:10px;justify-content:flex-end">
-                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#E53935,#B71C1C);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Delete Account</button>
-                    <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#6b7280,#434a54);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
+                    <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#F44336,#D32F2F);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Delete Account</button>
+                    <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#9aa3af,#5b6472);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
                 </div>`;
         }
         document.getElementById('modal-title').textContent = 'Delete Account';
@@ -4761,8 +4761,8 @@ const App = {
         const body = document.getElementById('modal-body');
         body.innerHTML = `<p style="margin:0 0 16px;font-size:15px">${msg}</p>
             <div style="display:flex;gap:10px;justify-content:flex-end">
-                <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#E53935,#B71C1C);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Confirm</button>
-                <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#6b7280,#434a54);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
+                <button id="confirm-yes" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#F44336,#D32F2F);color:#fff;font-size:14px;font-weight:600;cursor:pointer">Confirm</button>
+                <button id="confirm-no" style="padding:10px 24px;border:none;border-radius:8px;background:linear-gradient(135deg,#9aa3af,#5b6472);color:#fff;font-size:14px;cursor:pointer">Cancel</button>
             </div>`;
         document.getElementById('modal-title').textContent = title;
         document.getElementById('modal-overlay').classList.add('active');
