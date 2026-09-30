@@ -781,26 +781,23 @@ select.input-sm { cursor: pointer; }
 
 .modal-confirm-actions { display: flex; gap: 10px; margin-top: 20px; }
 .modal-confirm-actions .btn-cancel {
-    flex: 1; padding: 12px 18px; border: 1px solid var(--border); border-radius: 11px;
-    background: var(--card-solid); color: var(--text); font-size: 15px; font-weight: 600;
+    flex: 1; padding: 12px 18px; border: none; border-radius: 11px;
+    background: linear-gradient(135deg, #6b7280, #434a54); color: #fff; font-size: 15px; font-weight: 600;
     cursor: pointer; transition: all .15s;
 }
-.modal-confirm-actions .btn-cancel:active { filter: brightness(.9); }
-.modal-confirm-actions .btn-cancel:hover { filter: brightness(.93); }
+.modal-confirm-actions .btn-cancel:hover { background: linear-gradient(135deg, #7d8694, #4d5460); }
 .modal-confirm-actions .btn-danger {
     flex: 1; padding: 12px 18px; border: none; border-radius: 11px;
-    background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger);
+    background: linear-gradient(135deg, #E53935, #B71C1C); color: #fff;
     font-size: 15px; font-weight: 600; cursor: pointer; transition: all .15s;
 }
-.modal-confirm-actions .btn-danger:active { filter: brightness(.85); }
-.modal-confirm-actions .btn-danger:hover { filter: brightness(1.07); }
+.modal-confirm-actions .btn-danger:hover { background: linear-gradient(135deg, #F44336, #D32F2F); }
 .modal-confirm-actions .btn-primary-action {
     flex: 1; padding: 12px 18px; border: none; border-radius: 11px;
-    background: var(--primary); color: #fff; font-size: 15px; font-weight: 600;
+    background: linear-gradient(135deg, #1565C0, #08306b); color: #fff; font-size: 15px; font-weight: 600;
     cursor: pointer; transition: all .15s;
 }
-.modal-confirm-actions .btn-primary-action:active { filter: brightness(.85); }
-.modal-confirm-actions .btn-primary-action:hover { filter: brightness(1.12); }
+.modal-confirm-actions .btn-primary-action:hover { background: linear-gradient(135deg, #3b7bdd, #0b3d91); }
 
 .dialog-wrap { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 80; padding: 20px; }
 .dialog-wrap:not([hidden]) { display: flex; align-items: center; justify-content: center; }
@@ -812,11 +809,10 @@ select.input-sm { cursor: pointer; }
 .dialog h3 { margin-bottom: 14px; font-size: 17px; font-weight: 700; color: var(--text); }
 .dialog-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
 .dialog-actions .btn { flex: 1; padding: 12px 18px; border: 0; border-radius: 11px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .1s; -webkit-tap-highlight-color: transparent; user-select: none; }
-.dialog-actions .btn.secondary { background: var(--card-solid); color: var(--text); border: 1px solid var(--border); }
-.dialog-actions .btn.secondary:active { filter: brightness(.9); }
-.dialog-actions .btn.danger { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
-.dialog-actions .btn.danger:active { filter: brightness(.85); }
-.dialog-actions .btn:hover { filter: brightness(1.06); }
+.dialog-actions .btn.secondary { background: linear-gradient(135deg, #6b7280, #434a54); color: #fff; border: none; }
+.dialog-actions .btn.secondary:hover { background: linear-gradient(135deg, #7d8694, #4d5460); }
+.dialog-actions .btn.danger { background: linear-gradient(135deg, #E53935, #B71C1C); color: #fff; }
+.dialog-actions .btn.danger:hover { background: linear-gradient(135deg, #F44336, #D32F2F); }
 
 .modal-footer {
     padding: 14px 18px;
@@ -957,7 +953,7 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 6px 20px rgba(11,61,145,0.3);
     transition: all var(--transition);
 }
-.btn-export-pdf:hover { filter: brightness(1.15); box-shadow: 0 8px 24px rgba(11,61,145,0.4); transform: translateY(-1px); }
+.btn-export-pdf:hover { background: linear-gradient(135deg, #3b7bdd, #0b3d91); box-shadow: 0 8px 24px rgba(11,61,145,0.4); transform: translateY(-1px); }
 .btn-export-pdf .material-icons-round { font-size: 22px; }
 
 /* ==================== FLAT PAGE ==================== */
@@ -1037,7 +1033,7 @@ select.input-sm { cursor: pointer; }
     box-shadow: 0 2px 8px rgba(11,61,145,0.3);
     transition: all var(--transition);
 }
-.btn-flat-add:hover { box-shadow: 0 4px 12px rgba(11,61,145,0.4); transform: translateY(-1px); }
+.btn-flat-add:hover { background: linear-gradient(135deg, #3b7bdd, #0b3d91); box-shadow: 0 4px 12px rgba(11,61,145,0.4); transform: translateY(-1px); }
 
 .flat-hint { font-size: 11px; color: #555; margin-bottom: 8px; }
 .flat-total { font-size: 14px; font-weight: 700; color: white; margin-bottom: 10px; }
@@ -1174,24 +1170,24 @@ select.input-sm { cursor: pointer; }
 /* ==================== MODAL BUTTONS ==================== */
 .btn-modal-add {
     flex: 1; padding: 12px 20px;
-    background: linear-gradient(135deg, #0b3d91, #08306b);
+    background: linear-gradient(135deg, #1565C0, #08306b);
     color: #fff; border: none; border-radius: var(--radius-sm);
     font-size: 15px; font-weight: 700;
     cursor: pointer; font-family: inherit; min-height: 44px;
     box-shadow: 0 4px 12px rgba(11,61,145,0.25);
     transition: all var(--transition);
 }
-.btn-modal-add:hover { filter: brightness(1.15); box-shadow: 0 6px 16px rgba(11,61,145,0.35); }
+.btn-modal-add:hover { background: linear-gradient(135deg, #3b7bdd, #0b3d91); box-shadow: 0 6px 16px rgba(11,61,145,0.35); }
 
 .btn-modal-cancel {
     flex: 1; padding: 12px 20px;
-    background: rgba(58,58,80,0.6); color: #bbb;
-    border: 1px solid rgba(255,255,255,0.06); border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #6b7280, #434a54); color: #fff;
+    border: none; border-radius: var(--radius-sm);
     font-size: 15px; font-weight: 600;
     cursor: pointer; font-family: inherit; min-height: 44px;
     transition: all var(--transition);
 }
-.btn-modal-cancel:hover { background: rgba(91,100,114,0.9); color: white; }
+.btn-modal-cancel:hover { background: linear-gradient(135deg, #7d8694, #4d5460); color: white; }
 
 /* ==================== FAB BUTTON ==================== */
 .btn-fab {
@@ -2132,10 +2128,10 @@ select.input-sm { cursor: pointer; }
 #page-addcost .aam-body, #page-adddeposit .aam-body { overflow-x: hidden; }
 .aam-save-btn {
     width: 100%; padding: 12px; border-radius: 12px; border: none;
-    background: var(--primary); color: #fff; font-size: 16px; font-weight: 700;
+    background: linear-gradient(135deg, #1565C0, #08306b); color: #fff; font-size: 16px; font-weight: 700;
     cursor: pointer; font-family: inherit;
 }
-.aam-save-btn:hover { filter: brightness(1.15); }
+.aam-save-btn:hover { background: linear-gradient(135deg, #3b7bdd, #0b3d91); }
 
 /* ==================== BAZAR LIST & MANAGER MONEY ==================== */
 .abazar-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; min-height: 56px; color: var(--text); margin: 0; }
@@ -2249,13 +2245,12 @@ select.input-sm { cursor: pointer; }
 
 .abazar-fab {
     position: fixed; bottom: 80px; right: 16px;
-    background: #d32f2f; color: #fff; border: none; border-radius: 16px;
+    background: linear-gradient(135deg, #E53935, #B71C1C); color: #fff; border: none; border-radius: 16px;
     padding: 14px 22px; font-size: 16px; font-weight: 700;
     display: flex; align-items: center; gap: 6px; cursor: pointer;
     box-shadow: 0 4px 12px rgba(229,57,53,.4); font-family: inherit; z-index: 20;
 }
-.abazar-fab .material-icons-round { font-size: 22px; }
-.abazar-fab:hover { filter: brightness(1.12); }
+.abazar-fab:hover { background: linear-gradient(135deg, #F44336, #D32F2F); }
 
 /* Wide screens: keep floating buttons inside the 652px card column.
    Scoped to #app-screen so these beat the base rules regardless of order. */
@@ -2429,11 +2424,11 @@ select.input-sm { cursor: pointer; }
 .anotice-fab {
     position: fixed; bottom: 92px; right: 16px; z-index: 60;
     display: flex; align-items: center; gap: 10px;
-    background: #d32f2f; color: #fff; border: none; border-radius: 22px;
+    background: linear-gradient(135deg, #E53935, #B71C1C); color: #fff; border: none; border-radius: 22px;
     padding: 16px 26px; font-family: inherit; font-size: 20px;
     cursor: pointer; box-shadow: 0 6px 18px rgba(0,0,0,.4);
 }
-.anotice-fab:hover { filter: brightness(1.12); }
+.anotice-fab:hover { background: linear-gradient(135deg, #F44336, #D32F2F); }
 .anotice-fab .material-icons-round { font-size: 26px; }
 
 /* ==================== BAZAR DUTY ROSTER ==================== */
@@ -2887,9 +2882,9 @@ img, canvas { max-width: 100%; }
 .amenu-item-row { padding: 12px; background: #fff; border: 1px solid #eef1f6; border-radius: 10px; margin-bottom: 6px; font-size: 15px; color: #333; }
 .amenu-add-special { display: flex; align-items: center; gap: 4px; padding: 10px 14px; border: 1px dashed #ccc; border-radius: 10px; background: none; font-size: 14px; color: #555; cursor: pointer; width: 100%; font-family: inherit; }
 .amenu-add-special .material-icons-round { font-size: 18px; }
-.amenu-fab { position: fixed; bottom: 24px; right: 16px; background: #FFB300; color: #1a1a1a; border: none; border-radius: 14px; padding: 14px 22px; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,179,0,.4); font-family: inherit; z-index: 20; }
+.amenu-fab { position: fixed; bottom: 24px; right: 16px; background: linear-gradient(135deg, #FFC130, #F39C00); color: #1a1a1a; border: none; border-radius: 14px; padding: 14px 22px; font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 4px 12px rgba(255,179,0,.4); font-family: inherit; z-index: 20; }
 .amenu-fab .material-icons-round { font-size: 22px; }
-.amenu-fab:hover { filter: brightness(1.08); }
+.amenu-fab:hover { background: linear-gradient(135deg, #FFD05C, #FFB300); }
 .amenu-form-row { margin-bottom: 14px; }
 .amenu-form-row label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 4px; }
 .amenu-form-row input { width: 100%; padding: 10px 12px; border: 1px solid #d0d8e4; border-radius: 8px; font-size: 15px; outline: none; box-sizing: border-box; }
@@ -3292,8 +3287,8 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .dep-input::placeholder { color: #666; }
 [data-theme="oled"] .dep-footer-hint { color: #999; }
 [data-theme="oled"] .dep-footer-total { color: #ff6b6b; }
-[data-theme="oled"] .dep-footer-btns .btn-modal-add { background: #3b7bdd; color: #fff; }
-[data-theme="oled"] .dep-footer-btns .btn-modal-cancel { background: #2a2a2a; color: #ccc; }
+[data-theme="oled"] .dep-footer-btns .btn-modal-add { background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; }
+[data-theme="oled"] .dep-footer-btns .btn-modal-cancel { background: linear-gradient(135deg, #3d3d3d, #222); color: #ccc; }
 [data-theme="dark"] .dep-date .material-icons-round { color: #ccc !important; }
 [data-theme="oled"] .dep-date .material-icons-round { color: #ccc !important; }
 /* Add meal page */
@@ -3304,7 +3299,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .aam-section-head { color: #ccc; }
 [data-theme="oled"] .aam-section-head .material-icons-round { color: #999; }
 [data-theme="oled"] .aam-body { background: #0a0a0a; }
-[data-theme="oled"] .aam-save-btn { background: #0b3d91; color: #fff; }
+[data-theme="oled"] .aam-save-btn { background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; }
 [data-theme="oled"] .aam-counter button { background: #2a2a2a; border-color: #2a2a2a; color: #e8ebf1; }
 [data-theme="oled"] .aam-counter button:active { background: #3a3a3a; }
 [data-theme="oled"] .modal-footer { border-color: #1a1a1a; }
@@ -3388,7 +3383,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .ameal-table thead th[data-today] { background: linear-gradient(135deg, #e0e0e0, #ccc) !important; color: #0a0a0a !important; }
 [data-theme="oled"] .ameal-grid-scroll { border-color: #1a1a1a; }
 /* Form elements */
-[data-theme="oled"] .btn-modal-add { background: #0b3d91; color: #fff; }
+[data-theme="oled"] .btn-modal-add { background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; }
 [data-theme="oled"] .bz-overlay { background: rgba(0,0,0,.7); }
 [data-theme="oled"] .bz-overlay-box { background: #0d0d0d; border-color: #1a1a1a; }
 [data-theme="oled"] .aam-overlay { background: rgba(0,0,0,.7); }
