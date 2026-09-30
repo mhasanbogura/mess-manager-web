@@ -1853,7 +1853,7 @@ select.input-sm { cursor: pointer; }
     font-size: 13px; line-height: 1.3; font-family: inherit; color: var(--text);
     cursor: pointer; text-align: left;
 }
-.bz-unit-opt.active { font-weight: 700; color: var(--primary); }
+.bz-unit-opt.active { font-weight: 700; background: #555; color: #fff; }
 .bz-add-more {
     display: flex; align-items: center; gap: 4px;
     margin-top: 8px; background: none; border: none;
@@ -3229,7 +3229,7 @@ img, canvas { max-width: 100%; }
 [data-theme="dark"] .bz-unit-btn, [data-theme="oled"] .bz-unit-btn { color: #fff; background: transparent; }
 [data-theme="dark"] .bz-unit-menu, [data-theme="oled"] .bz-unit-menu { background: #141414; border-color: #333; }
 [data-theme="dark"] .bz-unit-opt, [data-theme="oled"] .bz-unit-opt { color: #fff; }
-[data-theme="dark"] .bz-unit-opt.active, [data-theme="oled"] .bz-unit-opt.active { color: #7aa5ff; }
+[data-theme="dark"] .bz-unit-opt.active, [data-theme="oled"] .bz-unit-opt.active { background: #ccc; color: #111; }
 [data-theme="oled"] .bz-input-wrap .material-icons-round { color: #999; }
 [data-theme="oled"] .bz-input { color: #e8ebf1; }
 [data-theme="oled"] .bz-input::placeholder { color: #666; }
