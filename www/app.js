@@ -1073,7 +1073,7 @@ const App = {
             const arr = [];
             snap.forEach(s => { arr.unshift({ key: s.key, ...s.val() }); });
             div.innerHTML = arr.map(n => {
-                const when = n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+                const when = n.createdAt ? new Date(n.createdAt).toLocaleString('en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) : '';
                 return `<div class="anotice-card">
                     <p>${this.esc(n.body || '')}</p>
                     <div class="anotice-meta">
