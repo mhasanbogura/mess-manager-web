@@ -169,13 +169,13 @@ const App = {
         an_meal_share:'Meal share by member',an_who_ate:'Who ate how much of the',an_meals_count:'meals',
         an_bazar_by_day:'Bazar by day',an_spent_across:'spent across the month',
         an_meals_by_day:'Meals by day',an_meals_across:'meals across the month',
-        an_top10_bazar:'All bazar items by cost',an_items:'items',
+        an_top10_bazar:'Bazar Items by Cost',an_items:'items',
         an_total_utility:'Total utility',an_rent:'Rent',an_other_utility:'Other utility',
         an_util_balance:'Balance',an_collection:'Collection',an_spending:'Spending',
         an_util_credit_hint:'Green = in credit · Red = owes (utility deposit − cost share)',
         an_util_expense_trend:'Expense per utility trend',
         an_util_by_day:'Utility cost by day',an_util_across:'utility cost across the month',
-        an_top10_util:'All utility items by cost',
+        an_top10_util:'Utility Items by Cost',
         // Profile
         prof_title:'Settings',
         prof_general:'GENERAL',
@@ -339,13 +339,13 @@ const App = {
             an_meal_share:'সদস্য অনুযায়ী খাবার অংশ',an_who_ate:'কারা কত খেয়েছে',an_meals_count:'খাবার',
             an_bazar_by_day:'দিন অনুযায়ী বাজার',an_spent_across:'পুরো মাসে খরচ',
             an_meals_by_day:'দিন অনুযায়ী খাবার',an_meals_across:'পুরো মাসে খাবার',
-            an_top10_bazar:'খরচ অনুযায়ী সব বাজার আইটেম',an_items:'আইটেম',
+            an_top10_bazar:'খরচ অনুযায়ী বাজার আইটেম',an_items:'আইটেম',
             an_total_utility:'মোট ইউটিলিটি',an_rent:'ভাড়া',an_other_utility:'অন্যান্য ইউটিলিটি',
             an_util_balance:'ব্যালেন্স',an_collection:'সংগ্রহ',an_spending:'খরচ',
             an_util_credit_hint:'সবুজ = বাকি আছে · লাল = দেনা (ইউটিলিটি জমা − খরচ অংশ)',
             an_util_expense_trend:'প্রতি ইউটিলিটিতে খরচের প্রবণতা',
             an_util_by_day:'দিন অনুযায়ী ইউটিলিটি খরচ',an_util_across:'পুরো মাসে ইউটিলিটি খরচ',
-            an_top10_util:'খরচ অনুযায়ী সব ইউটিলিটি আইটেম',
+            an_top10_util:'খরচ অনুযায়ী ইউটিলিটি আইটেম',
             // Profile
             prof_title:'সেটিংস',
             prof_general:'সাধারণ',
@@ -2640,7 +2640,7 @@ const App = {
                             items.forEach(i => {
                                 const each = i._count ? Math.round((parseFloat(i.cost) || 0) / i._count * 100) / 100 : parseFloat(i.cost) || 0;
                                 html2 += `<div class="abazar-item-row abazar-util-grid" onclick="App.toggleBazarItem(this)">
-                                <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
+                                <span class="abazar-item-name">${this.esc(this.bzDisplayName(i))}</span>
                                 <span class="abazar-item-buyer">${this.esc(i.splitWith || '-')}</span>
                                 <span class="abazar-item-each">৳${this.fmtNum(each)}</span>
                                 <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
@@ -2651,7 +2651,7 @@ const App = {
                                     <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
                                     ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                                 </div>
-                                <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (personal, ${this.esc(i.splitWith || 'N/A')})</div>
+                                <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (personal, ${this.esc(i.splitWith || 'N/A')})</div>
                                 <div class="abazar-item-detail-btns">
                                     <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
                                 </div>
@@ -2665,7 +2665,7 @@ const App = {
                         nonUtilItems.forEach(i => {
                             const buyerName = (members[i.memberId]||{}).name || i.memberId || '-';
                             html2 += `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
-                            <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
+                            <span class="abazar-item-name">${this.esc(this.bzDisplayName(i))}</span>
                             <span class="abazar-item-buyer">${this.esc(buyerName)}</span>
                             <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                         </div>
@@ -2677,13 +2677,13 @@ const App = {
                                 <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
                                 ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                             </div>
-                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
+                            <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
                             ${i.editedBy ? `<div class="abazar-item-detail-info">
                                 <span class="abazar-detail-dot orange"></span>
                                 <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
                                 ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                             </div>
-                            <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
+                            <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
                             <div class="abazar-item-detail-btns">
                                 <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
                                 <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
@@ -2694,7 +2694,7 @@ const App = {
                     })() : dayItems.filter(i => (i.category || 'bazar') !== 'utility').map(i => {
                         const buyerName = (members[i.memberId]||{}).name || i.memberId || '-';
                         return `<div class="abazar-item-row" onclick="App.toggleBazarItem(this)">
-                        <span class="abazar-item-name">${this.esc(i.name || '-')}</span>
+                        <span class="abazar-item-name">${this.esc(this.bzDisplayName(i))}</span>
                         <span class="abazar-item-buyer">${this.esc(buyerName)}</span>
                         <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                     </div>
@@ -2706,13 +2706,13 @@ const App = {
                             <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
                             ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                         </div>
-                        <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
+                        <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
                         ${i.editedBy ? `<div class="abazar-item-detail-info">
                             <span class="abazar-detail-dot orange"></span>
                             <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
                             ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
                         </div>
-                        <div class="abazar-item-detail-row">${this.esc(i.name || '-')} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
+                        <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
                         <div class="abazar-item-detail-btns">
                             <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
                             <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
@@ -2751,15 +2751,26 @@ const App = {
 
     editBazarItem(key, name, cost, memberId, date, category) {
         this._editBzKey = key;
+        const found = (this._allBazar || []).find(([k]) => k === key);
+        const v = found ? found[1] : {};
+        name = v.name ?? name ?? '';
+        cost = v.cost ?? cost ?? 0;
+        memberId = v.memberId ?? memberId ?? '';
+        date = v.date ?? date ?? '';
+        category = v.category ?? category ?? 'bazar';
+        const qty = v.qty ?? '';
+        const unit = v.unit ?? 'kg';
         this._editBzCategory = category;
         const members = this._bazarMembers || {};
         const currentName = (members[memberId] || {}).name || memberId || 'Manager';
         const names = ['Manager', ...Object.entries(members).filter(([id]) => id.startsWith('member_')).map(([, m]) => m.name || 'Unknown').filter(n => n !== 'Manager')];
         const dateVal = date || new Date().toISOString().slice(0,10);
         const isBazar = category === 'bazar';
+        const units = ['kg','g','L','ml','pcs'];
         document.getElementById('modal-title').textContent = 'Edit Expense';
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label>Item name</label><input type="text" id="edit-bz-name" value="${this.esc(name)}"></div>
+            ${isBazar ? `<div class="form-group"><label>Quantity (optional)</label><div style="display:flex;gap:8px"><input type="number" min="0" step="any" id="edit-bz-qty" value="${this.esc(qty)}" placeholder="e.g. 1 / 1.5" style="flex:1"><select id="edit-bz-unit" style="max-width:100px">${units.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('')}<option value="" ${!unit ? 'selected' : ''}>-</option></select></div></div>` : ''}
             <div class="form-group"><label>Money from</label><select id="edit-bz-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
             <div class="form-group"><label>Date</label><input type="date" id="edit-bz-date" value="${dateVal}"></div>
             <div class="form-group"><label>Expense (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>
@@ -2778,11 +2789,15 @@ const App = {
         const memberName = document.getElementById('edit-bz-member').value;
         const date = document.getElementById('edit-bz-date').value;
         const newCategory = document.getElementById('edit-bz-category').value;
+        const qtyEl = document.getElementById('edit-bz-qty');
+        const unitEl = document.getElementById('edit-bz-unit');
+        const qty = qtyEl ? qtyEl.value.trim() : '';
+        const unit = unitEl ? unitEl.value : '';
         if (!name) { this.toast('Enter name', 'error'); return; }
         if (cost <= 0) { this.toast('Enter cost', 'error'); return; }
         const memberId = memberName;
         const userName = this.currentUser?.displayName || 'Unknown';
-        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, cost, memberId, date, category: newCategory, editedBy: userName, editedAt: Date.now() });
+        await db.ref(`messes/${this.messId}/bazarItems/${key}`).update({ name, qty, unit, cost, memberId, date, category: newCategory, editedBy: userName, editedAt: Date.now() });
         this.closeModal();
         this._cacheClearAll();
         this.loadBazarList();
@@ -2976,7 +2991,7 @@ const App = {
         const dateStr = `${now.getDate()} ${now.toLocaleDateString('en-US',{month:'long'})}, ${now.getFullYear()}`;
         this._bzMembers = names;
         this._bzDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-        this._bzItems = [{ name: '', cost: '' }];
+        this._bzItems = [{ name: '', qty: '', unit: 'kg', cost: '' }];
         this._bzMoneyBy = 'Manager';
         this._bzUtilMoneyBy = 'Manager';
         this._bzDoneBy = '';
@@ -3004,6 +3019,7 @@ const App = {
                 <div id="bz-item-rows">
                     <div class="bz-item-row">
                         <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
+                        <div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(0,'qty',this.value)"><select class="bz-unit-select" onchange="App.bzUpdateItem(0,'unit',this.value)"><option value="">-</option><option value="kg" selected>kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="pcs">pcs</option></select></div>
                         <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
@@ -3053,7 +3069,7 @@ const App = {
 
         this._bzMembers = names;
         this._bzDate = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-        this._bzItems = [{ name: '', cost: '' }];
+        this._bzItems = [{ name: '', qty: '', unit: 'kg', cost: '' }];
         this._bzMoneyBy = 'Manager';
         this._bzUtilMoneyBy = 'Manager';
         this._bzDoneBy = '';
@@ -3083,6 +3099,7 @@ const App = {
                 <div id="bz-item-rows">
                     <div class="bz-item-row">
                         <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
+                        <div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(0,'qty',this.value)"><select class="bz-unit-select" onchange="App.bzUpdateItem(0,'unit',this.value)"><option value="">-</option><option value="kg" selected>kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="pcs">pcs</option></select></div>
                         <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
@@ -3163,15 +3180,29 @@ const App = {
         this._bzUtilType = el.dataset.type;
     },
 
+    bzDisplayName(v) {
+        const name = (v.name || '-').trim() || '-';
+        const qty = (v.qty || '').toString().trim();
+        const unit = (v.unit || '').toString().trim();
+        if (qty && unit) return `${name} ${qty}${unit}`;
+        if (qty) return `${name} ${qty}`;
+        return name;
+    },
+
+    bzQtyRowHtml(idx) {
+        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><select class="bz-unit-select" onchange="App.bzUpdateItem(${idx},'unit',this.value)"><option value="">-</option><option value="kg" selected>kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="pcs">pcs</option></select></div>`;
+    },
+
     bzUpdateItem(idx, field, val) { this._bzItems[idx][field] = val; this.bzRenderFooter(); },
 
     bzAddItemRow() {
-        this._bzItems.push({ name: '', cost: '' });
+        this._bzItems.push({ name: '', qty: '', unit: 'kg', cost: '' });
         const div = document.getElementById('bz-item-rows');
         const idx = this._bzItems.length - 1;
         const row = document.createElement('div');
         row.className = 'bz-item-row';
         row.innerHTML = `<div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(${idx},'name',this.value)"></div>
+            ${this.bzQtyRowHtml(idx)}
             <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(${idx},'cost',this.value)"></div>`;
         div.appendChild(row);
     },
@@ -3228,7 +3259,8 @@ const App = {
             if (!this._bzDoneBy) { this.toast('Pick who did the shopping', 'error'); return false; }
             for (const item of items) {
                 await db.ref(`messes/${this.messId}/bazarItems`).push({
-                    name: item.name, cost: parseFloat(item.cost) || 0,
+                    name: (item.name || '').trim(), qty: (item.qty || '').toString().trim(), unit: (item.unit || '').toString().trim(),
+                    cost: parseFloat(item.cost) || 0,
                     memberId: this._bzMoneyBy, doneBy: this._bzDoneBy || '', date: dateKey, category: 'bazar', addedBy: userName, createdAt: Date.now()
                 });
             }
@@ -4202,7 +4234,7 @@ const App = {
                             <div class="am-chart-scroll"><canvas id="am-ml-chart"></canvas></div>
                         </div>
                         ${topMealItems.length ? `<div class="am-card">
-                            <h3>All bazar items by cost</h3>
+                            <h3>Bazar Items by Cost</h3>
                             <p class="am-sub">${topMealItems.length} items</p>
                             <div class="am-top-items">${topMealItems.map((it, i) => {
                                 const pct = it.total / topMealItems[0].total * 100;
@@ -4253,7 +4285,7 @@ const App = {
                             <div class="am-chart-scroll"><canvas id="am-util-bz-chart"></canvas></div>
                         </div>
                         ${topUtilItems.length ? `<div class="am-card">
-                            <h3>All utility items by cost</h3>
+                            <h3>Utility Items by Cost</h3>
                             <p class="am-sub">${topUtilItems.length} items</p>
                             <div class="am-top-items">${topUtilItems.map((it, i) => {
                                 const pct = it.total / topUtilItems[0].total * 100;

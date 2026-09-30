@@ -1824,6 +1824,16 @@ select.input-sm { cursor: pointer; }
 }
 .bz-input::placeholder { color: var(--text); opacity: .45; }
 .bz-cost-wrap { flex: 0.7; }
+.bz-qty-wrap {
+    flex: 0.85; display: flex; align-items: center; gap: 4px;
+    border-bottom: 1px solid #ccc; padding: 5px 0; min-width: 0;
+}
+.bz-qty-input { min-width: 0; width: 100%; }
+.bz-unit-select {
+    border: none; outline: none; background: transparent;
+    font-size: 14px; color: #555; font-family: inherit;
+    max-width: 60px; flex-shrink: 0; cursor: pointer;
+}
 .bz-add-more {
     display: flex; align-items: center; gap: 4px;
     margin-top: 8px; background: none; border: none;
