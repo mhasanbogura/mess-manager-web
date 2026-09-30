@@ -52,7 +52,9 @@ task stampVersion {
 }
 
 project.afterEvaluate {
+    tasks.findByName('stampVersion')?.dependsOn('bumpVersion')
     tasks.findByName('assembleDebug')?.dependsOn('stampVersion')
+    tasks.findByName('mergeDebugAssets')?.dependsOn('stampVersion')
 }
 
 task release {
@@ -64,20 +66,6 @@ task release {
         def v = currentNameMatcher[0][1]
         def b = currentCodeMatcher[0][1] as int
 
-        def newCode = b + 3
-        def parts = v.split('\\.')
-        def major = parts[0] as int
-        def minor = parts.length > 1 ? parts[1] as int : 0
-        def patch = parts.length > 2 ? parts[2] as int : 0
-        patch += 1
-        if (patch > 99) { patch = 0; minor += 1 }
-        if (minor > 99) { minor = 0; major += 1 }
-        def newName = "${major}.${minor}.${patch}"
-        def newContent = content
-            .replaceFirst(/versionCode \d+/, "versionCode ${newCode}")
-            .replaceFirst(/versionName "[\d.]+"/, "versionName \"${newName}\"")
-        versionFile.text = newContent
-
         def apkName = "mess-manager.apk"
         def apkPath = file("${buildDir}/outputs/apk/debug/app-debug.apk")
         def tagName = "v${v}"
@@ -86,7 +74,7 @@ task release {
         def apkStore = "/home/mhasanbogura/Google Drive/mahmudulhasandhk70/Apk Store/Android"
         def storeApkName = "Mess Manager_com.mahmuduls.messmanager_v${v}_build_${b}.apk"
 
-        println "Release v${v} build ${b} (next: v${newName} build ${newCode})..."
+        println "Release v${v} build ${b}..."
 
         exec {
             workingDir rootDir
@@ -142,8 +130,8 @@ android {
         applicationId "com.mahmuduls.messmanager"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 469
-        versionName "1.4.49"
+        versionCode 475
+        versionName "1.4.51"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
