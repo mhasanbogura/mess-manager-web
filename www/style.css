@@ -2372,7 +2372,7 @@ select.input-sm { cursor: pointer; }
 #app-screen.on-notices .main-content { margin-top: 0; padding: 0 24px 72px; background: #fff; }
 #page-notices {
     font-family: 'Times New Roman', serif;
-    background: #fff;
+    background: transparent;
     min-height: calc(100vh - 72px);
     position: relative;
     padding-bottom: 90px;
@@ -2390,6 +2390,7 @@ select.input-sm { cursor: pointer; }
     background: #fff;
     min-height: calc(100vh - 260px);
     padding: 20px 16px; margin: 0 12px;
+    border-radius: 14px; border: 1px solid var(--card-border);
 }
 .anotice-empty {
     text-align: center; padding: 90px 30px 40px;
@@ -2626,7 +2627,7 @@ img, canvas { max-width: 100%; }
 .aflat-tab.active { background: linear-gradient(135deg, #555, #333); color: #fff; }
 .aflat-tab.active::after { display: none; }
 
-.aflat-tab-content { padding: 12px; }
+.aflat-tab-content { padding: 12px 0; }
 .aflat-info-box {
     display: flex; gap: 10px; padding: 14px; border-radius: 14px;
     font-size: 13px; line-height: 1.5; margin-bottom: 14px;
