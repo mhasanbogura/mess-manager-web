@@ -184,7 +184,7 @@ const App = {
         prof_language:'Language',prof_lang_desc:'Choose your preferred language',
         prof_account:'ACCOUNT',prof_leave_mess:'Leave Mess',prof_logout:'Log out',prof_reset_pwd:'Reset password',prof_delete:'Delete account',
         prof_more:'MORE',prof_share_app:'Share App',prof_about:'About App',prof_contact:'Contact Developer',
-        prof_version:'Version 1.4.59 (build 499)',
+        prof_version:'Version 1.4.60 (build 502)',
         // Duty editor
         de_assign_dates:'Assign dates',de_yours:'yours',de_taken:'taken (tap to take over)',de_done:'Done',
         // Select Month
@@ -354,7 +354,7 @@ const App = {
             prof_language:'ভাষা',prof_lang_desc:'আপনার পছন্দের ভাষা নির্বাচন করুন',
             prof_account:'অ্যাকাউন্ট',prof_leave_mess:'মেস ছাড়ুন',prof_logout:'লগ আউট',prof_reset_pwd:'পাসওয়ার্ড রিসেট',prof_delete:'অ্যাকাউন্ট মুছুন',
             prof_more:'আরও',prof_share_app:'অ্যাপ শেয়ার',prof_about:'অ্যাপ সম্পর্কে',prof_contact:'ডেভেলপারের সাথে যোগাযোগ',
-            prof_version:'ভার্সন 1.4.59 (বিল্ড 499)',
+            prof_version:'ভার্সন 1.4.60 (বিল্ড 502)',
             // Duty editor
             de_assign_dates:'তারিখ নির্ধারণ',de_yours:'আপনার',de_taken:'নেওয়া হয়েছে (ক্লিক করে নিন)',de_done:'সম্পন্ন',
             // Select Month
@@ -3042,10 +3042,10 @@ const App = {
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
                 <div class="dep-label">Expense from:</div>
-                <select id="bz-util-money-by" class="bz-util-money-select" onchange="App._bzUtilMoneyBy=this.value">
+                <div class="bz-util-money-wrap"><select id="bz-util-money-by" class="bz-util-money-select" onchange="App._bzUtilMoneyBy=this.value">
                     <option value="Manager" selected>Manager</option>
                     ${names.map(n => `<option value="${n}">${n}</option>`).join('')}
-                </select>
+                </select><span class="material-icons-round">expand_more</span></div>
                 <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
@@ -3122,10 +3122,10 @@ const App = {
                 </div>
                 <div class="dep-input-wrap" style="margin:6px 0"><span style="font-size:20px;font-weight:700">৳</span><input class="bz-input" type="number" placeholder="Total bill amount" oninput="App._bzUtilAmount=this.value;App.bzRenderFooter()"></div>
                 <div class="dep-label">Expense from:</div>
-                <select id="bz-util-money-by" class="bz-util-money-select" onchange="App._bzUtilMoneyBy=this.value">
+                <div class="bz-util-money-wrap"><select id="bz-util-money-by" class="bz-util-money-select" onchange="App._bzUtilMoneyBy=this.value">
                     <option value="Manager" selected>Manager</option>
                     ${names.map(n => `<option value="${n}">${n}</option>`).join('')}
-                </select>
+                </select><span class="material-icons-round">expand_more</span></div>
                 <div class="dep-label" style="margin-top:6px">Divided to:</div>
                 <div class="bz-util-members">
                     <div class="bz-util-selectall" onclick="App.bzToggleAll()">
