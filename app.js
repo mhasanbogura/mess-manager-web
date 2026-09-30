@@ -3199,25 +3199,32 @@ const App = {
     bzToggleUnit(idx) {
         const menu = document.getElementById(`bz-unit-menu-${idx}`);
         const btn = document.getElementById(`bz-unit-btn-${idx}`);
-        if (!menu) return;
+        if (!menu || !btn) return;
         const isOpen = menu.style.display !== 'none';
-        document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
+        const closeMenus = () => document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
+        closeMenus();
         if (!isOpen) {
             menu.style.display = 'flex';
-            menu.classList.remove('open-up');
-            const r = btn ? btn.getBoundingClientRect() : null;
+            menu.style.position = 'fixed';
+            menu.style.right = 'auto';
+            menu.style.bottom = 'auto';
+            menu.style.zIndex = '500';
+            const r = btn.getBoundingClientRect();
+            const menuW = menu.offsetWidth || 80;
             const menuH = menu.offsetHeight || 160;
-            if (r && (window.innerHeight - r.bottom) < (menuH + 8) && r.top > (menuH + 8)) {
-                menu.classList.add('open-up');
-            }
+            const openUp = (window.innerHeight - r.bottom) < (menuH + 8) && r.top > (menuH + 8);
+            menu.style.top = (openUp ? Math.max(8, r.top - menuH - 4) : (r.bottom + 4)) + 'px';
+            menu.style.left = Math.max(8, Math.min(r.right - menuW, window.innerWidth - menuW - 8)) + 'px';
         }
         if (!this._bzUnitOutsideBound) {
             this._bzUnitOutsideBound = true;
             document.addEventListener('click', (e) => {
                 if (!e.target || !e.target.closest || !e.target.closest('.bz-unit-picker')) {
-                    document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
+                    closeMenus();
                 }
             });
+            document.addEventListener('scroll', closeMenus, true);
+            window.addEventListener('resize', closeMenus);
         }
     },
 
