@@ -3198,10 +3198,19 @@ const App = {
 
     bzToggleUnit(idx) {
         const menu = document.getElementById(`bz-unit-menu-${idx}`);
+        const btn = document.getElementById(`bz-unit-btn-${idx}`);
         if (!menu) return;
         const isOpen = menu.style.display !== 'none';
         document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
-        menu.style.display = isOpen ? 'none' : 'flex';
+        if (!isOpen) {
+            menu.style.display = 'flex';
+            menu.classList.remove('open-up');
+            const r = btn ? btn.getBoundingClientRect() : null;
+            const menuH = menu.offsetHeight || 160;
+            if (r && (window.innerHeight - r.bottom) < (menuH + 8) && r.top > (menuH + 8)) {
+                menu.classList.add('open-up');
+            }
+        }
         if (!this._bzUnitOutsideBound) {
             this._bzUnitOutsideBound = true;
             document.addEventListener('click', (e) => {
