@@ -3440,6 +3440,9 @@ img, canvas { max-width: 100%; }
 /* Phones: uniform 12px gutters on every page. */
 @media (max-width: 767px) {
     #app-screen[class] .main-content { padding-left: 12px; padding-right: 12px; }
+    .bz-item-row > .bz-input-wrap { flex: 2.5 1 0%; }
+    .bz-item-row > .bz-qty-wrap { flex: 1.5 1 0%; }
+    .bz-item-row > .bz-cost-wrap { flex: 2 1 0%; }
     .bottom-nav { left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); border-radius: 16px; border: 1px solid var(--glass-border); }
     .abazar-fab, .anotice-fab, .amenu-fab { left: 16px; right: 16px; bottom: 84px; border-radius: 14px; justify-content: center; padding: 14px; }
     #app-screen .aam-footer { bottom: 84px; }
