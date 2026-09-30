@@ -1830,7 +1830,7 @@ select.input-sm { cursor: pointer; }
 .bz-qty-wrap {
     flex: 0.85; gap: 4px; min-width: 0;
 }
-.bz-qty-input { min-width: 0; width: 100%; }
+.bz-qty-input { min-width: 0; width: auto; flex: 1 1 0%; }
 .bz-unit-picker { position: relative; flex-shrink: 0; }
 .bz-unit-btn {
     display: flex; align-items: center; gap: 0;
