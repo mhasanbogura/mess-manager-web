@@ -2659,10 +2659,11 @@ img, canvas { max-width: 100%; }
 .aflat-clear-btn { background: none; border: none; color: #999; cursor: pointer; display: flex; padding: 4px; }
 .aflat-clear-btn .material-icons-round { font-size: 20px; }
 .aflat-add-btn {
-    background: var(--primary); color: #fff; border: none; border-radius: 12px;
+    background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; border: none; border-radius: 12px;
     padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer;
     font-family: inherit; letter-spacing: .5px;
 }
+.aflat-add-btn:hover, .aflat-add-btn:active { background: linear-gradient(135deg, #6aa5f5, #1565C0); }
 .aflat-hint { font-size: 12px; color: #999; margin-top: 6px; display: flex; justify-content: space-between; }
 .aflat-divider { height: 1px; background: #e0ddd5; margin: 14px 0; }
 .aflat-total { font-size: 15px; font-weight: 700; color: #1a1a1a; margin-bottom: 10px; }
@@ -3265,6 +3266,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .bz-tab.active .material-icons-round { color: #0a0a0a; }
 [data-theme="oled"] .bz-input-wrap, [data-theme="oled"] .bz-qty-wrap { background: transparent; border-color: #333; }
 [data-theme="dark"] .bz-unit-btn, [data-theme="oled"] .bz-unit-btn { color: #fff; background: transparent; }
+[data-theme="dark"] .aflat-input-wrap, [data-theme="oled"] .aflat-input-wrap { background: transparent; border: none; border-bottom: 1px solid #333; border-radius: 0; padding-left: 2px; padding-right: 2px; }
 [data-theme="dark"] .bz-unit-menu, [data-theme="oled"] .bz-unit-menu { background: #141414; border-color: #333; }
 [data-theme="dark"] .bz-unit-opt, [data-theme="oled"] .bz-unit-opt { color: #fff; }
 [data-theme="dark"] .bz-unit-opt.active, [data-theme="oled"] .bz-unit-opt.active { background: #ccc; color: #111; }
