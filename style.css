@@ -3421,17 +3421,15 @@ img, canvas { max-width: 100%; }
 [data-lang="bn"] h3, [data-lang="bn"] h4, [data-lang="bn"] p,
 [data-lang="bn"] .dash-mess-name, [data-lang="bn"] .dash-date-text { font-family: 'Kalpurush', 'Noto Sans Bengali', serif; }
 
-/* Wide screens: every card spans the full column width, no exceptions. */
-@media (min-width: 768px) {
-    .adash-table-wrap, .ameal-month-row, .abazar-month-row,
-    .abazar-filters, .anotice-board { margin-left: 0; margin-right: 0; }
-    .abazar-member-filter { margin-left: 0; margin-right: 0; }
-    .aprof-card { margin-left: 0; margin-right: 0; }
-    .adash-join-card, .adash-notice, .adash-today,
-    .adash-finance-card, .amealhist-card, .aduty-banner,
-    .aduty-card, .aduty-member, .aflat-tabs,
-    .aflat-card, .adash-mess-card { margin-left: 0; margin-right: 0; }
-}
+/* Every card spans the full column width on all screens, no exceptions. */
+.adash-table-wrap, .ameal-month-row, .abazar-month-row,
+.abazar-filters, .anotice-board { margin-left: 0; margin-right: 0; }
+.abazar-member-filter { margin-left: 0; margin-right: 0; }
+.aprof-card { margin-left: 0; margin-right: 0; }
+.adash-join-card, .adash-notice, .adash-today,
+.adash-finance-card, .amealhist-card, .aduty-banner,
+.aduty-card, .aduty-member, .aflat-tabs,
+.aflat-card, .adash-mess-card { margin-left: 0; margin-right: 0; }
 
 /* Inner page bodies never add side gutters; the main column owns them. */
 .aam-body, .abn-body, .amenu-body, .am-body { padding-left: 0; padding-right: 0; }
@@ -3448,6 +3446,7 @@ img, canvas { max-width: 100%; }
     .bz-item-row > .bz-qty-wrap { flex: 1.5 1 0%; }
     .bz-item-row > .bz-cost-wrap { flex: 2 1 0%; }
     .bottom-nav { left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); border-radius: 16px; border: 1px solid var(--glass-border); }
-    .abazar-fab, .anotice-fab, .amenu-fab { left: 16px; right: 16px; bottom: 84px; border-radius: 14px; justify-content: center; padding: 14px; }
-    #app-screen .aam-footer { bottom: 84px; }
+    .abazar-fab, .anotice-fab, .amenu-fab { left: 12px; right: 12px; bottom: 84px; border-radius: 14px; justify-content: center; padding: 14px; }
+    #app-screen .aam-footer { left: 12px; right: 12px; bottom: 84px; background: transparent; padding: 0; }
+    #app-screen .abn-bottom { left: 12px; right: 12px; bottom: 12px; border-radius: 16px; border: 1px solid var(--border); }
 }
