@@ -815,8 +815,8 @@ select.input-sm { cursor: pointer; }
 .dialog-actions .btn.secondary:hover { background: linear-gradient(135deg, #b6bdc7, #6b7280); }
 .dialog-actions .btn.danger { background: linear-gradient(135deg, #F44336, #D32F2F); color: #fff; }
 .dialog-actions .btn.danger:hover { background: linear-gradient(135deg, #FF7A70, #E53935); }
-#confirm-yes:hover { background: linear-gradient(135deg, #FF7A70, #E53935); }
-#confirm-no:hover { background: linear-gradient(135deg, #b6bdc7, #6b7280); }
+#confirm-yes:hover { background: linear-gradient(135deg, #FF7A70, #E53935) !important; }
+#confirm-no:hover { background: linear-gradient(135deg, #b6bdc7, #6b7280) !important; }
 
 .modal-footer {
     padding: 14px 18px;
@@ -3292,7 +3292,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .dep-input::placeholder { color: #666; }
 [data-theme="oled"] .dep-footer-hint { color: #999; }
 [data-theme="oled"] .dep-footer-total { color: #ff6b6b; }
-[data-theme="oled"] .dep-footer-btns .btn-modal-add { background: linear-gradient(135deg, #6aa5f5, #1565C0); color: #fff; }
+[data-theme="oled"] .dep-footer-btns .btn-modal-add { background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; }
 [data-theme="oled"] .dep-footer-btns .btn-modal-cancel { background: linear-gradient(135deg, #3d3d3d, #222); color: #ccc; }
 [data-theme="dark"] .dep-date .material-icons-round { color: #ccc !important; }
 [data-theme="oled"] .dep-date .material-icons-round { color: #ccc !important; }
@@ -3304,7 +3304,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .aam-section-head { color: #ccc; }
 [data-theme="oled"] .aam-section-head .material-icons-round { color: #999; }
 [data-theme="oled"] .aam-body { background: #0a0a0a; }
-[data-theme="oled"] .aam-save-btn { background: linear-gradient(135deg, #6aa5f5, #1565C0); color: #fff; }
+[data-theme="oled"] .aam-save-btn { background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; }
 [data-theme="oled"] .aam-counter button { background: #2a2a2a; border-color: #2a2a2a; color: #e8ebf1; }
 [data-theme="oled"] .aam-counter button:active { background: #3a3a3a; }
 [data-theme="oled"] .modal-footer { border-color: #1a1a1a; }
@@ -3388,7 +3388,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .ameal-table thead th[data-today] { background: linear-gradient(135deg, #e0e0e0, #ccc) !important; color: #0a0a0a !important; }
 [data-theme="oled"] .ameal-grid-scroll { border-color: #1a1a1a; }
 /* Form elements */
-[data-theme="oled"] .btn-modal-add { background: linear-gradient(135deg, #6aa5f5, #1565C0); color: #fff; }
+[data-theme="oled"] .btn-modal-add { background: linear-gradient(135deg, #3b7bdd, #0b3d91); color: #fff; }
 [data-theme="oled"] .bz-overlay { background: rgba(0,0,0,.7); }
 [data-theme="oled"] .bz-overlay-box { background: #0d0d0d; border-color: #1a1a1a; }
 [data-theme="oled"] .aam-overlay { background: rgba(0,0,0,.7); }
