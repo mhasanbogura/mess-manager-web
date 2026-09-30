@@ -1813,7 +1813,7 @@ select.input-sm { cursor: pointer; }
 .bz-chip.active { background: linear-gradient(135deg, #555, #333); border-color: #555; color: #fff; font-weight: 600; }
 .bz-chip .material-icons-round { font-size: 16px; color: inherit; }
 .bz-item-row {
-    display: flex; gap: 10px; margin-top: 8px;
+    display: flex; gap: 6px; margin-top: 8px;
 }
 .bz-input-wrap, .bz-qty-wrap {
     flex: 1; display: flex; align-items: center; gap: 6px;
@@ -1822,7 +1822,7 @@ select.input-sm { cursor: pointer; }
 }
 .bz-input-wrap .material-icons-round { font-size: 20px; color: #777; flex-shrink: 0; }
 .bz-input {
-    flex: 1; border: none; outline: none; font-size: 16px;
+    flex: 1; min-width: 0; border: none; outline: none; font-size: 16px;
     font-family: 'Times New Roman', serif; color: #333; background: transparent;
 }
 .bz-input::placeholder { color: var(--text); opacity: .45; }
@@ -1853,6 +1853,12 @@ select.input-sm { cursor: pointer; }
     cursor: pointer; text-align: left;
 }
 .bz-unit-opt.active { font-weight: 700; background: #555; color: #fff; }
+@media (max-width: 380px) {
+    .bz-item-row { gap: 4px; }
+    .bz-input { font-size: 14px; }
+    .bz-unit-btn { font-size: 13px; padding-left: 2px; }
+    .bz-input-wrap .material-icons-round { font-size: 18px; }
+}
 .bz-add-more {
     display: flex; align-items: center; gap: 4px;
     margin-top: 8px; background: none; border: none;
