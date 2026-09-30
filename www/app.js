@@ -3201,7 +3201,7 @@ const App = {
         const cur = (this._bzItems[idx] && this._bzItems[idx].unit) ?? 'kg';
         const units = ['', 'kg', 'g', 'L', 'ml', 'pcs'];
         const opts = units.map(u => `<button type="button" class="bz-unit-opt${u === cur ? ' active' : ''}" data-unit="${u}" onclick="App.bzPickUnit(${idx},'${u}')">${u || '-'}</button>`).join('');
-        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><div class="bz-unit-picker"><button type="button" class="bz-unit-btn" id="bz-unit-btn-${idx}" onclick="App.bzToggleUnit(${idx})">${this.esc(cur || '-')}<span class="material-icons-round">expand_more</span></button><div class="bz-unit-menu" id="bz-unit-menu-${idx}" style="display:none">${opts}</div></div></div>`;
+        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Quantity" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><div class="bz-unit-picker"><button type="button" class="bz-unit-btn" id="bz-unit-btn-${idx}" onclick="App.bzToggleUnit(${idx})">${this.esc(cur || '-')}<span class="material-icons-round">expand_more</span></button><div class="bz-unit-menu" id="bz-unit-menu-${idx}" style="display:none">${opts}</div></div></div>`;
     },
 
     bzToggleUnit(idx) {
