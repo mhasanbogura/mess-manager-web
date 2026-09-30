@@ -80,9 +80,9 @@ const App = {
         dash_notice_preview:'Pin a notice for the whole house',dash_today:'Today is',dash_breakfast:'Breakfast',dash_lunch:'Lunch',dash_dinner:'Dinner',
         dash_meal:'Meal',dash_deposit:'Deposit',dash_balance:'Balance',dash_expense_per_meal:'Expense per meal',
         dash_utility:'Utility',dash_expense_per_utility:'Expense per utility',dash_analyse:'Analyse',
-        dash_meal_summary:'Meal Summary',dash_util_others:'Utility & Others',
+        dash_meal_summary:'Meal Summary',dash_util_others:'Rent, Utilities & Others',
         dash_table_name:'Name',dash_table_total:'Total',dash_table_expense:'Expense(৳)',dash_table_deposit:'Deposit(৳)',dash_table_balance:'Balance(৳)',
-        dash_table_rent:'Rent(৳)',dash_table_util_others:'Utility & Others(৳)',
+        dash_table_rent:'Rent(৳)',dash_table_util_others:'Rent, Utilities & Others(৳)',
         dash_no_data:'No data',
         // Expense Today
         dt_title:'Expense Today',dt_banner:'Expense today',dt_nobody:'Nobody assigned',
@@ -115,17 +115,17 @@ const App = {
         mr_meals:'meal(s)',mr_removed:'Removed',mr_added:'Added',mr_error:'Error loading',
         // Expense List
         el_title:'Expense List',el_current_month:'Current Month:',
-        el_tab_meal:'Meal',el_tab_utility:'Utility & Others',el_add:'Add',
+        el_tab_meal:'Meal',el_tab_utility:'Rent, Utilities & Others',el_add:'Add',
         el_no_items:'No cost items this month',el_item:'ITEM',el_money_from:'MONEY FROM',el_total:'TOTAL',
         el_divided_to:'MEMBER',el_each:'EACH',el_delete:'Delete',el_edit:'Edit',
         el_each_label:'each',el_members:'member(s)',
         // Money Management
         mm2_title:'Money Management',mm2_current_month:'Current Month:',
-        mm2_tab_meal:'Meal',mm2_tab_utility:'Utility & Others',mm2_add:'Add',
+        mm2_tab_meal:'Meal',mm2_tab_utility:'Rent, Utilities & Others',mm2_add:'Add',
         mm2_no_deposits:'No deposits this month',mm2_money_from:'MONEY FROM',mm2_amount:'AMOUNT',
         mm2_delete:'Delete',mm2_edit:'Edit',
         // Add Expense
-        ae_title:'Add Expense',ae_tab_meal:'Meal',ae_tab_utility:'Utility & Others',
+        ae_title:'Add Expense',ae_tab_meal:'Meal',ae_tab_utility:'Rent, Utilities & Others',
         ae_money_from:'Money from:',ae_manager:'Manager',ae_done_by:'Done by:',
         ae_item_name:'Item name',ae_expense:'Expense',ae_add_another:'Add another item',
         ae_hint:'Add each item on its own line. The Analysis page can then show which items cost you the most.',
@@ -133,12 +133,12 @@ const App = {
         ae_total_bill:'Total bill amount',ae_expense_from:'Expense from:',ae_divided_to:'Divided to:',
         ae_select_all:'Select all',ae_selected:'selected',ae_footer_hint:'total',
         // Add Deposit
-        ad_title:'Add Deposit',ad_tab_meal:'Meal',ad_tab_utility:'Utility & Others',
+        ad_title:'Add Deposit',ad_tab_meal:'Meal',ad_tab_utility:'Rent, Utilities & Others',
         ad_money_from:'Money from:',ad_amount:'Enter Amount',
         // Deleted Expenses
         de_title:'Deleted Expenses',de_current_month:'Current Month:',de_loading:'Loading...',
         de_no_items:'No deleted costs this month',de_deleted_by:'Deleted by:',
-        de_utility:'Utility & Others',de_meal:'Meal',
+        de_utility:'Rent, Utilities & Others',de_meal:'Meal',
         de_expense:'Expense:',de_orig_added_by:'Originally added by:',de_error:'Error loading',
         // Deleted Transactions
         dt2_title:'Deleted Transactions',dt2_loading:'Loading...',
@@ -251,9 +251,9 @@ const App = {
             dash_notice_preview:'পুরো বাড়ির জন্য একটি নোটিশ দিন',dash_today:'আজ',dash_breakfast:'সকালের নাস্তা',dash_lunch:'দুপুরের খাবার',dash_dinner:'রাতের খাবার',
             dash_meal:'খাবার',dash_deposit:'জমা',dash_balance:'ব্যালেন্স',dash_expense_per_meal:'প্রতি খাবারে খরচ',
             dash_utility:'ইউটিলিটি',dash_expense_per_utility:'প্রতি ইউটিলিটিতে খরচ',dash_analyse:'বিশ্লেষণ',
-            dash_meal_summary:'খাবার সারসংক্ষেপ',dash_util_others:'ইউটিলিটি ও অন্যান্য',
+            dash_meal_summary:'খাবার সারসংক্ষেপ',dash_util_others:'ভাড়া, ইউটিলিটি ও অন্যান্য',
             dash_table_name:'নাম',dash_table_total:'মোট',dash_table_expense:'খরচ(৳)',dash_table_deposit:'জমা(৳)',dash_table_balance:'ব্যালেন্স(৳)',
-            dash_table_rent:'ভাড়া(৳)',dash_table_util_others:'ইউটিলিটি ও অন্যান্য(৳)',dash_no_data:'কোনো তথ্য নেই',
+            dash_table_rent:'ভাড়া(৳)',dash_table_util_others:'ভাড়া, ইউটিলিটি ও অন্যান্য(৳)',dash_no_data:'কোনো তথ্য নেই',
             // Expense Today
             dt_title:'আজকের খরচ',dt_banner:'আজকের খরচ',dt_nobody:'কেউ নিয়োগ করা হয়নি',
             dt_unassigned:'নিয়োগবিহীন তারিখ',dt_all_assigned:'সব তারিখ নিয়োগ করা হয়েছে',dt_day:'দিন',
@@ -285,17 +285,17 @@ const App = {
             mr_meals:'খাবার',mr_removed:'সরানো হয়েছে',mr_added:'যোগ হয়েছে',mr_error:'লোড হচ্ছে না',
             // Expense List
             el_title:'খরচ তালিকা',el_current_month:'বর্তমান মাস:',
-            el_tab_meal:'খাবার',el_tab_utility:'ইউটিলিটি ও অন্যান্য',el_add:'যোগ',
+            el_tab_meal:'খাবার',el_tab_utility:'ভাড়া, ইউটিলিটি ও অন্যান্য',el_add:'যোগ',
             el_no_items:'এই মাসে কোনো খরচ নেই',el_item:'আইটেম',el_money_from:'টাকা দিয়েছে',el_total:'মোট',
             el_divided_to:'ভাগ করা হয়েছে',el_each:'প্রতি',el_delete:'মুছুন',el_edit:'সম্পাদনা',
             el_each_label:'প্রতি',el_members:'সদস্য',
             // Money Management
             mm2_title:'টাকা ব্যবস্থাপনা',mm2_current_month:'বর্তমান মাস:',
-            mm2_tab_meal:'খাবার',mm2_tab_utility:'ইউটিলিটি ও অন্যান্য',mm2_add:'যোগ',
+            mm2_tab_meal:'খাবার',mm2_tab_utility:'ভাড়া, ইউটিলিটি ও অন্যান্য',mm2_add:'যোগ',
             mm2_no_deposits:'এই মাসে কোনো জমা নেই',mm2_money_from:'টাকা দিয়েছে',mm2_amount:'পরিমাণ',
             mm2_delete:'মুছুন',mm2_edit:'সম্পাদনা',
             // Add Expense
-            ae_title:'খরচ যোগ',ae_tab_meal:'খাবার',ae_tab_utility:'ইউটিলিটি ও অন্যান্য',
+            ae_title:'খরচ যোগ',ae_tab_meal:'খাবার',ae_tab_utility:'ভাড়া, ইউটিলিটি ও অন্যান্য',
             ae_money_from:'টাকা দিয়েছে:',ae_manager:'ম্যানেজার',ae_done_by:'করেছে:',
             ae_item_name:'আইটেমের নাম',ae_expense:'খরচ',ae_add_another:'আরেকটি আইটেম যোগ',
             ae_hint:'প্রতিটি আইটেম আলাদা লাইনে যোগ করুন। বিশ্লেষণ পৃষ্ঠায় দেখা যাবে কোন আইটেম সবচেয়ে বেশি খরচ হয়েছে।',
@@ -303,12 +303,12 @@ const App = {
             ae_total_bill:'মোট বিল',ae_expense_from:'খরচ থেকে:',ae_divided_to:'ভাগ করা হয়েছে:',
             ae_select_all:'সব নির্বাচন',ae_selected:'নির্বাচিত',ae_footer_hint:'মোট',
             // Add Deposit
-            ad_title:'জমা যোগ',ad_tab_meal:'খাবার',ad_tab_utility:'ইউটিলিটি ও অন্যান্য',
+            ad_title:'জমা যোগ',ad_tab_meal:'খাবার',ad_tab_utility:'ভাড়া, ইউটিলিটি ও অন্যান্য',
             ad_money_from:'টাকা দিয়েছে:',ad_amount:'পরিমাণ লিখুন',
             // Deleted Expenses
             de_title:'মুছে ফেলা খরচ',de_current_month:'বর্তমান মাস:',de_loading:'লোড হচ্ছে...',
             de_no_items:'এই মাসে কোনো মুছে ফেলা খরচ নেই',de_deleted_by:'মুছে ফেলেছে:',
-            de_utility:'ইউটিলিটি ও অন্যান্য',de_meal:'খাবার',
+            de_utility:'ভাড়া, ইউটিলিটি ও অন্যান্য',de_meal:'খাবার',
             de_expense:'খরচ:',de_orig_added_by:'মূলত যোগ করেছে:',de_error:'লোড হচ্ছে না',
             // Deleted Transactions
             dt2_title:'মুছে ফেলা লেনদেন',dt2_loading:'লোড হচ্ছে...',
@@ -2385,7 +2385,7 @@ const App = {
                 const d = new Date(v.deletedAt || 0);
                 const dateStr = d.toLocaleString('en', { day: 'numeric', month: 'short', year: 'numeric' });
                 const timeStr = d.toLocaleString('en', { hour: 'numeric', minute: '2-digit', hour12: true });
-                const catLabel = v.category === 'utility' ? 'Utility & Others' : 'Meal';
+                const catLabel = v.category === 'utility' ? 'Rent, Utilities & Others' : 'Meal';
                 const catColor = v.category === 'utility' ? '#7B1FA2' : '#0b3d91';
                 html += `<div class="amealhist-card" onclick="this.classList.toggle('expanded')">
                     <div class="amealhist-row">
@@ -2437,7 +2437,7 @@ const App = {
                 const timeStr = d.toLocaleString('en', { hour: 'numeric', minute: '2-digit', hour12: true });
                 const members = this._depMembers || {};
                 const memberName = (members[v.memberId] || {}).name || v.memberId || '?';
-                const catLabel = v.category === 'utility' ? 'Utility & Others' : 'Meal';
+                const catLabel = v.category === 'utility' ? 'Rent, Utilities & Others' : 'Meal';
                 const catColor = v.category === 'utility' ? '#7B1FA2' : '#0b3d91';
                 html += `<div class="amealhist-card" onclick="this.classList.toggle('expanded')">
                     <div class="amealhist-row">
@@ -2774,7 +2774,7 @@ const App = {
             <div class="form-group"><label>Money from</label><select id="edit-bz-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
             <div class="form-group"><label>Date</label><input type="date" id="edit-bz-date" value="${dateVal}"></div>
             <div class="form-group"><label>Expense (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>
-            <div class="form-group"><label>Type</label><select id="edit-bz-category"><option value="bazar" ${isBazar?'selected':''}>Meal</option><option value="utility" ${!isBazar?'selected':''}>Utility & Others</option></select></div>`;
+            <div class="form-group"><label>Type</label><select id="edit-bz-category"><option value="bazar" ${isBazar?'selected':''}>Meal</option><option value="utility" ${!isBazar?'selected':''}>Rent, Utilities & Others</option></select></div>`;
         document.getElementById('modal-footer').innerHTML = `
             <div class="dep-footer-btns">
                 <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
@@ -3002,7 +3002,7 @@ const App = {
         document.getElementById('addcost-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 8px">
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">restaurant</span> Meal</button>
-                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="bz-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
@@ -3082,7 +3082,7 @@ const App = {
         document.getElementById('modal-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 12px">
                 <button class="bz-tab active" data-tab="bazar" onclick="App.bzSwitchTab('bazar')"><span class="material-icons-round">restaurant</span> Meal</button>
-                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="bz-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
@@ -3322,7 +3322,7 @@ const App = {
         document.getElementById('adddeposit-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 8px">
                 <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
-                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
             </div>
             <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money from:</div>
@@ -3361,7 +3361,7 @@ const App = {
         document.getElementById('modal-body').innerHTML = `
             <div class="bz-tabs" style="padding:0 0 12px">
                 <button class="bz-tab active" data-tab="meal" onclick="App.depSwitchTab('meal')"><span class="material-icons-round">restaurant</span> Meal</button>
-                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Utility & Others</button>
+                <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
             </div>
             <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money from:</div>
