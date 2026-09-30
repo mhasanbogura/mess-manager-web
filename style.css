@@ -3258,6 +3258,8 @@ img, canvas { max-width: 100%; }
 [data-theme="dark"] .bz-unit-opt, [data-theme="oled"] .bz-unit-opt { color: #fff; }
 [data-theme="dark"] .bz-unit-opt.active, [data-theme="oled"] .bz-unit-opt.active { background: #ccc; color: #111; }
 [data-theme="oled"] .bz-input-wrap .material-icons-round { color: #999; }
+[data-theme="dark"] .flat-add-row input, [data-theme="oled"] .flat-add-row input { background: transparent; border: none; border-bottom: 1px solid #333; border-radius: 0; padding-left: 2px; padding-right: 2px; }
+[data-theme="dark"] .flat-add-row input:focus, [data-theme="oled"] .flat-add-row input:focus { box-shadow: none; border-bottom-color: #888; }
 [data-theme="oled"] .bz-input { color: #e8ebf1; }
 [data-theme="oled"] .bz-input::placeholder { color: #666; }
 [data-theme="oled"] .bz-add-more { color: #999; }
