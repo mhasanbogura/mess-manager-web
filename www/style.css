@@ -3266,7 +3266,9 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .bz-tab.active .material-icons-round { color: #0a0a0a; }
 [data-theme="oled"] .bz-input-wrap, [data-theme="oled"] .bz-qty-wrap { background: transparent; border-color: #333; }
 [data-theme="dark"] .bz-unit-btn, [data-theme="oled"] .bz-unit-btn { color: #fff; background: transparent; }
-[data-theme="dark"] .aflat-input-wrap, [data-theme="oled"] .aflat-input-wrap { background: transparent; border: 1.5px solid #333; }
+[data-theme="dark"] .aflat-input-wrap { background: transparent; border: 1.5px solid #333; }
+[data-theme="oled"] .aflat-input-wrap { background: #0d0d0d; border: 1.5px solid #1a1a1a; }
+[data-theme="oled"] .aflat-input-wrap input { background: #0d0d0d !important; border-color: transparent !important; }
 [data-theme="dark"] .bz-unit-menu, [data-theme="oled"] .bz-unit-menu { background: #141414; border-color: #333; }
 [data-theme="dark"] .bz-unit-opt, [data-theme="oled"] .bz-unit-opt { color: #fff; }
 [data-theme="dark"] .bz-unit-opt.active, [data-theme="oled"] .bz-unit-opt.active { background: #ccc; color: #111; }
