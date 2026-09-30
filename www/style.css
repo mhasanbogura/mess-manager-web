@@ -1573,6 +1573,7 @@ select.input-sm { cursor: pointer; }
     cursor: pointer;
 }
 .adash-share .material-icons-round { font-size: 18px; color: #333; }
+.adash-share:hover, .adash-share:active { background: linear-gradient(135deg, #e8f0fe, #c8ddf0); }
 .adash-share-row { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
 .adash-share-name { font-size: 16px; font-weight: 700; color: var(--text); }
 .adash-flat-type { margin-top: 8px; font-size: 15px; color: var(--text); }
@@ -1710,6 +1711,8 @@ select.input-sm { cursor: pointer; }
     border: 1px solid var(--card-border); min-height: 42px;
 }
 .adash-analyse .material-icons-round { font-size: 16px; }
+.adash-analyse:hover, .adash-analyse:active { background: linear-gradient(135deg, #d0d0d0, #bababa); }
+[data-theme="oled"] .adash-analyse:hover, [data-theme="oled"] .adash-analyse:active { background: linear-gradient(135deg, #444, #555); }
 
 .adash-stats { margin-top: 10px; }
 .adash-stats-head { display: flex; align-items: center; gap: 6px; padding: 4px 12px 8px; }
