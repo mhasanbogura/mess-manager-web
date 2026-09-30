@@ -427,7 +427,7 @@ body {
     cursor: pointer; font-family: inherit; white-space: nowrap; min-height: 40px;
     transition: all var(--transition);
 }
-.btn-share:hover { background: #e8f0fe; transform: scale(1.02); }
+.btn-share:hover { background: linear-gradient(135deg, #e8f0fe, #c8ddf0); transform: scale(1.02); }
 .btn-share .material-icons-round { font-size: 16px; }
 
 .dash-mess-info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; position: relative; z-index: 1; }
@@ -530,7 +530,7 @@ body {
 
 .btn-analyse {
     display: flex; align-items: center; gap: 6px; padding: 10px 16px;
-    background: linear-gradient(135deg, #0b3d91, #08306b); color: #fff; border: none;
+    background: linear-gradient(135deg, #1565C0, #08306b); color: #fff; border: none;
     border-radius: var(--radius-sm); font-size: 12px; font-weight: 700;
     cursor: pointer; font-family: inherit; white-space: nowrap; min-height: 44px;
     box-shadow: 0 4px 12px rgba(11,61,145,0.25);
