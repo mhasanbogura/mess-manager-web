@@ -1831,13 +1831,27 @@ select.input-sm { cursor: pointer; }
     flex: 0.85; gap: 4px; min-width: 0;
 }
 .bz-qty-input { min-width: 0; width: 100%; }
-.bz-unit-select {
-    border: none; outline: none; background: transparent;
-    -webkit-appearance: none; appearance: none;
+.bz-unit-picker { position: relative; flex-shrink: 0; }
+.bz-unit-btn {
+    display: flex; align-items: center; gap: 0;
+    border: none; background: transparent; box-shadow: none;
+    padding: 2px 0 2px 4px; margin: 0;
     font-size: 14px; color: var(--text); font-family: inherit;
-    max-width: 60px; flex-shrink: 0; cursor: pointer;
-    padding-right: 0;
+    cursor: pointer; white-space: nowrap;
 }
+.bz-unit-btn .material-icons-round { font-size: 16px; color: inherit; }
+.bz-unit-menu {
+    position: absolute; right: 0; top: calc(100% + 4px); z-index: 50;
+    min-width: 68px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; box-shadow: var(--shadow-md);
+    display: flex; flex-direction: column;
+}
+.bz-unit-opt {
+    border: none; background: transparent; padding: 8px 12px; margin: 0;
+    font-size: 14px; font-family: inherit; color: var(--text);
+    cursor: pointer; text-align: left;
+}
+.bz-unit-opt.active { font-weight: 700; color: var(--primary); }
 .bz-add-more {
     display: flex; align-items: center; gap: 4px;
     margin-top: 8px; background: none; border: none;
@@ -3210,8 +3224,10 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .bz-tab.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #0a0a0a; }
 [data-theme="oled"] .bz-tab.active .material-icons-round { color: #0a0a0a; }
 [data-theme="oled"] .bz-input-wrap, [data-theme="oled"] .bz-qty-wrap { background: transparent; border-color: #333; }
-[data-theme="oled"] .bz-unit-select { color: #fff; background: transparent; }
-[data-theme="oled"] .bz-unit-select option { color: #fff; background: #141414; }
+[data-theme="dark"] .bz-unit-btn, [data-theme="oled"] .bz-unit-btn { color: #fff; background: transparent; }
+[data-theme="dark"] .bz-unit-menu, [data-theme="oled"] .bz-unit-menu { background: #141414; border-color: #333; }
+[data-theme="dark"] .bz-unit-opt, [data-theme="oled"] .bz-unit-opt { color: #fff; }
+[data-theme="dark"] .bz-unit-opt.active, [data-theme="oled"] .bz-unit-opt.active { color: #7aa5ff; }
 [data-theme="oled"] .bz-input-wrap .material-icons-round { color: #999; }
 [data-theme="oled"] .bz-input { color: #e8ebf1; }
 [data-theme="oled"] .bz-input::placeholder { color: #666; }

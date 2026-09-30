@@ -3019,7 +3019,7 @@ const App = {
                 <div id="bz-item-rows">
                     <div class="bz-item-row">
                         <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
-                        <div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(0,'qty',this.value)"><select class="bz-unit-select" onchange="App.bzUpdateItem(0,'unit',this.value)"><option value="">-</option><option value="kg" selected>kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="pcs">pcs</option></select></div>
+                        ${this.bzQtyRowHtml(0)}
                         <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
@@ -3099,7 +3099,7 @@ const App = {
                 <div id="bz-item-rows">
                     <div class="bz-item-row">
                         <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" oninput="App.bzUpdateItem(0,'name',this.value)"></div>
-                        <div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(0,'qty',this.value)"><select class="bz-unit-select" onchange="App.bzUpdateItem(0,'unit',this.value)"><option value="">-</option><option value="kg" selected>kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="pcs">pcs</option></select></div>
+                        ${this.bzQtyRowHtml(0)}
                         <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
@@ -3190,7 +3190,37 @@ const App = {
     },
 
     bzQtyRowHtml(idx) {
-        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><select class="bz-unit-select" onchange="App.bzUpdateItem(${idx},'unit',this.value)"><option value="">-</option><option value="kg" selected>kg</option><option value="g">g</option><option value="L">L</option><option value="ml">ml</option><option value="pcs">pcs</option></select></div>`;
+        const cur = (this._bzItems[idx] && this._bzItems[idx].unit) ?? 'kg';
+        const units = ['', 'kg', 'g', 'L', 'ml', 'pcs'];
+        const opts = units.map(u => `<button type="button" class="bz-unit-opt${u === cur ? ' active' : ''}" data-unit="${u}" onclick="App.bzPickUnit(${idx},'${u}')">${u || '-'}</button>`).join('');
+        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><div class="bz-unit-picker"><button type="button" class="bz-unit-btn" id="bz-unit-btn-${idx}" onclick="App.bzToggleUnit(${idx})">${this.esc(cur || '-')}<span class="material-icons-round">expand_more</span></button><div class="bz-unit-menu" id="bz-unit-menu-${idx}" style="display:none">${opts}</div></div></div>`;
+    },
+
+    bzToggleUnit(idx) {
+        const menu = document.getElementById(`bz-unit-menu-${idx}`);
+        if (!menu) return;
+        const isOpen = menu.style.display !== 'none';
+        document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
+        menu.style.display = isOpen ? 'none' : 'block';
+        if (!this._bzUnitOutsideBound) {
+            this._bzUnitOutsideBound = true;
+            document.addEventListener('click', (e) => {
+                if (!e.target || !e.target.closest || !e.target.closest('.bz-unit-picker')) {
+                    document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
+                }
+            });
+        }
+    },
+
+    bzPickUnit(idx, unit) {
+        if (this._bzItems[idx]) this._bzItems[idx].unit = unit;
+        const btn = document.getElementById(`bz-unit-btn-${idx}`);
+        if (btn) btn.innerHTML = `${this.esc(unit || '-')}<span class="material-icons-round">expand_more</span>`;
+        const menu = document.getElementById(`bz-unit-menu-${idx}`);
+        if (menu) {
+            menu.style.display = 'none';
+            menu.querySelectorAll('.bz-unit-opt').forEach(o => o.classList.toggle('active', (o.dataset.unit || '') === (unit || '')));
+        }
     },
 
     bzUpdateItem(idx, field, val) { this._bzItems[idx][field] = val; this.bzRenderFooter(); },
