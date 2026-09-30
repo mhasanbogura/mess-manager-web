@@ -1479,9 +1479,9 @@ select.input-sm { cursor: pointer; }
     .abazar-day-card { margin: 0 0 10px; }
     .aprof-card { margin: 0 0 4px; }
     .amealhist-card { margin: 8px 0; }
-    .abazar-fab { right: calc(50% - 350px + 16px); }
-    .bottom-nav { left: 50%; right: auto; transform: translateX(-50%); width: 100%; max-width: 700px; bottom: 12px; border-radius: 16px; border: 1px solid var(--glass-border); }
-    .aam-footer { left: 50%; right: auto; transform: translateX(-50%); width: 100%; max-width: 700px; bottom: 90px; background: transparent; padding: 6px 24px; }
+    .abazar-fab { right: calc(50% - 326px + 16px); }
+    .bottom-nav { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 12px; border-radius: 16px; border: 1px solid var(--glass-border); }
+    .aam-footer { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 90px; background: transparent; padding: 6px 0; }
 }
 
 @media (max-width: 360px) {
