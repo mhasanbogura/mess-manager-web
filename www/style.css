@@ -2657,7 +2657,17 @@ img, canvas { max-width: 100%; }
 .aflat-card-box-head span:last-child { margin-left: auto; }
 .aflat-share-inline { background: none; border: none; color: var(--primary); padding: 0; cursor: pointer; display: flex; }
 .aflat-share-inline .material-icons-round { font-size: 18px; color: var(--primary); }
-.aflat-card-box strong { font-size: 14px; font-weight: 600; word-break: break-all; color: var(--text); }
+.aflat-card-box strong { display: block; font-size: 14px; font-weight: 600; text-align: center; overflow-wrap: break-word; color: var(--text); }
+@media (min-width: 768px) {
+    .aflat-card-box { display: flex; align-items: center; gap: 6px; }
+    .aflat-card-box-head { display: contents; }
+    .aflat-card-box-head .aflat-card-label { white-space: nowrap; }
+    .aflat-card-box-head .aflat-card-label::after { content: ":"; }
+    .aflat-card-box-head span:last-child { margin-left: 0; }
+    .aflat-card-box strong { order: 2; min-width: 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .aflat-share-inline { order: 3; }
+    .aflat-card-box-head > span.material-icons-round:last-child { order: 3; }
+}
 
 .aflat-tabs {
     display: flex; margin: 14px 12px 0; background: #e0ddd5; border-radius: 12px;
