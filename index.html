@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0a0a0a">
     <title>Mess Manager</title>
     <link rel="icon" type="image/png" href="app-icon.png?v=1.4.40">
-    <link rel="stylesheet" href="style.css?v=202610011157">
+    <link rel="stylesheet" href="style.css?v=202610011249">
     <link href="fonts/inter.css" rel="stylesheet">
     <link href="fonts/material-icons.css" rel="stylesheet">
 </head>
@@ -283,7 +283,6 @@
             </div>
             <div class="page" id="page-duty">
                 <div class="aduty-head">
-                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
                     <h2 data-lang-key="dt_title">Expense Today</h2>
                 </div>
                 <div class="aduty-banner" id="duty-banner"></div>
@@ -374,7 +373,6 @@
             </div>
             <div class="page" id="page-addmeal">
                 <div class="aam-head">
-                    <button class="icon-btn" onclick="App.navigate('meals')"><span class="material-icons-round">arrow_back</span></button>
                     <h2 data-lang-key="am_title">Add Meal</h2>
                 </div>
                 <div class="aam-body">
@@ -455,7 +453,6 @@
             </div>
             <div class="page" id="page-addcost">
                 <div class="aam-head">
-                    <button class="icon-btn" onclick="App.navigate('bazaar')"><span class="material-icons-round">arrow_back</span></button>
                     <h2 data-lang-key="ae_title">Add Expense</h2>
                 </div>
                 <div class="aam-body" id="addcost-body"></div>
@@ -465,7 +462,6 @@
             </div>
             <div class="page" id="page-adddeposit">
                 <div class="aam-head">
-                    <button class="icon-btn" onclick="App.navigate('balance')"><span class="material-icons-round">arrow_back</span></button>
                     <h2 data-lang-key="ad_title">Add Deposit</h2>
                 </div>
                 <div class="aam-body" id="adddeposit-body"></div>
@@ -489,7 +485,6 @@
             </div>
             <div class="page" id="page-notices">
                 <div class="anotice-head">
-                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
                     <h2 data-lang-key="nb_title">Notice Board</h2>
                 </div>
                 <div class="anotice-board" id="notices-list">
@@ -506,7 +501,6 @@
             <!-- BAZAR NOTE PAGE -->
             <div class="page" id="page-bazarnote">
                 <div class="abn-head">
-                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
                     <h2 data-lang-key="bn_title">Bazar Note <span class="abn-count" id="abn-count">0</span></h2>
                 </div>
                 <div class="abn-body">
@@ -530,7 +524,6 @@
             <!-- MENU TODAY PAGE -->
             <div class="page" id="page-menu">
                 <div class="amenu-head">
-                    <button class="icon-btn" onclick="App.navigate('dashboard')"><span class="material-icons-round">arrow_back</span></button>
                     <h2 data-lang-key="mt_title">Menu Today</h2>
                     <button class="icon-btn" onclick="App.toast('Menu history coming soon','info')"><span class="material-icons-round">schedule</span></button>
                 </div>
@@ -649,7 +642,7 @@
 
     <!-- MODAL -->
     <div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal">
-        <div class="modal-header"><h3 id="modal-title">Title</h3><button class="icon-btn" id="modal-close"><span class="material-icons-round">close</span></button></div>
+        <div class="modal-header"><h3 id="modal-title">Title</h3></div>
         <div class="modal-body" id="modal-body"></div>
         <div class="modal-footer" id="modal-footer"></div>
     </div></div>
@@ -680,6 +673,6 @@
     <script src="firebase-auth-compat.js"></script>
     <script src="firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="app.js?v=202610011157"></script>
+    <script src="app.js?v=202610011249"></script>
 </body>
 </html>

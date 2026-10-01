@@ -499,7 +499,6 @@ const App = {
         bind('join-mess-btn', 'click', () => this.joinMess());
         bind('logout-from-setup', 'click', () => auth.signOut());
         bind('delete-account-from-setup', 'click', () => this.deleteAccount());
-        bind('modal-close', 'click', () => this.closeModal());
         const overlay = $('modal-overlay');
         if (overlay) overlay.addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
         document.addEventListener('click', e => {
@@ -1019,8 +1018,6 @@ const App = {
         topbarActions.innerHTML = '';
         if (page === 'bazaar') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'costtrash\')"><span class="material-icons-round">delete</span></button>';
         if (page === 'balance') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'deptrash\')"><span class="material-icons-round">delete</span></button>';
-        if (page === 'costtrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'bazaar\')"><span class="material-icons-round">arrow_back</span></button>';
-        if (page === 'deptrash') topbarActions.innerHTML = '<button class="topbar-btn" onclick="App.navigate(\'balance\')"><span class="material-icons-round">arrow_back</span></button>';
         if (page !== 'dashboard' && !this._fromPopstate) { try { history.pushState({ page }, ''); } catch (e) { /* ignore */ } }
         this._fromPopstate = false;
         try {
