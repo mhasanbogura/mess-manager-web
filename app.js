@@ -2949,6 +2949,40 @@ https://mahmudulsapp.u.gy/mess-manager
         this.toast('Deleted!', 'success');
     },
 
+    _fmtLongDate(val) {
+        const d = new Date((val || '').slice(0, 10) + 'T00:00:00');
+        if (isNaN(d)) return val || '';
+        return `${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'long' })}, ${d.getFullYear()}`;
+    },
+
+    editBzPickDate() { this._openHiddenDate('edit-bz-date', 'edit-bz-date-hid', v => this.editBzOnDateChange(v)); },
+    editBzOnDateChange(val) { this._applyHiddenDate('edit-bz-date', 'edit-bz-date-text', val); },
+    editDepPickDate() { this._openHiddenDate('edit-dep-date', 'edit-dep-date-hid', v => this.editDepOnDateChange(v)); },
+    editDepOnDateChange(val) { this._applyHiddenDate('edit-dep-date', 'edit-dep-date-text', val); },
+
+    _openHiddenDate(targetId, hidId, onChange) {
+        const old = document.getElementById(hidId);
+        if (old) old.remove();
+        const target = document.getElementById(targetId);
+        const input = document.createElement('input');
+        input.type = 'date';
+        input.id = hidId;
+        input.value = (target && target.value) || new Date().toISOString().slice(0, 10);
+        input.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;opacity:0';
+        input.oninput = () => onChange(input.value);
+        document.body.appendChild(input);
+        input.click();
+        setTimeout(() => { try { input.showPicker(); } catch (e) {} }, 100);
+    },
+
+    _applyHiddenDate(targetId, textId, val) {
+        if (!val) return;
+        const target = document.getElementById(targetId);
+        if (target) target.value = val;
+        const el = document.getElementById(textId);
+        if (el) el.textContent = this._fmtLongDate(val);
+    },
+
     editBazarItem(key, name, cost, memberId, date, category) {
         this._editBzKey = key;
         const found = (this._allBazar || []).find(([k]) => k === key);
@@ -2972,7 +3006,14 @@ https://mahmudulsapp.u.gy/mess-manager
             <div class="form-group"><label>Item name</label><input type="text" id="edit-bz-name" value="${this.esc(name)}"></div>
             ${isBazar ? `<div class="form-group"><label>Quantity (optional)</label><div style="display:flex;gap:8px"><input type="number" min="0" step="any" id="edit-bz-qty" value="${this.esc(qty)}" placeholder="e.g. 1 / 1.5" style="flex:1"><select id="edit-bz-unit" style="max-width:100px">${units.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('')}<option value="" ${!unit ? 'selected' : ''}>-</option></select></div></div>` : ''}
             <div class="form-group"><label>Money from</label><select id="edit-bz-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
-            <div class="form-group"><label>Date</label><input type="date" id="edit-bz-date" value="${dateVal}"></div>
+            <div class="form-group"><label>Date</label>
+                <div class="aam-select" style="cursor:pointer" onclick="App.editBzPickDate()">
+                    <span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span>
+                    <span id="edit-bz-date-text">${this._fmtLongDate(dateVal)}</span>
+                    <span class="material-icons-round">expand_more</span>
+                </div>
+                <input type="date" id="edit-bz-date" value="${dateVal}" style="display:none">
+            </div>
             <div class="form-group"><label>Expense (৳)</label><input type="number" id="edit-bz-cost" value="${cost}"></div>
             <div class="form-group"><label>Type</label><select id="edit-bz-category"><option value="bazar" ${isBazar?'selected':''}>Meal</option><option value="utility" ${!isBazar?'selected':''}>Rent, Utilities & Others</option></select></div>`;
         document.getElementById('modal-footer').innerHTML = `
@@ -3189,7 +3230,14 @@ https://mahmudulsapp.u.gy/mess-manager
         document.getElementById('modal-title').textContent = 'Edit Deposit';
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label>Money from</label><select id="edit-dep-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
-            <div class="form-group"><label>Date</label><input type="date" id="edit-dep-date" value="${dateVal}"></div>
+            <div class="form-group"><label>Date</label>
+                <div class="aam-select" style="cursor:pointer" onclick="App.editDepPickDate()">
+                    <span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span>
+                    <span id="edit-dep-date-text">${this._fmtLongDate(dateVal)}</span>
+                    <span class="material-icons-round">expand_more</span>
+                </div>
+                <input type="date" id="edit-dep-date" value="${dateVal}" style="display:none">
+            </div>
             <div class="form-group"><label>Amount (৳)</label><input type="number" id="edit-dep-amount" value="${amount}"></div>
             <div class="form-group"><label>Category</label><select id="edit-dep-cat"><option value="meal" ${category==='meal'?'selected':''}>Meal</option><option value="utility" ${category==='utility'?'selected':''}>Utility</option></select></div>`;
         document.getElementById('modal-footer').innerHTML = `

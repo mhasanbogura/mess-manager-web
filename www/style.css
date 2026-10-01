@@ -848,9 +848,9 @@ select.input-sm { cursor: pointer; }
 .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #888; }
 
 .form-group input, .form-group select, .form-group textarea {
-    width: 100%; padding: 11px 14px; border: 1px solid rgba(255,255,255,0.1);
+    width: 100%; padding: 11px 14px; border: 1px solid var(--card-border);
     border-radius: var(--radius-sm); font-size: 14px; font-family: inherit;
-    outline: none; background: rgba(42,42,62,0.6); color: white; min-height: 44px;
+    outline: none; background: var(--bg); color: var(--text); min-height: 44px;
     transition: all var(--transition);
 }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
