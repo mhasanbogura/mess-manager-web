@@ -503,9 +503,13 @@ const App = {
         const overlay = $('modal-overlay');
         if (overlay) overlay.addEventListener('click', e => { if (e.target === e.currentTarget) this.closeModal(); });
         document.addEventListener('click', e => {
-            const mf = document.getElementById('abazar-member-filter');
-            const dd = document.getElementById('abazar-member-dropdown');
-            if (mf && dd && !mf.contains(e.target)) dd.classList.remove('open');
+            [['abazar-member-filter', 'abazar-member-dropdown'],
+             ['abazar-type-filter', 'abazar-type-dropdown'],
+             ['abalance-member-filter', 'abalance-member-dropdown']].forEach(([f, d]) => {
+                const mf = document.getElementById(f);
+                const dd = document.getElementById(d);
+                if (mf && dd && !mf.contains(e.target)) dd.classList.remove('open');
+            });
         });
         this._setupSwipe();
         document.addEventListener('input', e => {
