@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0a0a0a">
     <title>Mess Manager</title>
     <link rel="icon" type="image/png" href="app-icon.png?v=1.4.40">
-    <link rel="stylesheet" href="style.css?v=202610011455">
+    <link rel="stylesheet" href="style.css?v=202610011515">
     <link href="fonts/inter.css" rel="stylesheet">
     <link href="fonts/material-icons.css" rel="stylesheet">
 </head>
@@ -411,21 +411,23 @@
                     <span class="abazar-filter-total" id="abazar-filter-total"></span>
                 </div>
                 <div class="abazar-toolbar">
-                    <div class="abazar-member-filter" id="abazar-member-filter">
-                        <button class="abazar-filter-btn" id="abazar-member-btn" onclick="App.toggleMemberDropdown()">
-                            <span class="material-icons-round">person</span>
-                            <span id="abazar-member-label">No Filter</span>
-                            <span class="material-icons-round" style="font-size:14px">expand_more</span>
-                        </button>
-                        <div class="abazar-member-dropdown" id="abazar-member-dropdown"></div>
-                    </div>
-                    <div class="abazar-member-filter" id="abazar-type-filter">
-                        <button class="abazar-filter-btn" id="abazar-type-btn" onclick="App.toggleTypeDropdown()">
-                            <span class="material-icons-round">sell</span>
-                            <span id="abazar-type-label">No Filter</span>
-                            <span class="material-icons-round" style="font-size:14px">expand_more</span>
-                        </button>
-                        <div class="abazar-member-dropdown" id="abazar-type-dropdown"></div>
+                    <div class="abazar-toolbar-fields">
+                        <div class="abazar-member-filter" id="abazar-member-filter">
+                            <button class="abazar-filter-btn" id="abazar-member-btn" onclick="App.toggleMemberDropdown()">
+                                <span class="material-icons-round">person</span>
+                                <span id="abazar-member-label">No Filter</span>
+                                <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                            </button>
+                            <div class="abazar-member-dropdown" id="abazar-member-dropdown"></div>
+                        </div>
+                        <div class="abazar-member-filter" id="abazar-type-filter">
+                            <button class="abazar-filter-btn" id="abazar-type-btn" onclick="App.toggleTypeDropdown()">
+                                <span class="material-icons-round">sell</span>
+                                <span id="abazar-type-label">No Filter</span>
+                                <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                            </button>
+                            <div class="abazar-member-dropdown" id="abazar-type-dropdown"></div>
+                        </div>
                     </div>
                     <div class="abazar-toolbar-tail">
                         <div class="abazar-member-filter" id="abazar-sort-filter">
@@ -715,6 +717,6 @@
     <script src="firebase-auth-compat.js"></script>
     <script src="firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="app.js?v=202610011455"></script>
+    <script src="app.js?v=202610011515"></script>
 </body>
 </html>
