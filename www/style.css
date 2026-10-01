@@ -1688,7 +1688,7 @@ select.input-sm { cursor: pointer; }
     padding: 0;
     display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: stretch;
 }
-.adash-fin-label { grid-column: 1 / -1; justify-self: start; }
+.adash-fin-label { grid-column: 1 / -1; justify-self: start; margin-bottom: 8px; }
 .adash-fin-box {
     border: 1px solid var(--card-border); border-radius: 10px; padding: 8px;
     text-align: center; min-width: 0;
