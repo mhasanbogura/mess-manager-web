@@ -1685,7 +1685,7 @@ select.input-sm { cursor: pointer; }
 .adash-finance {
     background: transparent; border-radius: 16px; margin: 0;
     padding: 4px 6px;
-    display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 4px; align-items: stretch;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; align-items: stretch;
 }
 .adash-fin-label { grid-column: 1 / -1; justify-self: start; }
 .adash-fin-box {
@@ -2809,8 +2809,8 @@ img, canvas { max-width: 100%; }
 .adash-duo-box .material-icons-round { font-size: 20px; flex-shrink: 0; }
 .adash-duo-box strong { font-size: 13px; white-space: nowrap; }
 .adash-duo-box p { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* Finance: always 4 in a row */
-.adash-finance { grid-template-columns: 1fr 1fr 1fr auto; }
+/* Finance: always 3 in a row */
+.adash-finance { grid-template-columns: 1fr 1fr 1fr; }
 .adash-fin-box { padding: 6px 4px; min-width: 0; }
 .adash-fin-box small { font-size: 11px; white-space: nowrap; }
 .adash-fin-box strong { font-size: 15px; }
@@ -3442,6 +3442,9 @@ img, canvas { max-width: 100%; }
 /* Phones: uniform 12px gutters on every page. */
 @media (max-width: 767px) {
     #app-screen[class] .main-content { padding-left: 12px; padding-right: 12px; }
+    .adash-finance { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
+    .adash-fin-box small { white-space: normal; }
+    .adash-analyse { min-width: 0; }
     .bz-item-row > .bz-input-wrap { flex: 2.5 1 0%; }
     .bz-item-row > .bz-qty-wrap { flex: 1.5 1 0%; }
     .bz-item-row > .bz-cost-wrap { flex: 2 1 0%; }
