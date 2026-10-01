@@ -2787,6 +2787,16 @@ https://mahmudulsapp.u.gy/mess-manager
         </div>`;
     },
 
+    _flatAddedMeta(i) {
+        if (!i || (!i.addedBy && !i.createdAt)) return '';
+        const parts = [`<span>Added by: ${this.esc(i.addedBy || 'Unknown')}</span>`];
+        const d = new Date(i.createdAt || 0);
+        if (i.createdAt && !isNaN(d)) {
+            parts.push(`<span>Added on: ${d.getDate()} ${this.shortMon(d)}. ${d.getFullYear()} ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</span>`);
+        }
+        return `<div class="abazar-flat-meta">${parts.join('')}</div>`;
+    },
+
     _bazarFlatHtml(objs, members) {
         return `<div class="abazar-flat-list">${objs.map(i => {
             const isUtil = (i.category || 'bazar') === 'utility';
@@ -2798,6 +2808,7 @@ https://mahmudulsapp.u.gy/mess-manager
                     <div class="abazar-flat-info">
                         <h4>${this.esc(this.bzDisplayName(i))}</h4>
                         <p>${dateStr}${buyer ? ' · ' + this.esc(buyer) : ''}</p>
+                        ${this._flatAddedMeta(i)}
                     </div>
                     <span class="abazar-flat-amount">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                 </div>
@@ -3088,6 +3099,7 @@ https://mahmudulsapp.u.gy/mess-manager
                     <div class="abazar-flat-info">
                         <h4>${this.esc(name)}</h4>
                         <p>${dateStr}</p>
+                        ${this._flatAddedMeta(i)}
                     </div>
                     <span class="abazar-flat-amount">৳${this.fmtNum(parseFloat(i.amount)||0)} <span class="material-icons-round">expand_more</span></span>
                 </div>
@@ -3584,7 +3596,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="dep-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
-            <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
+            <div class="aam-select" style="position:relative;cursor:pointer;margin-top:4px" onclick="App.depPickDate()"><span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span><span id="dep-date-text">${dateStr}</span><span class="material-icons-round">expand_more</span></div>
             <div class="dep-label">Money from:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
@@ -3624,7 +3636,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="dep-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
-            <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
+            <div class="aam-select" style="position:relative;cursor:pointer;margin-top:4px" onclick="App.depPickDate()"><span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span><span id="dep-date-text">${dateStr}</span><span class="material-icons-round">expand_more</span></div>
             <div class="dep-label">Money from:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}

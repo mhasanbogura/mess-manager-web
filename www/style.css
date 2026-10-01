@@ -2237,6 +2237,10 @@ select.input-sm { cursor: pointer; }
 .abazar-flat-info { flex: 1; min-width: 0; }
 .abazar-flat-info h4 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .abazar-flat-info p { font-size: 12px; color: #777; margin: 3px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.abazar-flat-meta {
+    display: flex; flex-wrap: wrap; gap: 2px 14px;
+    font-size: 12px; color: #999; margin-top: 3px;
+}
 .abazar-flat-amount {
     font-size: 15px; font-weight: 700; color: #d32f2f; white-space: nowrap;
     display: flex; align-items: center; gap: 2px;
@@ -2770,14 +2774,15 @@ img, canvas { max-width: 100%; }
     padding: 10px 18px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
     cursor: pointer; font-family: inherit; white-space: nowrap;
 }
-.fp-btn-red { background: #d32f2f; color: #fff; }
-.fp-btn-red:hover { background: #b71c1c; }
-.fp-btn-yellow { background: #FFB300; color: #1a1a1a; }
-.fp-btn-yellow:hover { background: #FFA000; }
-.fp-btn-gray { background: #9e9e9e; color: #fff; }
-.fp-btn-gray:hover { background: #757575; }
-.fp-btn-green { background: #2E7D32; color: #fff; }
-.fp-btn-green:hover { background: #1B5E20; }
+.fp-btn { transition: filter .15s, box-shadow .15s, transform .15s; }
+.fp-btn-red { background: linear-gradient(135deg, #ef5350, #c62828); color: #fff; }
+.fp-btn-red:hover { background: linear-gradient(135deg, #ff6659, #d32f2f); box-shadow: 0 4px 12px rgba(211,47,47,.3); transform: translateY(-1px); }
+.fp-btn-yellow { background: linear-gradient(135deg, #ffc94d, #f9a825); color: #1a1a1a; }
+.fp-btn-yellow:hover { background: linear-gradient(135deg, #ffd666, #ffb300); box-shadow: 0 4px 12px rgba(255,179,0,.3); transform: translateY(-1px); }
+.fp-btn-gray { background: linear-gradient(135deg, #b0b0b0, #8a8a8a); color: #fff; }
+.fp-btn-gray:hover { background: linear-gradient(135deg, #bdbdbd, #9e9e9e); box-shadow: 0 4px 12px rgba(0,0,0,.2); transform: translateY(-1px); }
+.fp-btn-green { background: linear-gradient(135deg, #43a047, #1b5e20); color: #fff; }
+.fp-btn-green:hover { background: linear-gradient(135deg, #4caf50, #2e7d32); box-shadow: 0 4px 12px rgba(46,125,50,.3); transform: translateY(-1px); }
 
 .aflat-perm-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 14px;
