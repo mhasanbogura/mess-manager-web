@@ -3445,6 +3445,11 @@ img, canvas { max-width: 100%; }
 @media (max-width: 767px) {
     #app-screen[class] .main-content { padding-left: 12px; padding-right: 12px; }
     .adash-finance { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
+    .adash-fin-box { min-width: 0; overflow: hidden; }
+    .adash-fin-box small { white-space: normal; }
+    .adash-analyse { min-width: 0; padding: 6px; font-size: 12px; }
+    .adash-analyse .material-icons-round { font-size: 16px; }
+    .adash-finance { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
     .adash-fin-box small { white-space: normal; }
     .adash-analyse { min-width: 0; }
     .bz-item-row > .bz-input-wrap { flex: 2.5 1 0%; }
