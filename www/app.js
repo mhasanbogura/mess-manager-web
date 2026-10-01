@@ -504,7 +504,9 @@ const App = {
         document.addEventListener('click', e => {
             [['abazar-member-filter', 'abazar-member-dropdown'],
              ['abazar-type-filter', 'abazar-type-dropdown'],
-             ['abalance-member-filter', 'abalance-member-dropdown']].forEach(([f, d]) => {
+             ['abazar-sort-filter', 'abazar-sort-dropdown'],
+             ['abalance-member-filter', 'abalance-member-dropdown'],
+             ['abalance-sort-filter', 'abalance-sort-dropdown']].forEach(([f, d]) => {
                 const mf = document.getElementById(f);
                 const dd = document.getElementById(d);
                 if (mf && dd && !mf.contains(e.target)) dd.classList.remove('open');
@@ -2528,8 +2530,11 @@ const App = {
             this._bazarMembers = members;
             if (!this._bazarMemberFilter) this._bazarMemberFilter = '';
             if (!this._bazarTypeFilter) this._bazarTypeFilter = '';
+            if (!this._bazarSort) this._bazarSort = 'newest';
+            if (!this._bazarView) this._bazarView = 'date';
             this._buildBazarDropdown();
             this._buildBazarTypeDropdown();
+            this._syncBazarToolbar();
             this.renderBazarList();
         } catch (e) { console.error('loadBazarList error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
@@ -2581,18 +2586,113 @@ const App = {
         this.renderBazarList();
     },
 
+    _closeFilterDropdowns(except) {
+        ['abazar-member-dropdown', 'abazar-type-dropdown', 'abazar-sort-dropdown',
+         'abalance-member-dropdown', 'abalance-sort-dropdown'].forEach(id => {
+            if (id === except) return;
+            const e = document.getElementById(id);
+            if (e) e.classList.remove('open');
+        });
+    },
+
+    _sortLabel(mode) {
+        return ({
+            newest: 'Newest → Oldest',
+            oldest: 'Oldest → Newest',
+            largest: 'Largest → Smallest',
+            smallest: 'Smallest → Largest'
+        })[mode || 'newest'] || 'Newest → Oldest';
+    },
+
+    _sortEntries(arr, mode, field) {
+        const a = arr.slice();
+        const val = x => parseFloat(x[field]) || 0;
+        const dt = x => (x.date || '').slice(0, 10);
+        const ct = x => (x.createdAt || 0);
+        const cmp = {
+            newest: (x, y) => dt(y).localeCompare(dt(x)) || ct(y) - ct(x),
+            oldest: (x, y) => dt(x).localeCompare(dt(y)) || ct(x) - ct(y),
+            largest: (x, y) => val(y) - val(x) || dt(y).localeCompare(dt(x)) || ct(y) - ct(x),
+            smallest: (x, y) => val(x) - val(y) || dt(y).localeCompare(dt(x)) || ct(y) - ct(x)
+        };
+        a.sort(cmp[mode] || cmp.newest);
+        return a;
+    },
+
+    _syncBazarToolbar() {
+        const sort = this._bazarSort || 'newest';
+        const view = this._bazarView || 'date';
+        const sl = document.getElementById('abazar-sort-label');
+        if (sl) sl.textContent = this._sortLabel(sort);
+        document.querySelectorAll('#abazar-sort-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.sort || 'newest') === sort));
+        const vd = document.getElementById('abazar-view-date');
+        if (vd) vd.classList.toggle('active', view === 'date');
+        const vl = document.getElementById('abazar-view-list');
+        if (vl) vl.classList.toggle('active', view === 'list');
+    },
+
+    _syncDepToolbar() {
+        const sort = this._depSort || 'newest';
+        const view = this._depView || 'date';
+        const sl = document.getElementById('abalance-sort-label');
+        if (sl) sl.textContent = this._sortLabel(sort);
+        document.querySelectorAll('#abalance-sort-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.sort || 'newest') === sort));
+        const vd = document.getElementById('abalance-view-date');
+        if (vd) vd.classList.toggle('active', view === 'date');
+        const vl = document.getElementById('abalance-view-list');
+        if (vl) vl.classList.toggle('active', view === 'list');
+    },
+
+    toggleSortDropdown() {
+        const dd = document.getElementById('abazar-sort-dropdown');
+        this._closeFilterDropdowns('abazar-sort-dropdown');
+        if (dd) dd.classList.toggle('open');
+    },
+
+    toggleDepSortDropdown() {
+        const dd = document.getElementById('abalance-sort-dropdown');
+        this._closeFilterDropdowns('abalance-sort-dropdown');
+        if (dd) dd.classList.toggle('open');
+    },
+
+    setBazarSort(mode) {
+        this._bazarSort = mode || 'newest';
+        const dd = document.getElementById('abazar-sort-dropdown');
+        if (dd) dd.classList.remove('open');
+        this._syncBazarToolbar();
+        this.renderBazarList();
+    },
+
+    setDepSort(mode) {
+        this._depSort = mode || 'newest';
+        const dd = document.getElementById('abalance-sort-dropdown');
+        if (dd) dd.classList.remove('open');
+        this._syncDepToolbar();
+        this.renderDeposits();
+    },
+
+    setBazarView(mode) {
+        this._bazarView = mode === 'list' ? 'list' : 'date';
+        this._syncBazarToolbar();
+        this.renderBazarList();
+    },
+
+    setDepView(mode) {
+        this._depView = mode === 'list' ? 'list' : 'date';
+        this._syncDepToolbar();
+        this.renderDeposits();
+    },
+
     toggleMemberDropdown() {
         const dd = document.getElementById('abazar-member-dropdown');
+        this._closeFilterDropdowns('abazar-member-dropdown');
         if (dd) dd.classList.toggle('open');
-        const td = document.getElementById('abazar-type-dropdown');
-        if (td) td.classList.remove('open');
     },
 
     toggleTypeDropdown() {
         const td = document.getElementById('abazar-type-dropdown');
+        this._closeFilterDropdowns('abazar-type-dropdown');
         if (td) td.classList.toggle('open');
-        const dd = document.getElementById('abazar-member-dropdown');
-        if (dd) dd.classList.remove('open');
     },
 
     filterBazarMember(name) {
@@ -2613,6 +2713,62 @@ const App = {
         if (dd) dd.classList.remove('open');
         document.querySelectorAll('#abazar-type-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.type || '') === (name || '')));
         this.renderBazarList();
+    },
+
+    _bazarUtilDetailHtml(i) {
+        return `<div class="abazar-item-detail" style="display:none">
+            <div class="abazar-item-detail-info">
+                <span class="abazar-detail-dot green"></span>
+                <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
+                ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+            </div>
+            <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (personal, ${this.esc(i.splitWith || 'N/A')})</div>
+            <div class="abazar-item-detail-btns">
+                <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+            </div>
+        </div>`;
+    },
+
+    _bazarItemDetailHtml(i) {
+        return `<div class="abazar-item-detail" style="display:none">
+            ${i.splitWith ? `<div class="abazar-detail-price">৳${this.fmtNum(parseFloat(i.cost)||0)} each</div>
+            <div class="abazar-detail-split">${this.esc(i.splitWith)}</div>` : ''}
+            <div class="abazar-item-detail-info">
+                <span class="abazar-detail-dot green"></span>
+                <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
+                ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+            </div>
+            <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
+            ${i.editedBy ? `<div class="abazar-item-detail-info">
+                <span class="abazar-detail-dot orange"></span>
+                <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
+                ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+            </div>
+            <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
+            <div class="abazar-item-detail-btns">
+                <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
+            </div>
+        </div>`;
+    },
+
+    _bazarFlatHtml(objs, members) {
+        return `<div class="abazar-flat-list">${objs.map(i => {
+            const isUtil = (i.category || 'bazar') === 'utility';
+            const buyer = isUtil ? (i.splitWith || '-') : ((members[i.memberId] || {}).name || i.memberId || '-');
+            const d = new Date((i.date || '').slice(0, 10) + 'T00:00:00');
+            const dateStr = isNaN(d) ? '' : `${d.getDate()} ${this.shortMon(d)}, ${d.getFullYear()}`;
+            return `<div class="abazar-flat-item">
+                <div class="abazar-flat-head" onclick="App.toggleBazarItem(this)">
+                    <div class="abazar-flat-info">
+                        <h4>${this.esc(this.bzDisplayName(i))}</h4>
+                        <p>${dateStr}${buyer ? ' · ' + this.esc(buyer) : ''}</p>
+                    </div>
+                    <span class="abazar-flat-amount">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
+                </div>
+                ${isUtil ? this._bazarUtilDetailHtml(i) : this._bazarItemDetailHtml(i)}
+            </div>`;
+        }).join('')}</div>`;
     },
 
     renderBazarList() {
@@ -2646,16 +2802,23 @@ const App = {
         if (totalEl) totalEl.textContent = items.length ? '৳ ' + this.fmtNum(total) : '';
         const div = document.getElementById('abazar-list');
         if (!items.length) { div.innerHTML = '<p class="empty-state">No cost items this month</p>'; return; }
+        const objs = items.map(([k, v]) => ({ key: k, ...v }));
+        const sort = this._bazarSort || 'newest';
+        const view = this._bazarView || 'date';
+        if (view === 'list') { div.innerHTML = this._bazarFlatHtml(this._sortEntries(objs, sort, 'cost'), members); return; }
         const grouped2 = {};
-        items.forEach(([k, v]) => {
-            const day = v.date.slice(0, 10);
-            (grouped2[day] = grouped2[day] || []).push({ key: k, ...v });
+        objs.forEach(i => {
+            const day = i.date.slice(0, 10);
+            (grouped2[day] = grouped2[day] || []).push(i);
         });
+        let dayEntries = Object.entries(grouped2);
+        if (sort === 'oldest') dayEntries.sort((a, b) => a[0].localeCompare(b[0]));
         let html = '';
-        Object.entries(grouped2).forEach(([day, dayItems]) => {
+        dayEntries.forEach(([day, dayItems0], dayIdx) => {
+            const dayItems = this._sortEntries(dayItems0, sort, 'cost');
             const d = new Date(day + 'T00:00:00');
             const dayTotal = dayItems.reduce((s, i) => s + (parseFloat(i.cost) || 0), 0);
-            const expanded = day === Object.keys(grouped2)[0];
+            const expanded = dayIdx === 0;
             html += `<div class="abazar-day-card">
                 <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
                     <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayItems.length} item${dayItems.length>1?'s':''}</p></div>
@@ -2684,17 +2847,7 @@ const App = {
                                 <span class="abazar-item-each">৳${this.fmtNum(each)}</span>
                                 <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                             </div>
-                            <div class="abazar-item-detail" style="display:none">
-                                <div class="abazar-item-detail-info">
-                                    <span class="abazar-detail-dot green"></span>
-                                    <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
-                                    ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
-                                </div>
-                                <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)} (personal, ${this.esc(i.splitWith || 'N/A')})</div>
-                                <div class="abazar-item-detail-btns">
-                                    <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
-                                </div>
-                            </div>`;
+                            ${this._bazarUtilDetailHtml(i)}`;
                             });
                             html2 += `<div class="abazar-util-subtotal abazar-util-grid" style="background:var(--bg);font-weight:700;font-size:13px;border-top:2px solid var(--border)">
                                 <span>${this.esc(typeName)} (${items.length})</span><span></span><span></span>
@@ -2708,26 +2861,7 @@ const App = {
                             <span class="abazar-item-buyer">${this.esc(buyerName)}</span>
                             <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                         </div>
-                        <div class="abazar-item-detail" style="display:none">
-                            ${i.splitWith ? `<div class="abazar-detail-price">৳${this.fmtNum(parseFloat(i.cost)||0)} each</div>
-                            <div class="abazar-detail-split">${this.esc(i.splitWith)}</div>` : ''}
-                            <div class="abazar-item-detail-info">
-                                <span class="abazar-detail-dot green"></span>
-                                <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
-                                ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
-                            </div>
-                            <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
-                            ${i.editedBy ? `<div class="abazar-item-detail-info">
-                                <span class="abazar-detail-dot orange"></span>
-                                <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
-                                ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
-                            </div>
-                            <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
-                            <div class="abazar-item-detail-btns">
-                                <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
-                                <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
-                            </div>
-                        </div>`;
+                        ${this._bazarItemDetailHtml(i)}`;
                         });
                         return html2;
                     })() : dayItems.filter(i => (i.category || 'bazar') !== 'utility').map(i => {
@@ -2737,26 +2871,7 @@ const App = {
                         <span class="abazar-item-buyer">${this.esc(buyerName)}</span>
                         <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
                     </div>
-                    <div class="abazar-item-detail" style="display:none">
-                        ${i.splitWith ? `<div class="abazar-detail-price">৳${this.fmtNum(parseFloat(i.cost)||0)} each</div>
-                        <div class="abazar-detail-split">${this.esc(i.splitWith)}</div>` : ''}
-                        <div class="abazar-item-detail-info">
-                            <span class="abazar-detail-dot green"></span>
-                            <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
-                            ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
-                        </div>
-                        <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>
-                        ${i.editedBy ? `<div class="abazar-item-detail-info">
-                            <span class="abazar-detail-dot orange"></span>
-                            <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
-                            ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
-                        </div>
-                        <div class="abazar-item-detail-row">${this.esc(this.bzDisplayName(i))} — ৳${this.fmtNum(parseFloat(i.cost)||0)}</div>` : ''}
-                        <div class="abazar-item-detail-btns">
-                            <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteBazarItem('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
-                            <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editBazarItem('${i.key}','${this.esc(i.name||'')}',${parseFloat(i.cost)||0},'${i.memberId||''}','${i.date||''}','${i.category||'bazar'}')"><span class="material-icons-round">edit</span> Edit</button>
-                        </div>
-                    </div>`;
+                    ${this._bazarItemDetailHtml(i)}`;
                     }).join('')}
                 </div>
             </div>`;
@@ -2863,7 +2978,10 @@ const App = {
                 .sort((a, b) => (b[1].date || '').localeCompare(a[1].date || '') || (b[1].createdAt || 0) - (a[1].createdAt || 0));
             this._depMembers = members;
             if (!this._depMemberFilter) this._depMemberFilter = '';
+            if (!this._depSort) this._depSort = 'newest';
+            if (!this._depView) this._depView = 'date';
             this._buildDepDropdown();
+            this._syncDepToolbar();
             this.renderDeposits();
         } catch (e) { console.error('loadManagerMoney error:', e); div.innerHTML = '<p class="empty-state">Error loading</p>'; }
     },
@@ -2891,6 +3009,7 @@ const App = {
 
     toggleDepDropdown() {
         const dd = document.getElementById('abalance-member-dropdown');
+        this._closeFilterDropdowns('abalance-member-dropdown');
         if (dd) dd.classList.toggle('open');
     },
 
@@ -2902,6 +3021,44 @@ const App = {
         if (dd) dd.classList.remove('open');
         document.querySelectorAll('#abalance-member-dropdown .abazar-member-dropdown-item').forEach(b => b.classList.toggle('active', (b.dataset.member || '') === (name || '')));
         this.renderDeposits();
+    },
+
+    _depDetailHtml(i, members) {
+        return `<div class="abazar-item-detail" style="display:none">
+            <div class="abazar-item-detail-info">
+                <span class="abazar-detail-dot green"></span>
+                <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
+                ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+            </div>
+            <div class="abazar-item-detail-row">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')} — ৳${this.fmtNum(parseFloat(i.amount)||0)}</div>
+            ${i.editedBy ? `<div class="abazar-item-detail-info">
+                <span class="abazar-detail-dot orange"></span>
+                <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
+                ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
+            </div>` : ''}
+            <div class="abazar-item-detail-btns">
+                <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteDeposit('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
+                <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editDeposit('${i.key}','${i.memberId||''}',${parseFloat(i.amount)||0},'${i.category||'meal'}','${i.date||''}')"><span class="material-icons-round">edit</span> Edit</button>
+            </div>
+        </div>`;
+    },
+
+    _depFlatHtml(objs, members) {
+        return `<div class="abazar-flat-list">${objs.map(i => {
+            const d = new Date((i.date || '').slice(0, 10) + 'T00:00:00');
+            const dateStr = isNaN(d) ? '' : `${d.getDate()} ${this.shortMon(d)}, ${d.getFullYear()}`;
+            const name = (members[i.memberId] || {}).name || i.memberId || '-';
+            return `<div class="abazar-flat-item">
+                <div class="abazar-flat-head" onclick="App.toggleBazarItem(this)">
+                    <div class="abazar-flat-info">
+                        <h4>${this.esc(name)}</h4>
+                        <p>${dateStr}</p>
+                    </div>
+                    <span class="abazar-flat-amount">৳${this.fmtNum(parseFloat(i.amount)||0)} <span class="material-icons-round">expand_more</span></span>
+                </div>
+                ${this._depDetailHtml(i, members)}
+            </div>`;
+        }).join('')}</div>`;
     },
 
     renderDeposits() {
@@ -2920,16 +3077,23 @@ const App = {
         if (totalEl) totalEl.textContent = deps.length ? '৳ ' + this.fmtNum(total) : '';
         const div = document.getElementById('abalance-list');
         if (!deps.length) { div.innerHTML = '<p class="empty-state">No deposits this month</p>'; return; }
+        const objs = deps.map(([k, v]) => ({ key: k, ...v }));
+        const sort = this._depSort || 'newest';
+        const view = this._depView || 'date';
+        if (view === 'list') { div.innerHTML = this._depFlatHtml(this._sortEntries(objs, sort, 'amount'), members); return; }
         const grouped = {};
-        deps.forEach(([k, v]) => {
-            const day = v.date.slice(0, 10);
-            (grouped[day] = grouped[day] || []).push({ key: k, ...v });
+        objs.forEach(i => {
+            const day = i.date.slice(0, 10);
+            (grouped[day] = grouped[day] || []).push(i);
         });
+        let dayEntries = Object.entries(grouped);
+        if (sort === 'oldest') dayEntries.sort((a, b) => a[0].localeCompare(b[0]));
         let html = '';
-        Object.entries(grouped).forEach(([day, dayDeps]) => {
+        dayEntries.forEach(([day, dayDeps0], dayIdx) => {
+            const dayDeps = this._sortEntries(dayDeps0, sort, 'amount');
             const d = new Date(day + 'T00:00:00');
             const dayTotal = dayDeps.reduce((s, i) => s + (parseFloat(i.amount) || 0), 0);
-            const expanded = day === Object.keys(grouped)[0];
+            const expanded = dayIdx === 0;
             html += `<div class="abazar-day-card">
                 <div class="abazar-day-head${expanded ? ' expanded' : ''}" onclick="App.toggleDayCard(this)">
                     <div class="abazar-day-info"><h3>${d.getDate()} ${this.shortMon(d)}, ${d.toLocaleDateString('en',{weekday:'long'})}</h3><p>${dayDeps.length} entr${dayDeps.length>1?'ies':'y'}</p></div>
@@ -2942,23 +3106,7 @@ const App = {
                         <span class="abazar-item-name">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')}</span>
                         <span class="abazar-item-cost">৳${this.fmtNum(parseFloat(i.amount)||0)} <span class="material-icons-round">expand_more</span></span>
                     </div>
-                    <div class="abazar-item-detail" style="display:none">
-                        <div class="abazar-item-detail-info">
-                            <span class="abazar-detail-dot green"></span>
-                            <span>Added by: <strong>${this.esc(i.addedBy || 'Unknown')}</strong></span>
-                            ${i.createdAt ? `<span> · ${new Date(i.createdAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
-                        </div>
-                        <div class="abazar-item-detail-row">${this.esc((members[i.memberId]||{}).name || i.memberId || '-')} — ৳${this.fmtNum(parseFloat(i.amount)||0)}</div>
-                        ${i.editedBy ? `<div class="abazar-item-detail-info">
-                            <span class="abazar-detail-dot orange"></span>
-                            <span>Edited by: <strong>${this.esc(i.editedBy)}</strong></span>
-                            ${i.editedAt ? `<span> · ${new Date(i.editedAt).toLocaleString('en',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</span>` : ''}
-                        </div>` : ''}
-                        <div class="abazar-item-detail-btns">
-                            <button class="abazar-btn-delete" onclick="event.stopPropagation();App.deleteDeposit('${i.key}')"><span class="material-icons-round">delete</span> Delete</button>
-                            <button class="abazar-btn-edit" onclick="event.stopPropagation();App.editDeposit('${i.key}','${i.memberId||''}',${parseFloat(i.amount)||0},'${i.category||'meal'}','${i.date||''}')"><span class="material-icons-round">edit</span> Edit</button>
-                        </div>
-                    </div>`).join('')}
+                    ${this._depDetailHtml(i, members)}`).join('')}
                 </div>
             </div>`;
         });

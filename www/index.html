@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0a0a0a">
     <title>Mess Manager</title>
     <link rel="icon" type="image/png" href="app-icon.png?v=1.4.40">
-    <link rel="stylesheet" href="style.css?v=202610011249">
+    <link rel="stylesheet" href="style.css?v=202610011333">
     <link href="fonts/inter.css" rel="stylesheet">
     <link href="fonts/material-icons.css" rel="stylesheet">
 </head>
@@ -410,21 +410,40 @@
                     <button class="abazar-filter-btn" data-filter="utility" onclick="App.filterBazar('utility')"><span class="material-icons-round">lightbulb</span> <span data-lang-key="el_tab_utility">Rent, Utilities & Others</span></button>
                     <span class="abazar-filter-total" id="abazar-filter-total"></span>
                 </div>
-                <div class="abazar-member-filter" id="abazar-member-filter">
-                    <button class="abazar-filter-btn" id="abazar-member-btn" onclick="App.toggleMemberDropdown()">
-                        <span class="material-icons-round">person</span>
-                        <span id="abazar-member-label">No Filter</span>
-                        <span class="material-icons-round" style="font-size:14px">expand_more</span>
-                    </button>
-                    <div class="abazar-member-dropdown" id="abazar-member-dropdown"></div>
-                </div>
-                <div class="abazar-member-filter" id="abazar-type-filter">
-                    <button class="abazar-filter-btn" id="abazar-type-btn" onclick="App.toggleTypeDropdown()">
-                        <span class="material-icons-round">sell</span>
-                        <span id="abazar-type-label">No Filter</span>
-                        <span class="material-icons-round" style="font-size:14px">expand_more</span>
-                    </button>
-                    <div class="abazar-member-dropdown" id="abazar-type-dropdown"></div>
+                <div class="abazar-toolbar">
+                    <div class="abazar-member-filter" id="abazar-member-filter">
+                        <button class="abazar-filter-btn" id="abazar-member-btn" onclick="App.toggleMemberDropdown()">
+                            <span class="material-icons-round">person</span>
+                            <span id="abazar-member-label">No Filter</span>
+                            <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                        </button>
+                        <div class="abazar-member-dropdown" id="abazar-member-dropdown"></div>
+                    </div>
+                    <div class="abazar-member-filter" id="abazar-type-filter">
+                        <button class="abazar-filter-btn" id="abazar-type-btn" onclick="App.toggleTypeDropdown()">
+                            <span class="material-icons-round">sell</span>
+                            <span id="abazar-type-label">No Filter</span>
+                            <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                        </button>
+                        <div class="abazar-member-dropdown" id="abazar-type-dropdown"></div>
+                    </div>
+                    <div class="abazar-member-filter" id="abazar-sort-filter">
+                        <button class="abazar-filter-btn" id="abazar-sort-btn" onclick="App.toggleSortDropdown()">
+                            <span class="material-icons-round">sort</span>
+                            <span id="abazar-sort-label" class="abazar-sort-label">Newest → Oldest</span>
+                            <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                        </button>
+                        <div class="abazar-member-dropdown" id="abazar-sort-dropdown">
+                            <button class="abazar-member-dropdown-item active" data-sort="newest" onclick="App.setBazarSort('newest')">Newest → Oldest</button>
+                            <button class="abazar-member-dropdown-item" data-sort="oldest" onclick="App.setBazarSort('oldest')">Oldest → Newest</button>
+                            <button class="abazar-member-dropdown-item" data-sort="largest" onclick="App.setBazarSort('largest')">Largest → Smallest</button>
+                            <button class="abazar-member-dropdown-item" data-sort="smallest" onclick="App.setBazarSort('smallest')">Smallest → Largest</button>
+                        </div>
+                    </div>
+                    <div class="abazar-view-group">
+                        <button class="abazar-view-btn active" id="abazar-view-date" onclick="App.setBazarView('date')"><span class="material-icons-round">calendar_month</span></button>
+                        <button class="abazar-view-btn" id="abazar-view-list" onclick="App.setBazarView('list')"><span class="material-icons-round">view_list</span></button>
+                    </div>
                 </div>
                 <div id="abazar-list"></div>
                 <button class="abazar-fab" onclick="App.openAddCostToday()"><span class="material-icons-round">add</span> <span data-lang-key="el_add">Add</span></button>
@@ -440,13 +459,32 @@
                     <button class="abazar-filter-btn" data-filter="utility" onclick="App.filterDeposits('utility')"><span class="material-icons-round">lightbulb</span> <span data-lang-key="mm2_tab_utility">Rent, Utilities & Others</span></button>
                     <span class="abazar-filter-total" id="abalance-filter-total"></span>
                 </div>
-                <div class="abazar-member-filter" id="abalance-member-filter">
-                    <button class="abazar-filter-btn" id="abalance-member-btn" onclick="App.toggleDepDropdown()">
-                        <span class="material-icons-round">person</span>
-                        <span id="abalance-member-label">No Filter</span>
-                        <span class="material-icons-round" style="font-size:14px">expand_more</span>
-                    </button>
-                    <div class="abazar-member-dropdown" id="abalance-member-dropdown"></div>
+                <div class="abazar-toolbar">
+                    <div class="abazar-member-filter" id="abalance-member-filter">
+                        <button class="abazar-filter-btn" id="abalance-member-btn" onclick="App.toggleDepDropdown()">
+                            <span class="material-icons-round">person</span>
+                            <span id="abalance-member-label">No Filter</span>
+                            <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                        </button>
+                        <div class="abazar-member-dropdown" id="abalance-member-dropdown"></div>
+                    </div>
+                    <div class="abazar-member-filter" id="abalance-sort-filter">
+                        <button class="abazar-filter-btn" id="abalance-sort-btn" onclick="App.toggleDepSortDropdown()">
+                            <span class="material-icons-round">sort</span>
+                            <span id="abalance-sort-label" class="abazar-sort-label">Newest → Oldest</span>
+                            <span class="material-icons-round" style="font-size:14px">expand_more</span>
+                        </button>
+                        <div class="abazar-member-dropdown" id="abalance-sort-dropdown">
+                            <button class="abazar-member-dropdown-item active" data-sort="newest" onclick="App.setDepSort('newest')">Newest → Oldest</button>
+                            <button class="abazar-member-dropdown-item" data-sort="oldest" onclick="App.setDepSort('oldest')">Oldest → Newest</button>
+                            <button class="abazar-member-dropdown-item" data-sort="largest" onclick="App.setDepSort('largest')">Largest → Smallest</button>
+                            <button class="abazar-member-dropdown-item" data-sort="smallest" onclick="App.setDepSort('smallest')">Smallest → Largest</button>
+                        </div>
+                    </div>
+                    <div class="abazar-view-group">
+                        <button class="abazar-view-btn active" id="abalance-view-date" onclick="App.setDepView('date')"><span class="material-icons-round">calendar_month</span></button>
+                        <button class="abazar-view-btn" id="abalance-view-list" onclick="App.setDepView('list')"><span class="material-icons-round">view_list</span></button>
+                    </div>
                 </div>
                 <div id="abalance-list"></div>
                 <button class="abazar-fab" onclick="App.openAddDepositToday()"><span class="material-icons-round">add</span> <span data-lang-key="mm2_add">Add</span></button>
@@ -673,6 +711,6 @@
     <script src="firebase-auth-compat.js"></script>
     <script src="firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="app.js?v=202610011249"></script>
+    <script src="app.js?v=202610011333"></script>
 </body>
 </html>

@@ -2197,6 +2197,28 @@ select.input-sm { cursor: pointer; }
 .abazar-view-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 .abazar-view-btn .material-icons-round { font-size: 20px; }
 
+.abazar-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; margin: 0 12px 8px; }
+.abazar-toolbar .abazar-member-filter { margin: 0; }
+.abazar-view-group { display: flex; gap: 6px; margin-left: auto; }
+.abazar-sort-label { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.abazar-flat-list { display: flex; flex-direction: column; gap: 10px; }
+.abazar-flat-item {
+    background: #fff; border: 1px solid #dfe4ec; border-radius: 14px; overflow: hidden;
+}
+.abazar-flat-head { display: flex; align-items: center; gap: 10px; padding: 14px; cursor: pointer; transition: background .15s; }
+.abazar-flat-head:hover { background: #f8f9fb; }
+.abazar-flat-head.expanded { background: #f0f4fa; }
+.abazar-flat-info { flex: 1; min-width: 0; }
+.abazar-flat-info h4 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.abazar-flat-info p { font-size: 12px; color: #777; margin: 3px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.abazar-flat-amount {
+    font-size: 15px; font-weight: 700; color: #d32f2f; white-space: nowrap;
+    display: flex; align-items: center; gap: 2px;
+}
+.abazar-flat-amount .material-icons-round { font-size: 20px; color: #ccc; transition: transform .2s; }
+.abazar-flat-head.expanded .abazar-flat-amount .material-icons-round { transform: rotate(180deg); }
+
 .abazar-day-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 14px;
     margin: 0 0 10px; overflow: hidden;
@@ -2984,6 +3006,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .adash-today, [data-theme="oled"] .dash-meal-box,
 [data-theme="oled"] .dash-cost-box, [data-theme="oled"] .aflat-card,
 [data-theme="oled"] .aflat-card-box, [data-theme="oled"] .abazar-day-card,
+[data-theme="oled"] .abazar-flat-item,
 [data-theme="oled"] .abazar-item, [data-theme="oled"] .amealhist-card,
 [data-theme="oled"] .acosttrash-card, [data-theme="oled"] .adeptrash-card,
 [data-theme="oled"] .amenu-card, [data-theme="oled"] .aduty-card,
@@ -3023,6 +3046,8 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-day-info h3 { color: #e8ebf1; }
 [data-theme="oled"] .abazar-day-info p { color: #999; }
 [data-theme="oled"] .abazar-item-name { color: #e8ebf1; }
+[data-theme="oled"] .abazar-flat-info h4 { color: #e8ebf1; }
+[data-theme="oled"] .abazar-flat-info p { color: #999; }
 [data-theme="oled"] .abazar-item-buyer { color: #999; }
 [data-theme="oled"] .abazar-item-each { color: #999; }
 [data-theme="oled"] .abazar-day-items-head { color: #999; border-color: #1a1a1a; }
@@ -3217,6 +3242,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-filter-btn.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #0a0a0a; }
 [data-theme="oled"] .abazar-filter-btn.active .material-icons-round { color: #0a0a0a !important; }
 [data-theme="oled"] .abazar-view-btn { background: #141414; border-color: #222; color: #ccc; }
+[data-theme="oled"] .abazar-flat-head:hover, [data-theme="oled"] .abazar-flat-head.expanded { background: #141414; }
 /* Meal page */
 [data-theme="oled"] .amealhist-card { background: #0d0d0d; border-color: #1a1a1a; }
 [data-theme="oled"] .ameal-table tbody td { color: #e8ebf1; }
@@ -3339,7 +3365,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] #page-monthly, [data-theme="oled"] #page-duty,
 [data-theme="oled"] #page-notices { background: #0a0a0a; }
 /* All cards, inputs, selects, buttons */
-[data-theme="oled"] .abazar-day-card, [data-theme="oled"] .abazar-item,
+[data-theme="oled"] .abazar-day-card, [data-theme="oled"] .abazar-flat-item, [data-theme="oled"] .abazar-item,
 [data-theme="oled"] .adash-notice-card, [data-theme="oled"] .adash-mess-card,
 [data-theme="oled"] .adash-meal-card, [data-theme="oled"] .adash-summary-card,
 [data-theme="oled"] .adash-card, [data-theme="oled"] .adash-today,
@@ -3429,7 +3455,7 @@ img, canvas { max-width: 100%; }
 
 /* Every card spans the full column width on all screens, no exceptions. */
 .adash-table-wrap, .ameal-month-row, .abazar-month-row,
-.abazar-filters, .anotice-board { margin-left: 0; margin-right: 0; }
+.abazar-filters, .anotice-board, .abazar-toolbar { margin-left: 0; margin-right: 0; }
 .abazar-member-filter { margin-left: 0; margin-right: 0; }
 .aprof-card { margin-left: 0; margin-right: 0; }
 .adash-join-card, .adash-notice, .adash-today,
