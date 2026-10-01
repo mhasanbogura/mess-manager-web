@@ -457,6 +457,11 @@ const App = {
             firebase.database.Reference.prototype.update = _writeTimeout(_origUpdate);
         } catch (e) {}
         this._setupConnectivity();
+        this._setupAppPullRefresh();
+        window.addEventListener('resize', () => {
+            const c = document.getElementById('toast-container');
+            if (c && c.classList.contains('above-footer')) this._toastPosition(c);
+        });
         this.bindEvents();
         this.bindBackButton();
         auth.onAuthStateChanged(user => {
@@ -805,6 +810,65 @@ const App = {
                     setTimeout(() => { indicator.style.transform = 'translateX(-50%) translateY(-50px)'; }, 1000);
                 });
             }
+        }, { passive: true });
+    },
+
+    _setupAppPullRefresh() {
+        if (this._pullAppSetup) return;
+        this._pullAppSetup = true;
+        let startY = 0, pulling = false, target = null, armed = false;
+        const indicator = document.createElement('div');
+        indicator.className = 'pull-refresh-indicator';
+        indicator.innerHTML = '<span class="material-icons-round pull-refresh-icon">refresh</span><span class="pull-refresh-text">Pull to refresh</span>';
+        document.body.appendChild(indicator);
+        const icon = indicator.querySelector('.pull-refresh-icon');
+        const label = indicator.querySelector('.pull-refresh-text');
+        const show = y => { indicator.style.transform = 'translateX(-50%) translateY(' + y + 'px)'; };
+        const hide = () => { indicator.classList.remove('active'); icon.style.transform = ''; show(-70); };
+        const appActive = () => { const a = document.getElementById('app-screen'); return !!(a && a.classList.contains('active')); };
+        const blocked = () => {
+            const mo = document.getElementById('modal-overlay');
+            const dl = document.getElementById('dlg');
+            return (mo && mo.classList.contains('active')) || (dl && !dl.hidden);
+        };
+        const atTop = el => {
+            if ((window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0) > 0) return false;
+            let n = el;
+            while (n && n !== document.body) { if (n.scrollTop > 0) return false; n = n.parentElement; }
+            return true;
+        };
+        document.addEventListener('touchstart', e => {
+            if (!appActive() || blocked()) { pulling = false; return; }
+            startY = e.touches[0].clientY;
+            target = e.touches[0].target;
+            pulling = true; armed = false;
+        }, { passive: true });
+        document.addEventListener('touchmove', e => {
+            if (!pulling) return;
+            const dy = e.touches[0].clientY - startY;
+            if (dy > 8 && atTop(target)) {
+                armed = true;
+                indicator.classList.add('active');
+                show(Math.min(dy * 0.45, 44) - 62);
+                label.textContent = dy > 90 ? 'Release to refresh' : 'Pull to refresh';
+                icon.style.transform = 'rotate(' + (dy * 3) + 'deg)';
+            } else if (dy <= 0) {
+                armed = false; hide();
+            }
+        }, { passive: true });
+        document.addEventListener('touchend', e => {
+            if (!pulling) return;
+            const dy = ((e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientY : 0) - startY;
+            const fire = armed && dy > 90;
+            pulling = false; armed = false;
+            if (fire) {
+                label.textContent = 'Refreshing...';
+                icon.style.transform = '';
+                icon.style.animation = 'spin 1s linear infinite';
+                show(14);
+                try { this._refreshCurrentPage(); } catch (err) {}
+                setTimeout(() => { icon.style.animation = ''; hide(); }, 900);
+            } else { hide(); }
         }, { passive: true });
     },
 
@@ -1606,7 +1670,7 @@ const App = {
         return !!this._userPerms[key];
     },
     checkPerm(key) {
-        if (!this.canDo(key)) { this.toast('No permission for this action', 'error'); return false; }
+        if (!this.canDo(key)) { this.toast("You don't have permission to perform this action. Please contact the Mess Manager.", 'error', 'toast-perm'); return false; }
         return true;
     },
 
@@ -3983,6 +4047,9 @@ https://mahmudulsapp.u.gy/mess-manager
             addmeal: () => this.loadAddMeal(),
             addcost: () => this.loadAddCost(),
             adddeposit: () => this.loadAddDeposit(),
+            duty: () => this.loadDuty(),
+            costtrash: () => this.loadCostTrash(),
+            deptrash: () => this.loadDepTrash(),
         };
         if (loaders[page]) {
             try { loaders[page](); } catch (e) {}
@@ -5054,13 +5121,36 @@ https://mahmudulsapp.u.gy/mess-manager
 
     esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; },
 
-    toast(msg, type = 'info') {
+    toast(msg, type = 'info', cls = '') {
         const c = document.getElementById('toast-container');
+        this._toastPosition(c);
         const t = document.createElement('div');
-        t.className = 'toast ' + type;
-        t.textContent = msg;
+        t.className = ('toast ' + type + (cls ? ' ' + cls : '')).trim();
+        if (cls && cls.indexOf('toast-perm') > -1) {
+            const span = document.createElement('span');
+            span.className = 'perm-msg';
+            span.textContent = msg;
+            t.appendChild(span);
+        } else {
+            t.textContent = msg;
+        }
         c.appendChild(t);
         setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; setTimeout(() => t.remove(), 300); }, 3000);
+    },
+
+    _toastPosition(c) {
+        c.classList.remove('above-footer');
+        c.style.left = ''; c.style.right = ''; c.style.bottom = '';
+        const page = this.currentPage;
+        if (page !== 'addmeal' && page !== 'addcost' && page !== 'adddeposit') return;
+        const btn = document.querySelector('#page-' + page + ' .aam-footer .aam-save-btn');
+        if (!btn) return;
+        const r = btn.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        c.classList.add('above-footer');
+        c.style.left = Math.round(r.left) + 'px';
+        c.style.right = Math.round(window.innerWidth - r.right) + 'px';
+        c.style.bottom = Math.round(window.innerHeight - r.top + 10) + 'px';
     }
 };
 
