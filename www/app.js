@@ -76,7 +76,7 @@ const App = {
         nav_dashboard:'Dashboard',nav_mess:'Mess',nav_expense:'Expense',nav_meal:'Meal',nav_money:'Money',nav_settings:'Settings',
         // Dashboard
         dash_greet_morning:'Good morning',dash_greet_afternoon:'Good afternoon',dash_greet_evening:'Good evening',
-        dash_share:'Share Mess ID',dash_manager:'Manager',dash_current_month:'Current month',dash_notice:'Notice',
+        dash_share:'Share Mess',dash_manager:'Manager',dash_current_month:'Current month',dash_notice:'Notice',
         dash_notice_preview:'Pin a notice for the whole house',dash_today:'Today is',dash_breakfast:'Breakfast',dash_lunch:'Lunch',dash_dinner:'Dinner',
         dash_meal:'Meal',dash_deposit:'Deposit',dash_balance:'Balance',dash_expense_per_meal:'Expense per Meal',
         dash_utility:'Utility',dash_expense_per_utility:'Expense per utility',dash_analyse:'Analyze',
@@ -247,7 +247,7 @@ const App = {
             nav_dashboard:'ড্যাশবোর্ড',nav_mess:'মেস',nav_expense:'খরচ',nav_meal:'খাবার',nav_money:'টাকা',nav_settings:'সেটিংস',
             // Dashboard
             dash_greet_morning:'সুপ্রভাত',dash_greet_afternoon:'শুভ অপরাহ্ন',dash_greet_evening:'শুভ সন্ধ্যা',
-            dash_share:'মেস আইডি শেয়ার',dash_manager:'ম্যানেজার',dash_current_month:'বর্তমান মাস',dash_notice:'নোটিশ',
+            dash_share:'মেস শেয়ার',dash_manager:'ম্যানেজার',dash_current_month:'বর্তমান মাস',dash_notice:'নোটিশ',
             dash_notice_preview:'পুরো বাড়ির জন্য একটি নোটিশ দিন',dash_today:'আজ',dash_breakfast:'সকালের নাস্তা',dash_lunch:'দুপুরের খাবার',dash_dinner:'রাতের খাবার',
             dash_meal:'খাবার',dash_deposit:'জমা',dash_balance:'ব্যালেন্স',dash_expense_per_meal:'প্রতি খাবারে খরচ',
             dash_utility:'ইউটিলিটি',dash_expense_per_utility:'প্রতি ইউটিলিটিতে খরচ',dash_analyse:'বিশ্লেষণ',
@@ -1267,6 +1267,24 @@ const App = {
         }, { passive: true });
     },
 
+    _fitFlatValues() {
+        const fit = (el) => {
+            if (!el || !el.clientWidth) return;
+            el.style.whiteSpace = 'nowrap';
+            el.style.overflow = 'hidden';
+            el.style.textOverflow = 'ellipsis';
+            let size = 14;
+            el.style.fontSize = size + 'px';
+            while (size > 9 && el.scrollWidth > el.clientWidth) { size -= 1; el.style.fontSize = size + 'px'; }
+        };
+        fit(document.getElementById('flat-manager-name'));
+        fit(document.getElementById('flat-mess-code'));
+        if (!this._fitBound) {
+            this._fitBound = true;
+            window.addEventListener('resize', () => { clearTimeout(this._fitT); this._fitT = setTimeout(() => this._fitFlatValues(), 150); });
+        }
+    },
+
     async loadFlat() {
         if (!this.messId) return;
         try {
@@ -1281,6 +1299,7 @@ const App = {
             const admin = Object.keys(members).find(id => members[id] && members[id].role === 'admin');
             if (admin) adminName = members[admin].name || '-';
             document.getElementById('flat-manager-name').textContent = adminName;
+            this._fitFlatValues();
 
             document.getElementById('flat-member-count').textContent = mids.length;
             const canManage = this.userRole === 'admin' || this.canDo('manage');
@@ -1628,7 +1647,23 @@ const App = {
     async shareMessCode() {
         if (!this.messCode) { this.toast('No mess code', 'error'); return; }
         const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
-        const text = `Join my mess ${this.messName || ''}!\n\n🔗 Join via Website: ${joinUrl}\n\n📲 Join via App: Download and install Mess Manager, then enter the mess code below.\n\n🔑 Mess Code: ${this.messCode}\n\nDownload App: https://mahmudulsapp.u.gy/mess-manager`;
+        const _nm = this.messName || 'my mess';
+        const text = `🏠 **You're Invited to Join Our Mess!**
+
+Welcome to **${_nm}**! We'd love to have you join our mess and stay connected with everyone.
+
+🔗 **Join via Website:**
+${joinUrl}
+
+📲 **Join via App:**
+Download and install **Mess Manager**, then enter the Mess ID below.
+
+🔑 **Mess ID:** ${this.messCode}
+
+📥 **Download Mess Manager:**
+https://mahmudulsapp.u.gy/mess-manager
+
+**See you in ${_nm}! 🎉**`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
         } else if (navigator.share) {
@@ -4776,7 +4811,23 @@ const App = {
     shareMessCode() {
         if (!this.messCode) return;
         const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
-        const text = `Join my mess ${this.messName || ''}!\n\n🔗 Join via Website: ${joinUrl}\n\n📲 Join via App: Download and install Mess Manager, then enter the mess code below.\n\n🔑 Mess Code: ${this.messCode}\n\nDownload App: https://mahmudulsapp.u.gy/mess-manager`;
+        const _nm = this.messName || 'my mess';
+        const text = `🏠 **You're Invited to Join Our Mess!**
+
+Welcome to **${_nm}**! We'd love to have you join our mess and stay connected with everyone.
+
+🔗 **Join via Website:**
+${joinUrl}
+
+📲 **Join via App:**
+Download and install **Mess Manager**, then enter the Mess ID below.
+
+🔑 **Mess ID:** ${this.messCode}
+
+📥 **Download Mess Manager:**
+https://mahmudulsapp.u.gy/mess-manager
+
+**See you in ${_nm}! 🎉**`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
         } else if (navigator.share) {
