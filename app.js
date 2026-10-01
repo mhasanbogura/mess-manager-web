@@ -1936,33 +1936,64 @@ const App = {
         setTimeout(() => this.switchFlatTab('peoples'), 100);
     },
 
-    changeMonth() {
-        const sm = this.getSelMonth();
-        let options = '';
-        const now = new Date();
-        for (let i = 0; i < 12; i++) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const y = d.getFullYear();
-            const m = d.getMonth();
-            const val = `${y}-${String(m + 1).padStart(2, '0')}`;
-            const label = `${d.toLocaleString('en-US', { month: 'long' })} ${y}`;
-            const sel = y === sm.year && m === sm.month ? ' selected' : '';
-            options += `<option value="${val}"${sel}>${label}</option>`;
-        }
-        document.getElementById('modal-title').textContent = 'Select Month';
-        document.getElementById('modal-body').innerHTML = `<select id="month-picker-select" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:15px;background:var(--card);color:var(--text);outline:none">${options}</select>`;
-        document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.confirmChangeMonth()" style="width:100%;padding:12px;border-radius:10px">OK</button></div>`;
-        this.openModal();
+    _ensureUnitMenuCloser() {
+        if (this._bzUnitOutsideBound) return;
+        this._bzUnitOutsideBound = true;
+        const closeMenus = () => document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
+        document.addEventListener('click', (e) => {
+            if (!e.target || !e.target.closest || !e.target.closest('.bz-unit-picker')) {
+                const mm = document.getElementById('month-menu');
+                if (mm && e.target.closest && e.target.closest('#month-menu')) return;
+                closeMenus();
+            }
+        });
+        document.addEventListener('scroll', closeMenus, true);
+        window.addEventListener('resize', closeMenus);
     },
 
-    confirmChangeMonth() {
-        const sel = document.getElementById('month-picker-select');
-        if (sel && sel.value) {
-            const [y, m] = sel.value.split('-').map(Number);
-            this._selYear = y;
-            this._selMonth = m - 1;
+    toggleMonthMenu(el) {
+        let menu = document.getElementById('month-menu');
+        if (!menu) {
+            menu = document.createElement('div');
+            menu.className = 'bz-unit-menu';
+            menu.id = 'month-menu';
+            menu.style.display = 'none';
+            document.body.appendChild(menu);
         }
-        this.closeModal();
+        const isOpen = menu.style.display !== 'none';
+        document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
+        if (!isOpen) {
+            const sm = this.getSelMonth();
+            const now = new Date();
+            let opts = '';
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                const label = `${d.toLocaleString('en-US', { month: 'long' })} ${d.getFullYear()}`;
+                const active = (d.getFullYear() === sm.year && d.getMonth() === sm.month) ? ' active' : '';
+                opts += `<button type="button" class="bz-unit-opt${active}" onclick="App.pickMonth('${val}')">${label}</button>`;
+            }
+            menu.innerHTML = opts;
+            menu.style.display = 'flex';
+            menu.style.position = 'fixed';
+            menu.style.right = 'auto';
+            menu.style.bottom = 'auto';
+            menu.style.zIndex = '500';
+            const r = el && el.getBoundingClientRect ? el.getBoundingClientRect() : { top: 100, bottom: 140, right: 200 };
+            const menuW = menu.offsetWidth || 200;
+            const menuH = menu.offsetHeight || 200;
+            const openUp = (window.innerHeight - r.bottom) < (menuH + 8) && r.top > (menuH + 8);
+            menu.style.top = (openUp ? Math.max(8, r.top - menuH - 4) : (r.bottom + 4)) + 'px';
+            menu.style.left = Math.max(8, Math.min(r.right - menuW, window.innerWidth - menuW - 8)) + 'px';
+        }
+        this._ensureUnitMenuCloser();
+    },
+
+    pickMonth(val) {
+        const [y, m] = val.split('-').map(Number);
+        this._selYear = y;
+        this._selMonth = m - 1;
+        document.querySelectorAll('.bz-unit-menu').forEach(mm => mm.style.display = 'none');
         const page = this.currentPage;
         if (page === 'dashboard') this.loadDashboard();
         else this.navigate(page);
@@ -1974,10 +2005,6 @@ const App = {
         this._aamEditName = null;
         this._aamEditType = null;
         this.navigate('addmeal');
-    },
-
-    mealPickMonth() {
-        this.changeMonth();
     },
 
     async loadMeals() {
@@ -3225,16 +3252,7 @@ const App = {
             menu.style.top = (openUp ? Math.max(8, r.top - menuH - 4) : (r.bottom + 4)) + 'px';
             menu.style.left = Math.max(8, Math.min(r.right - menuW, window.innerWidth - menuW - 8)) + 'px';
         }
-        if (!this._bzUnitOutsideBound) {
-            this._bzUnitOutsideBound = true;
-            document.addEventListener('click', (e) => {
-                if (!e.target || !e.target.closest || !e.target.closest('.bz-unit-picker')) {
-                    closeMenus();
-                }
-            });
-            document.addEventListener('scroll', closeMenus, true);
-            window.addEventListener('resize', closeMenus);
-        }
+        this._ensureUnitMenuCloser();
     },
 
     bzPickUnit(idx, unit) {
@@ -4243,7 +4261,7 @@ const App = {
                     <h2>Analysis</h2>
                 </div>
                 <div class="am-body">
-                    <div class="am-month-row" onclick="App.mealPickMonth()" style="cursor:pointer"><span data-lang-key="an_current_month">Current Month:</span><span class="month-pick"><strong id="am-month-label">-</strong><span class="material-icons-round">expand_more</span></span></div>
+                    <div class="am-month-row" onclick="App.toggleMonthMenu(this)" style="cursor:pointer"><span data-lang-key="an_current_month">Current Month:</span><span class="month-pick"><strong id="am-month-label">-</strong><span class="material-icons-round">expand_more</span></span></div>
                     <div class="am-tabs">
                         <button class="am-tab active" onclick="App.switchAnalysisTab('meal')"><span class="material-icons-round" style="font-size:16px;vertical-align:middle">restaurant</span> Meal</button>
                         <button class="am-tab" onclick="App.switchAnalysisTab('utility')"><span class="material-icons-round" style="font-size:16px;vertical-align:middle">lightbulb</span> Utility</button>
