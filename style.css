@@ -1476,7 +1476,7 @@ select.input-sm { cursor: pointer; }
 
     .modal { max-width: 100%; margin: 0 8px; border-radius: 20px; max-height: calc(75vh - env(safe-area-inset-top, 0px)); }
     .modal-overlay { padding: 16px; padding-top: env(safe-area-inset-top, 0px); }
-    .modal-overlay.active { align-items: flex-end; padding-bottom: 16px; }
+    .modal-overlay.active { align-items: center; }
     .modal-header { padding: 14px 16px; }
     .modal-body { padding: 14px 16px; padding-bottom: 24px; }
     .modal-footer { padding: 12px 16px; }
@@ -2789,7 +2789,7 @@ img, canvas { max-width: 100%; }
 .aflat-activity-btn .material-icons-round { font-size: 18px; }
 
 .aflat-people-item {
-    display: flex; align-items: center; gap: 10px;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     background: #fff; border: 1px solid #dfe4ec; border-radius: 12px;
     padding: 8px 12px; margin-bottom: 6px; cursor: pointer;
 }
@@ -2806,7 +2806,7 @@ img, canvas { max-width: 100%; }
 .aflat-people-item .chevron { color: #ccc; flex-shrink: 0; transition: transform .2s; }
 .aflat-people-item.expanded .chevron { transform: rotate(180deg); }
 .aflat-people-item.expanded .fp-actions { display: flex; }
-.fp-actions { display: none; gap: 10px; margin-top: 10px; }
+.fp-actions { display: none; gap: 10px; margin-top: 0; flex: 1 0 100%; padding-left: 52px; }
 .fp-btn {
     padding: 10px 18px; border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
     cursor: pointer; font-family: inherit; white-space: nowrap;

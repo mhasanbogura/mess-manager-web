@@ -568,7 +568,50 @@ const App = {
     bindBackButton() {
         this._pageHistory = [];
         this._lastBackToast = 0;
+        this._overlayPushed = false;
+        this._skipPopNav = false;
+        // Popup <-> history bridge: while any popup (modal / About-Contact dialog)
+        // is open we own one history entry, so the browser's back button closes
+        // the popup instead of navigating the page behind it.
+        const isOverlayOpen = () => {
+            const dlg = document.getElementById('dlg');
+            const modal = document.getElementById('modal-overlay');
+            return !!((dlg && !dlg.hidden) || (modal && modal.classList.contains('active')));
+        };
+        const closeTopOverlay = () => {
+            const dlg = document.getElementById('dlg');
+            if (dlg && !dlg.hidden) { this.closeDialog(); return true; }
+            const modal = document.getElementById('modal-overlay');
+            if (modal && modal.classList.contains('active')) { this.closeModal(); return true; }
+            return false;
+        };
+        const syncOverlayHistory = () => {
+            const open = isOverlayOpen();
+            if (open && !this._overlayPushed) {
+                this._overlayPushed = true;
+                try { history.pushState({ mmOverlay: 1 }, ''); } catch (e) { this._overlayPushed = false; }
+            } else if (!open && this._overlayPushed) {
+                // closed from the UI: consume our entry so history stays aligned
+                this._overlayPushed = false;
+                this._skipPopNav = true;
+                try { history.back(); } catch (e) { this._skipPopNav = false; }
+            }
+        };
+        try {
+            const mo = document.getElementById('modal-overlay');
+            const dlg = document.getElementById('dlg');
+            if (mo && window.MutationObserver) new MutationObserver(syncOverlayHistory).observe(mo, { attributes: true, attributeFilter: ['class'] });
+            if (dlg && window.MutationObserver) new MutationObserver(syncOverlayHistory).observe(dlg, { attributes: true, attributeFilter: ['hidden'] });
+        } catch (e) { /* observers are an enhancement only */ }
+        this._syncOverlayHistory = syncOverlayHistory;
         window.addEventListener('popstate', (e) => {
+            if (this._skipPopNav) { this._skipPopNav = false; return; }
+            if (this._overlayPushed) {
+                this._overlayPushed = false;
+                if (closeTopOverlay()) return;
+            } else if (isOverlayOpen()) {
+                if (closeTopOverlay()) return;
+            }
             if (!document.getElementById('app-screen')?.classList.contains('active')) return;
             if (e.state && e.state.page) {
                 this._fromPopstate = true;
@@ -1552,9 +1595,9 @@ const App = {
                     <div class="aflat-people-info">
                         <h4>${this.esc(m.name || 'Unknown')} ${isAdmin ? '<span class="role-badge">(Manager' + (isYou ? ', You' : '') + ')</span>' : ''}</h4>
                         <div class="email">${this.esc(email)}</div>
-                        ${actionsHtml}
                     </div>
                     <span class="material-icons-round chevron">expand_more</span>
+                    ${actionsHtml}
                 </div>`;
             }
             div.innerHTML = html;
