@@ -2911,9 +2911,10 @@ img, canvas { max-width: 100%; }
 .am-tab.active { background: linear-gradient(135deg, #555, #333); color: #fff; }
 .am-tab-content { display: none; }
 .am-tab-content.active { display: block; }
-.am-month-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-.am-month-row label { font-size: 14px; color: #555; font-weight: 600; }
-.am-month-row select { flex: 1; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; background: var(--card); color: var(--text); outline: none; }
+.am-month-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.am-month-row strong { font-size: 16px; color: #d32f2f; font-weight: 700; }
+.month-pick { display: inline-flex; align-items: center; gap: 4px; }
+.month-pick .material-icons-round { font-size: 18px; color: #999; }
 .am-stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
 .am-stat-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 12px; text-align: center; }
 .am-stat-card small { font-size: 11px; color: #888; display: block; }

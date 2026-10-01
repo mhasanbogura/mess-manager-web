@@ -160,7 +160,7 @@ const App = {
         mt_no_items:'No items yet',mt_special_days:'Special menus for specific dates',mt_add_special:'Add special day',
         mt_coming_soon:'Menu history coming soon',
         // Analysis
-        an_title:'Analysis',an_month:'Month',an_tab_meal:'Meal',an_tab_utility:'Utility',
+        an_title:'Analysis',an_month:'Month',an_current_month:'Current Month:',an_tab_meal:'Meal',an_tab_utility:'Utility',
         an_total_meals:'Total meals',an_meal_bazar:'Meal bazar',an_members:'Members',
         an_expense_per_meal:'Expense per Meal',an_bazar:'Bazar',an_meals_label:'Meals',
         an_member_balances:'Member balances',an_credit_hint:'Green = in credit · Red = owes (deposit − meal cost)',
@@ -330,7 +330,7 @@ const App = {
             mt_no_items:'এখনো কোনো আইটেম নেই',mt_special_days:'নির্দিষ্ট তারিখের বিশেষ মেনু',mt_add_special:'বিশেষ দিন যোগ',
             mt_coming_soon:'মেনু ইতিহাস শীঘ্রই আসছে',
             // Analysis
-            an_title:'বিশ্লেষণ',an_month:'মাস',an_tab_meal:'খাবার',an_tab_utility:'ইউটিলিটি',
+            an_title:'বিশ্লেষণ',an_month:'মাস',an_current_month:'বর্তমান মাস:',an_tab_meal:'খাবার',an_tab_utility:'ইউটিলিটি',
             an_total_meals:'মোট খাবার',an_meal_bazar:'খাবার বাজার',an_members:'সদস্য',
             an_expense_per_meal:'প্রতি খাবারে খরচ',an_bazar:'বাজার',an_meals_label:'খাবার',
             an_member_balances:'সদস্যদের ব্যালেন্স',an_credit_hint:'সবুজ = বাকি আছে · লাল = দেনা (জমা − খরচ)',
@@ -4243,9 +4243,7 @@ const App = {
                     <h2>Analysis</h2>
                 </div>
                 <div class="am-body">
-                    <div class="am-month-row"><label>Month</label><select id="am-month-select" onchange="App.changeAnalysisMonth(this.value)">
-                        ${this.buildMonthOptions(year, mon)}
-                    </select></div>
+                    <div class="am-month-row" onclick="App.mealPickMonth()" style="cursor:pointer"><span data-lang-key="an_current_month">Current Month:</span><span class="month-pick"><strong id="am-month-label">-</strong><span class="material-icons-round">expand_more</span></span></div>
                     <div class="am-tabs">
                         <button class="am-tab active" onclick="App.switchAnalysisTab('meal')"><span class="material-icons-round" style="font-size:16px;vertical-align:middle">restaurant</span> Meal</button>
                         <button class="am-tab" onclick="App.switchAnalysisTab('utility')"><span class="material-icons-round" style="font-size:16px;vertical-align:middle">lightbulb</span> Utility</button>
@@ -4355,6 +4353,8 @@ const App = {
                     </div>
 
                 </div>`;
+            const amLabel = document.getElementById('am-month-label');
+            if (amLabel) amLabel.textContent = monthLabel;
 
             setTimeout(() => {
                 this.drawRateChart(mealBzByDay, mealsByDay, daysInMonth);
@@ -4365,28 +4365,6 @@ const App = {
                 this.drawUtilRateChart(utilBzByDay, daysInMonth, mids.length);
             }, 100);
         } catch (e) { console.error('loadMonthly error:', e); }
-    },
-
-    buildMonthOptions(currentYear, currentMon) {
-        let html = '';
-        const now = new Date();
-        for (let i = 0; i < 12; i++) {
-            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const y = d.getFullYear();
-            const m = d.getMonth();
-            const val = `${y}-${String(m + 1).padStart(2, '0')}`;
-            const label = `${d.toLocaleString('en-US', { month: 'long' })} ${y}`;
-            const sel = y === currentYear && m === currentMon ? ' selected' : '';
-            html += `<option value="${val}"${sel}>${label}</option>`;
-        }
-        return html;
-    },
-
-    changeAnalysisMonth(val) {
-        const [y, m] = val.split('-').map(Number);
-        this._selYear = y;
-        this._selMonth = m - 1;
-        this.loadMonthly();
     },
 
     switchAnalysisTab(tab) {
