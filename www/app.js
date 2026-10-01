@@ -1941,6 +1941,7 @@ const App = {
         this._bzUnitOutsideBound = true;
         const closeMenus = () => document.querySelectorAll('.bz-unit-menu').forEach(m => m.style.display = 'none');
         document.addEventListener('click', (e) => {
+            if (Date.now() - (App._monthMenuOpenedAt || 0) < 500) return;
             if (!e.target || !e.target.closest || !e.target.closest('.bz-unit-picker')) {
                 const mm = document.getElementById('month-menu');
                 if (mm && e.target.closest && e.target.closest('#month-menu')) return;
@@ -1985,6 +1986,7 @@ const App = {
             const openUp = (window.innerHeight - r.bottom) < (menuH + 8) && r.top > (menuH + 8);
             menu.style.top = (openUp ? Math.max(8, r.top - menuH - 4) : (r.bottom + 4)) + 'px';
             menu.style.left = Math.max(8, Math.min(r.right - menuW, window.innerWidth - menuW - 8)) + 'px';
+            App._monthMenuOpenedAt = Date.now();
         }
         this._ensureUnitMenuCloser();
     },
