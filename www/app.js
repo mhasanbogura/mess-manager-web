@@ -2005,6 +2005,7 @@ const App = {
                 nameToMid[name] = mid;
             });
             Object.entries(allMeals).forEach(([dateKey, dayMeals]) => {
+                if (!dateKey.startsWith(month)) return;
                 const day = parseInt(dateKey.slice(8, 10), 10) - 1;
                 if (day < 0 || day >= daysInMonth) return;
                 Object.entries(dayMeals || {}).forEach(([memberName, m]) => {
