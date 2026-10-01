@@ -2194,13 +2194,15 @@ select.input-sm { cursor: pointer; }
     background: #fff; display: flex; align-items: center; justify-content: center;
     cursor: pointer; color: #555;
 }
-.abazar-view-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.abazar-view-btn.active { background: linear-gradient(135deg, #555, #333); border-color: #555; color: #fff; }
 .abazar-view-btn .material-icons-round { font-size: 20px; }
 
 .abazar-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; margin: 0 12px 8px; }
-.abazar-toolbar .abazar-member-filter { margin: 0; }
-.abazar-view-group { display: flex; gap: 6px; margin-left: auto; }
-.abazar-sort-label { max-width: 118px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.abazar-toolbar .abazar-member-filter { margin: 0; flex: 1 1 0; min-width: 0; }
+.abazar-toolbar .abazar-filter-btn { width: 100%; min-width: 0; }
+.abazar-toolbar .abazar-filter-btn > span:not(.material-icons-round) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.abazar-view-group { display: flex; gap: 6px; flex: 0 0 auto; margin-left: auto; }
+.abazar-sort-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .abazar-flat-list { display: flex; flex-direction: column; gap: 10px; }
 .abazar-flat-item {
@@ -3242,6 +3244,8 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .abazar-filter-btn.active { background: linear-gradient(135deg, #e0e0e0, #ccc); color: #0a0a0a; }
 [data-theme="oled"] .abazar-filter-btn.active .material-icons-round { color: #0a0a0a !important; }
 [data-theme="oled"] .abazar-view-btn { background: #141414; border-color: #222; color: #ccc; }
+[data-theme="oled"] .abazar-view-btn.active { background: linear-gradient(135deg, #e0e0e0, #ccc); border-color: #e0e0e0; color: #0a0a0a; }
+[data-theme="oled"] .abazar-view-btn.active .material-icons-round { color: #0a0a0a !important; }
 [data-theme="oled"] .abazar-flat-head:hover, [data-theme="oled"] .abazar-flat-head.expanded { background: #141414; }
 /* Meal page */
 [data-theme="oled"] .amealhist-card { background: #0d0d0d; border-color: #1a1a1a; }
@@ -3488,6 +3492,17 @@ img, canvas { max-width: 100%; }
     .abazar-fab, .anotice-fab, .amenu-fab { left: 12px; right: 12px; bottom: 84px; border-radius: 14px; justify-content: center; padding: 14px; }
     #app-screen .aam-footer { left: 12px; right: 12px; bottom: 84px; background: transparent; padding: 0; }
     #app-screen .abn-bottom { left: 12px; right: 12px; bottom: 12px; border-radius: 16px; border: 1px solid var(--border); }
+
+    /* Filter line: two full-width rows on phones (pills share row 1, sort + view row 2). */
+    .abazar-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .abazar-toolbar .abazar-member-filter { min-width: 0; }
+    .abazar-view-group { grid-column: 2; justify-self: end; }
+
+    /* Tabs + total always share one line; the wide tab shrinks with an ellipsis. */
+    .abazar-filters { flex-wrap: nowrap; }
+    .abazar-filters .abazar-filter-btn { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+    .abazar-filters .abazar-filter-btn > span:not(.material-icons-round) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .abazar-filters .abazar-filter-total { flex: 0 0 auto; }
 }
 
 /* Every scrollable page keeps enough bottom clearance so the last
