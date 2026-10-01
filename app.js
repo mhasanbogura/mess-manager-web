@@ -131,10 +131,10 @@ const App = {
         ae_hint:'Add each item on its own line. The Analysis page can then show which items cost you the most.',
         ae_type:'Type:',ae_rent:'Rent',ae_electricity:'Electricity',ae_wifi:'Wi-Fi',ae_others:'Others',
         ae_total_bill:'Total bill amount',ae_expense_from:'Expense from:',ae_divided_to:'Divided to:',
-        ae_select_all:'Select all',ae_selected:'selected',ae_footer_hint:'total',
+        ae_select_all:'Select all',ae_selected:'selected',ae_footer_hint:'total',ae_select_date:'Select expense date',
         // Add Deposit
         ad_title:'Add Deposit',ad_tab_meal:'Meal',ad_tab_utility:'Rent, Utilities & Others',
-        ad_money_from:'Money from:',ad_amount:'Enter Amount',
+        ad_money_from:'Money from:',ad_amount:'Enter Amount',ad_select_date:'Select deposit date',
         // Deleted Expenses
         de_title:'Deleted Expenses',de_current_month:'Current Month:',de_loading:'Loading...',
         de_no_items:'No deleted costs this month',de_deleted_by:'Deleted by:',
@@ -301,10 +301,10 @@ const App = {
             ae_hint:'প্রতিটি আইটেম আলাদা লাইনে যোগ করুন। বিশ্লেষণ পৃষ্ঠায় দেখা যাবে কোন আইটেম সবচেয়ে বেশি খরচ হয়েছে।',
             ae_type:'ধরন:',ae_rent:'ভাড়া',ae_electricity:'বিদ্যুৎ',ae_wifi:'ওয়াইফাই',ae_others:'অন্যান্য',
             ae_total_bill:'মোট বিল',ae_expense_from:'খরচ থেকে:',ae_divided_to:'ভাগ করা হয়েছে:',
-            ae_select_all:'সব নির্বাচন',ae_selected:'নির্বাচিত',ae_footer_hint:'মোট',
+            ae_select_all:'সব নির্বাচন',ae_selected:'নির্বাচিত',ae_footer_hint:'মোট',ae_select_date:'খরচের তারিখ নির্বাচন করুন',
             // Add Deposit
             ad_title:'জমা যোগ',ad_tab_meal:'খাবার',ad_tab_utility:'ভাড়া, ইউটিলিটি ও অন্যান্য',
-            ad_money_from:'টাকা দিয়েছে:',ad_amount:'পরিমাণ লিখুন',
+            ad_money_from:'টাকা দিয়েছে:',ad_amount:'পরিমাণ লিখুন',ad_select_date:'ডিপোজিটের তারিখ নির্বাচন করুন',
             // Deleted Expenses
             de_title:'মুছে ফেলা খরচ',de_current_month:'বর্তমান মাস:',de_loading:'লোড হচ্ছে...',
             de_no_items:'এই মাসে কোনো মুছে ফেলা খরচ নেই',de_deleted_by:'মুছে ফেলেছে:',
@@ -2240,8 +2240,9 @@ https://mahmudulsapp.u.gy/mess-manager
             cardsHtml += `<div class="aam-card"><div class="aam-card-top"><div class="aam-avatar" style="background:${bg}20"><span style="color:${bg};font-size:18px;font-weight:700">${name.charAt(0).toUpperCase()}</span></div><span class="aam-name">${this.esc(name)}</span><span class="aam-total" id="aam-total-${idx}">Total: ${preType ? 1 : 0}</span></div><div class="aam-meals-row">${mealsHtml}</div></div>`;
         });
         document.getElementById('modal-title').textContent = 'Add Meal';
-        document.getElementById('modal-body').innerHTML = `<div class="dep-date" style="position:relative;cursor:pointer" onclick="App.aamPickDate()"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
+        document.getElementById('modal-body').innerHTML = `<div class="dep-label" data-lang-key="am_select_date">Select meal date</div><div class="dep-date" style="position:relative;cursor:pointer" onclick="App.aamPickDate()"><span class="material-icons-round">calendar_month</span> <span id="aam-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div><div id="aam-cards-wrap">${cardsHtml || '<p class="empty-state">No members</p>'}</div>`;
         document.getElementById('modal-footer').innerHTML = `<div class="dep-footer-btns"><button class="btn-modal-add" onclick="App.aamSave()" style="width:100%;padding:12px;border-radius:10px">Add</button></div>`;
+        this.applyLanguage();
         this.openModal();
     },
 
@@ -3287,6 +3288,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="bz-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
+            <div class="dep-label" data-lang-key="ae_select_date">Select expense date</div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div id="bz-bazar-section">
                 <div class="dep-label">Money from:</div>
@@ -3367,6 +3369,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.bzSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="bz-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
+            <div class="dep-label" data-lang-key="ae_select_date">Select expense date</div>
             <div class="dep-date" style="cursor:pointer" onclick="App.bzPickDate()"><span class="material-icons-round">calendar_month</span> <span id="bz-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div id="bz-bazar-section">
                 <div class="dep-label">Money from:</div>
@@ -3418,6 +3421,7 @@ https://mahmudulsapp.u.gy/mess-manager
             <div class="dep-footer-btns">
                 <button class="btn-modal-add" onclick="App.bzSave()">Add</button>
             </div>`;
+        this.applyLanguage();
         this.openModal();
     },
 
@@ -3644,6 +3648,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="dep-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
+            <div class="dep-label" data-lang-key="ad_select_date">Select deposit date</div>
             <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money from:</div>
             <div class="dep-chips" id="dep-chips">
@@ -3684,6 +3689,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="dep-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
+            <div class="dep-label" data-lang-key="ad_select_date">Select deposit date</div>
             <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money from:</div>
             <div class="dep-chips" id="dep-chips">
@@ -3699,6 +3705,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="btn-modal-add" onclick="App.saveDeposit()">Add</button>
             </div>`;
         this._depSelected = null;
+        this.applyLanguage();
         this.openModal();
     },
 
