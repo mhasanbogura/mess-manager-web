@@ -2807,7 +2807,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <div class="abazar-flat-head" onclick="App.toggleBazarItem(this)">
                     <div class="abazar-flat-info">
                         <h4>${this.esc(this.bzDisplayName(i))}</h4>
-                        <p>${dateStr}${buyer ? ' · ' + this.esc(buyer) : ''}</p>
+                        <p>${dateStr}${buyer ? ' · Money from: ' + this.esc(buyer) : ''}</p>
                         ${this._flatAddedMeta(i)}
                     </div>
                     <span class="abazar-flat-amount">৳${this.fmtNum(parseFloat(i.cost)||0)} <span class="material-icons-round">expand_more</span></span>
