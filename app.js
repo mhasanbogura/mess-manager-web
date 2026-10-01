@@ -1648,22 +1648,22 @@ const App = {
         if (!this.messCode) { this.toast('No mess code', 'error'); return; }
         const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
         const _nm = this.messName || 'my mess';
-        const text = `🏠 **You're Invited to Join Our Mess!**
+        const text = `🏠 *You're Invited to Join Our Mess!*
 
-Welcome to **${_nm}**! We'd love to have you join our mess and stay connected with everyone.
+Welcome to *${_nm}*! We'd love to have you join our mess and stay connected with everyone.
 
-🔗 **Join via Website:**
+🔗 *Join via Website:*
 ${joinUrl}
 
-📲 **Join via App:**
-Download and install **Mess Manager**, then enter the Mess ID below.
+📲 *Join via App:*
+Download and install *Mess Manager*, then enter the Mess ID below.
 
-🔑 **Mess ID:** ${this.messCode}
+🔑 *Mess ID:* ${this.messCode}
 
-📥 **Download Mess Manager:**
+📥 *Download Mess Manager:*
 https://mahmudulsapp.u.gy/mess-manager
 
-**See you in ${_nm}! 🎉**`;
+*See you in ${_nm}! 🎉*`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
         } else if (navigator.share) {
@@ -4812,22 +4812,22 @@ https://mahmudulsapp.u.gy/mess-manager
         if (!this.messCode) return;
         const joinUrl = `https://mhasanbogura.github.io/mess-manager-web/?join=${this.messCode}`;
         const _nm = this.messName || 'my mess';
-        const text = `🏠 **You're Invited to Join Our Mess!**
+        const text = `🏠 *You're Invited to Join Our Mess!*
 
-Welcome to **${_nm}**! We'd love to have you join our mess and stay connected with everyone.
+Welcome to *${_nm}*! We'd love to have you join our mess and stay connected with everyone.
 
-🔗 **Join via Website:**
+🔗 *Join via Website:*
 ${joinUrl}
 
-📲 **Join via App:**
-Download and install **Mess Manager**, then enter the Mess ID below.
+📲 *Join via App:*
+Download and install *Mess Manager*, then enter the Mess ID below.
 
-🔑 **Mess ID:** ${this.messCode}
+🔑 *Mess ID:* ${this.messCode}
 
-📥 **Download Mess Manager:**
+📥 *Download Mess Manager:*
 https://mahmudulsapp.u.gy/mess-manager
 
-**See you in ${_nm}! 🎉**`;
+*See you in ${_nm}! 🎉*`;
         if (window.Capacitor?.Plugins?.Share) {
             window.Capacitor.Plugins.Share.share({ title: 'Mess Manager', text }).catch(() => {});
         } else if (navigator.share) {
