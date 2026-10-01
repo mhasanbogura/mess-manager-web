@@ -968,17 +968,32 @@ const App = {
 
     async leaveMess() {
         const lang = this._currentLang || 'en';
-        const msg = lang === 'bn' ? 'আপনি কি সত্যিই এই মেস ছাড়তে চান?' : 'Are you sure you want to leave this mess?';
+        const iAmAdmin = this.userRole === 'admin';
         const body = document.getElementById('modal-body');
-        body.innerHTML = `<p style="margin:0;font-size:15px">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-danger" onclick="App.closeModal();App._doLeaveMess()">${lang === 'bn' ? 'ছাড়ুন' : 'Leave'}</button></div>`;
-        document.getElementById('modal-title').textContent = lang === 'bn' ? 'মেস ছাড়ুন' : 'Leave Mess';
+        if (iAmAdmin) {
+            const msg = lang === 'bn' ? 'আপনি এই মেসের ম্যানেজার। মেস ছাড়তে হলে আগে ম্যানেজার পদ ছেড়ে দিতে হবে। কনফার্ম করলে আপনি ম্যানেজার পদ ছেড়ে মেস ছেড়ে যাবেন।' : "You are this mess's manager. You must step down as manager before leaving. Confirm to step down as manager and leave the mess.";
+            body.innerHTML = `<p style="margin:0;font-size:15px">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-danger" onclick="App.closeModal();App._doLeaveMess(true)">${lang === 'bn' ? 'কনফার্ম' : 'Confirm'}</button></div>`;
+            document.getElementById('modal-title').textContent = lang === 'bn' ? 'ম্যানেজার পদ ছেড়ে মেস ছাড়ুন' : 'Step Down as Manager & Leave';
+        } else {
+            const msg = lang === 'bn' ? 'আপনি কি সত্যিই এই মেস ছাড়তে চান?' : 'Are you sure you want to leave this mess?';
+            body.innerHTML = `<p style="margin:0;font-size:15px">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-danger" onclick="App.closeModal();App._doLeaveMess()">${lang === 'bn' ? 'ছাড়ুন' : 'Leave'}</button></div>`;
+            document.getElementById('modal-title').textContent = lang === 'bn' ? 'মেস ছাড়ুন' : 'Leave Mess';
+        }
         this.openModal();
         document.getElementById('modal').classList.add('confirm-mode');
     },
-    async _doLeaveMess() {
+    async _doLeaveMess(stepDown) {
         if (!this.messId || !this.currentUser) return;
         try {
             const uid = this.currentUser.uid;
+            if (stepDown) {
+                const stepDownUpdates = {};
+                stepDownUpdates[`messes/${this.messId}/members/${uid}/role`] = 'member';
+                stepDownUpdates[`messes/${this.messId}/permissions/${uid}`] = null;
+                await db.ref().update(stepDownUpdates);
+                this.userRole = 'member';
+                try { localStorage.setItem(`mess_role_${this.messId}`, 'member'); } catch (e) {}
+            }
             const updates = {};
             updates[`messes/${this.messId}/members/${uid}`] = null;
             updates[`messes/${this.messId}/permissions/${uid}`] = null;
@@ -989,6 +1004,8 @@ const App = {
             if (!remaining.length) {
                 await this.deleteMessFully(this.messId);
                 this.toast(this._currentLang === 'bn' ? 'শেষ ব্যক্তি চলে গেছে — মেস মুছে ফেলা হয়েছে' : 'Last person left — mess deleted', 'success');
+            } else if (stepDown) {
+                this.toast(this._currentLang === 'bn' ? 'ম্যানেজার পদ ছেড়ে মেস ছেড়ে হয়েছে' : 'Stepped down as manager and left the mess', 'success');
             } else {
                 this.toast(this._currentLang === 'bn' ? 'মেস ছাড়া হয়েছে' : 'Left mess', 'success');
             }
@@ -1486,6 +1503,10 @@ const App = {
             document.getElementById('flat-peoples-count').textContent = appUsers.length;
             if (!appUsers.length) { div.innerHTML = '<p class="empty-state" style="padding:20px;text-align:center;color:#999">No peoples have joined yet</p>'; return; }
             const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
+            const hasManager = Object.values(members).some(x => x && x.role === 'admin');
+            const myUid = this.currentUser ? this.currentUser.uid : '';
+            let managerRequests = {};
+            try { const reqSnap = await db.ref(`messes/${this.messId}/managerRequests`).once('value'); managerRequests = reqSnap.val() || {}; } catch (e) {}
             let html = '';
             for (let i = 0; i < appUsers.length; i++) {
                 const id = appUsers[i];
@@ -1504,17 +1525,22 @@ const App = {
                 const canManage = this.userRole === 'admin' || this.canDo('manage');
                 if (isYou && isAdmin) {
                     actionsHtml = `<div class="fp-actions">
-                        <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
-                        <button class="fp-btn fp-btn-green" onclick="event.stopPropagation();App.stepDownManager()">Step down as manager</button>
+                        <button class="fp-btn fp-btn-yellow" onclick="event.stopPropagation();App.stepDownManager()">Step Down as Manager</button>
+                    </div>`;
+                } else if (!isYou && isAdmin) {
+                    const requested = !!managerRequests[myUid];
+                    actionsHtml = `<div class="fp-actions">
+                        <button class="fp-btn fp-btn-yellow" ${requested ? 'disabled' : ''} onclick="event.stopPropagation();App.requestStepDown('${id}')">${requested ? 'Request Sent' : 'Request to Step Down as Manager'}</button>
                     </div>`;
                 } else if (isYou && !isAdmin) {
                     actionsHtml = `<div class="fp-actions">
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
+                        ${!hasManager ? `<button class="fp-btn fp-btn-green" onclick="event.stopPropagation();App.becomeManager()">Become Manager</button>` : ''}
                     </div>`;
                 } else if (!isYou && canManage) {
                     actionsHtml = `<div class="fp-actions">
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>
-                        ${!isAdmin ? `<button class="fp-btn fp-btn-yellow" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote as manager</button>` : ''}
+                        ${!isAdmin ? `<button class="fp-btn fp-btn-green" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote to Manager</button>` : ''}
                     </div>`;
                 }
                 html += `<div class="aflat-people-item" onclick="this.classList.toggle('expanded')">
@@ -1532,30 +1558,113 @@ const App = {
     },
 
     stepDownManager() {
-        if (!confirm('Step down as manager?')) return;
+        const lang = this._currentLang || 'en';
+        const msg = lang === 'bn' ? 'আপনি কি সত্যিই ম্যানেজার পদ ছাড়তে চান? নতুন কেউ ম্যানেজার না হওয়া পর্যন্ত এই মেসে আর কোনো ম্যানেজার থাকবে না।' : 'Step down as manager? Until someone becomes manager again, this mess will have no manager.';
+        const body = document.getElementById('modal-body');
+        body.innerHTML = `<p style="margin:0;font-size:15px">${msg}</p><div class="modal-confirm-actions"><button class="btn-cancel" onclick="App.closeModal()">${lang === 'bn' ? 'বাতিল' : 'Cancel'}</button><button class="btn-danger" onclick="App.closeModal();App._doStepDownManager()">${lang === 'bn' ? 'কনফার্ম' : 'Confirm'}</button></div>`;
+        document.getElementById('modal-title').textContent = lang === 'bn' ? 'ম্যানেজার পদ ছাড়ুন' : 'Step Down as Manager';
+        this.openModal();
+        document.getElementById('modal').classList.add('confirm-mode');
+    },
+
+    async _doStepDownManager() {
+        if (!this.messId || !this.currentUser) return;
+        const uid = this.currentUser.uid;
+        try {
+            const updates = {};
+            updates[`messes/${this.messId}/members/${uid}/role`] = 'member';
+            updates[`messes/${this.messId}/permissions/${uid}`] = null;
+            await db.ref().update(updates);
+            this.userRole = 'member';
+            try { localStorage.setItem(`mess_role_${this.messId}`, 'member'); } catch (e) {}
+            try { await this.loadMyPerms(); } catch (e) {}
+            this.toast(this._currentLang === 'bn' ? 'আপনি ম্যানেজার পদ ছেড়েছেন' : 'You stepped down as manager', 'success');
+            this.loadFlat();
+            try { this.loadDashboard(); } catch (e) {}
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    becomeManager() {
         this.promoteToManager(this.currentUser.uid, this.currentUser.displayName);
     },
 
     async promoteToManager(uid, name) {
-        if (!this.checkPerm('manage')) return;
-        if (!confirm(`Promote ${name} as manager?`)) return;
+        if (!this.messId || !this.currentUser) return;
         try {
             const membersSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const members = membersSnap.val() || {};
+            const hasManager = Object.values(members).some(m => m && m.role === 'admin');
+            const isSelf = uid === this.currentUser.uid;
+            const becoming = isSelf && !hasManager;
+            if (!becoming && !this.checkPerm('manage')) return;
+            const lang = this._currentLang || 'en';
+            const q = becoming
+                ? (lang === 'bn' ? 'আপনি কি এই মেসের ম্যানেজার হতে চান?' : 'Become the manager of this mess?')
+                : (lang === 'bn' ? `${name} কে ম্যানেজার করবেন?` : `Promote ${name} to Manager?`);
+            if (!confirm(q)) return;
             const permSnap = await db.ref(`messes/${this.messId}/permissions`).once('value');
             const perms = permSnap.val() || {};
             const oldAdminId = Object.entries(members).find(([, m]) => m && m.role === 'admin')?.[0];
             const newAdminPerms = perms[uid] || {};
             const updates = {};
-            if (oldAdminId) {
+            if (oldAdminId && oldAdminId !== uid) {
                 updates[`messes/${this.messId}/members/${oldAdminId}/role`] = 'member';
                 updates[`messes/${this.messId}/permissions/${oldAdminId}`] = newAdminPerms;
             }
             updates[`messes/${this.messId}/members/${uid}/role`] = 'admin';
             updates[`messes/${this.messId}/permissions/${uid}`] = null;
             await db.ref().update(updates);
-            this.toast('Manager changed!', 'success');
+            if (isSelf) {
+                this.userRole = 'admin';
+                try { localStorage.setItem(`mess_role_${this.messId}`, 'admin'); } catch (e) {}
+                try { await this.loadMyPerms(); } catch (e) {}
+            }
+            this.toast(becoming ? 'You are now the manager!' : 'Manager changed!', 'success');
             this.loadFlat();
+            try { this.loadDashboard(); } catch (e) {}
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async requestStepDown(managerUid) {
+        if (!this.messId || !this.currentUser) return;
+        const uid = this.currentUser.uid;
+        if (uid === managerUid) return;
+        try {
+            const snap = await db.ref(`messes/${this.messId}/managerRequests/${uid}`).once('value');
+            if (snap.exists()) { this.toast('Request already sent to the manager', 'info'); return; }
+            await db.ref(`messes/${this.messId}/managerRequests/${uid}`).set({
+                name: this.currentUser.displayName || 'Member',
+                email: this.currentUser.email || '',
+                requestedAt: Date.now()
+            });
+            this.toast('Request sent to the manager', 'success');
+            this.loadFlat();
+        } catch (e) { this.toast('Error: ' + e.message, 'error'); }
+    },
+
+    async resolveStepDownRequest(requesterUid, accept) {
+        if (!this.messId || !this.currentUser) return;
+        if (this.userRole !== 'admin') { this.toast('Only the manager can respond to this request', 'error', 'toast-perm'); return; }
+        try {
+            const reqSnap = await db.ref(`messes/${this.messId}/managerRequests/${requesterUid}`).once('value');
+            const req = reqSnap.val() || {};
+            await db.ref(`messes/${this.messId}/managerRequests/${requesterUid}`).remove();
+            if (!accept) {
+                this.toast('Request dismissed', 'success');
+                try { this.loadDashboard(); } catch (e) {}
+                return;
+            }
+            const uid = this.currentUser.uid;
+            const updates = {};
+            updates[`messes/${this.messId}/members/${uid}/role`] = 'member';
+            updates[`messes/${this.messId}/permissions/${uid}`] = null;
+            await db.ref().update(updates);
+            this.userRole = 'member';
+            try { localStorage.setItem(`mess_role_${this.messId}`, 'member'); } catch (e) {}
+            try { await this.loadMyPerms(); } catch (e) {}
+            this.toast(req.name ? `You stepped down as manager (${req.name} requested)` : 'You stepped down as manager', 'success');
+            try { this.loadDashboard(); } catch (e) {}
+            try { this.loadFlat(); } catch (e) {}
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
     },
 
@@ -1816,7 +1925,6 @@ https://mahmudulsapp.u.gy/mess-manager
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
             let managerName = '-';
             if (adminFound) managerName = adminFound[1].name || '-';
-            else if (mids.length) managerName = (members[mids[0]] || {}).name || '-';
             document.getElementById('dash-manager').textContent = managerName;
             document.getElementById('dash-month').textContent = this.fmtMonth(this.getSelMonth().date);
 
@@ -1972,32 +2080,52 @@ https://mahmudulsapp.u.gy/mess-manager
         const div = document.getElementById('dash-join-requests');
         if (!div) return;
         const canManage = this.userRole === 'admin' || this.canDo('manage');
+        const iAmAdmin = this.userRole === 'admin';
         const pending = Object.entries(members).filter(([, m]) => m && m.status === 'pending');
-        if (!pending.length) { div.innerHTML = ''; return; }
-        if (!canManage) {
-            div.innerHTML = '';
-            return;
-        }
+        if (!canManage && !iAmAdmin) { div.innerHTML = ''; return; }
         const colors = ['#E53935','#1565C0','#2E7D32','#FF9800','#7B1FA2','#00838F'];
         let html = '';
-        pending.forEach(([id, m], i) => {
-            const initial = ((m.name || '?')[0] || '?').toUpperCase();
-            const color = colors[i % colors.length];
-            const email = m.email || '';
-            html += `<div class="adash-join-card">
-                <div class="adash-join-left">
-                    <div class="adash-join-avatar" style="background:${color}">${initial}</div>
-                    <div class="adash-join-info">
-                        <strong>${this.esc(m.name || 'Unknown')}</strong>
-                        <small>${this.esc(email)}</small>
+        if (canManage) {
+            pending.forEach(([id, m], i) => {
+                const initial = ((m.name || '?')[0] || '?').toUpperCase();
+                const color = colors[i % colors.length];
+                const email = m.email || '';
+                html += `<div class="adash-join-card">
+                    <div class="adash-join-left">
+                        <div class="adash-join-avatar" style="background:${color}">${initial}</div>
+                        <div class="adash-join-info">
+                            <strong>${this.esc(m.name || 'Unknown')}</strong>
+                            <small>${this.esc(email)}</small>
+                        </div>
                     </div>
-                </div>
-                <div class="adash-join-actions">
-                    <button class="adash-join-btn adash-join-delete" onclick="App.rejectJoin('${id}')"><span class="material-icons-round">close</span></button>
-                    <button class="adash-join-btn adash-join-confirm" onclick="App.confirmJoin('${id}')"><span class="material-icons-round">check</span></button>
-                </div>
-            </div>`;
-        });
+                    <div class="adash-join-actions">
+                        <button class="adash-join-btn adash-join-delete" onclick="App.rejectJoin('${id}')"><span class="material-icons-round">close</span></button>
+                        <button class="adash-join-btn adash-join-confirm" onclick="App.confirmJoin('${id}')"><span class="material-icons-round">check</span></button>
+                    </div>
+                </div>`;
+            });
+        }
+        if (this.userRole === 'admin') {
+            let reqs = {};
+            try { const rSnap = await db.ref(`messes/${this.messId}/managerRequests`).once('value'); reqs = rSnap.val() || {}; } catch (e) {}
+            Object.entries(reqs).forEach(([id, r]) => {
+                const name = (r && r.name) || 'Member';
+                const initial = ((name)[0] || '?').toUpperCase();
+                html += `<div class="adash-join-card">
+                    <div class="adash-join-left">
+                        <div class="adash-join-avatar" style="background:#FF9800">${initial}</div>
+                        <div class="adash-join-info">
+                            <strong>${this.esc(name)}</strong>
+                            <small>Requested you to step down as manager</small>
+                        </div>
+                    </div>
+                    <div class="adash-join-actions">
+                        <button class="adash-join-btn adash-join-delete" onclick="App.resolveStepDownRequest('${id}', false)"><span class="material-icons-round">close</span></button>
+                        <button class="adash-join-btn adash-join-confirm" onclick="App.resolveStepDownRequest('${id}', true)"><span class="material-icons-round">check</span></button>
+                    </div>
+                </div>`;
+            });
+        }
         div.innerHTML = html;
     },
 
