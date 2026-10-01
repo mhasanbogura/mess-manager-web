@@ -5282,14 +5282,18 @@ https://mahmudulsapp.u.gy/mess-manager
         if (!btn) return;
         const pageEl = document.getElementById('page-' + page);
         const r = btn.getBoundingClientRect();
-        const vh = window.innerHeight;
+        // clientWidth/clientHeight exclude the classic scrollbars, which
+        // getBoundingClientRect() already excludes too - window.inner* would
+        // over-measure and leave the toast ~15px short of the button's right edge.
+        const cw = document.documentElement.clientWidth || window.innerWidth;
+        const ch = document.documentElement.clientHeight || window.innerHeight;
         // While the page runs its fadeIn transform, its fixed children report a
         // page-relative rect (a tiny top) which would fling the toast to the top
         // of the screen - wait for the animation, then measure again. The top-half
         // check is the belt-and-braces version of the same idea.
         const animating = !!(pageEl && pageEl.getAnimations &&
             pageEl.getAnimations().some(a => a.playState === 'running'));
-        if (animating || !r.width || !r.height || r.top < vh * 0.4) {
+        if (animating || !r.width || !r.height || r.top < ch * 0.4) {
             if (!c._posRetry && c.firstChild) {
                 c._posRetry = true;
                 setTimeout(() => { c._posRetry = false; if (c.isConnected && c.firstChild) this._toastPosition(c); }, 350);
@@ -5299,8 +5303,8 @@ https://mahmudulsapp.u.gy/mess-manager
         c._posRetry = false;
         c.classList.add('above-footer');
         c.style.left = Math.round(r.left) + 'px';
-        c.style.right = Math.round(window.innerWidth - r.right) + 'px';
-        c.style.bottom = Math.round(vh - r.top + 10) + 'px';
+        c.style.right = Math.round(cw - r.right) + 'px';
+        c.style.bottom = Math.round(ch - r.top + 10) + 'px';
     }
 };
 
