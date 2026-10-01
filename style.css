@@ -2104,6 +2104,12 @@ select.input-sm { cursor: pointer; }
 }
 .aam-select .material-icons-round { color: #999; font-size: 22px; }
 .aam-date-icon .material-icons-round { color: #d32f2f; font-size: 20px; margin-right: 8px; }
+/* date box inside modal forms matches the other fields (dashboard bg) */
+.form-group .aam-select {
+    background: var(--bg);
+    border-color: var(--card-border);
+    color: var(--text);
+}
 .aam-section-head { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
 .aam-card {
     background: #fff; border: 1px solid #dfe4ec; border-radius: 10px;
