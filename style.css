@@ -88,45 +88,56 @@ body {
 #auth-register-screen,
 #forgot-screen {
     min-height: 100vh;
-    background: linear-gradient(160deg, #0b3d91 0%, #0d4fb5 40%, #0a56c4 100%);
+    background: #f2f4f8;
     justify-content: center;
     position: relative;
     overflow: hidden;
+}
+[data-theme="dark"] #auth-screen,
+[data-theme="dark"] #auth-login-screen,
+[data-theme="dark"] #auth-register-screen,
+[data-theme="dark"] #forgot-screen,
+[data-theme="oled"] #auth-screen,
+[data-theme="oled"] #auth-login-screen,
+[data-theme="oled"] #auth-register-screen,
+[data-theme="oled"] #forgot-screen {
+    background: var(--bg);
 }
 #auth-screen::before,
 #auth-login-screen::before,
 #auth-register-screen::before,
 #forgot-screen::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.08) 0%, transparent 50%),
-                radial-gradient(circle at 70% 80%, rgba(255,255,255,0.04) 0%, transparent 40%);
+    background: radial-gradient(circle at 30% 20%, rgba(11,61,145,0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(11,61,145,0.03) 0%, transparent 40%);
 }
 
 .auth-header {
-    text-align: center; color: white; margin-bottom: 32px; position: relative; z-index: 1;
+    text-align: center; color: var(--text); margin-bottom: 32px; position: relative; z-index: 1;
 }
 
 .auth-logo {
     width: 80px; height: 80px;
-    background: rgba(255,255,255,0.15);
+    background: var(--card);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid var(--card-border);
     border-radius: 22px;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-md);
 }
 
-.auth-logo .material-icons-round { font-size: 40px; }
-.auth-logo-img { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; margin: 0 auto 16px; display: block; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+.auth-logo .material-icons-round { font-size: 40px; color: var(--primary); }
+.auth-logo-img { width: 64px; height: 64px; border-radius: 16px; object-fit: cover; margin: 0 auto 16px; display: block; box-shadow: var(--shadow-lg); }
 .auth-header h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-.auth-header p { opacity: 0.8; margin-top: 6px; font-size: 14px; }
+.auth-header p { color: var(--text-secondary); opacity: 1; margin-top: 6px; font-size: 14px; }
 
 .auth-welcome-card {
-    background: rgba(255,255,255,0.95);
+    background: var(--card);
+    border: 1px solid var(--card-border);
     border-radius: 20px;
     padding: 28px 24px;
-    box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-md);
     margin-bottom: 20px;
     position: relative; z-index: 1;
 }
@@ -135,10 +146,11 @@ body {
 .auth-welcome-title p { font-size: 13px; color: #666; line-height: 1.4; }
 
 .auth-card {
-    background: rgba(255,255,255,0.95);
+    background: var(--card);
+    border: 1px solid var(--card-border);
     border-radius: 20px;
     padding: 28px 24px;
-    box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-md);
     margin-bottom: 16px;
     position: relative; z-index: 1;
 }
@@ -177,19 +189,19 @@ body {
     display: flex; align-items: center; justify-content: center; gap: 8px;
     position: relative; z-index: 1;
 }
-.btn-link-footer { background: none; border: none; color: rgba(255,255,255,0.6); font-size: 12px; cursor: pointer; font-family: inherit; padding: 4px 0; }
-.btn-link-footer:hover { color: rgba(255,255,255,0.9); text-decoration: underline; }
-.auth-welcome-dot { color: rgba(255,255,255,0.3); font-size: 10px; }
+.btn-link-footer { background: none; border: none; color: var(--text-secondary); font-size: 12px; cursor: pointer; font-family: inherit; padding: 4px 0; }
+.btn-link-footer:hover { color: var(--text); text-decoration: underline; }
+.auth-welcome-dot { color: var(--text-secondary); opacity: .5; font-size: 10px; }
 
 /* Back button for sub-screens */
 .auth-back-btn {
-    background: rgba(255,255,255,0.15); border: none; color: white;
+    background: var(--card); border: 1px solid var(--card-border); color: var(--text);
     width: 40px; height: 40px; border-radius: 12px; display: flex;
     align-items: center; justify-content: center; cursor: pointer;
     position: relative; z-index: 1; margin-bottom: 20px;
     transition: background var(--transition);
 }
-.auth-back-btn:hover { background: rgba(255,255,255,0.25); }
+.auth-back-btn:hover { background: var(--bg); }
 
 /* Forgot screen back */
 .btn-text {
@@ -209,7 +221,7 @@ body {
 
 .auth-divider { text-align: center; margin: 16px 0; position: relative; }
 .auth-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; border-top: 1px solid #e0e0e0; }
-.auth-divider span { background: white; padding: 0 12px; color: #999; font-size: 13px; position: relative; }
+.auth-divider span { background: var(--card); padding: 0 12px; color: #999; font-size: 13px; position: relative; }
 
 .hint-text { text-align: center; color: #888; font-size: 12px; margin-top: 12px; }
 
@@ -254,14 +266,18 @@ body {
 /* ==================== MESS SELECT ==================== */
 #mess-select-screen {
     min-height: 100vh;
-    background: linear-gradient(135deg, #0b3d91, #0d4fb5);
+    background: #f2f4f8;
     justify-content: flex-start;
     padding-top: 20px;
     position: relative;
 }
+[data-theme="dark"] #mess-select-screen,
+[data-theme="oled"] #mess-select-screen {
+    background: var(--bg);
+}
 #mess-select-screen::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 60% 30%, rgba(11,61,145,0.1) 0%, transparent 50%);
+    background: radial-gradient(circle at 60% 30%, rgba(11,61,145,0.05) 0%, transparent 50%);
     pointer-events: none;
 }
 
@@ -888,7 +904,7 @@ select.input-sm { cursor: pointer; }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 /* ==================== EMPTY STATE ==================== */
-.empty-state { text-align: center; color: rgba(255,255,255,0.6); padding: 16px 16px; font-size: 14px; font-style: italic; }
+.empty-state { text-align: center; color: var(--text-secondary); padding: 16px 16px; font-size: 14px; font-style: italic; }
 
 /* ==================== ANALYSIS PAGE ==================== */
 .analysis-card {
