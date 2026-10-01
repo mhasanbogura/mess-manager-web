@@ -1508,7 +1508,8 @@ select.input-sm { cursor: pointer; }
 }
 
 /* ==================== LIGHT APP SHELL (Android style) ==================== */
-#app-screen { background: #f2f4f8; }
+#app-screen { background: #f2f4f8; min-height: 100vh; }
+[data-theme="dark"] #app-screen { background: var(--bg); }
 .main-content { background: transparent; }
 .topbar h2 { color: var(--text); }
 #topbar-mess-label { color: var(--text); opacity: .6 !important; }
