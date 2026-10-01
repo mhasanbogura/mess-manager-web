@@ -3644,7 +3644,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="dep-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
-            <div class="aam-select" style="position:relative;cursor:pointer;margin-top:4px" onclick="App.depPickDate()"><span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span><span id="dep-date-text">${dateStr}</span><span class="material-icons-round">expand_more</span></div>
+            <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money from:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
@@ -3684,7 +3684,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 <button class="bz-tab" data-tab="utility" onclick="App.depSwitchTab('utility')"><span class="material-icons-round">lightbulb</span> Rent, Utilities & Others</button>
                 <span id="dep-header-total" style="margin-left:auto;font-size:16px;font-weight:700;color:var(--primary)">৳ 0</span>
             </div>
-            <div class="aam-select" style="position:relative;cursor:pointer;margin-top:4px" onclick="App.depPickDate()"><span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span><span id="dep-date-text">${dateStr}</span><span class="material-icons-round">expand_more</span></div>
+            <div class="dep-date" style="position:relative;cursor:pointer" onclick="App.depPickDate()"><span class="material-icons-round">calendar_month</span> <span id="dep-date-text">${dateStr}</span><span class="material-icons-round" style="margin-left:auto;font-size:18px;color:#999">expand_more</span></div>
             <div class="dep-label">Money from:</div>
             <div class="dep-chips" id="dep-chips">
                 ${names.map(n => `<button class="dep-chip" data-name="${n}" onclick="App.depPick(this)">${n}</button>`).join('')}
