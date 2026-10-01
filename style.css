@@ -2165,6 +2165,8 @@ select.input-sm { cursor: pointer; }
 .abazar-month-row span { font-size: 14px; color: #555; }
 .abazar-month-row strong { font-size: 16px; color: #d32f2f; font-weight: 700; }
 .abazar-filters { display: flex; align-items: center; gap: 8px; padding: 10px 12px; flex-wrap: wrap; margin: 0 12px; }
+.abazar-filters .abazar-filter-btn { flex: 1 1 0; min-width: 0; justify-content: center; }
+.abazar-filters .abazar-filter-btn > span:not(.material-icons-round) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .abazar-filter-btn {
     display: flex; align-items: center; gap: 4px; background: #fff;
     border: 1px solid #ccc; border-radius: 20px; padding: 6px 12px;
@@ -2173,7 +2175,7 @@ select.input-sm { cursor: pointer; }
 .abazar-filter-btn.active { background: linear-gradient(135deg, #555, #333); color: #fff; border-color: #555; }
 .abazar-filter-btn.active .material-icons-round { color: inherit; }
 .abazar-filter-btn .material-icons-round { font-size: 16px; }
-.abazar-filter-total { margin-left: auto; font-size: 14px; font-weight: 700; color: #d32f2f; white-space: nowrap; }
+.abazar-filter-total { margin-left: auto; flex: 0 0 auto; font-size: 14px; font-weight: 700; color: #d32f2f; white-space: nowrap; }
 .abazar-member-filter { position: relative; display: inline-block; margin: 0 12px 8px; }
 .abazar-member-dropdown {
     display: none; position: absolute; top: 100%; left: 0; z-index: 100;
@@ -2190,18 +2192,20 @@ select.input-sm { cursor: pointer; }
 .abazar-member-dropdown-item:hover { background: var(--bg); }
 .abazar-member-dropdown-item.active { color: var(--primary); font-weight: 600; background: rgba(11,61,145,0.06); }
 .abazar-view-btn {
-    width: 36px; height: 36px; border-radius: 8px; border: 1px solid #ccc;
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid #ccc;
     background: #fff; display: flex; align-items: center; justify-content: center;
     cursor: pointer; color: #555;
 }
 .abazar-view-btn.active { background: linear-gradient(135deg, #555, #333); border-color: #555; color: #fff; }
-.abazar-view-btn .material-icons-round { font-size: 20px; }
+.abazar-view-btn .material-icons-round { font-size: 18px; }
 
 .abazar-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 0 12px; margin: 0 12px 8px; }
-.abazar-toolbar .abazar-member-filter { margin: 0; flex: 1 1 0; min-width: 0; }
-.abazar-toolbar .abazar-filter-btn { width: 100%; min-width: 0; }
+.abazar-toolbar > .abazar-member-filter { margin: 0; flex: 1 1 0; min-width: 0; }
+.abazar-toolbar .abazar-filter-btn { width: 100%; min-width: 0; justify-content: center; }
 .abazar-toolbar .abazar-filter-btn > span:not(.material-icons-round) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.abazar-view-group { display: flex; gap: 6px; flex: 0 0 auto; margin-left: auto; }
+.abazar-toolbar-tail { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; min-width: 0; }
+.abazar-toolbar-tail > .abazar-member-filter { margin: 0; flex: 1 1 auto; min-width: 0; }
+.abazar-view-group { display: flex; gap: 6px; align-items: center; flex: 0 0 auto; }
 .abazar-sort-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .abazar-flat-list { display: flex; flex-direction: column; gap: 10px; }
@@ -3493,15 +3497,16 @@ img, canvas { max-width: 100%; }
     #app-screen .aam-footer { left: 12px; right: 12px; bottom: 84px; background: transparent; padding: 0; }
     #app-screen .abn-bottom { left: 12px; right: 12px; bottom: 12px; border-radius: 16px; border: 1px solid var(--border); }
 
-    /* Filter line: two full-width rows on phones (pills share row 1, sort + view row 2). */
-    .abazar-toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
-    .abazar-toolbar .abazar-member-filter { min-width: 0; }
-    .abazar-view-group { grid-column: 2; justify-self: end; }
+    /* Filter line: two full-width rows on phones — field pills share row 1,
+       the sort + view tail owns row 2 and fills it edge to edge. */
+    .abazar-toolbar > .abazar-member-filter { flex: 1 1 calc(50% - 4px); }
+    .abazar-toolbar-tail { flex: 1 1 100%; min-width: 100%; }
 
-    /* Tabs + total always share one line; the wide tab shrinks with an ellipsis. */
+    /* Tabs + total share one line: the selected tab keeps its full label,
+       the other one shrinks only as far as it has to. */
     .abazar-filters { flex-wrap: nowrap; }
-    .abazar-filters .abazar-filter-btn { flex: 0 1 auto; min-width: 0; overflow: hidden; }
-    .abazar-filters .abazar-filter-btn > span:not(.material-icons-round) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .abazar-filters .abazar-filter-btn { flex: 1 1 auto; overflow: hidden; }
+    .abazar-filters .abazar-filter-btn.active { flex: 0 0 auto; }
     .abazar-filters .abazar-filter-total { flex: 0 0 auto; }
 }
 
