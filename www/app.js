@@ -1537,11 +1537,15 @@ const App = {
                         <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.leaveMess()">Leave</button>
                         ${!hasManager ? `<button class="fp-btn fp-btn-green" onclick="event.stopPropagation();App.becomeManager()">Become Manager</button>` : ''}
                     </div>`;
-                } else if (!isYou && canManage) {
-                    actionsHtml = `<div class="fp-actions">
-                        <button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>
-                        ${!isAdmin ? `<button class="fp-btn fp-btn-green" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote to Manager</button>` : ''}
-                    </div>`;
+                } else if (!isYou) {
+                    const showRemove = canManage;
+                    const showPromote = canManage || !hasManager;
+                    if (showRemove || showPromote) {
+                        actionsHtml = `<div class="fp-actions">
+                            ${showRemove ? `<button class="fp-btn fp-btn-red" onclick="event.stopPropagation();App.removePerson('${id}','${this.esc(m.name||'')}')">Remove</button>` : ''}
+                            ${showPromote ? `<button class="fp-btn fp-btn-green" onclick="event.stopPropagation();App.promoteToManager('${id}','${this.esc(m.name||'')}')">Promote to Manager</button>` : ''}
+                        </div>`;
+                    }
                 }
                 html += `<div class="aflat-people-item" onclick="this.classList.toggle('expanded')">
                     <div class="aflat-people-avatar" style="${avatarStyle}">${profilePic ? '' : initial}</div>
@@ -1596,7 +1600,9 @@ const App = {
             const hasManager = Object.values(members).some(m => m && m.role === 'admin');
             const isSelf = uid === this.currentUser.uid;
             const becoming = isSelf && !hasManager;
-            if (!becoming && !this.checkPerm('manage')) return;
+            // Mess without a manager: any member may promote (matches the button
+            // shown in loadFlatPeoples). With a manager present: manage perm only.
+            if (hasManager && !this.checkPerm('manage')) return;
             const lang = this._currentLang || 'en';
             const q = becoming
                 ? (lang === 'bn' ? 'আপনি কি এই মেসের ম্যানেজার হতে চান?' : 'Become the manager of this mess?')
@@ -5251,7 +5257,6 @@ https://mahmudulsapp.u.gy/mess-manager
 
     toast(msg, type = 'info', cls = '') {
         const c = document.getElementById('toast-container');
-        this._toastPosition(c);
         const t = document.createElement('div');
         t.className = ('toast ' + type + (cls ? ' ' + cls : '')).trim();
         if (cls && cls.indexOf('toast-perm') > -1) {
@@ -5263,6 +5268,7 @@ https://mahmudulsapp.u.gy/mess-manager
             t.textContent = msg;
         }
         c.appendChild(t);
+        this._toastPosition(c);
         setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; setTimeout(() => t.remove(), 300); }, 3000);
     },
 
@@ -5270,15 +5276,31 @@ https://mahmudulsapp.u.gy/mess-manager
         c.classList.remove('above-footer');
         c.style.left = ''; c.style.right = ''; c.style.bottom = '';
         const page = this.currentPage;
-        if (page !== 'addmeal' && page !== 'addcost' && page !== 'adddeposit') return;
-        const btn = document.querySelector('#page-' + page + ' .aam-footer .aam-save-btn');
+        if (!page) return;
+        const btn = document.querySelector('#page-' + page + ' .aam-footer .aam-save-btn')
+            || document.querySelector('#page-' + page + ' .abazar-fab');
         if (!btn) return;
+        const pageEl = document.getElementById('page-' + page);
         const r = btn.getBoundingClientRect();
-        if (!r.width || !r.height) return;
+        const vh = window.innerHeight;
+        // While the page runs its fadeIn transform, its fixed children report a
+        // page-relative rect (a tiny top) which would fling the toast to the top
+        // of the screen - wait for the animation, then measure again. The top-half
+        // check is the belt-and-braces version of the same idea.
+        const animating = !!(pageEl && pageEl.getAnimations &&
+            pageEl.getAnimations().some(a => a.playState === 'running'));
+        if (animating || !r.width || !r.height || r.top < vh * 0.4) {
+            if (!c._posRetry && c.firstChild) {
+                c._posRetry = true;
+                setTimeout(() => { c._posRetry = false; if (c.isConnected && c.firstChild) this._toastPosition(c); }, 350);
+            }
+            return;
+        }
+        c._posRetry = false;
         c.classList.add('above-footer');
         c.style.left = Math.round(r.left) + 'px';
         c.style.right = Math.round(window.innerWidth - r.right) + 'px';
-        c.style.bottom = Math.round(window.innerHeight - r.top + 10) + 'px';
+        c.style.bottom = Math.round(vh - r.top + 10) + 'px';
     }
 };
 
