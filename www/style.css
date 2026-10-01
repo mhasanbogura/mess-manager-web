@@ -1680,12 +1680,12 @@ select.input-sm { cursor: pointer; }
 
 .adash-finance-card {
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 16px; margin: 10px 12px 0; padding: 6px 6px;
+    border-radius: 16px; margin: 10px 12px 0; padding: 16px;
 }
 .adash-finance {
     background: transparent; border-radius: 16px; margin: 0;
-    padding: 4px 6px;
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; align-items: stretch;
+    padding: 0;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: stretch;
 }
 .adash-fin-label { grid-column: 1 / -1; justify-self: start; }
 .adash-fin-box {
