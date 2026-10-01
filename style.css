@@ -1497,6 +1497,7 @@ select.input-sm { cursor: pointer; }
     .dash-mess-top h2 { font-size: 16px; }
     .btn-share { font-size: 10px; min-height: 34px; padding: 6px 8px; }
     .dash-meal-box { padding: 6px 2px; min-height: 58px; }
+    .adash-fin-box { padding: 6px 2px; min-height: 58px; }
     .dash-meal-box .material-icons-round { font-size: 16px !important; }
     .dash-meal-box strong { font-size: 18px; }
     .dash-meal-box small { font-size: 9px; }
@@ -1689,8 +1690,9 @@ select.input-sm { cursor: pointer; }
 }
 .adash-fin-label { grid-column: 1 / -1; justify-self: start; }
 .adash-fin-box {
-    border: 1px solid var(--card-border); border-radius: 10px; padding: 5px 4px;
-    text-align: center; min-width: 0;
+    border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 8px;
+    text-align: center; min-width: 0; min-height: 84px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     background: var(--card);
 }
 .adash-fin-box small { font-size: 10px; color: #888; display: block; }
@@ -2811,7 +2813,7 @@ img, canvas { max-width: 100%; }
 .adash-duo-box p { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Finance: always 3 in a row */
 .adash-finance { grid-template-columns: 1fr 1fr 1fr; }
-.adash-fin-box { padding: 6px 4px; min-width: 0; }
+.adash-fin-box { padding: 14px 8px; min-width: 0; min-height: 84px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .adash-fin-box small { font-size: 11px; white-space: nowrap; }
 .adash-fin-box strong { font-size: 15px; }
 .adash-analyse { grid-column: auto; font-size: 13px; padding: 6px 10px; white-space: nowrap; }
