@@ -3497,10 +3497,17 @@ img, canvas { max-width: 100%; }
     #app-screen .aam-footer { left: 12px; right: 12px; bottom: 84px; background: transparent; padding: 0; }
     #app-screen .abn-bottom { left: 12px; right: 12px; bottom: 12px; border-radius: 16px; border: 1px solid var(--border); }
 
-    /* Filter line: two full-width rows on phones — field pills share row 1,
+    /* Expense List: two full-width rows on phones — member + type share row 1,
        the sort + view tail owns row 2 and fills it edge to edge. */
     .abazar-toolbar > .abazar-member-filter { flex: 1 1 calc(50% - 4px); }
     .abazar-toolbar-tail { flex: 1 1 100%; min-width: 100%; }
+
+    /* Money Management is short enough to keep member, sort and view on ONE line. */
+    #page-balance .abazar-toolbar { flex-wrap: nowrap; gap: 6px; }
+    #page-balance .abazar-toolbar > .abazar-member-filter { flex: 1 1 0; min-width: 0; }
+    #page-balance .abazar-toolbar-tail { flex: 0 0 auto; min-width: 0; gap: 6px; }
+    #page-balance .abazar-toolbar .abazar-filter-btn { padding: 6px 10px; }
+    #page-balance .abazar-toolbar .abazar-filter-btn > .material-icons-round:last-child { display: none; }
 
     /* Tabs + total share one line: the selected tab keeps its full label,
        the other one shrinks only as far as it has to. */
