@@ -474,7 +474,7 @@ body {
 .dash-meal-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
 
 .dash-meal-box {
-    border-radius: var(--radius-sm); padding: 14px 8px; text-align: center; min-height: 84px;
+    border-radius: var(--radius-sm); padding: 14px 8px; text-align: center;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     transition: all var(--transition); position: relative; overflow: hidden;
 }
@@ -1496,7 +1496,7 @@ select.input-sm { cursor: pointer; }
 @media (max-width: 360px) {
     .dash-mess-top h2 { font-size: 16px; }
     .btn-share { font-size: 10px; min-height: 34px; padding: 6px 8px; }
-    .dash-meal-box { padding: 6px 2px; min-height: 58px; }
+    .dash-meal-box { padding: 6px 2px; }
     .adash-fin-box { padding: 6px 2px; }
     .dash-meal-box .material-icons-round { font-size: 16px !important; }
     .dash-meal-box strong { font-size: 18px; }
