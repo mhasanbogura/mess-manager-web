@@ -1684,14 +1684,14 @@ select.input-sm { cursor: pointer; }
 
 .adash-finance-card {
     background: var(--card); border: 1px solid var(--card-border);
-    border-radius: 16px; margin: 10px 12px 0; padding: 16px;
+    border-radius: 16px; margin: 10px 12px 0; padding: 12px;
 }
 .adash-finance {
     background: transparent; border-radius: 16px; margin: 0;
     padding: 0;
     display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; align-items: stretch;
 }
-.adash-fin-label { grid-column: 1 / -1; justify-self: start; margin-bottom: 8px; }
+.adash-fin-label { grid-column: 1 / -1; justify-self: start; margin-bottom: 2px; }
 .adash-fin-box {
     border: 1px solid var(--card-border); border-radius: 10px; padding: 8px;
     text-align: center; min-width: 0;
@@ -1708,7 +1708,7 @@ select.input-sm { cursor: pointer; }
 }
 .adash-fin-box.meal-fin small, .adash-fin-box.util-fin small { color: #888; font-weight: 600; }
 .adash-fin-label {
-    display: flex; align-items: center; gap: 3px; padding: 2px 4px;
+    display: flex; align-items: center; gap: 3px; padding: 0;
     font-size: 14px; font-weight: 700; color: var(--primary); cursor: pointer;
 }
 .adash-fin-label strong { font-size: 12px; }
@@ -2846,7 +2846,7 @@ img, canvas { max-width: 100%; }
 .adash-duo-box p { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Finance: always 3 in a row */
 .adash-finance { grid-template-columns: 1fr 1fr 1fr; }
-.adash-fin-box { padding: 8px; min-width: 0; }
+.adash-fin-box { padding: 6px 4px; min-width: 0; }
 .adash-fin-box small { font-size: 11px; white-space: nowrap; }
 .adash-fin-box strong { font-size: 15px; }
 .adash-analyse { grid-column: auto; font-size: 13px; padding: 6px 10px; white-space: nowrap; }
@@ -3485,7 +3485,7 @@ img, canvas { max-width: 100%; }
 @media (max-width: 767px) {
     #app-screen[class] .main-content { padding-left: 12px; padding-right: 12px; }
     .adash-finance { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
-    .adash-fin-box { min-width: 0; padding: 6px 2px; }
+    .adash-fin-box { min-width: 0; padding: 4px 2px; }
     .adash-analyse { min-width: 0; padding: 6px; font-size: 12px; }
     .adash-analyse .material-icons-round { font-size: 16px; }
     .adash-finance { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr); }
