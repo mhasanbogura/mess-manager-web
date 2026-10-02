@@ -2050,6 +2050,7 @@ https://mahmudulsapp.u.gy/mess-manager
             allMids.forEach(id => { const n = (members[id] || {}).name; if (n) uidToName[id] = n; });
             const resolveName = (id) => uidToName[id] || id;
             const currentNames = new Set(allMids.map(id => (members[id] || {}).name).filter(Boolean));
+            const orphanNames = new Set();
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
             let managerName = '-';
             if (adminFound) managerName = adminFound[1].name || '-';
@@ -2079,10 +2080,10 @@ https://mahmudulsapp.u.gy/mess-manager
                 if (cat === 'bazar') {
                     bazTotal += amt;
                     const n = resolveName((b.memberId || '').trim());
-                    if (n && n !== 'Manager') mealPaidBy[n] = (mealPaidBy[n] || 0) + amt;
+                    if (n && n !== 'Manager') { mealPaidBy[n] = (mealPaidBy[n] || 0) + amt; if (!currentNames.has(n)) orphanNames.add(n); }
                 } else if (cat === 'utility') {
                     const n = resolveName((b.memberId || '').trim());
-                    if (n && n !== 'Manager') utilPaidBy[n] = (utilPaidBy[n] || 0) + amt;
+                    if (n && n !== 'Manager') { utilPaidBy[n] = (utilPaidBy[n] || 0) + amt; if (!currentNames.has(n)) orphanNames.add(n); }
                 }
             });
 
@@ -2091,7 +2092,7 @@ https://mahmudulsapp.u.gy/mess-manager
             Object.entries(mlMData).forEach(([key, d]) => {
                 if (key < month + '-01' || key > monthEnd) return;
                 Object.entries(d || {}).forEach(([memberName, m]) => {
-                    if (!currentNames.has(memberName)) return;
+                    if (!currentNames.has(memberName)) { if (memberName !== 'Manager') orphanNames.add(memberName); }
                     const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
                     memberMeals[memberName] = (memberMeals[memberName] || 0) + base;
                     totalMeals += base;
@@ -2105,6 +2106,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 if (typeof v.amount === 'number' && v.memberId) {
                     totalDep += v.amount;
                     const resolvedId = resolveName(v.memberId);
+                    if (resolvedId && resolvedId !== 'Manager' && !currentNames.has(resolvedId)) orphanNames.add(resolvedId);
                     const cat = v.category || 'meal';
                     if (cat === 'utility') {
                         utilDepByName[resolvedId] = (utilDepByName[resolvedId] || 0) + v.amount;
@@ -2146,11 +2148,12 @@ https://mahmudulsapp.u.gy/mess-manager
             utilBalEl.className = utilBal < 0 ? 'neg' : 'pos';
 
             const rowsEl = document.getElementById('dash-member-rows');
-            if (!memberMids.length) { rowsEl.innerHTML = '<tr><td colspan="5" class="empty-state">No data</td></tr>'; return; }
+            const t1Names = memberMids.map(mid => members[mid]?.name || 'Unknown');
+            [...orphanNames].sort((a, b) => a.localeCompare(b)).forEach(n => {
+                if ((memberMeals[n] || 0) > 0 || (mealDepByName[n] || 0) > 0) t1Names.push(n);
+            });
             let html = '';
-            memberMids.forEach(mid => {
-                const m = members[mid] || {};
-                const name = m.name || 'Unknown';
+            t1Names.forEach(name => {
                 const total = memberMeals[name] || 0;
                 const cost = total * rate;
                 const dep = mealDepByName[name] || 0;
@@ -2163,7 +2166,7 @@ https://mahmudulsapp.u.gy/mess-manager
                     <td class="${bal < 0 ? 'neg' : 'pos'}"><strong>৳${this.fmtNum(bal)}</strong></td>
                 </tr>`;
             });
-            rowsEl.innerHTML = html;
+            rowsEl.innerHTML = html || '<tr><td colspan="5" class="empty-state">No data</td></tr>';
 
             const utilRows = document.getElementById('dash-utility-rows');
             const utilByName = {};
@@ -2175,6 +2178,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 if (b.category === 'utility') {
                     const n = resolveName((b.splitWith || b.memberId || '').trim());
                     if (!n) return;
+                    if (n !== 'Manager' && !currentNames.has(n)) orphanNames.add(n);
                     if ((b.name || '').toLowerCase() === 'rent') {
                         rentByName[n] = (rentByName[n] || 0) + amt;
                     } else {
@@ -2183,9 +2187,11 @@ https://mahmudulsapp.u.gy/mess-manager
                 }
             });
             let utilHtml = '';
-            memberMids.forEach(mid => {
-                const m = members[mid] || {};
-                const name = m.name || 'Unknown';
+            const t2Names = memberMids.map(mid => members[mid]?.name || 'Unknown');
+            [...orphanNames].sort((a, b) => a.localeCompare(b)).forEach(n => {
+                if ((rentByName[n] || 0) > 0 || (utilByName[n] || 0) > 0 || (utilDepByName[n] || 0) > 0) t2Names.push(n);
+            });
+            t2Names.forEach(name => {
                 const rent = rentByName[name] || 0;
                 const util = utilByName[name] || 0;
                 const dep = utilDepByName[name] || 0;
@@ -2381,9 +2387,9 @@ https://mahmudulsapp.u.gy/mess-manager
         try {
             const members = await this._dbGet(`messes/${this.messId}/members`, 'members');
             const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare((members[b]?.name || '')));
-            if (!mids.length) { loader.innerHTML = '<p class="empty-state">No members</p>'; return; }
             const allMeals = await this._dbGet(`messes/${this.messId}/meals`, 'meals_month');
             const memberData = {};
+            const orphanData = {};
             const nameToMid = {};
             mids.forEach(mid => {
                 const m = members[mid] || {};
@@ -2396,19 +2402,25 @@ https://mahmudulsapp.u.gy/mess-manager
                 const day = parseInt(dateKey.slice(8, 10), 10) - 1;
                 if (day < 0 || day >= daysInMonth) return;
                 Object.entries(dayMeals || {}).forEach(([memberName, m]) => {
+                    if (memberName === 'Manager') return;
                     const mid = nameToMid[memberName];
-                    if (!mid || !memberData[mid]) return;
+                    let md = mid ? memberData[mid] : null;
+                    if (!md) {
+                        if (!orphanData[memberName]) orphanData[memberName] = { name: memberName, readonly: true, breakfast: new Array(daysInMonth).fill(0), lunch: new Array(daysInMonth).fill(0), dinner: new Array(daysInMonth).fill(0), breakfastTotal: 0, lunchTotal: 0, dinnerTotal: 0 };
+                        md = orphanData[memberName];
+                    }
                     const bf = m.breakfast || 0;
                     const lunch = m.lunch || 0;
                     const dinner = m.dinner || 0;
-                    memberData[mid].breakfast[day] += bf;
-                    memberData[mid].lunch[day] += lunch;
-                    memberData[mid].dinner[day] += dinner;
-                    memberData[mid].breakfastTotal += bf;
-                    memberData[mid].lunchTotal += lunch;
-                    memberData[mid].dinnerTotal += dinner;
+                    md.breakfast[day] += bf;
+                    md.lunch[day] += lunch;
+                    md.dinner[day] += dinner;
+                    md.breakfastTotal += bf;
+                    md.lunchTotal += lunch;
+                    md.dinnerTotal += dinner;
                 });
             });
+            if (!mids.length && !Object.keys(orphanData).length) { loader.innerHTML = '<p class="empty-state">No members</p>'; return; }
             const today = new Date().getDate();
             const viewHide = JSON.parse(localStorage.getItem('meal_view_hide') || '{}');
             const showBf = !viewHide.breakfast;
@@ -2423,9 +2435,10 @@ https://mahmudulsapp.u.gy/mess-manager
             if (showBf) mealTypes.push('breakfast');
             if (showLc) mealTypes.push('lunch');
             if (showDn) mealTypes.push('dinner');
-            mids.forEach((mid, idx) => {
-                const md = memberData[mid];
+            const gridRows = mids.map(mid => memberData[mid]).concat(Object.values(orphanData).sort((a, b) => a.name.localeCompare(b.name)));
+            gridRows.forEach((md, idx) => {
                 const bg = colors[idx % colors.length];
+                const readonly = !!md.readonly;
                 const total = md.breakfastTotal + md.lunchTotal + md.dinnerTotal;
                 const mealColors = { breakfast: { bg: '#fff8e1', color: '#e65100', icon: '☕', label: 'Breakfast' }, lunch: { bg: '#e8f5e9', color: '#2E7D32', icon: '🍔', label: 'Lunch' }, dinner: { bg: '#e3f2fd', color: '#1565C0', icon: '🍽', label: 'Dinner' } };
                 const classes = { breakfast: 'ameal-row-bf', lunch: 'ameal-row-lc', dinner: 'ameal-row-dn' };
@@ -2433,14 +2446,15 @@ https://mahmudulsapp.u.gy/mess-manager
                     const mc = mealColors[type];
                     const isFirst = ri === 0;
                     html += `<tr class="${classes[type]}">`;
-                    if (isFirst) html += `<td rowspan="${visibleRows}" class="am-col-name" style="background:${bg}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
+                    if (isFirst) html += `<td rowspan="${visibleRows}" class="am-col-name" style="background:${bg}${readonly ? ';opacity:.72' : ''}"><div class="ameal-mname">${this.esc(md.name)}</div><div class="ameal-mtotal">(${total})</div></td>`;
                     html += `<td class="am-col-type" style="background:${mc.bg}"><div class="ameal-row-label"><span style="font-size:12px">${mc.icon}</span><span class="ameal-row-count" style="color:${mc.color}${md[type+'Total']===0?';color:#ccc':''}">${md[type+'Total']}</span><span style="color:${mc.color};font-size:10px">${mc.label}</span></div></td>`;
                     for (let d = 0; d < daysInMonth; d++) {
                         const v = md[type][d];
                         const cls = d + 1 === today ? ' class="ame-day-today"' : '';
                         const dateKey = `${month}-${String(d + 1).padStart(2, '0')}`;
-                        const click = v ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','${type}',${v})"` : '';
-                        html += `<td${cls}${click} style="${v?'font-weight:600;cursor:pointer':''}">${v || ''}</td>`;
+                        const click = (v && !readonly) ? ` onclick="App.mealCellClick(event,'${md.name.replace(/'/g,"\\'")}','${dateKey}','${type}',${v})"` : '';
+                        const vStyle = v ? (readonly ? 'font-weight:600;cursor:default;color:#9aa0a6' : 'font-weight:600;cursor:pointer') : '';
+                        html += `<td${cls}${click} style="${vStyle}">${v || ''}</td>`;
                     }
                     html += '</tr>';
                 });
@@ -2524,6 +2538,18 @@ https://mahmudulsapp.u.gy/mess-manager
                     if (totEl) totEl.textContent = `Total: ${(em.breakfast||0)+(em.lunch||0)+(em.dinner||0)}`;
                 }
             });
+            const curNameSet = new Set(mids.map(id => members[id]?.name || 'Unknown'));
+            const roNames = Object.keys(existing).filter(n => n !== 'Manager' && !curNameSet.has(n) && ((existing[n]?.breakfast || 0) + (existing[n]?.lunch || 0) + (existing[n]?.dinner || 0)) > 0).sort((a, b) => a.localeCompare(b));
+            if (roNames.length) {
+                const roHtml = roNames.map(n => {
+                    const em = existing[n] || {};
+                    const bf = em.breakfast || 0, ln = em.lunch || 0, dn = em.dinner || 0;
+                    const col = v => `<div class="aam-meal-col"><label>${v[0]}</label><div class="aam-counter" style="border-color:#ddd"><span class="aam-val" style="color:#9aa0a6">${v[1]}</span></div></div>`;
+                    return `<div class="aam-card" style="opacity:.72;border-style:dashed"><div class="aam-card-top"><div class="aam-avatar" style="background:#eceff1"><span style="color:#999;font-size:18px;font-weight:700">${(n.charAt(0) || '?').toUpperCase()}</span></div><span class="aam-name">${this.esc(n)}</span><span class="aam-total" style="color:#999">Total: ${bf + ln + dn}</span></div><div class="aam-meals-row">${col(['Breakfast', bf])}${col(['Lunch', ln])}${col(['Dinner', dn])}</div></div>`;
+                }).join('');
+                const cardsEl = document.getElementById('aam-member-cards');
+                if (cardsEl) cardsEl.insertAdjacentHTML('beforeend', roHtml);
+            }
             if (this._aamEditName) {
                 this._aamEditName = null;
                 this._aamEditType = null;
@@ -2899,13 +2925,23 @@ https://mahmudulsapp.u.gy/mess-manager
         const members = this._bazarMembers || {};
         const memberNames = Object.entries(members)
             .filter(([id]) => id.startsWith('member_'))
-            .map(([, m]) => m.name).filter(Boolean).sort((a, b) => a.localeCompare(b));
+            .map(([, m]) => m.name).filter(Boolean);
+        const nameSet = new Set(memberNames);
+        const extra = new Set();
+        (this._allBazar || []).forEach(([, v]) => {
+            if (!v) return;
+            const mName = ((members[v.memberId] || {}).name || v.memberId || '').trim();
+            const sw = (v.splitWith || '').trim();
+            if (mName && mName !== 'Manager' && !nameSet.has(mName)) extra.add(mName);
+            if (sw && sw !== 'Manager' && !nameSet.has(sw)) extra.add(sw);
+        });
+        const allNames = memberNames.concat([...extra]).sort((a, b) => a.localeCompare(b));
         const memberFilter = this._bazarMemberFilter || '';
         const dd = document.getElementById('abazar-member-dropdown');
         if (!dd) return;
         let ddHtml = `<button class="abazar-member-dropdown-item${!memberFilter ? ' active' : ''}" data-member="" onclick="App.filterBazarMember('')">No Filter</button>`;
         ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === 'Manager' ? ' active' : ''}" data-member="Manager" onclick="App.filterBazarMember('Manager')">Manager</button>`;
-        memberNames.forEach(n => { ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === n ? ' active' : ''}" data-member="${this.esc(n)}" onclick="App.filterBazarMember('${this.esc(n)}')">${this.esc(n)}</button>`; });
+        allNames.forEach(n => { ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === n ? ' active' : ''}" data-member="${this.esc(n)}" onclick="App.filterBazarMember('${this.esc(n)}')">${this.esc(n)}</button>`; });
         dd.innerHTML = ddHtml;
         const label = document.getElementById('abazar-member-label');
         if (label) label.textContent = memberFilter || 'No Filter';
@@ -3319,6 +3355,7 @@ https://mahmudulsapp.u.gy/mess-manager
         const members = this._bazarMembers || {};
         const currentName = (members[memberId] || {}).name || memberId || 'Manager';
         const names = ['Manager', ...Object.entries(members).filter(([id]) => id.startsWith('member_')).map(([, m]) => m.name || 'Unknown').filter(n => n !== 'Manager')];
+        const missingOpt = names.includes(currentName) ? '' : `<option value="${this.esc(currentName)}" selected disabled>${this.esc(currentName)} (deleted)</option>`;
         const dateVal = date || new Date().toISOString().slice(0,10);
         const isBazar = category === 'bazar';
         const units = ['kg','g','L','ml','pcs'];
@@ -3326,7 +3363,7 @@ https://mahmudulsapp.u.gy/mess-manager
         document.getElementById('modal-body').innerHTML = `
             <div class="form-group"><label>Item name</label><input type="text" id="edit-bz-name" value="${this.esc(name)}"></div>
             ${isBazar ? `<div class="form-group"><label>Quantity (optional)</label><div style="display:flex;gap:8px"><input type="number" min="0" step="any" id="edit-bz-qty" value="${this.esc(qty)}" placeholder="e.g. 1 / 1.5" style="flex:1"><select id="edit-bz-unit" style="max-width:100px">${units.map(u => `<option value="${u}" ${u === unit ? 'selected' : ''}>${u}</option>`).join('')}<option value="" ${!unit ? 'selected' : ''}>-</option></select></div></div>` : ''}
-            <div class="form-group"><label>Money from</label><select id="edit-bz-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Money from</label><select id="edit-bz-member">${missingOpt}${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
             <div class="form-group"><label>Date</label>
                 <div class="aam-select" style="cursor:pointer" onclick="App.editBzPickDate()">
                     <span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span>
@@ -3404,12 +3441,20 @@ https://mahmudulsapp.u.gy/mess-manager
         const members = this._depMembers || {};
         const memberNames = Object.entries(members)
             .filter(([id]) => id.startsWith('member_'))
-            .map(([, m]) => m.name).filter(Boolean).sort((a, b) => a.localeCompare(b));
+            .map(([, m]) => m.name).filter(Boolean);
+        const nameSet = new Set(memberNames);
+        const extra = new Set();
+        (this._allDeps || []).forEach(([, v]) => {
+            if (!v) return;
+            const mName = ((members[v.memberId] || {}).name || v.memberId || '').trim();
+            if (mName && mName !== 'Manager' && !nameSet.has(mName)) extra.add(mName);
+        });
+        const allNames = memberNames.concat([...extra]).sort((a, b) => a.localeCompare(b));
         const memberFilter = this._depMemberFilter || '';
         const dd = document.getElementById('abalance-member-dropdown');
         if (!dd) return;
         let ddHtml = `<button class="abazar-member-dropdown-item${!memberFilter ? ' active' : ''}" data-member="" onclick="App.filterDepositMember('')">No Filter</button>`;
-        memberNames.forEach(n => { ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === n ? ' active' : ''}" data-member="${this.esc(n)}" onclick="App.filterDepositMember('${this.esc(n)}')">${this.esc(n)}</button>`; });
+        allNames.forEach(n => { ddHtml += `<button class="abazar-member-dropdown-item${memberFilter === n ? ' active' : ''}" data-member="${this.esc(n)}" onclick="App.filterDepositMember('${this.esc(n)}')">${this.esc(n)}</button>`; });
         dd.innerHTML = ddHtml;
         const label = document.getElementById('abalance-member-label');
         if (label) label.textContent = memberFilter || 'No Filter';
@@ -3547,10 +3592,11 @@ https://mahmudulsapp.u.gy/mess-manager
         const members = this._depMembers || {};
         const currentName = memberId || Object.values(members)[0]?.name || '';
         const names = Object.entries(members).filter(([id]) => id.startsWith('member_')).map(([, m]) => m.name || 'Unknown');
+        const missingOpt = (currentName && !names.includes(currentName)) ? `<option value="${this.esc(currentName)}" selected disabled>${this.esc(currentName)} (deleted)</option>` : '';
         const dateVal = date || new Date().toISOString().slice(0,10);
         document.getElementById('modal-title').textContent = 'Edit Deposit';
         document.getElementById('modal-body').innerHTML = `
-            <div class="form-group"><label>Money from</label><select id="edit-dep-member">${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
+            <div class="form-group"><label>Money from</label><select id="edit-dep-member">${missingOpt}${names.map(n => `<option value="${n}" ${n === currentName ? 'selected' : ''}>${n}</option>`).join('')}</select></div>
             <div class="form-group"><label>Date</label>
                 <div class="aam-select" style="cursor:pointer" onclick="App.editDepPickDate()">
                     <span class="aam-date-icon"><span class="material-icons-round">calendar_today</span></span>
@@ -4842,6 +4888,7 @@ https://mahmudulsapp.u.gy/mess-manager
             const mids = Object.keys(members).filter(id => id.startsWith('member_')).sort((a, b) => (members[a]?.name || '').localeCompare(members[b]?.name || ''));
             const allMids = Object.keys(members);
             const currentNames = new Set(allMids.map(id => (members[id] || {}).name).filter(Boolean));
+            const orphanNames = new Set();
             const uidToName = {};
             allMids.forEach(id => { const n = (members[id] || {}).name; if (n) uidToName[id] = n; });
             const resolveName = (id) => uidToName[id] || id;
@@ -4871,12 +4918,13 @@ https://mahmudulsapp.u.gy/mess-manager
                     if (n) bzByName[n] = (bzByName[n] || 0) + amt;
                     if (!isUtil) {
                         const rn = resolveName(n);
-                        if (rn && rn !== 'Manager') mealPaidBy[rn] = (mealPaidBy[rn] || 0) + amt;
+                        if (rn && rn !== 'Manager') { mealPaidBy[rn] = (mealPaidBy[rn] || 0) + amt; if (!currentNames.has(rn)) orphanNames.add(rn); }
                     } else {
                         const rn = resolveName(n);
-                        if (rn && rn !== 'Manager') utilPaidBy[rn] = (utilPaidBy[rn] || 0) + amt;
+                        if (rn && rn !== 'Manager') { utilPaidBy[rn] = (utilPaidBy[rn] || 0) + amt; if (!currentNames.has(rn)) orphanNames.add(rn); }
                         const sw = resolveName((b.splitWith || b.memberId || '').trim());
                         if (sw) {
+                            if (sw !== 'Manager' && !currentNames.has(sw)) orphanNames.add(sw);
                             if ((b.name || '').toLowerCase() === 'rent') rentByName[sw] = (rentByName[sw] || 0) + amt;
                             else utilByName[sw] = (utilByName[sw] || 0) + amt;
                         }
@@ -4907,7 +4955,7 @@ https://mahmudulsapp.u.gy/mess-manager
             mlSnap.forEach(d => {
                 const day = parseInt(d.key.slice(8, 10), 10);
                 Object.entries(d.val() || {}).forEach(([name, m]) => {
-                    if (!currentNames.has(name)) return;
+                    if (!currentNames.has(name)) { if (name !== 'Manager') orphanNames.add(name); }
                     const base = (m.breakfast || 0) + (m.lunch || 0) + (m.dinner || 0);
                     memberMeals[name] = (memberMeals[name] || 0) + base;
                     totalMeals += base;
@@ -4925,6 +4973,7 @@ https://mahmudulsapp.u.gy/mess-manager
                 if (v && typeof v.amount === 'number' && v.memberId && v.date && v.date.startsWith(month)) {
                     totalDep += v.amount;
                     const resolvedId = resolveName(v.memberId);
+                    if (resolvedId && resolvedId !== 'Manager' && !currentNames.has(resolvedId)) orphanNames.add(resolvedId);
                     const cat = v.category || 'meal';
                     if (cat === 'utility') {
                         totalUtilDep += v.amount;
@@ -4961,8 +5010,11 @@ https://mahmudulsapp.u.gy/mess-manager
             const topMealItems = Object.values(mealItemFreq).sort((a, b) => b.total - a.total);
             const topUtilItems = Object.values(utilItemFreq).sort((a, b) => b.total - a.total);
 
-            const memberBalances = mids.map(mid => {
-                const name = members[mid]?.name || 'Unknown';
+            const balNames = mids.map(mid => members[mid]?.name || 'Unknown');
+            [...orphanNames].sort((a, b) => a.localeCompare(b)).forEach(n => {
+                if ((memberMeals[n] || 0) > 0 || (depByName[n] || 0) > 0) balNames.push(n);
+            });
+            const memberBalances = balNames.map(name => {
                 const dep = depByName[name] || 0;
                 const mealCost = (memberMeals[name] || 0) * rate;
                 return { name, balance: dep - mealCost };
@@ -4990,8 +5042,11 @@ https://mahmudulsapp.u.gy/mess-manager
             const prevUtilRate = mids.length > 0 ? prevUtilBz / mids.length : 0;
             const utilRateDiff = prevUtilRate > 0 ? ((utilRate - prevUtilRate) / prevUtilRate * 100).toFixed(0) : 0;
 
-            const mealShare = mids.map(mid => {
-                const name = members[mid]?.name || 'Unknown';
+            const shareNames = mids.map(mid => members[mid]?.name || 'Unknown');
+            [...orphanNames].sort((a, b) => a.localeCompare(b)).forEach(n => {
+                if ((memberMeals[n] || 0) > 0) shareNames.push(n);
+            });
+            const mealShare = shareNames.map(name => {
                 return { name, meals: memberMeals[name] || 0 };
             }).filter(m => m.meals > 0).sort((a, b) => b.meals - a.meals);
 
@@ -5070,8 +5125,12 @@ https://mahmudulsapp.u.gy/mess-manager
                             <div class="am-calc-labels"><span>Collection</span><span>Spending</span><span>Balance</span></div>
                         </div>
                         ${(() => {
-                            const utilMemberBalances = mids.map(mid => {
-                                const name = members[mid]?.name || 'Unknown';
+                            const utilNames = mids.map(mid => members[mid]?.name || 'Unknown');
+                            [...orphanNames].sort((a, b) => a.localeCompare(b)).forEach(n => {
+                                const hasDep = Object.values(depAll).some(v => v && resolveName(v.memberId) === n && (v.category || 'meal') === 'utility' && v.date && v.date.startsWith(month) && v.amount);
+                                if ((rentByName[n] || 0) > 0 || (utilByName[n] || 0) > 0 || (utilPaidBy[n] || 0) > 0 || hasDep) utilNames.push(n);
+                            });
+                            const utilMemberBalances = utilNames.map(name => {
                                 const rent = rentByName[name] || 0;
                                 const util = utilByName[name] || 0;
                                 const utilDepRaw = Object.values(depAll).filter(v => v && resolveName(v.memberId) === name && v.category === 'utility' && v.date && v.date.startsWith(month)).reduce((s, v) => s + (v.amount || 0), 0);
