@@ -128,6 +128,8 @@ const App = {
         ae_title:'Add Expense',ae_tab_meal:'Meal',ae_tab_utility:'Rent, Utilities & Others',
         ae_money_from:'Money from:',ae_manager:'Manager',ae_done_by:'Done by:',
         ae_item_name:'Item name',ae_expense:'Expense',ae_add_another:'Add another item',
+        ae_add_from_text:'Add from Text',
+        ae_ft_hint:'One item per line: name qty unit expense — e.g. চাল 5kg 300',
         ae_hint:'Add each item on its own line. The Analysis page can then show which items cost you the most.',
         ae_type:'Type:',ae_rent:'Rent',ae_electricity:'Electricity',ae_wifi:'Wi-Fi',ae_others:'Others',
         ae_total_bill:'Total bill amount',ae_expense_from:'Expense from:',ae_divided_to:'Divided to:',
@@ -298,6 +300,8 @@ const App = {
             ae_title:'খরচ যোগ',ae_tab_meal:'খাবার',ae_tab_utility:'ভাড়া, ইউটিলিটি ও অন্যান্য',
             ae_money_from:'টাকা দিয়েছে:',ae_manager:'ম্যানেজার',ae_done_by:'করেছে:',
             ae_item_name:'আইটেমের নাম',ae_expense:'খরচ',ae_add_another:'আরেকটি আইটেম যোগ',
+            ae_add_from_text:'টেক্সট থেকে যোগ',
+            ae_ft_hint:'প্রতি লাইনে একটি আইটেম: নাম পরিমাণ একক খরচ — যেমন চাল 5kg 300',
             ae_hint:'প্রতিটি আইটেম আলাদা লাইনে যোগ করুন। বিশ্লেষণ পৃষ্ঠায় দেখা যাবে কোন আইটেম সবচেয়ে বেশি খরচ হয়েছে।',
             ae_type:'ধরন:',ae_rent:'ভাড়া',ae_electricity:'বিদ্যুৎ',ae_wifi:'ওয়াইফাই',ae_others:'অন্যান্য',
             ae_total_bill:'মোট বিল',ae_expense_from:'খরচ থেকে:',ae_divided_to:'ভাগ করা হয়েছে:',
@@ -3623,7 +3627,10 @@ https://mahmudulsapp.u.gy/mess-manager
                         <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
-                <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                <div class="bz-add-row">
+                    <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                    <button class="bz-add-more" onclick="App.bzOpenFromText()"><span class="material-icons-round">note_add</span> <span data-lang-key="ae_add_from_text">Add from Text</span></button>
+                </div>
                 <p class="bz-hint">Add each item on its own line. The Analysis page can then show which items cost you the most.</p>
             </div>
             <div id="bz-utility-section" style="display:none">
@@ -3648,6 +3655,7 @@ https://mahmudulsapp.u.gy/mess-manager
                     ${names.map(n => `<label class="bz-util-member"><input type="checkbox" checked data-member="${n}" onchange="App.bzUpdateUtilCount()"><span>${n}</span></label>`).join('')}
                 </div>
             </div>`;
+        this.applyLanguage();
     },
 
     async bzSavePage() {
@@ -3704,7 +3712,10 @@ https://mahmudulsapp.u.gy/mess-manager
                         <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(0,'cost',this.value)"></div>
                     </div>
                 </div>
-                <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                <div class="bz-add-row">
+                    <button class="bz-add-more" onclick="App.bzAddItemRow()"><span class="material-icons-round">add</span> Add another item</button>
+                    <button class="bz-add-more" onclick="App.bzOpenFromText()"><span class="material-icons-round">note_add</span> <span data-lang-key="ae_add_from_text">Add from Text</span></button>
+                </div>
                 <p class="bz-hint">Add each item on its own line. The Analysis page can then show which items cost you the most.</p>
             </div>
             <div id="bz-utility-section" style="display:none">
@@ -3795,7 +3806,7 @@ https://mahmudulsapp.u.gy/mess-manager
         const cur = (this._bzItems[idx] && this._bzItems[idx].unit) ?? 'kg';
         const units = ['', 'kg', 'g', 'L', 'ml', 'pcs'];
         const opts = units.map(u => `<button type="button" class="bz-unit-opt${u === cur ? ' active' : ''}" data-unit="${u}" onclick="App.bzPickUnit(${idx},'${u}')">${u || '-'}</button>`).join('');
-        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><div class="bz-unit-picker"><button type="button" class="bz-unit-btn" id="bz-unit-btn-${idx}" onclick="App.bzToggleUnit(${idx})">${this.esc(cur || '-')}<span class="material-icons-round">expand_more</span></button><div class="bz-unit-menu" id="bz-unit-menu-${idx}" style="display:none">${opts}</div></div></div>`;
+        return `<div class="bz-qty-wrap"><input class="bz-input bz-qty-input" type="number" min="0" step="any" placeholder="Qty" value="${this.esc(String((this._bzItems[idx] && this._bzItems[idx].qty) || ''))}" oninput="App.bzUpdateItem(${idx},'qty',this.value)"><div class="bz-unit-picker"><button type="button" class="bz-unit-btn" id="bz-unit-btn-${idx}" onclick="App.bzToggleUnit(${idx})">${this.esc(cur || '-')}<span class="material-icons-round">expand_more</span></button><div class="bz-unit-menu" id="bz-unit-menu-${idx}" style="display:none">${opts}</div></div></div>`;
     },
 
     bzToggleUnit(idx) {
@@ -3844,6 +3855,114 @@ https://mahmudulsapp.u.gy/mess-manager
             ${this.bzQtyRowHtml(idx)}
             <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" oninput="App.bzUpdateItem(${idx},'cost',this.value)"></div>`;
         div.appendChild(row);
+    },
+
+    bzRenderRows() {
+        const div = document.getElementById('bz-item-rows');
+        if (!div) return;
+        if (!(this._bzItems || []).length) this._bzItems = [{ name: '', qty: '', unit: 'kg', cost: '' }];
+        div.innerHTML = this._bzItems.map((it, idx) => `
+            <div class="bz-item-row">
+                <div class="bz-input-wrap"><span class="material-icons-round">shopping_bag</span><input class="bz-input" placeholder="Item name" value="${this.esc(it.name || '')}" oninput="App.bzUpdateItem(${idx},'name',this.value)"></div>
+                ${this.bzQtyRowHtml(idx)}
+                <div class="bz-input-wrap bz-cost-wrap"><input class="bz-input" type="number" placeholder="Expense" value="${this.esc(String(it.cost || ''))}" oninput="App.bzUpdateItem(${idx},'cost',this.value)"></div>
+            </div>`).join('');
+    },
+
+    bzOpenFromText() {
+        document.getElementById('modal-title').textContent = 'Add from Text';
+        document.getElementById('modal-body').innerHTML = `
+            <textarea id="bzft-text" class="bzft-textarea" rows="8" placeholder="চাল 5kg 300&#10;ডাল 1kg 100&#10;আলু ৫০&#10;Vim 15"></textarea>
+            <p class="bz-hint" data-lang-key="ae_ft_hint">One item per line: name qty unit expense — e.g. চাল 5kg 300</p>`;
+        document.getElementById('modal-footer').innerHTML = `
+            <div class="dep-footer-btns">
+                <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
+                <button class="btn-modal-cancel" onclick="App.bzftPaste()">Paste</button>
+                <button class="btn-modal-add" onclick="App.bzFromTextSave()">Save</button>
+            </div>`;
+        this.applyLanguage();
+        this.openModal();
+        const ta = document.getElementById('bzft-text');
+        if (ta) setTimeout(() => ta.focus(), 150);
+    },
+
+    async bzftPaste() {
+        const ta = document.getElementById('bzft-text');
+        if (!ta) return;
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) { ta.value = ta.value ? ta.value.replace(/\s+$/, '') + '\n' + text : text; ta.focus(); }
+            else this.toast('Clipboard is empty', 'info');
+        } catch (e) {
+            ta.focus();
+            this.toast('Clipboard blocked — long-press to paste', 'info');
+        }
+    },
+
+    bzParseFromText(raw) {
+        const toNums = s => s.replace(/[\u09e6-\u09ef]/g, d => String('০১২৩৪৫৬৭৮৯'.indexOf(d)));
+        let t = toNums(String(raw || ''));
+        t = t.replace(/(\d),(\d)/g, '$1$2').replace(/৳/g, ' ').replace(/।/g, '\n').replace(/,(?!\d)/g, '\n');
+        const nuRe = /\d+(?:\.\d+)?\s*(?:kgs|kg|gm|ml|ltr|lt|pcs|pc|g|l)?/gi;
+        let out = '', last = 0, m;
+        while ((m = nuRe.exec(t))) {
+            const end = m.index + m[0].length;
+            out += t.slice(last, end);
+            if (end < t.length && /[A-Za-z\u0980-\u09ff]/.test(t[end])) out += '\n';
+            last = end;
+        }
+        out += t.slice(last);
+        const unitMap = { kg: 'kg', kgs: 'kg', g: 'g', gm: 'g', ml: 'ml', l: 'l', lt: 'l', ltr: 'l', pcs: 'pcs', pc: 'pcs' };
+        const items = [];
+        const skipped = [];
+        out.split('\n').forEach(rawLine => {
+            const line = rawLine.trim();
+            if (!line) return;
+            const firstDig = line.search(/\d/);
+            if (firstDig < 0) { skipped.push(line); return; }
+            const name = line.slice(0, firstDig).replace(/[\s:：\-–—,]+$/, '').trim();
+            if (!name) { skipped.push(line); return; }
+            const toks = [];
+            const re = /(\d+(?:\.\d+)?)\s*([A-Za-z]+)?/g;
+            const rest = line.slice(firstDig);
+            let mm;
+            while ((mm = re.exec(rest))) {
+                const u = (mm[2] || '').toLowerCase();
+                toks.push({ n: mm[1], u: unitMap[u] || '' });
+            }
+            if (!toks.length) { skipped.push(line); return; }
+            let qty = '', unit = '', cost = '';
+            const ui = toks.findIndex(x => x.u);
+            if (ui >= 0) {
+                qty = toks[ui].n;
+                unit = toks[ui].u;
+                for (let i = toks.length - 1; i > ui; i--) { if (!toks[i].u) { cost = toks[i].n; break; } }
+                if (!cost) { for (let i = ui - 1; i >= 0; i--) { if (!toks[i].u) { cost = toks[i].n; break; } } }
+            } else if (toks.length >= 2) {
+                qty = toks[0].n;
+                cost = toks[toks.length - 1].n;
+            } else {
+                cost = toks[0].n;
+            }
+            items.push({ name, qty, unit, cost });
+        });
+        return { items, skipped };
+    },
+
+    bzFromTextSave() {
+        const ta = document.getElementById('bzft-text');
+        const text = ta ? ta.value : '';
+        if (!text.trim()) { this.toast('Type or paste items first', 'error'); return; }
+        const res = this.bzParseFromText(text);
+        if (!res.items.length) { this.toast('No items found — check the format', 'error'); return; }
+        this._bzItems = (this._bzItems || []).filter(i => (i.name || '').trim() || String(i.cost || '').trim());
+        res.items.forEach(it => this._bzItems.push({ name: it.name, qty: it.qty, unit: it.unit || '', cost: it.cost }));
+        this.bzRenderRows();
+        this.bzRenderFooter();
+        this.closeModal();
+        let msg = `Added ${res.items.length} item${res.items.length === 1 ? '' : 's'}`;
+        if (res.skipped.length) msg += `, skipped ${res.skipped.length} line${res.skipped.length === 1 ? '' : 's'}`;
+        this.toast(msg, res.skipped.length ? 'info' : 'success');
     },
 
     bzToggleAll() {
