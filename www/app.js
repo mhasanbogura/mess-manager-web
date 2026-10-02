@@ -4321,20 +4321,26 @@ https://mahmudulsapp.u.gy/mess-manager
         } finally { this._cacheDriveBusy = false; }
     },
     _mdToHtml(md) {
-        let html = md
-            .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-            .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-            .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.+?)\*/g, '<em>$1</em>')
-            .replace(/`(.+?)`/g, '<code>$1</code>')
-            .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" style="color:var(--primary)">$1</a>')
-            .replace(/^- (.+)$/gm, '<li>$1</li>')
-            .replace(/^---$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">')
-            .replace(/\n{2,}/g, '</p><p>')
-            .replace(/\n/g, '<br>');
-        html = html.replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:18px;margin:8px 0">$1</ul>');
-        return `<div style="font-size:14px;line-height:1.7;color:var(--text)">${html}</div>`;
+        let html = '';
+        for (const line of md.split('\n')) {
+            const trimmed = line.trim();
+            if (!trimmed) { html += '<div style="height:4px"></div>'; continue; }
+            const inline = s => s
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--primary)">$1</a>')
+                .replace(/`(.+?)`/g, '<code style="background:var(--bg);padding:1px 4px;border-radius:3px">$1</code>');
+            if (trimmed.startsWith('## ') || trimmed.startsWith('# ')) {
+                html += `<div style="font-weight:700;font-size:13px;color:var(--primary);margin:6px 0 2px">${trimmed.replace(/^#+\s*/, '')}</div>`;
+            } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                html += `<div style="font-size:12px;line-height:1.5;margin-left:8px">• ${inline(trimmed.slice(2))}</div>`;
+            } else if (trimmed === '---') {
+                html += '<hr style="border:none;border-top:1px solid var(--border);margin:8px 0">';
+            } else {
+                html += `<div style="font-size:12px;line-height:1.5">${inline(trimmed)}</div>`;
+            }
+        }
+        return html;
     },
     _isValidMd(md) {
         if (!md || md.length < 10) return false;
@@ -4352,9 +4358,8 @@ https://mahmudulsapp.u.gy/mess-manager
     },
     aboutApp() {
         const lang = this._currentLang || 'en';
-        const title = lang === 'bn' ? 'অ্যাপ সম্পর্কে' : 'About App';
         const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
-        this.openDialog(title, loadingHtml, []);
+        this.openDialog('', loadingHtml, []);
         const cached = localStorage.getItem('cache_about_md');
         const hasCached = this._isValidMd(cached);
         if (hasCached) this._renderAboutFromMd(cached);
@@ -4373,10 +4378,10 @@ https://mahmudulsapp.u.gy/mess-manager
         const versionText = versionEl ? versionEl.textContent : 'Version';
         const versionHtml = `<p style="margin-top:16px;font-size:12px;color:var(--text);opacity:.4;text-align:center">${versionText}</p>`;
         const html = `
-            <div style="text-align:center;padding:0 0 16px">
-                <img src="app-icon.png" alt="" style="width:72px;height:72px;border-radius:18px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:12px">
-                <h3 style="margin:0;font-size:20px;font-weight:800;color:var(--text)">Mess Manager</h3>
-                <p style="margin:4px 0 0;font-size:13px;color:var(--text);opacity:.5">${lang === 'bn' ? 'আপনার মেস সহজে পরিচালনা করুন' : 'Manage your mess easily'}</p>
+            <div style="text-align:center;margin-bottom:8px">
+                <img src="app-icon.png" alt="" style="width:64px;height:64px;border-radius:16px;box-shadow:0 4px 16px rgba(0,0,0,0.15);margin-bottom:8px">
+                <div style="font-weight:700;font-size:15px;margin-top:2px">Mess Manager</div>
+                <div style="font-size:13px;color:var(--text-secondary);margin-top:2px">${lang === 'bn' ? 'আপনার মেস সহজে পরিচালনা করুন' : 'Manage your mess easily'}</div>
             </div>
             ${this._mdToHtml(md)}
             ${versionHtml}`;
@@ -4385,9 +4390,8 @@ https://mahmudulsapp.u.gy/mess-manager
     },
     contactDeveloper() {
         const lang = this._currentLang || 'en';
-        const title = lang === 'bn' ? 'ডেভেলপারের সাথে যোগাযোগ' : 'Contact Developer';
         const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
-        this.openDialog(title, loadingHtml, []);
+        this.openDialog('', loadingHtml, []);
         const cached = localStorage.getItem('cache_contact_md');
         const hasCached = this._isValidMd(cached);
         if (hasCached) this._renderContactFromMd(cached);
@@ -4429,7 +4433,7 @@ https://mahmudulsapp.u.gy/mess-manager
             website: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>'
         };
         let html = `<div style="text-align:center;margin-bottom:16px"><div style="font-weight:700;font-size:22px;margin-bottom:12px;color:var(--text)">${this.esc(developerName)}</div>`;
-        if (bio) html += `<div style="font-size:14px;line-height:1.7;color:var(--text);opacity:.6;margin-bottom:16px;text-align:center">${this.esc(bio)}</div>`;
+        if (bio) html += `<div style="font-size:14px;line-height:1.7;color:var(--text-secondary);margin-bottom:16px;text-align:center">${this.esc(bio)}</div>`;
         html += '</div><div style="display:flex;flex-direction:column;gap:10px">';
         for (const { label, value } of entries) {
             const lower = label.toLowerCase();
@@ -4446,7 +4450,7 @@ https://mahmudulsapp.u.gy/mess-manager
             else if (lower.includes('website') || lower.includes('url')) href = value.startsWith('http') ? value : 'https://' + value;
             const isPhone = lower.includes('phone') || lower.includes('mobile');
             const iconKey = lower.includes('messenger') ? 'messenger' : isPhone ? 'mobile' : lower.includes('instagram') ? 'instagram' : Object.keys(icons).find(k => lower.includes(k));
-            html += `<a href="${this.esc(href)}" ${isPhone ? '' : 'target="_blank" rel="noopener"'} style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px 14px;border:1.5px solid var(--card-border);border-radius:14px;text-decoration:none;color:var(--text);font-weight:600;font-size:15px;transition:all .2s"><span style="display:flex;align-items:center">${iconKey ? icons[iconKey] : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>'}</span><span style="text-align:center">${this.esc(label)}</span></a>`;
+            html += `<a href="${this.esc(href)}" ${isPhone ? '' : 'target="_blank" rel="noopener"'} class="settings-box" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:10px"><span style="display:flex;align-items:center">${iconKey ? icons[iconKey] : '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>'}</span><span style="text-align:center">${this.esc(label)}</span></a>`;
         }
         html += '</div>';
         document.getElementById('dlgBody').innerHTML = html;
