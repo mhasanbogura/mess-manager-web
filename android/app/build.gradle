@@ -37,6 +37,11 @@ task stampVersion {
         if (codeMatcher.find() && nameMatcher.find()) {
             def v = nameMatcher.group(1)
             def b = codeMatcher.group(1)
+            def cfgV = android.defaultConfig.versionName
+            def cfgB = "${android.defaultConfig.versionCode}"
+            if (v != cfgV || b != cfgB) {
+                throw new GradleException("Version mismatch: build.gradle on disk is ${v} (build ${b}) but this build was configured with ${cfgV} (build ${cfgB}). The APK manifest would get the configured version. Run bumpVersion in a SEPARATE Gradle invocation before the build (./gradlew bumpVersion, then ./gradlew release).")
+            }
             def projRoot = project.projectDir.parentFile.parentFile
             ["app.js", "www/app.js", "android/app/src/main/assets/public/app.js"].each { rel ->
                 def f = new File(projRoot, rel)
