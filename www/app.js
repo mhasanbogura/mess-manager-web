@@ -402,6 +402,7 @@ const App = {
             if (splash && !splash.classList.contains('hidden')) { splash.classList.add('hidden'); setTimeout(() => splash.remove(), 400); }
         };
         this.applyTheme();
+        this._applySafeInsets(10);
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (this.theme === 'system') this.applyTheme(); });
         this.applyLanguage();
         const isOnline = await new Promise(resolve => {
@@ -625,6 +626,9 @@ const App = {
             }
         });
         const hwBack = () => {
+            const now = Date.now();
+            if (this._hwBackAt && now - this._hwBackAt < 200) return;
+            this._hwBackAt = now;
             if (document.getElementById('bz-overlay')) { this.bzClose(); return; }
             if (document.getElementById('dlg') && !document.getElementById('dlg').hidden) { this.closeDialog(); return; }
             const modal = document.getElementById('modal-overlay');
@@ -663,7 +667,6 @@ const App = {
                 this.signOut();
             }
         };
-        document.addEventListener('backbutton', hwBack, false);
         try {
             if (window.Capacitor?.Plugins?.App) {
                 window.Capacitor.Plugins.App.addListener('backButton', hwBack);
@@ -675,6 +678,8 @@ const App = {
                     if (state.isActive && this.currentUser && this.messId) {
                         this.showApp();
                         this.loadDashboard();
+                        this._cacheDriveFiles();
+                        this._applySafeInsets(10);
                     }
                 });
             }
@@ -4103,29 +4108,48 @@ https://mahmudulsapp.u.gy/mess-manager
             if (meta) meta.setAttribute('content', bgColor);
             else { const m = document.createElement('meta'); m.name = 'theme-color'; m.content = bgColor; document.head.appendChild(m); }
         } catch (e) {}
-        try { if (window.AndroidBridge?.setStatusBarColor) AndroidBridge.setStatusBarColor(bgColor); } catch(e) {}
         const setBars = (retry) => {
+            try { if (window.AndroidBridge?.setStatusBarColor) AndroidBridge.setStatusBarColor(bgColor); } catch (e) {}
             try {
                 if (window.Capacitor?.Plugins?.SystemBars) {
-                    window.Capacitor.Plugins.SystemBars.setColors({ color: bgColor });
-                    return;
-                }
-            } catch (e) {}
-            try {
-                if (window.Capacitor?.Plugins?.StatusBar) {
-                    const isDark = bgColor === '#0a0a0a';
-                    window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
-                    window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
-                }
-            } catch (e) {}
-            try {
-                if (window.Capacitor?.Plugins?.NavigationBar) {
-                    window.Capacitor.Plugins.NavigationBar.setNavigationBarColor({ color: bgColor });
+                    const p = window.Capacitor.Plugins.SystemBars.setColors({ color: bgColor });
+                    if (p && p.catch) p.catch(() => {});
+                } else {
+                    if (window.Capacitor?.Plugins?.StatusBar) {
+                        const isDark = bgColor === '#0a0a0a';
+                        const p1 = window.Capacitor.Plugins.StatusBar.setStyle({ style: isDark ? 'DARK' : 'LIGHT' });
+                        if (p1 && p1.catch) p1.catch(() => {});
+                        const p2 = window.Capacitor.Plugins.StatusBar.setBackgroundColor({ color: bgColor });
+                        if (p2 && p2.catch) p2.catch(() => {});
+                    }
+                    if (window.Capacitor?.Plugins?.NavigationBar) {
+                        const p3 = window.Capacitor.Plugins.NavigationBar.setNavigationBarColor({ color: bgColor });
+                        if (p3 && p3.catch) p3.catch(() => {});
+                    }
                 }
             } catch (e) {}
             if (retry > 0) setTimeout(() => setBars(retry - 1), 300);
         };
         setBars(5);
+    },
+    _applySafeInsets(retry) {
+        try {
+            if (window.AndroidBridge?.getSystemBarInsets) {
+                const raw = AndroidBridge.getSystemBarInsets();
+                if (typeof raw === 'string' && raw.indexOf(',') > -1) {
+                    const parts = raw.split(',');
+                    const sat = Math.max(0, parseInt(parts[0], 10) || 0);
+                    const sab = Math.max(0, parseInt(parts[1], 10) || 0);
+                    if (sat > 0 || sab > 0 || retry <= 0) {
+                        const root = document.documentElement.style;
+                        root.setProperty('--sat', sat + 'px');
+                        root.setProperty('--sab', sab + 'px');
+                        return;
+                    }
+                }
+            }
+        } catch (e) {}
+        if (retry > 0) setTimeout(() => this._applySafeInsets(retry - 1), 300);
     },
     _setupConnectivity() {
         this._isOnline = navigator.onLine;
@@ -4266,23 +4290,27 @@ https://mahmudulsapp.u.gy/mess-manager
         contact: { url: 'https://www.googleapis.com/drive/v3/files/1VNmXxG33NWMphp1mz2xQGWcm9NdCc3oH?alt=media&key=AIzaSyAX7T6Vd75LnhQg15IydOLEYqjfGUT8TO8', key: 'cache_contact_md' }
     },
     async _cacheDriveFiles() {
-        for (const [name, cfg] of Object.entries(this._driveFiles)) {
-            const existing = localStorage.getItem(cfg.key);
-            if (existing && existing.trimStart().startsWith('{')) localStorage.removeItem(cfg.key);
-            try {
-                const resp = await fetch(cfg.url);
-                const text = await resp.text();
-                if (text && text.length > 10 && !text.includes('<!DOCTYPE') && !text.trimStart().startsWith('{')) {
-                    localStorage.setItem(cfg.key, text);
-                } else if (!localStorage.getItem(cfg.key)) {
-                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading...`);
-                }
-            } catch (e) {
-                if (!localStorage.getItem(cfg.key)) {
-                    localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading...`);
+        if (this._cacheDriveBusy) return;
+        this._cacheDriveBusy = true;
+        try {
+            for (const [name, cfg] of Object.entries(this._driveFiles)) {
+                const existing = localStorage.getItem(cfg.key);
+                if (existing && existing.trimStart().startsWith('{')) localStorage.removeItem(cfg.key);
+                try {
+                    const resp = await fetch(cfg.url);
+                    const text = await resp.text();
+                    if (text && text.length > 10 && !text.includes('<!DOCTYPE') && !text.trimStart().startsWith('{')) {
+                        localStorage.setItem(cfg.key, text);
+                    } else if (!localStorage.getItem(cfg.key)) {
+                        localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading...`);
+                    }
+                } catch (e) {
+                    if (!localStorage.getItem(cfg.key)) {
+                        localStorage.setItem(cfg.key, `# ${name === 'about' ? 'About App' : 'Contact Developer'}\n\nContent loading...`);
+                    }
                 }
             }
-        }
+        } finally { this._cacheDriveBusy = false; }
     },
     _mdToHtml(md) {
         let html = md
@@ -4300,19 +4328,36 @@ https://mahmudulsapp.u.gy/mess-manager
         html = html.replace(/(<li>.*<\/li>)/gs, '<ul style="padding-left:18px;margin:8px 0">$1</ul>');
         return `<div style="font-size:14px;line-height:1.7;color:var(--text)">${html}</div>`;
     },
+    _isValidMd(md) {
+        if (!md || md.length < 10) return false;
+        const t = md.trimStart();
+        if (t.startsWith('{') || /^<!doctype/i.test(t) || /^<html/i.test(t)) return false;
+        if (md.includes('Content loading')) return false;
+        return true;
+    },
+    _showContentRetry(fn, lang) {
+        const body = document.getElementById('dlgBody');
+        if (!body || document.getElementById('dlg').hidden) return;
+        const msg = lang === 'bn' ? 'কনটেন্ট লোড করা যায়নি। ইন্টারনেট সংযোগ চেক করুন।' : "Couldn't load content. Check your connection.";
+        const btn = lang === 'bn' ? 'আবার চেষ্টা করুন' : 'Retry';
+        body.innerHTML = `<div style="text-align:center;padding:18px 0"><p style="margin:0 0 14px;font-size:14px;color:var(--text);opacity:.7">${msg}</p><button type="button" onclick="App.${fn}()" style="padding:10px 26px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer">${btn}</button></div>`;
+    },
     aboutApp() {
         const lang = this._currentLang || 'en';
         const title = lang === 'bn' ? 'অ্যাপ সম্পর্কে' : 'About App';
         const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
         this.openDialog(title, loadingHtml, []);
-        const fallback = `# About App\n\nA simple mess management application designed to help users organize shared-mess information, track members, meals, expenses, and monthly calculations in one place.\n\n## Features\n\n- Manage mess members\n- Track daily meals\n- Manage meal rates and meal counts\n- Record shared expenses\n- Track individual member expenses\n- Calculate monthly meal costs\n- Manage deposits and balances\n- View monthly summaries\n- Track mess-related transactions\n- Simple and organized interface`;
         const cached = localStorage.getItem('cache_about_md');
-        if (cached && !cached.includes('Content loading') && !cached.trimStart().startsWith('{')) { this._renderAboutFromMd(cached); return; }
-        localStorage.removeItem('cache_about_md');
+        const hasCached = this._isValidMd(cached);
+        if (hasCached) this._renderAboutFromMd(cached);
         fetch(this._driveFiles.about.url)
             .then(r => r.text())
-            .then(md => { if (md && !md.trimStart().startsWith('{')) { localStorage.setItem('cache_about_md', md); this._renderAboutFromMd(md); } else { this._renderAboutFromMd(fallback); } })
-            .catch(() => { this._renderAboutFromMd(fallback); });
+            .then(md => {
+                if (!this._isValidMd(md)) { if (!hasCached) this._showContentRetry('aboutApp', lang); return; }
+                localStorage.setItem('cache_about_md', md);
+                if (md !== cached && !document.getElementById('dlg').hidden) this._renderAboutFromMd(md);
+            })
+            .catch(() => { if (!hasCached) this._showContentRetry('aboutApp', lang); });
     },
     _renderAboutFromMd(md) {
         const lang = this._currentLang || 'en';
@@ -4336,12 +4381,16 @@ https://mahmudulsapp.u.gy/mess-manager
         const loadingHtml = `<div style="text-align:center;padding:20px 0"><div class="spinner" style="margin:0 auto;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite"></div><p style="margin:12px 0 0;font-size:14px;color:var(--text);opacity:.6">${lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</p></div>`;
         this.openDialog(title, loadingHtml, []);
         const cached = localStorage.getItem('cache_contact_md');
-        if (cached && !cached.includes('Content loading') && !cached.trimStart().startsWith('{')) { this._renderContactFromMd(cached); return; }
-        localStorage.removeItem('cache_contact_md');
+        const hasCached = this._isValidMd(cached);
+        if (hasCached) this._renderContactFromMd(cached);
         fetch(this._driveFiles.contact.url)
             .then(r => r.text())
-            .then(md => { if (md && !md.trimStart().startsWith('{')) { localStorage.setItem('cache_contact_md', md); this._renderContactFromMd(md); } else { this._renderContactFallback(); } })
-            .catch(() => { this._renderContactFallback(); });
+            .then(md => {
+                if (!this._isValidMd(md)) { if (!hasCached) this._showContentRetry('contactDeveloper', lang); return; }
+                localStorage.setItem('cache_contact_md', md);
+                if (md !== cached && !document.getElementById('dlg').hidden) this._renderContactFromMd(md);
+            })
+            .catch(() => { if (!hasCached) this._showContentRetry('contactDeveloper', lang); });
     },
     _renderContactFromMd(md) {
         let developerName = 'Developer', bio = '';
