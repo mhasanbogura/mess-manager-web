@@ -409,9 +409,12 @@ const App = {
         if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this._measureBottomBar()).catch(() => {});
         const isOnline = await new Promise(resolve => {
             if (!navigator.onLine) return resolve(false);
+            let settled = false;
+            const done = v => { if (!settled) { settled = true; resolve(v); } };
             fetch('https://firebasedynamiclinks.googleapis.com/v1', { method: 'HEAD', mode: 'no-cors', cache: 'no-store' })
-                .then(() => resolve(true))
-                .catch(() => resolve(false));
+                .then(() => done(true))
+                .catch(() => done(false));
+            setTimeout(() => done(true), 1800);
         });
         if (!isOnline) {
             const spinner = splash?.querySelector('.spinner');
