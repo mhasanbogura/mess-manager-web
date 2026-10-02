@@ -35,7 +35,7 @@
        the live top edge of the visible bottom bar measured by JS (includes
        the safe-area inset); the values below are pre-paint fallbacks.
        Heights of the floating controls for stack padding maths. */
-    --nav-top: 63px;
+    --nav-top: 51px;
     --g-btm: 9px;
     --fab-h: 52px;
     --nfab-h: 54px;
@@ -2744,7 +2744,7 @@ img, canvas { max-width: 100%; }
 .aflat-card-box-head { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #888; margin-bottom: 4px; }
 .aflat-card-box-head .material-icons-round { font-size: 16px; color: var(--primary); }
 .aflat-card-box-head span:last-child { margin-left: auto; }
-.aflat-share-inline { background: none; border: none; color: var(--primary); padding: 0; cursor: pointer; display: flex; }
+.aflat-share-inline { background: none; border: none; color: var(--primary); padding: 0; cursor: pointer; display: flex; margin-left: auto; }
 .aflat-share-inline .material-icons-round { font-size: 18px; color: var(--primary); }
 .aflat-card-box strong { display: block; font-size: 14px; font-weight: 600; text-align: center; overflow-wrap: break-word; color: var(--text); }
 @media (min-width: 768px) {
@@ -3594,7 +3594,7 @@ img, canvas { max-width: 100%; }
     .bz-item-row > .bz-input-wrap { flex: 2.5 1 0%; }
     .bz-item-row > .bz-qty-wrap { flex: 1.5 1 0%; }
     .bz-item-row > .bz-cost-wrap { flex: 2 1 0%; }
-    .bottom-nav { left: 12px; right: 12px; bottom: calc(12px + var(--sab)); border-radius: 16px; border: 1px solid var(--glass-border); }
+    .bottom-nav { left: 12px; right: 12px; bottom: 0; padding-bottom: calc(6px + var(--sab)); border-radius: 16px 16px 0 0; border: 1px solid var(--glass-border); }
     .abazar-fab, .anotice-fab { left: 12px; right: 12px; border-radius: 14px; justify-content: center; padding: 14px; }
     #app-screen .aam-footer { left: 12px; right: 12px; background: transparent; padding: 0; }
     #app-screen .abn-bottom { left: 12px; right: 12px; bottom: calc(12px + var(--sab)); border-radius: 16px; border: 1px solid var(--border); }
