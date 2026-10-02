@@ -407,16 +407,7 @@ const App = {
         this.applyLanguage();
         this._measureBottomBar();
         if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this._measureBottomBar()).catch(() => {});
-        const isOnline = await new Promise(resolve => {
-            if (!navigator.onLine) return resolve(false);
-            let settled = false;
-            const done = v => { if (!settled) { settled = true; resolve(v); } };
-            fetch('https://firebasedynamiclinks.googleapis.com/v1', { method: 'HEAD', mode: 'no-cors', cache: 'no-store' })
-                .then(() => done(true))
-                .catch(() => done(false));
-            setTimeout(() => done(true), 1800);
-        });
-        if (!isOnline) {
+        if (!navigator.onLine) {
             const spinner = splash?.querySelector('.spinner');
             if (spinner) spinner.style.display = 'none';
             if (offlineWarn) offlineWarn.style.display = 'block';
@@ -428,8 +419,12 @@ const App = {
             }, { once: true });
             return;
         }
+        // Non-blocking connectivity probe: boot never waits on the network —
+        // a failed probe just raises the offline banner once the UI is up.
+        fetch('https://firebasedynamiclinks.googleapis.com/v1', { method: 'HEAD', mode: 'no-cors', cache: 'no-store' })
+            .catch(() => { this._probeDead = true; try { this._showOnlineStatus(false); } catch (e) {} });
         setTimeout(() => { if (splash && !splash.classList.contains('hidden')) this._hideSplash(); }, 5000);
-        this._cacheDriveFiles();
+        setTimeout(() => this._cacheDriveFiles(), 2500);
         if (typeof firebaseConfig === 'undefined' || !firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY_HERE') {
             this.showScreen('auth-screen');
             document.querySelector('.auth-container').innerHTML = '<div class="auth-header"><div class="auth-logo"><span class="material-icons-round">warning</span></div><h1>Firebase Setup Required</h1><p style="margin-top:12px">Edit <code>firebase-config.js</code></p></div>';
@@ -787,16 +782,25 @@ const App = {
         if (!this.currentUser) return;
         const cacheKey = `user_messes_${this.currentUser.uid}`;
         let data = {};
+        try { data = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e) {}
         const offline = !navigator.onLine;
-        if (offline) {
-            try { data = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch (e) {}
-        } else {
-            try {
-                const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
-                data = snap.val() || {};
-                try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
-            } catch (e) {
-                try { const c = JSON.parse(localStorage.getItem(cacheKey) || '{}'); if (Object.keys(c).length) data = c; } catch (e2) {}
+        const hasCache = Object.keys(data).length > 0;
+        if (!offline) {
+            if (hasCache) {
+                // Cache-first: enter instantly, then refresh membership in the
+                // background and re-run only if the mess list actually changed.
+                const sig = o => JSON.stringify(Object.keys(o).sort().map(k => [k, (o[k] || {}).role]));
+                db.ref(`users/${this.currentUser.uid}/messes`).once('value').then(snap => {
+                    const fresh = snap.val() || {};
+                    try { localStorage.setItem(cacheKey, JSON.stringify(fresh)); } catch (e) {}
+                    if (sig(fresh) !== sig(data)) this.loadMyMesses();
+                }).catch(() => {});
+            } else {
+                try {
+                    const snap = await db.ref(`users/${this.currentUser.uid}/messes`).once('value');
+                    data = snap.val() || {};
+                    try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
+                } catch (e) {}
             }
         }
         const ids = Object.keys(data);
@@ -807,16 +811,17 @@ const App = {
             let html = '<div class="card-body">';
             for (const mid of ids) {
                 let s = {};
-                try {
-                    if (offline) {
-                        s = JSON.parse(localStorage.getItem(`mess_settings_${mid}`) || '{}');
+                try { s = JSON.parse(localStorage.getItem(`mess_settings_${mid}`) || '{}'); } catch (e) {}
+                if (!offline) {
+                    if (Object.keys(s).length) {
+                        db.ref(`messes/${mid}/settings`).once('value').then(ms => { try { localStorage.setItem(`mess_settings_${mid}`, JSON.stringify(ms.val() || {})); } catch (e) {} }).catch(() => {});
                     } else {
-                        const ms = await db.ref(`messes/${mid}/settings`).once('value');
-                        s = ms.val() || {};
-                        try { localStorage.setItem(`mess_settings_${mid}`, JSON.stringify(s)); } catch (e) {}
+                        try {
+                            const ms = await db.ref(`messes/${mid}/settings`).once('value');
+                            s = ms.val() || {};
+                            try { localStorage.setItem(`mess_settings_${mid}`, JSON.stringify(s)); } catch (e) {}
+                        } catch (e) {}
                     }
-                } catch (e) {
-                    try { s = JSON.parse(localStorage.getItem(`mess_settings_${mid}`) || '{}'); } catch (e2) {}
                 }
                 html += `<div class="mess-item" onclick="App.enterMess('${mid}', {skipMemberCheck:true})">
                     <div class="mess-item-icon"><span class="material-icons-round">home</span></div>
@@ -832,6 +837,17 @@ const App = {
         this.showScreen('mess-select-screen');
         document.getElementById('my-messes-list').innerHTML = '<div class="card-body"><p class="empty-state">No mess yet. Create or join one below.</p></div>';
         this._setupMessSelectPullRefresh();
+    },
+
+    _userMessesCacheUpdate(mid, role) {
+        if (!this.currentUser || !mid) return;
+        try {
+            const key = `user_messes_${this.currentUser.uid}`;
+            const c = JSON.parse(localStorage.getItem(key) || '{}');
+            if (role) c[mid] = { role: role, joinedAt: Date.now() };
+            else delete c[mid];
+            localStorage.setItem(key, JSON.stringify(c));
+        } catch (e) {}
     },
 
     _setupMessSelectPullRefresh() {
@@ -938,22 +954,45 @@ const App = {
                     const memberSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
                     if (!memberSnap.exists()) {
                         try { await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).remove(); } catch (e2) {}
+                        this._userMessesCacheUpdate(mid, null);
                         this.toast('You are no longer a member of this mess', 'error');
                         this.messId = null;
                         return this.loadMyMesses();
                     }
                 }
-                const s = await db.ref(`messes/${mid}/settings`).once('value');
-                const v = s.val() || {};
-                this.messCode = v.messCode;
-                this.messName = v.messName;
-                try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e) {}
-                try {
-                    const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
-                    this.userRole = roleSnap.val() || 'member';
-                    try { localStorage.setItem(roleCacheKey, this.userRole); } catch (e) {}
-                } catch (e) {
-                    try { this.userRole = localStorage.getItem(roleCacheKey) || 'member'; } catch (e2) {}
+                let cachedSettings = null;
+                try { cachedSettings = JSON.parse(localStorage.getItem(settingsCacheKey) || 'null'); } catch (e2) {}
+                if (cachedSettings) {
+                    // Cache-first: show the app immediately, refresh in background.
+                    this.messCode = cachedSettings.messCode || null;
+                    this.messName = cachedSettings.messName || null;
+                    this.userRole = localStorage.getItem(roleCacheKey) || 'member';
+                    db.ref(`messes/${mid}/settings`).once('value').then(sn => {
+                        if (this.messId !== mid) return;
+                        const v = sn.val() || {};
+                        this.messCode = v.messCode;
+                        this.messName = v.messName;
+                        try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e2) {}
+                    }).catch(() => {});
+                    db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value').then(rn => {
+                        if (this.messId !== mid) return;
+                        this.userRole = rn.val() || 'member';
+                        try { localStorage.setItem(roleCacheKey, this.userRole); } catch (e2) {}
+                    }).catch(() => {});
+                } else {
+                    // First enter for this mess — the data is needed, wait for it.
+                    const s = await db.ref(`messes/${mid}/settings`).once('value');
+                    const v = s.val() || {};
+                    this.messCode = v.messCode;
+                    this.messName = v.messName;
+                    try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e) {}
+                    try {
+                        const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
+                        this.userRole = roleSnap.val() || 'member';
+                        try { localStorage.setItem(roleCacheKey, this.userRole); } catch (e) {}
+                    } catch (e) {
+                        try { this.userRole = localStorage.getItem(roleCacheKey) || 'member'; } catch (e2) {}
+                    }
                 }
             } else {
                 try {
@@ -1053,6 +1092,7 @@ const App = {
             updates[`messes/${this.messId}/permissions/${uid}`] = null;
             updates[`users/${uid}/messes/${this.messId}`] = null;
             await db.ref().update(updates);
+            this._userMessesCacheUpdate(this.messId, null);
             const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const remaining = Object.keys(mSnap.val() || {}).filter(id => !id.startsWith('member_'));
             if (!remaining.length) {
@@ -1083,6 +1123,7 @@ const App = {
             });
             await Promise.race([write, timeout]);
             await Promise.race([db.ref(`users/${this.currentUser.uid}/messes/${newKey}`).set({ role: 'admin', joinedAt: Date.now() }), timeout]);
+            this._userMessesCacheUpdate(newKey, 'admin');
             this.toast('Mess created!', 'success');
             document.getElementById('create-mess-name').value = '';
             this.enterMess(newKey, { skipMemberCheck: true });
@@ -1104,6 +1145,7 @@ const App = {
                 const ed = existingSnap.val() || {};
                 if (ed.status === 'pending') { this.toast('Join request already pending', 'info'); btn.textContent = 'Join Mess'; btn.disabled = false; return; }
                 await db.ref(`users/${this.currentUser.uid}/messes/${mid}`).set({ role: 'member', joinedAt: ed.joinedAt || Date.now() });
+                this._userMessesCacheUpdate(mid, 'member');
                 this.toast('Joined!', 'success');
                 document.getElementById('join-mess-code').value = '';
                 this.enterMess(mid);
@@ -1121,6 +1163,7 @@ const App = {
 
     showApp() {
         this.showScreen('app-screen');
+        this._hideSplash();
         try { history.pushState({ page: 'dashboard' }, ''); } catch (e) { /* ignore */ }
         const savedPage = localStorage.getItem('mess_currentPage');
         const validPages = ['dashboard','members','bazaar','meals','balance','profile'];
@@ -1636,7 +1679,7 @@ const App = {
             await db.ref().update(updates);
             this.userRole = 'member';
             try { localStorage.setItem(`mess_role_${this.messId}`, 'member'); } catch (e) {}
-            try { await this.loadMyPerms(); } catch (e) {}
+            try { await this.loadMyPerms(true); } catch (e) {}
             this.toast(this._currentLang === 'bn' ? 'আপনি ম্যানেজার পদ ছেড়েছেন' : 'You stepped down as manager', 'success');
             this.loadFlat();
             try { this.loadDashboard(); } catch (e) {}
@@ -1678,7 +1721,7 @@ const App = {
             if (isSelf) {
                 this.userRole = 'admin';
                 try { localStorage.setItem(`mess_role_${this.messId}`, 'admin'); } catch (e) {}
-                try { await this.loadMyPerms(); } catch (e) {}
+                try { await this.loadMyPerms(true); } catch (e) {}
             }
             this.toast(becoming ? 'You are now the manager!' : 'Manager changed!', 'success');
             this.loadFlat();
@@ -1722,7 +1765,7 @@ const App = {
             await db.ref().update(updates);
             this.userRole = 'member';
             try { localStorage.setItem(`mess_role_${this.messId}`, 'member'); } catch (e) {}
-            try { await this.loadMyPerms(); } catch (e) {}
+            try { await this.loadMyPerms(true); } catch (e) {}
             this.toast(req.name ? `You stepped down as manager (${req.name} requested)` : 'You stepped down as manager', 'success');
             try { this.loadDashboard(); } catch (e) {}
             try { this.loadFlat(); } catch (e) {}
@@ -1738,6 +1781,7 @@ const App = {
             updates[`messes/${this.messId}/permissions/${uid}`] = null;
             updates[`users/${uid}/messes/${this.messId}`] = null;
             await db.ref().update(updates);
+            if (uid === this.currentUser.uid) this._userMessesCacheUpdate(this.messId, null);
             const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const remaining = Object.keys(mSnap.val() || {}).filter(id => !id.startsWith('member_'));
             if (!remaining.length) {
@@ -1814,10 +1858,29 @@ const App = {
 
     _userPerms: {},
     _permsLoaded: false,
-    async loadMyPerms() {
+    async loadMyPerms(force) {
         if (!this.messId || !this.currentUser) return;
         const cacheKey = `perms_${this.messId}_${this.currentUser.uid}`;
         const offline = !navigator.onLine;
+        const cachedRaw = localStorage.getItem(cacheKey);
+        if (!offline && !force && cachedRaw !== null) {
+            // Cache-first: permissions render instantly, verified in background.
+            try { this._userPerms = JSON.parse(cachedRaw); } catch (e) { this._userPerms = {}; }
+            this._permsLoaded = true;
+            db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value').then(ms => {
+                const m = ms.val() || {};
+                if (m.role === 'admin') {
+                    this._userPerms = null;
+                    try { localStorage.setItem(cacheKey, 'null'); } catch (e) {}
+                    return;
+                }
+                db.ref(`messes/${this.messId}/permissions/${this.currentUser.uid}`).once('value').then(ps => {
+                    this._userPerms = ps.val() || {};
+                    try { localStorage.setItem(cacheKey, JSON.stringify(this._userPerms)); } catch (e) {}
+                }).catch(() => {});
+            }).catch(() => {});
+            return;
+        }
         try {
             if (!offline) {
                 const membersSnap = await db.ref(`messes/${this.messId}/members/${this.currentUser.uid}`).once('value');
@@ -1923,22 +1986,22 @@ https://mahmudulsapp.u.gy/mess-manager
             const avatarEl = document.getElementById('dash-avatar');
             if (avatarEl) {
                 avatarEl.textContent = initial;
-                try {
-                    let pic = this._cacheGetGlobal('profilePic');
-                    if (!pic && navigator.onLine) {
-                        pic = await Promise.race([
-                            db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value').then(s => s.val()),
-                            new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
-                        ]);
-                        if (pic) this._cacheSetGlobal('profilePic', pic);
-                    }
+                const applyPic = pic => {
                     if (pic && typeof pic === 'string') {
                         avatarEl.style.backgroundImage = `url(${pic})`;
                         avatarEl.style.backgroundSize = 'cover';
                         avatarEl.style.backgroundPosition = 'center';
                         avatarEl.textContent = '';
                     }
-                } catch (e) {}
+                };
+                const pic = this._cacheGetGlobal('profilePic');
+                if (pic) applyPic(pic);
+                else if (navigator.onLine) {
+                    db.ref(`users/${this.currentUser.uid}/profilePicture`).once('value').then(s => {
+                        const p = s.val();
+                        if (p) { this._cacheSetGlobal('profilePic', p); applyPic(p); }
+                    }).catch(() => {});
+                }
             }
             const usernameEl = document.getElementById('dash-username');
             if (usernameEl) usernameEl.textContent = userName;
@@ -4161,7 +4224,7 @@ https://mahmudulsapp.u.gy/mess-manager
     },
     _setupConnectivity() {
         this._isOnline = navigator.onLine;
-        this._showOnlineStatus(this._isOnline);
+        this._showOnlineStatus(this._isOnline && !this._probeDead);
         window.addEventListener('online', () => {
             this._isOnline = true;
             this._showOnlineStatus(true);
