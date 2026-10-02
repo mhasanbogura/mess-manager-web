@@ -405,6 +405,8 @@ const App = {
         this._applySafeInsets(10);
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (this.theme === 'system') this.applyTheme(); });
         this.applyLanguage();
+        this._measureBottomBar();
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this._measureBottomBar()).catch(() => {});
         const isOnline = await new Promise(resolve => {
             if (!navigator.onLine) return resolve(false);
             fetch('https://firebasedynamiclinks.googleapis.com/v1', { method: 'HEAD', mode: 'no-cors', cache: 'no-store' })
@@ -460,6 +462,7 @@ const App = {
         this._setupConnectivity();
         this._setupAppPullRefresh();
         window.addEventListener('resize', () => {
+            this._measureBottomBar();
             const c = document.getElementById('toast-container');
             if (c && c.classList.contains('above-footer')) this._toastPosition(c);
         });
@@ -1187,6 +1190,7 @@ const App = {
         if (page === 'costtrash') this.loadCostTrash();
         if (page === 'deptrash') this.loadDepTrash();
         this.applyLanguage();
+        this._measureBottomBar();
     },
 
     async loadNotices() {
@@ -4144,6 +4148,7 @@ https://mahmudulsapp.u.gy/mess-manager
                         const root = document.documentElement.style;
                         root.setProperty('--sat', sat + 'px');
                         root.setProperty('--sab', sab + 'px');
+                        this._measureBottomBar();
                         return;
                     }
                 }
@@ -5370,7 +5375,9 @@ https://mahmudulsapp.u.gy/mess-manager
         const page = this.currentPage;
         if (!page) return;
         const btn = document.querySelector('#page-' + page + ' .aam-footer .aam-save-btn')
-            || document.querySelector('#page-' + page + ' .abazar-fab');
+            || document.querySelector('#page-' + page + ' .abazar-fab')
+            || document.querySelector('#page-' + page + ' .anotice-fab')
+            || document.querySelector('#page-' + page + ' .amenu-fab');
         if (!btn) return;
         const pageEl = document.getElementById('page-' + page);
         const r = btn.getBoundingClientRect();
@@ -5394,9 +5401,27 @@ https://mahmudulsapp.u.gy/mess-manager
         }
         c._posRetry = false;
         c.classList.add('above-footer');
+        // The same single gap that separates content, Add button and bottom
+        // bar (--g-btm, 9px phones / 21px desktop) goes between button and toast.
+        const g = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--g-btm')) || 9;
         c.style.left = Math.round(r.left) + 'px';
         c.style.right = Math.round(cw - r.right) + 'px';
-        c.style.bottom = Math.round(ch - r.top + 10) + 'px';
+        c.style.bottom = Math.round(ch - r.top + g) + 'px';
+    },
+
+    _measureBottomBar() {
+        try {
+            const ch = document.documentElement.clientHeight;
+            if (!ch) return;
+            const nav = document.querySelector('.bottom-nav');
+            const abn = document.querySelector('.abn-bottom');
+            const bar = (nav && nav.offsetHeight > 0) ? nav : ((abn && abn.offsetHeight > 0) ? abn : null);
+            if (!bar) return;
+            const top = bar.getBoundingClientRect().top;
+            if (top > 0 && top <= ch) {
+                document.documentElement.style.setProperty('--nav-top', (Math.round((ch - top) * 100) / 100) + 'px');
+            }
+        } catch (e) { /* ignore */ }
     }
 };
 

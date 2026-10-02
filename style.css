@@ -30,6 +30,22 @@
     --radius-sm: 10px;
     --radius-xs: 6px;
     --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Bottom rhythm: --g-btm is THE gap between page content, the floating
+       Add/Save button and the bottom bar (and above a toast). --nav-top is
+       the live top edge of the visible bottom bar measured by JS (includes
+       the safe-area inset); the values below are pre-paint fallbacks.
+       Heights of the floating controls for stack padding maths. */
+    --nav-top: 63px;
+    --g-btm: 9px;
+    --fab-h: 52px;
+    --nfab-h: 54px;
+    --mfab-h: 50px;
+    --foot-h: 46px;
+}
+/* Wide screens: taller nav (10px/22px items) lifted 12px off the bottom, so
+   the reference gap becomes the Add button→nav gap (90px − 69px = 21px). */
+@media (min-width: 768px) {
+    :root { --nav-top: 69px; --g-btm: 21px; --foot-h: 58px; }
 }
 [data-theme="dark"] {
     --bg: #0a0a0a; --card: #0d0d0d; --card-solid: #0d0d0d; --card-border: #1a1a1a;
@@ -900,11 +916,12 @@ select.input-sm { cursor: pointer; }
 
 /* ==================== TOAST ==================== */
 /* Full width like the page's Add button: the container mirrors the 652px content
-   column on desktop and the 12px side padding on phones. On pages that have an
-   Add button, JS additionally pins it 10px above that button (above-footer),
-   giving left/right/bottom equal to the button rect. */
+   column on desktop and the 12px side padding on phones. It sits --g-btm above
+   the bottom bar; on pages with an Add button, JS additionally pins it --g-btm
+   above that button (above-footer), giving left/right/bottom equal to the
+   button rect. */
 #toast-container {
-    position: fixed; bottom: calc(80px + var(--sab)); right: 12px; left: 12px;
+    position: fixed; bottom: calc(var(--nav-top) + var(--g-btm)); right: 12px; left: 12px;
     z-index: 400; display: flex; flex-direction: column; gap: 8px;
     align-items: stretch;
 }
@@ -1262,7 +1279,7 @@ select.input-sm { cursor: pointer; }
 
 /* ==================== FAB BUTTON ==================== */
 .btn-fab {
-    position: fixed; bottom: calc(80px + var(--sab)); right: 16px;
+    position: fixed; bottom: calc(var(--nav-top) + var(--g-btm)); right: 16px;
     display: flex; align-items: center; gap: 6px; padding: 14px 22px;
     background: linear-gradient(135deg, #d32f2f, #C62828); color: white; border: none;
     border-radius: 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;
@@ -1382,12 +1399,7 @@ select.input-sm { cursor: pointer; }
 .bottom-nav-item.active { color: var(--primary); }
 .bottom-nav-item.active .material-icons-round { filter: drop-shadow(0 0 6px rgba(11,61,145,0.4)); }
 
-.main-content { padding-bottom: 100px !important; }
 .analysis-export-wrap { position: relative; }
-
-@media (max-width: 768px) {
-    .main-content { padding-bottom: 100px !important; }
-}
 
 /* ==================== PROFILE PAGE ==================== */
 .profile-card {
@@ -1429,7 +1441,7 @@ select.input-sm { cursor: pointer; }
 
 /* ==================== RESPONSIVE - MOBILE ==================== */
 @media (max-width: 480px) {
-    .main-content { padding: 10px; padding-bottom: 72px !important; }
+    .main-content { padding: 10px; }
     .topbar { padding: 0 8px; }
     .topbar h2 { font-size: 15px; }
 
@@ -2188,7 +2200,7 @@ select.input-sm { cursor: pointer; }
 .aam-footer {
     padding: 6px 14px;
     position: fixed;
-    bottom: calc(56px + var(--sab));
+    bottom: calc(var(--nav-top) + var(--g-btm));
     left: 0;
     right: 0;
     z-index: 50;
@@ -2361,7 +2373,7 @@ select.input-sm { cursor: pointer; }
 }
 
 .abazar-fab {
-    position: fixed; bottom: calc(80px + var(--sab)); right: 16px;
+    position: fixed; bottom: calc(var(--nav-top) + var(--g-btm)); right: 16px;
     background: linear-gradient(135deg, #F44336, #D32F2F); color: #fff; border: none; border-radius: 16px;
     padding: 14px 22px; font-size: 16px; font-weight: 700;
     display: flex; align-items: center; gap: 6px; cursor: pointer;
@@ -2372,9 +2384,9 @@ select.input-sm { cursor: pointer; }
 /* Wide screens: keep floating buttons inside the 652px card column.
    Scoped to #app-screen so these beat the base rules regardless of order. */
 @media (min-width: 768px) {
-    #app-screen .abazar-fab { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 90px; border-radius: 14px; justify-content: center; padding: 14px; }
-    #app-screen .aam-footer { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 90px; background: transparent; padding: 6px 0; }
-    #app-screen .anotice-fab { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 90px; border-radius: 14px; justify-content: center; padding: 14px; }
+    #app-screen .abazar-fab { left: calc(50% - 326px); right: calc(50% - 326px); border-radius: 14px; justify-content: center; padding: 14px; }
+    #app-screen .aam-footer { left: calc(50% - 326px); right: calc(50% - 326px); background: transparent; padding: 6px 0; }
+    #app-screen .anotice-fab { left: calc(50% - 326px); right: calc(50% - 326px); border-radius: 14px; justify-content: center; padding: 14px; }
     #app-screen .amenu-fab { right: calc(50% - 326px + 16px); }
     #app-screen .abn-bottom { left: calc(50% - 326px); right: calc(50% - 326px); bottom: 12px; border-radius: 16px; border: 1px solid var(--border); }
     #app-screen .aam-body { padding-left: 0; padding-right: 0; }
@@ -2496,7 +2508,6 @@ select.input-sm { cursor: pointer; }
     background: transparent;
     min-height: calc(100vh - 72px);
     position: relative;
-    padding-bottom: 90px;
 }
 .anotice-head {
     display: flex; align-items: center; gap: 10px;
@@ -2539,7 +2550,7 @@ select.input-sm { cursor: pointer; }
 .anotice-del:hover { color: #D32F2F; background: rgba(211,47,47,.08); }
 .anotice-del .material-icons-round { font-size: 20px; }
 .anotice-fab {
-    position: fixed; bottom: calc(92px + var(--sab)); right: 16px; z-index: 60;
+    position: fixed; bottom: calc(var(--nav-top) + var(--g-btm)); right: 16px; z-index: 60;
     display: flex; align-items: center; gap: 10px;
     background: linear-gradient(135deg, #F44336, #D32F2F); color: #fff; border: none; border-radius: 22px;
     padding: 16px 26px; font-family: inherit; font-size: 20px;
@@ -2647,7 +2658,7 @@ img, canvas { max-width: 100%; }
     .anotice-head { padding: 10px 12px; gap: 12px; }
     .anotice-board { padding: 16px 12px; }
     .anotice-empty { padding: 70px 20px 30px; }
-    .anotice-fab { bottom: 86px; right: 12px; padding: 14px 20px; font-size: 18px; }
+    .anotice-fab { right: 12px; padding: 14px 20px; font-size: 18px; }
     /* duty */
     .aduty-head { padding: 10px 12px; gap: 12px; }
     .aduty-banner, .aduty-card, .aduty-member { margin-left: 10px; margin-right: 10px; }
@@ -3532,7 +3543,7 @@ img, canvas { max-width: 100%; }
 [data-theme="oled"] .aam-box { background: #0d0d0d; border-color: #1a1a1a; }
 
 #connectivity-banner {
-    position: fixed; bottom: calc(56px + var(--sab)); left: 0; right: 0; z-index: 9998;
+    position: fixed; bottom: calc(var(--nav-top) + var(--g-btm)); left: 0; right: 0; z-index: 9998;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     padding: 10px 16px; font-size: 13px; font-weight: 500;
     background: #333; color: #fff; transition: transform .3s, opacity .3s;
@@ -3578,8 +3589,8 @@ img, canvas { max-width: 100%; }
     .bz-item-row > .bz-qty-wrap { flex: 1.5 1 0%; }
     .bz-item-row > .bz-cost-wrap { flex: 2 1 0%; }
     .bottom-nav { left: 12px; right: 12px; bottom: calc(12px + var(--sab)); border-radius: 16px; border: 1px solid var(--glass-border); }
-    .abazar-fab, .anotice-fab, .amenu-fab { left: 12px; right: 12px; bottom: calc(84px + var(--sab)); border-radius: 14px; justify-content: center; padding: 14px; }
-    #app-screen .aam-footer { left: 12px; right: 12px; bottom: calc(84px + var(--sab)); background: transparent; padding: 0; }
+    .abazar-fab, .anotice-fab { left: 12px; right: 12px; border-radius: 14px; justify-content: center; padding: 14px; }
+    #app-screen .aam-footer { left: 12px; right: 12px; background: transparent; padding: 0; }
     #app-screen .abn-bottom { left: 12px; right: 12px; bottom: calc(12px + var(--sab)); border-radius: 16px; border: 1px solid var(--border); }
 
     /* Expense List: two full-width rows on phones — the member + type fields
@@ -3604,13 +3615,20 @@ img, canvas { max-width: 100%; }
     .abazar-filters .abazar-filter-total { flex: 0 0 auto; }
 }
 
-/* Bottom clearance above the floating nav: small on regular pages so the
-   gap under the last content stays tight. Expense List & Money Management
-   keep the old 170px so their floating Add button has room above the nav. */
-.main-content, #app-screen[class] .main-content { padding-bottom: 100px !important; }
-@media (max-width: 480px) {
-    .main-content, #app-screen[class] .main-content { padding-bottom: 72px !important; }
-}
+/* ==== Bottom rhythm: ONE gap everywhere (web + Android) ====
+   --g-btm is that gap: 9px on phones (the dashboard→nav gap) and 21px on
+   desktop (the Add button→nav gap). --nav-top is the live top edge of the
+   visible bottom bar (JS-measured, safe-area inset included).
+   Plain pages: content sits --g-btm above the bar.
+   Pages with a floating Add/Save control: content — gap — button — gap — bar,
+   so the stack paddings add the control's height on top of two gaps. */
+.main-content, #app-screen[class] .main-content { padding-bottom: calc(var(--nav-top) + var(--g-btm)) !important; }
+#app-screen.on-meals .main-content,
 #app-screen.on-bazaar .main-content,
-#app-screen.on-balance .main-content { padding-bottom: 170px !important; }
-.aam-body, .abn-body, .amenu-body { padding-bottom: 170px !important; }
+#app-screen.on-balance .main-content { padding-bottom: calc(var(--nav-top) + var(--g-btm) * 2 + var(--fab-h)) !important; }
+#app-screen.on-notices .main-content { padding-bottom: calc(var(--nav-top) + var(--g-btm) * 2 + var(--nfab-h)) !important; }
+#app-screen.on-addmeal .main-content,
+#app-screen.on-addcost .main-content,
+#app-screen.on-adddeposit .main-content { padding-bottom: calc(var(--nav-top) + var(--g-btm) * 2 + var(--foot-h)) !important; }
+#app-screen.on-menu .main-content { padding-bottom: calc(24px + var(--sab) + var(--mfab-h) + var(--g-btm)) !important; }
+.aam-body, .abn-body, .amenu-body { padding-bottom: 0 !important; }
