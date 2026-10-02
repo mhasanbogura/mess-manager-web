@@ -1382,11 +1382,11 @@ select.input-sm { cursor: pointer; }
 .bottom-nav-item.active { color: var(--primary); }
 .bottom-nav-item.active .material-icons-round { filter: drop-shadow(0 0 6px rgba(11,61,145,0.4)); }
 
-.main-content { padding-bottom: 170px !important; }
+.main-content { padding-bottom: 100px !important; }
 .analysis-export-wrap { position: relative; }
 
 @media (max-width: 768px) {
-    .main-content { padding-bottom: 170px !important; }
+    .main-content { padding-bottom: 100px !important; }
 }
 
 /* ==================== PROFILE PAGE ==================== */
@@ -3604,7 +3604,13 @@ img, canvas { max-width: 100%; }
     .abazar-filters .abazar-filter-total { flex: 0 0 auto; }
 }
 
-/* Every scrollable page keeps enough bottom clearance so the last
-   content scrolls fully above the floating nav and action bars. */
-.main-content, #app-screen[class] .main-content { padding-bottom: 170px !important; }
+/* Bottom clearance above the floating nav: small on regular pages so the
+   gap under the last content stays tight. Expense List & Money Management
+   keep the old 170px so their floating Add button has room above the nav. */
+.main-content, #app-screen[class] .main-content { padding-bottom: 100px !important; }
+@media (max-width: 480px) {
+    .main-content, #app-screen[class] .main-content { padding-bottom: 72px !important; }
+}
+#app-screen.on-bazaar .main-content,
+#app-screen.on-balance .main-content { padding-bottom: 170px !important; }
 .aam-body, .abn-body, .amenu-body { padding-bottom: 170px !important; }
