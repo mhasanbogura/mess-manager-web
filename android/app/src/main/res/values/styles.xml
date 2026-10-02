@@ -27,4 +27,15 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
+
+    <!-- Runtime overlays (MainActivity.applyEdgeToEdge): Capacitor's SystemBars
+         plugin paints the decor background with android:windowBackground, which
+         otherwise falls back to the DayNight default (#303030) and shows through
+         the transparent status bar. -->
+    <style name="AppTheme.BarDark" parent="">
+        <item name="android:windowBackground">#0a0a0a</item>
+    </style>
+    <style name="AppTheme.BarLight" parent="">
+        <item name="android:windowBackground">#f2f4f8</item>
+    </style>
 </resources>
