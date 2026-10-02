@@ -1685,7 +1685,7 @@ select.input-sm { cursor: pointer; }
 .adash-edit .material-icons-round { font-size: 20px; color: var(--primary); }
 .adash-edit.sm { width: 30px; height: 30px; }
 .adash-edit.sm .material-icons-round { font-size: 18px; color: #777; }
-.adash-mess-box strong { display: block; margin-top: 8px; font-size: 18px; font-weight: 600; color: var(--text); }
+.adash-mess-box strong { display: block; margin-top: 8px; font-size: 18px; font-weight: 600; color: var(--text); text-align: center; }
 
 .adash-join-card {
     background: var(--card); border-radius: 16px; margin: 10px 12px 0;

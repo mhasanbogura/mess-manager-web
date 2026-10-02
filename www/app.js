@@ -911,8 +911,9 @@ const App = {
             while (n && n !== document.body) { if (n.scrollTop > 0) return false; n = n.parentElement; }
             return true;
         };
+        const formPages = ['addcost', 'addmeal', 'adddeposit'];
         document.addEventListener('touchstart', e => {
-            if (!appActive() || blocked()) { pulling = false; return; }
+            if (!appActive() || blocked() || formPages.includes(this.currentPage)) { pulling = false; return; }
             startY = e.touches[0].clientY;
             target = e.touches[0].target;
             pulling = true; armed = false;
@@ -1974,6 +1975,17 @@ https://u2l.ai/mess-manager
         }
     },
 
+    _fitDashStrong(el) {
+        if (!el) return;
+        el.style.fontSize = '';
+        let size = parseFloat(getComputedStyle(el).fontSize) || 16;
+        const min = Math.min(12, Math.floor(size));
+        while (size > min && el.scrollWidth > el.clientWidth + 1) {
+            size -= 1;
+            el.style.fontSize = size + 'px';
+        }
+    },
+
     async loadDashboard() {
         if (!this.messId) return;
         try {
@@ -2054,8 +2066,19 @@ https://u2l.ai/mess-manager
             const adminFound = mids.map(id => [id, members[id]]).find(([id, m]) => m && m.role === 'admin');
             let managerName = '-';
             if (adminFound) managerName = adminFound[1].name || '-';
-            document.getElementById('dash-manager').textContent = managerName;
-            document.getElementById('dash-month').textContent = this.fmtMonth(this.getSelMonth().date);
+            const mgrEl = document.getElementById('dash-manager');
+            mgrEl.textContent = managerName;
+            this._fitDashStrong(mgrEl);
+            const monEl = document.getElementById('dash-month');
+            monEl.textContent = this.fmtMonth(this.getSelMonth().date);
+            this._fitDashStrong(monEl);
+            if (!this._dashFitBound) {
+                this._dashFitBound = true;
+                window.addEventListener('resize', () => {
+                    this._fitDashStrong(document.getElementById('dash-manager'));
+                    this._fitDashStrong(document.getElementById('dash-month'));
+                });
+            }
 
             let bf = 0, ln = 0, dn = 0;
             Object.values(todayMeals).forEach(m => { bf += (m.breakfast || 0); ln += (m.lunch || 0); dn += (m.dinner || 0); });
