@@ -1392,10 +1392,10 @@ select.input-sm { cursor: pointer; }
 }
 .bottom-nav::before, .bottom-nav::after {
     content: ''; position: absolute; width: 16px; height: 16px;
-    background: var(--bg); z-index: -1; pointer-events: none;
+    z-index: -1; pointer-events: none;
 }
-.bottom-nav::before { left: -1px; bottom: -1px; border-top-right-radius: 16px; }
-.bottom-nav::after { right: -1px; bottom: -1px; border-top-left-radius: 16px; }
+.bottom-nav::before { left: -1px; bottom: -1px; background: radial-gradient(circle at 100% 0, transparent 16px, var(--bg) 16px); }
+.bottom-nav::after { right: -1px; bottom: -1px; background: radial-gradient(circle at 0 0, transparent 16px, var(--bg) 16px); }
 .bottom-nav.hidden-nav { display: none; }
 .bottom-nav-items { display: flex; justify-content: space-around; flex: 1; }
 .bottom-nav-item {
