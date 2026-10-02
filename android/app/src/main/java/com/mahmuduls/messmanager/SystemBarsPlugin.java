@@ -5,7 +5,6 @@ import android.os.Build;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsetsController;
-import android.view.WindowManager;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -24,33 +23,26 @@ public class SystemBarsPlugin extends Plugin {
             return;
         }
         try {
-            Window window = getActivity().getWindow();
+            // Bars stay transparent (edge-to-edge); only the icon appearance is
+            // derived from the theme color so icons remain readable on the page
+            // background behind the bars.
             int parsedColor = Color.parseColor(color);
-
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(parsedColor);
-            window.setNavigationBarColor(parsedColor);
-
             boolean light = Color.luminance(parsedColor) > 0.5;
+            Window window = getActivity().getWindow();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 WindowInsetsController controller = window.getInsetsController();
                 if (controller != null) {
-                    controller.setSystemBarsAppearance(
-                            light ? WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS : 0,
-                            WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
-                    controller.setSystemBarsAppearance(
-                            light ? WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS : 0,
-                            WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+                    int mask = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                            | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                    controller.setSystemBarsAppearance(light ? mask : 0, mask);
                 }
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 int flags = window.getDecorView().getSystemUiVisibility();
                 if (light) {
-                    flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                    flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                    flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
                 } else {
-                    flags &= ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-                    flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                    flags &= ~(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
                 }
                 window.getDecorView().setSystemUiVisibility(flags);
             }
