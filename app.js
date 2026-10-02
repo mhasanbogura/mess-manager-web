@@ -129,7 +129,7 @@ const App = {
         ae_money_from:'Money from:',ae_manager:'Manager',ae_done_by:'Done by:',
         ae_item_name:'Item name',ae_expense:'Expense',ae_add_another:'Add another item',
         ae_add_from_text:'Add from Text',
-        ae_ft_hint:'One item per line: name qty unit expense — e.g. চাল 5kg 300',
+        ae_ft_hint:'Enter items one per line or separate them with commas: Name Qty+Unit Expense. Qty and unit are optional. Example: চাল 5kg 300, ডাল 100',
         ae_hint:'Add each item on its own line. The Analysis page can then show which items cost you the most.',
         ae_type:'Type:',ae_rent:'Rent',ae_electricity:'Electricity',ae_wifi:'Wi-Fi',ae_others:'Others',
         ae_total_bill:'Total bill amount',ae_expense_from:'Expense from:',ae_divided_to:'Divided to:',
@@ -301,7 +301,7 @@ const App = {
             ae_money_from:'টাকা দিয়েছে:',ae_manager:'ম্যানেজার',ae_done_by:'করেছে:',
             ae_item_name:'আইটেমের নাম',ae_expense:'খরচ',ae_add_another:'আরেকটি আইটেম যোগ',
             ae_add_from_text:'টেক্সট থেকে যোগ',
-            ae_ft_hint:'প্রতি লাইনে একটি আইটেম: নাম পরিমাণ একক খরচ — যেমন চাল 5kg 300',
+            ae_ft_hint:'প্রতি লাইনে একটি আইটেম লিখুন অথবা কমা দিয়ে আলাদা করুন: নাম পরিমাণ+একক খরচ। পরিমাণ ও একক ঐচ্ছিক। উদাহরণ: চাল 5kg 300, ডাল 100',
             ae_hint:'প্রতিটি আইটেম আলাদা লাইনে যোগ করুন। বিশ্লেষণ পৃষ্ঠায় দেখা যাবে কোন আইটেম সবচেয়ে বেশি খরচ হয়েছে।',
             ae_type:'ধরন:',ae_rent:'ভাড়া',ae_electricity:'বিদ্যুৎ',ae_wifi:'ওয়াইফাই',ae_others:'অন্যান্য',
             ae_total_bill:'মোট বিল',ae_expense_from:'খরচ থেকে:',ae_divided_to:'ভাগ করা হয়েছে:',
@@ -3919,9 +3919,9 @@ https://mahmudulsapp.u.gy/mess-manager
         document.getElementById('modal-title').textContent = 'Add from Text';
         document.getElementById('modal-body').innerHTML = `
             <textarea id="bzft-text" class="bzft-textarea" rows="8" placeholder="চাল 5kg 300&#10;ডাল 1kg 100&#10;আলু ৫০&#10;Vim 15"></textarea>
-            <p class="bz-hint" data-lang-key="ae_ft_hint">One item per line: name qty unit expense — e.g. চাল 5kg 300</p>`;
+            <p class="bz-hint" data-lang-key="ae_ft_hint">Enter items one per line or separate them with commas: Name Qty+Unit Expense. Qty and unit are optional. Example: চাল 5kg 300, ডাল 100</p>`;
         document.getElementById('modal-footer').innerHTML = `
-            <div class="dep-footer-btns">
+            <div class="dep-footer-btns bzft-btns">
                 <button class="btn-modal-cancel" onclick="App.closeModal()">Cancel</button>
                 <button class="btn-modal-cancel" onclick="App.bzftPaste()">Paste</button>
                 <button class="btn-modal-add" onclick="App.bzFromTextSave()">Save</button>

@@ -1978,8 +1978,14 @@ select.input-sm { cursor: pointer; }
 }
 .bz-add-more .material-icons-round { font-size: 18px; }
 .bz-hint { font-size: 12px; color: #888; margin-top: 6px; line-height: 1.4; }
-.bz-add-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; margin-top: 8px; }
-.bz-add-row .bz-add-more { margin-top: 0; }
+.bz-add-row { display: flex; gap: 10px; margin-top: 8px; }
+.bz-add-row .bz-add-more {
+    margin-top: 0; flex: 1; justify-content: center;
+    padding: 11px 12px; border: 1px dashed var(--border);
+    border-radius: 10px; background: var(--card-solid);
+    text-align: center;
+}
+.bz-add-row .bz-add-more:hover { border-color: var(--primary); color: var(--primary); }
 .bzft-textarea {
     width: 100%; min-height: 150px; padding: 10px 12px; margin-top: 4px;
     border: 1px solid var(--border); border-radius: 10px;
@@ -2159,6 +2165,7 @@ select.input-sm { cursor: pointer; }
 .dep-footer-hint { font-size: 13px; color: #888; }
 .dep-footer-total { font-size: 16px; font-weight: 700; color: #d32f2f; }
 .dep-footer-btns { display: flex; gap: 12px; }
+.dep-footer-btns.bzft-btns { width: 100%; }
 .dep-footer-btns .btn-modal-add { flex: 1; }
 .dep-footer-btns .btn-modal-cancel { flex: 1; }
 
