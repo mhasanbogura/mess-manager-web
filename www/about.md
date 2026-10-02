@@ -27,4 +27,4 @@ Students, roommates, and shared-mess residents who want an organized way to mana
 
 ## Link
 
-https://mahmudulsapp.u.gy/mess-manager
+https://u2l.ai/mess-manager
