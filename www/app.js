@@ -1975,11 +1975,15 @@ https://u2l.ai/mess-manager
         }
     },
 
-    _fitDashStrong(el) {
+    _fitDashStrong(el, attempt = 0) {
         if (!el) return;
         el.style.fontSize = '';
+        if (!el.clientWidth) {
+            if (attempt < 60) requestAnimationFrame(() => this._fitDashStrong(el, attempt + 1));
+            return;
+        }
         let size = parseFloat(getComputedStyle(el).fontSize) || 16;
-        const min = Math.min(12, Math.floor(size));
+        const min = Math.min(9, Math.floor(size));
         while (size > min && el.scrollWidth > el.clientWidth + 1) {
             size -= 1;
             el.style.fontSize = size + 'px';
