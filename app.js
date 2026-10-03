@@ -947,6 +947,15 @@ const App = {
         }, { passive: true });
     },
 
+    _ensureMessCodeIndex(mid, code) {
+        if (!mid || !code || !navigator.onLine) return;
+        try {
+            db.ref(`messCodes/${code}`).once('value').then(sn => {
+                if (!sn.exists()) return db.ref(`messCodes/${code}`).set(mid);
+            }).catch(() => {});
+        } catch (e) { /* best-effort */ }
+    },
+
     async enterMess(mid, opts) {
         this.messId = mid;
         this.messCode = null;
@@ -978,6 +987,7 @@ const App = {
                         this.messCode = v.messCode;
                         this.messName = v.messName;
                         try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e2) {}
+                        this._ensureMessCodeIndex(mid, v.messCode);
                     }).catch(() => {});
                     db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value').then(rn => {
                         if (this.messId !== mid) return;
@@ -991,6 +1001,7 @@ const App = {
                     this.messCode = v.messCode;
                     this.messName = v.messName;
                     try { localStorage.setItem(settingsCacheKey, JSON.stringify(v)); } catch (e) {}
+                    this._ensureMessCodeIndex(mid, v.messCode);
                     try {
                         const roleSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}/role`).once('value');
                         this.userRole = roleSnap.val() || 'member';
@@ -1084,26 +1095,34 @@ const App = {
         if (!this.messId || !this.currentUser) return;
         try {
             const uid = this.currentUser.uid;
+            const mid = this.messId;
+            const mSnap = await db.ref(`messes/${mid}/members`).once('value');
+            const others = Object.keys(mSnap.val() || {}).filter(id => id !== uid && !id.startsWith('member_'));
+            if (!others.length) {
+                const ok = await this.deleteMessFully(mid);
+                if (ok) {
+                    this._userMessesCacheUpdate(mid, null);
+                    this.toast(this._currentLang === 'bn' ? 'শেষ ব্যক্তি চলে গেছে — মেস মুছে ফেলা হয়েছে' : 'Last person left — mess deleted', 'success');
+                    this.messId = null; this.messCode = null; this.messName = null;
+                    this.loadMyMesses();
+                    return;
+                }
+            }
             if (stepDown) {
                 const stepDownUpdates = {};
-                stepDownUpdates[`messes/${this.messId}/members/${uid}/role`] = 'member';
-                stepDownUpdates[`messes/${this.messId}/permissions/${uid}`] = null;
+                stepDownUpdates[`messes/${mid}/members/${uid}/role`] = 'member';
+                stepDownUpdates[`messes/${mid}/permissions/${uid}`] = null;
                 await db.ref().update(stepDownUpdates);
                 this.userRole = 'member';
-                try { localStorage.setItem(`mess_role_${this.messId}`, 'member'); } catch (e) {}
+                try { localStorage.setItem(`mess_role_${mid}`, 'member'); } catch (e) {}
             }
             const updates = {};
-            updates[`messes/${this.messId}/members/${uid}`] = null;
-            updates[`messes/${this.messId}/permissions/${uid}`] = null;
-            updates[`users/${uid}/messes/${this.messId}`] = null;
+            updates[`messes/${mid}/members/${uid}`] = null;
+            updates[`messes/${mid}/permissions/${uid}`] = null;
+            updates[`users/${uid}/messes/${mid}`] = null;
             await db.ref().update(updates);
-            this._userMessesCacheUpdate(this.messId, null);
-            const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
-            const remaining = Object.keys(mSnap.val() || {}).filter(id => !id.startsWith('member_'));
-            if (!remaining.length) {
-                await this.deleteMessFully(this.messId);
-                this.toast(this._currentLang === 'bn' ? 'শেষ ব্যক্তি চলে গেছে — মেস মুছে ফেলা হয়েছে' : 'Last person left — mess deleted', 'success');
-            } else if (stepDown) {
+            this._userMessesCacheUpdate(mid, null);
+            if (stepDown) {
                 this.toast(this._currentLang === 'bn' ? 'ম্যানেজার পদ ছেড়ে মেস ছেড়ে হয়েছে' : 'Stepped down as manager and left the mess', 'success');
             } else {
                 this.toast(this._currentLang === 'bn' ? 'মেস ছাড়া হয়েছে' : 'Left mess', 'success');
@@ -1128,6 +1147,7 @@ const App = {
             });
             await Promise.race([write, timeout]);
             await Promise.race([db.ref(`users/${this.currentUser.uid}/messes/${newKey}`).set({ role: 'admin', joinedAt: Date.now() }), timeout]);
+            db.ref(`messCodes/${code}`).set(newKey).catch(() => {});
             this._userMessesCacheUpdate(newKey, 'admin');
             this.toast('Mess created!', 'success');
             document.getElementById('create-mess-name').value = '';
@@ -1142,9 +1162,18 @@ const App = {
         const btn = document.getElementById('join-mess-btn');
         btn.textContent = 'Joining...'; btn.disabled = true;
         try {
-            const snap = await db.ref('messes').orderByChild('settings/messCode').equalTo(code).once('value');
-            if (!snap.exists()) { this.toast('Mess not found', 'error'); btn.textContent = 'Join Mess'; btn.disabled = false; return; }
-            let mid = null; snap.forEach(s => { mid = s.key; });
+            let mid = null;
+            try {
+                const idxSnap = await db.ref(`messCodes/${code}`).once('value');
+                if (idxSnap.exists()) mid = idxSnap.val();
+            } catch (e) { /* fall back to legacy query below */ }
+            if (!mid) {
+                try {
+                    const snap = await db.ref('messes').orderByChild('settings/messCode').equalTo(code).once('value');
+                    if (snap.exists()) snap.forEach(s => { if (!mid) mid = s.key; });
+                } catch (e) { /* index missing and legacy query denied */ }
+            }
+            if (!mid) { this.toast('Mess not found', 'error'); btn.textContent = 'Join Mess'; btn.disabled = false; return; }
             const existingSnap = await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).once('value');
             if (existingSnap.exists()) {
                 const ed = existingSnap.val() || {};
@@ -1157,7 +1186,12 @@ const App = {
                 btn.textContent = 'Join Mess'; btn.disabled = false;
                 return;
             }
-            await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).set({ name: this.currentUser.displayName || 'Member', email: this.currentUser.email, role: 'member', status: 'pending', joinedAt: Date.now() });
+            try {
+                await db.ref(`messes/${mid}/members/${this.currentUser.uid}`).set({ name: this.currentUser.displayName || 'Member', email: this.currentUser.email, role: 'member', status: 'pending', joinedAt: Date.now() });
+            } catch (err) {
+                this.toast((err && err.code === 'PERMISSION_DENIED') ? 'Mess not found' : 'Error: ' + (err && err.message ? err.message : err), 'error');
+                return;
+            }
             this.toast('Request sent! Waiting for approval.', 'success');
             document.getElementById('join-mess-code').value = '';
         } catch (e) { this.toast('Error: ' + e.message, 'error'); }
@@ -1591,9 +1625,11 @@ const App = {
             Object.keys(members).forEach(uid => {
                 if (!uid.startsWith('member_')) updates[`users/${uid}/messes/${messId}`] = null;
             });
+            if (this.messCode) updates[`messCodes/${this.messCode}`] = null;
             updates[`messes/${messId}`] = null;
             await db.ref().update(updates);
-        } catch (e) { console.error('deleteMessFully error:', e); }
+            return true;
+        } catch (e) { console.error('deleteMessFully error:', e); return false; }
     },
 
     async loadFlatPeoples(members) {
@@ -1790,11 +1826,13 @@ const App = {
             const mSnap = await db.ref(`messes/${this.messId}/members`).once('value');
             const remaining = Object.keys(mSnap.val() || {}).filter(id => !id.startsWith('member_'));
             if (!remaining.length) {
-                await this.deleteMessFully(this.messId);
-                this.toast('Last person removed — mess deleted', 'success');
-                this.messId = null; this.messCode = null; this.messName = null;
-                this.loadMyMesses();
-                return;
+                const ok = await this.deleteMessFully(this.messId);
+                if (ok) {
+                    this.toast('Last person removed — mess deleted', 'success');
+                    this.messId = null; this.messCode = null; this.messName = null;
+                    this.loadMyMesses();
+                    return;
+                }
             }
             this.toast('Removed!', 'success');
             this.loadFlat();
